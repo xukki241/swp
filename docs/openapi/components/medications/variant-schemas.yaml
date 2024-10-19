@@ -112,10 +112,39 @@ CreateMedicationVariantsRequest:
   description: Array of medication variants to create
 
 CreateMedicationVariantsResponse:
-  type: array
-  items:
-    $ref: "#/MedicationVariant"
-  description: Array of created medication variants
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Medication variants created successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/MedicationVariant"
+          description: Array of created medication variants
+
+MedicationVariantResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Medication variant retrieved successfully"
+        data:
+          $ref: "#/MedicationVariant"
+
+DeleteMedicationVariantResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Medication variant deleted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
 
 UpdateMedicationVariant:
   type: object
@@ -154,14 +183,13 @@ UpdateMedicationVariant:
       description: Whether this variant is available for sale
 
 MedicationVariantListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/MedicationVariant"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Medication variants retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/MedicationVariant"

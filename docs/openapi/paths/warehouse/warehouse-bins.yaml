@@ -1,0 +1,47 @@
+/warehouse/bins:
+  get:
+    tags:
+      - Warehouse
+    summary: List warehouse bins
+    description: Retrieve a paginated list of warehouse bins across all racks
+    operationId: listWarehouseBins
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/PageParam"
+      - $ref: "../../components/common/parameters.yaml#/LimitParam"
+      - $ref: "../../components/common/parameters.yaml#/SearchParam"
+      - name: rackId
+        in: query
+        description: Filter by rack ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      - name: zoneId
+        in: query
+        description: Filter by zone ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      - name: level
+        in: query
+        description: Filter by level
+        required: false
+        schema:
+          type: integer
+          example: 1
+    responses:
+      "200":
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/warehouse/bin-schemas.yaml#/WarehouseBinListResponse"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

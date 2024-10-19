@@ -42,10 +42,25 @@ export const useApproveRegistration = () => {
   return useMutation({
     mutationFn: approveRegistrationRequest,
     onSuccess: (data, variables) => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["registrationRequests"] });
+      // Invalidate registration requests
+      queryClient.invalidateQueries({
+        queryKey: ["registrationRequests"],
+        refetchType: "active",
+      });
       queryClient.invalidateQueries({
         queryKey: ["registrationRequests", variables.id],
+        refetchType: "active",
+      });
+
+      // IMPORTANT: When approving, a new user is created
+      // So we need to invalidate users/staff lists too
+      queryClient.invalidateQueries({
+        queryKey: ["users"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["staff"],
+        refetchType: "active",
       });
     },
   });
@@ -60,10 +75,14 @@ export const useRejectRegistration = () => {
   return useMutation({
     mutationFn: rejectRegistrationRequest,
     onSuccess: (data, requestId) => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["registrationRequests"] });
+      // Invalidate and refetch registration requests
+      queryClient.invalidateQueries({
+        queryKey: ["registrationRequests"],
+        refetchType: "active",
+      });
       queryClient.invalidateQueries({
         queryKey: ["registrationRequests", requestId],
+        refetchType: "active",
       });
     },
   });
@@ -78,8 +97,11 @@ export const useDeleteRegistration = () => {
   return useMutation({
     mutationFn: deleteRegistrationRequest,
     onSuccess: (data, requestId) => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["registrationRequests"] });
+      // Invalidate and refetch registration list
+      queryClient.invalidateQueries({
+        queryKey: ["registrationRequests"],
+        refetchType: "active",
+      });
       // Remove specific item from cache
       queryClient.removeQueries({
         queryKey: ["registrationRequests", requestId],

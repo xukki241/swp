@@ -7,10 +7,12 @@ import logger from "../utils/logger.js";
  */
 export const getAllMedicationVariants = async (req, res, next) => {
   try {
-    const { search, medicationId, isActive } = req.query;
+    const { search, isActive } = req.query;
+    const { medicationId } = req.params;
+
     const variants = await medicationVariantService.getAllMedicationVariants({
       search,
-      medicationId: medicationId ? BigInt(medicationId) : undefined,
+      medicationId: medicationId || undefined,
       isActive: isActive !== undefined ? isActive === "true" : undefined,
     });
 
@@ -24,14 +26,13 @@ export const getAllMedicationVariants = async (req, res, next) => {
     next(error);
   }
 };
-
 /**
  * Get medication variant by ID
  * @route GET /api/medication-variants/:id
  */
 export const getMedicationVariantById = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
     const variant = await medicationVariantService.getMedicationVariantById(id);
 
     if (!variant) {
@@ -120,7 +121,7 @@ export const createMedicationVariant = async (req, res, next) => {
  */
 export const updateMedicationVariant = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
     const {
       medicationId,
       sku,
@@ -208,7 +209,7 @@ export const updateMedicationVariant = async (req, res, next) => {
  */
 export const deleteMedicationVariant = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
 
     const variant = await medicationVariantService.deleteMedicationVariant(id);
 

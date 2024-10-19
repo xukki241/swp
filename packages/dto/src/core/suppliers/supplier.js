@@ -8,7 +8,7 @@ import {
   paginationSchema,
 } from "../common/index.js";
 import { supplierStatusEnum } from "../common/index.js";
-
+import { createSupplierMedicationSchema } from "./medication.js";
 // Supplier schema
 export const supplierSchema = z.object({
   id: uuidSchema,
@@ -18,6 +18,10 @@ export const supplierSchema = z.object({
   phone: phoneSchema,
   address: addressSchema,
   status: supplierStatusEnum,
+  medicationVariants: z
+    .array(createSupplierMedicationSchema)
+    .optional()
+    .default([]), // 👈 thêm dòng này
 });
 
 // POST /api/suppliers (batch)
@@ -28,6 +32,10 @@ export const createSupplierSchema = z.object({
   phone: phoneSchema,
   address: addressSchema,
   status: supplierStatusEnum.default("active"),
+  medicationVariants: z
+    .array(createSupplierMedicationSchema)
+    .optional()
+    .default([]), // 👈 thêm dòng này
 });
 
 export const createSuppliersRequestSchema = z.array(createSupplierSchema);

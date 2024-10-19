@@ -66,10 +66,39 @@ CreateMedicationsRequest:
   description: Array of medications to create
 
 CreateMedicationsResponse:
-  type: array
-  items:
-    $ref: "#/Medication"
-  description: Array of created medications
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Medications created successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/Medication"
+          description: Array of created medications
+
+MedicationResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Medication retrieved successfully"
+        data:
+          $ref: "#/Medication"
+
+DeleteMedicationResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Medication deleted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
 
 UpdateMedication:
   type: object
@@ -92,14 +121,13 @@ UpdateMedication:
       $ref: "../common/enums.yaml#/MedicationStatus"
 
 MedicationListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/Medication"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Medications retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/Medication"

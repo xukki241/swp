@@ -84,15 +84,34 @@ CreateReceipt:
         $ref: "#/CreateReceiptItem"
       description: Array of items being received
 
+CreateReceiptResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Receipt created successfully"
+        data:
+          $ref: "#/PurchaseOrderReceipt"
+
+ReceiptResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Receipt retrieved successfully"
+        data:
+          $ref: "#/PurchaseOrderReceipt"
+
 ReceiptListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/PurchaseOrderReceipt"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Receipts retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/PurchaseOrderReceipt"

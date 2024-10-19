@@ -1,6 +1,7 @@
 import {
   createMedicationsRequestSchema,
   listMedicationsQuerySchema,
+  listVariantsQuerySchema,
   updateMedicationRequestSchema,
   uuidSchema,
 } from "@pharmaflow/dto";
@@ -42,7 +43,16 @@ medicationRouter.get(
   validateQuery(listMedicationsQuerySchema),
   medicationController.getAllMedications
 );
-
+/**
+ * @route   GET /api/medications/:medicationId/variants/all
+ * @desc    Get all variants for a medication
+ * @access  Private (Authenticated)
+ */
+medicationRouter.get(
+  "/variants/all",
+  validateQuery(listVariantsQuerySchema),
+  medicationVariantController.getAllMedicationVariants
+);
 /**
  * @route   GET /api/medications/:id
  * @desc    Get medication by ID

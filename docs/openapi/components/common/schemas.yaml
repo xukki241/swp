@@ -144,3 +144,91 @@ Pagination:
       type: boolean
       description: Whether there are more pages
       example: true
+
+# Standardized Response Wrappers
+SuccessResponse:
+  type: object
+  required:
+    - success
+    - message
+    - data
+  properties:
+    success:
+      type: boolean
+      description: Indicates if the request was successful
+      example: true
+    message:
+      type: string
+      description: Response message
+      example: "Operation completed successfully"
+    data:
+      description: Response data (structure varies by endpoint)
+
+SuccessListResponse:
+  type: object
+  required:
+    - success
+    - message
+    - data
+    - pagination
+  properties:
+    success:
+      type: boolean
+      description: Indicates if the request was successful
+      example: true
+    message:
+      type: string
+      description: Response message
+      example: "Data retrieved successfully"
+    data:
+      type: array
+      description: Array of response items
+      items: {}
+    pagination:
+      $ref: "#/Pagination"
+
+ErrorResponse:
+  type: object
+  required:
+    - success
+    - error
+  properties:
+    success:
+      type: boolean
+      description: Indicates if the request was successful
+      example: false
+    error:
+      type: string
+      description: Error message
+      example: "An error occurred"
+    reasons:
+      type: array
+      description: Detailed reasons for the error (optional)
+      items:
+        type: string
+      example: ["Invalid email format", "Password too short"]
+
+ErrorResponseWithTrace:
+  type: object
+  required:
+    - success
+    - error
+  properties:
+    success:
+      type: boolean
+      description: Indicates if the request was successful
+      example: false
+    error:
+      type: string
+      description: Error message
+      example: "An error occurred"
+    reasons:
+      type: array
+      description: Detailed reasons for the error (optional)
+      items:
+        type: string
+      example: ["Invalid email format", "Password too short"]
+    trace:
+      type: string
+      description: Stack trace (only in development mode)
+      example: "Error: Invalid input\n    at validateInput (/app/validators.js:42:11)"

@@ -7,58 +7,49 @@ import { supplierMedicationVariants } from "../db/schema/supplierMedicationVaria
 import { suppliers } from "../db/schema/suppliers.js";
 
 export const supplierService = {
-  async create(supplierData) {
+  async create(suppliersData) {
     try {
-      const { medicationVariants: variants, ...supplierInfo } = supplierData;
-
       return await db.transaction(async (tx) => {
-        // ✅ Tạo nhà cung cấp
-        const [supplier] = await tx
-          .insert(suppliers)
-          .values(supplierInfo)
-          .returning();
+        const createdSuppliers = [];
 
-        // ✅ Nếu có danh sách thuốc, hãy chèn liên kết
-        if (variants && Array.isArray(variants) && variants.length > 0) {
-          const variantsToInsert = variants.map((variant) => ({
-            supplierId: supplier.id,
-            medicationVariantId: Number(variant.medicationVariantId),
-            supplierSku: variant.supplierSku,
-            leadTimeDays: Number(variant.leadTimeDays),
-          }));
+        for (const supplierData of suppliersData) {
+          const { medicationVariants: variants, ...supplierInfo } =
+            supplierData;
 
-          await tx.insert(supplierMedicationVariants).values(variantsToInsert);
+          const [supplier] = await tx
+            .insert(suppliers)
+            .values(supplierInfo)
+            .returning();
+
+          let supplierVariants = [];
+
+          if (variants && Array.isArray(variants) && variants.length > 0) {
+            const variantsToInsert = variants.map((variant) => ({
+              supplierId: supplier.id,
+              medicationVariantId: variant.medication_variant_id,
+              supplierSku: variant.supplier_sku,
+              leadTimeDays: variant.lead_time_days
+                ? Number(variant.lead_time_days)
+                : null,
+            }));
+
+            supplierVariants = await tx
+              .insert(supplierMedicationVariants)
+              .values(variantsToInsert)
+              .returning();
+          }
+
+          createdSuppliers.push({
+            ...supplier,
+            medicationVariants: supplierVariants,
+          });
         }
 
-        // ✅ Trả lại nhà cung cấp cùng với danh sách thuốc
-        const result = await tx
-          .select({
-            id: suppliers.id,
-            name: suppliers.name,
-            contactName: suppliers.contactName,
-            email: suppliers.email,
-            phone: suppliers.phone,
-            address: suppliers.address,
-            status: suppliers.status,
-          })
-          .from(suppliers)
-          .where(eq(suppliers.id, supplier.id));
-
-        const supplierVariants = await tx
-          .select({
-            id: supplierMedicationVariants.id,
-            medicationVariantId: supplierMedicationVariants.medicationVariantId,
-            supplierSku: supplierMedicationVariants.supplierSku,
-            leadTimeDays: supplierMedicationVariants.leadTimeDays,
-          })
-          .from(supplierMedicationVariants)
-          .where(eq(supplierMedicationVariants.supplierId, supplier.id));
-
-        return { ...result[0], medicationVariants: supplierVariants };
+        return createdSuppliers;
       });
     } catch (error) {
-      console.error("Lỗi khi tạo nhà cung cấp:", error.message);
-      throw error;
+      console.error("Error creating suppliers:", error.message);
+      throw new Error(`Failed to create suppliers: ${error.message}`);
     }
   },
 
@@ -91,7 +82,7 @@ export const supplierService = {
       const results = await query.limit(limit).offset(offset);
       return results;
     } catch (error) {
-      console.error("Lỗi khi lấy tất cả nhà cung cấp:", error);
+      console.error("Error fetching suppliers:", error);
       throw error;
     }
   },
@@ -107,7 +98,6 @@ export const supplierService = {
         return null;
       }
 
-      // Lấy tất cả các biến thể thuốc cho nhà cung cấp này
       const variants = await db
         .select({
           id: supplierMedicationVariants.id,
@@ -136,7 +126,7 @@ export const supplierService = {
         medicationVariants: variants,
       };
     } catch (error) {
-      console.error(`Lỗi khi lấy nhà cung cấp theo ID ${id}:`, error);
+      console.error(`Loading supplier with ID ${id}:`, error);
       throw error;
     }
   },
@@ -146,7 +136,6 @@ export const supplierService = {
       const { medicationVariants: variants, ...supplierInfo } = supplierData;
 
       return await db.transaction(async (tx) => {
-        // ✅ 1. Cập nhật thông tin nhà cung cấp
         const [supplier] = await tx
           .update(suppliers)
           .set(supplierInfo)
@@ -157,65 +146,65 @@ export const supplierService = {
           return null;
         }
 
-        // ✅ 2. Nếu có danh sách thuốc kèm theo, thực hiện logic UPSERT
         if (Array.isArray(variants)) {
-          // Lấy danh sách thuốc hiện có của nhà cung cấp này
           const existingVariants = await tx
             .select()
             .from(supplierMedicationVariants)
             .where(eq(supplierMedicationVariants.supplierId, id));
-
           const incomingMedicationVariantIds = new Set(
-            variants.map((v) => v.medicationVariantId)
+            variants.map(
+              (v) => v.medicationVariantId || v.medication_variant_id
+            )
           );
 
-          // === PHẦN LOGIC ĐƯỢC THAY ĐỔI ===
-          // Vòng lặp qua danh sách thuốc gửi lên từ frontend
           for (const variant of variants) {
-            // Tìm xem thuốc này đã tồn tại trong DB cho nhà cung cấp này chưa
+            const variantId =
+              variant.medicationVariantId || variant.medication_variant_id;
+            const sku = variant.supplierSku || variant.supplier_sku;
+            const leadTime = variant.leadTimeDays || variant.lead_time_days;
+
+            if (!variantId) {
+              console.warn("⚠️ Skipping variant without ID:", variant);
+              continue;
+            }
+
             const existing = existingVariants.find(
-              (ev) => ev.medicationVariantId === variant.medicationVariantId
+              (ev) => ev.medicationVariantId === variantId
             );
 
             if (existing) {
-              // Nếu ĐÃ TỒN TẠI -> Cập nhật thông tin (SKU, thời gian giao hàng)
               await tx
                 .update(supplierMedicationVariants)
                 .set({
-                  supplierSku: variant.supplierSku,
-                  leadTimeDays: variant.leadTimeDays,
+                  supplierSku: sku,
+                  leadTimeDays: leadTime,
                 })
                 .where(eq(supplierMedicationVariants.id, existing.id));
             } else {
-              // Nếu CHƯA TỒN TẠI -> Thêm mới bản ghi liên kết
               await tx.insert(supplierMedicationVariants).values({
                 supplierId: id,
-                medicationVariantId: variant.medicationVariantId,
-                supplierSku: variant.supplierSku,
-                leadTimeDays: variant.leadTimeDays,
+                medicationVariantId: variantId,
+                supplierSku: sku,
+                leadTimeDays: leadTime,
               });
             }
           }
-          // === KẾT THÚC PHẦN THAY ĐỔI ===
 
-          // 🔻 Xóa những variant không còn trong danh sách mới
           for (const old of existingVariants) {
             if (!incomingMedicationVariantIds.has(old.medicationVariantId)) {
-              // Giữ lại logic xóa cũ của bạn vì nó đã xử lý trường hợp thuốc đang được sử dụng
               try {
                 await tx
                   .delete(supplierMedicationVariants)
                   .where(eq(supplierMedicationVariants.id, old.id));
               } catch (e) {
                 console.warn(
-                  `⚠️ Variant ${old.id} đang được sử dụng và không thể xóa. Lỗi: ${e.message}`
+                  `⚠️ Variant ${old.id} is in use and cannot be deleted. Error: ${e.message}`
                 );
               }
             }
           }
         }
 
-        // ✅ 3. Trả lại supplier đã cập nhật (giữ nguyên)
         const [updatedSupplier] = await tx
           .select()
           .from(suppliers)
@@ -250,7 +239,7 @@ export const supplierService = {
         };
       });
     } catch (error) {
-      console.error(`Lỗi khi cập nhật nhà cung cấp có ID ${id}:`, error);
+      console.error(`Error updating supplier with ID ${id}:`, error);
       throw error;
     }
   },
@@ -258,12 +247,9 @@ export const supplierService = {
   async delete(id) {
     try {
       return await db.transaction(async (tx) => {
-        // Xóa tất cả các biến thể thuốc trước
         await tx
           .delete(supplierMedicationVariants)
           .where(eq(supplierMedicationVariants.supplierId, id));
-
-        // Xóa nhà cung cấp
         const [supplier] = await tx
           .delete(suppliers)
           .where(eq(suppliers.id, id))
@@ -271,7 +257,7 @@ export const supplierService = {
         return supplier;
       });
     } catch (error) {
-      console.error(`Lỗi khi xóa nhà cung cấp có ID ${id}:`, error);
+      console.error(`Error deleting supplier with ID ${id}:`, error);
       throw error;
     }
   },

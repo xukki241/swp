@@ -25,14 +25,16 @@ RegisterRequest:
       example: "456 New Street, City, Country"
 
 RegisterResponse:
-  type: object
-  required:
-    - message
-  properties:
-    message:
-      type: string
-      description: Registration result message
-      example: "Registration request submitted successfully"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Registration request submitted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
 
 LoginRequest:
   type: object
@@ -52,19 +54,26 @@ LoginRequest:
       example: "password123"
 
 LoginResponse:
-  type: object
-  required:
-    - accessToken
-    - refreshToken
-  properties:
-    accessToken:
-      type: string
-      description: JWT access token
-      example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-    refreshToken:
-      type: string
-      description: JWT refresh token
-      example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Login successful"
+        data:
+          type: object
+          required:
+            - accessToken
+            - refreshToken
+          properties:
+            accessToken:
+              type: string
+              description: JWT access token
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            refreshToken:
+              type: string
+              description: JWT refresh token
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
 ForgotPasswordRequest:
   type: object
@@ -78,14 +87,16 @@ ForgotPasswordRequest:
       example: "user@example.com"
 
 ForgotPasswordResponse:
-  type: object
-  required:
-    - message
-  properties:
-    message:
-      type: string
-      description: Password reset request confirmation
-      example: "Password reset instructions sent to your email"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Password reset instructions sent to your email"
+        data:
+          type: object
+          nullable: true
+          example: null
 
 ResetPasswordRequest:
   type: object
@@ -107,14 +118,16 @@ ResetPasswordRequest:
       example: "newSecurePassword123"
 
 ResetPasswordResponse:
-  type: object
-  required:
-    - message
-  properties:
-    message:
-      type: string
-      description: Password reset confirmation
-      example: "Password reset successfully"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Password reset successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
 
 ChangePasswordRequest:
   type: object
@@ -135,37 +148,46 @@ ChangePasswordRequest:
       example: "newSecurePassword123"
 
 ChangePasswordResponse:
-  type: object
-  required:
-    - message
-  properties:
-    message:
-      type: string
-      description: Password change confirmation
-      example: "Password changed successfully"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Password changed successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
 
 MeResponse:
-  type: object
-  required:
-    - id
-    - name
-    - email
-    - phone
-    - address
-    - status
-    - role
-  properties:
-    id:
-      $ref: "../common/schemas.yaml#/UUID"
-    name:
-      $ref: "../common/schemas.yaml#/Name"
-    email:
-      $ref: "../common/schemas.yaml#/Email"
-    phone:
-      $ref: "../common/schemas.yaml#/Phone"
-    address:
-      $ref: "../common/schemas.yaml#/Address"
-    status:
-      $ref: "../common/enums.yaml#/UserStatus"
-    role:
-      $ref: "../common/enums.yaml#/UserRole"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "User profile retrieved successfully"
+        data:
+          type: object
+          required:
+            - id
+            - name
+            - email
+            - phone
+            - address
+            - status
+            - role
+          properties:
+            id:
+              $ref: "../common/schemas.yaml#/UUID"
+            name:
+              $ref: "../common/schemas.yaml#/Name"
+            email:
+              $ref: "../common/schemas.yaml#/Email"
+            phone:
+              $ref: "../common/schemas.yaml#/Phone"
+            address:
+              $ref: "../common/schemas.yaml#/Address"
+            status:
+              $ref: "../common/enums.yaml#/UserStatus"
+            role:
+              $ref: "../common/enums.yaml#/UserRole"

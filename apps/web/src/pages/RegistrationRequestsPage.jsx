@@ -36,6 +36,8 @@ import {
 } from "@/hooks/useRegistration";
 
 export default function RegistrationRequestsPage() {
+  // Separate pending search input from actual search query
+  const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showApproveDialog, setShowApproveDialog] = useState(false);
@@ -58,6 +60,7 @@ export default function RegistrationRequestsPage() {
       ? apiResponse.data
       : [];
 
+  // Client-side filtering based on search query
   const filteredRequests = registrations.filter(
     (req) =>
       req.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -206,17 +209,43 @@ export default function RegistrationRequestsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="mb-6">
-              <div className="relative">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setSearchQuery(searchInput);
+              }}
+              className="mb-6 flex gap-2"
+            >
+              <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search by name or email..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
                   className="pl-10 h-11 rounded-lg"
                 />
               </div>
-            </div>
+              <Button
+                type="submit"
+                className="h-11 bg-primary hover:bg-primary/90"
+              >
+                <Search className="h-4 w-4 mr-2" />
+                Search
+              </Button>
+              {searchQuery && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11"
+                  onClick={() => {
+                    setSearchInput("");
+                    setSearchQuery("");
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
+            </form>
 
             <div className="rounded-lg border">
               <Table>

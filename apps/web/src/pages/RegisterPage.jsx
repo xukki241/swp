@@ -29,6 +29,7 @@ export default function RegisterPage() {
       address: "",
       password: "",
       confirmPassword: "",
+      agreePolicy: false, // Added agreePolicy field
     },
   });
 
@@ -209,8 +210,36 @@ export default function RegisterPage() {
                 className="h-11 rounded-lg"
               />
               {errors.confirmPassword && (
-                <p className="text-sm text-destructive">
+                <p className="text-sm text-destructive mt-1">
                   {errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-start space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="agreePolicy"
+                  {...register("agreePolicy", {
+                    required:
+                      "You must agree to the policy to continue registration.", // Updated error message to English
+                  })}
+                  className="accent-primary h-4 w-4 mt-0.5 cursor-pointer"
+                />
+                <span className="text-sm text-gray-700">
+                  I agree to the {/* Updated label to English */}
+                  <Link
+                    to="/policy"
+                    className="text-primary underline hover:text-primary/80"
+                  >
+                    Privacy Policy & Terms of Service
+                  </Link>
+                </span>
+              </Label>
+              {errors.agreePolicy && (
+                <p className="text-sm text-destructive mt-1">
+                  {errors.agreePolicy.message}
                 </p>
               )}
             </div>

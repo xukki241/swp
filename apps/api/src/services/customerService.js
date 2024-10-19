@@ -35,8 +35,6 @@ export const customerService = {
   async getAll(filters = {}) {
     const { search, limit = 100, offset = 0 } = filters;
 
-    let query = db.select().from(customers);
-
     const conditions = [];
 
     if (search) {
@@ -49,11 +47,12 @@ export const customerService = {
       );
     }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    const results = await db.query.customers.findMany({
+      where: conditions.length > 0 ? and(...conditions) : undefined,
+      limit,
+      offset,
+    });
 
-    const results = await query.limit(limit).offset(offset);
     return results;
   },
 
@@ -61,42 +60,30 @@ export const customerService = {
    * Get customer by ID
    */
   async getById(id) {
-    const [customer] = await db
-      .select()
-      .from(customers)
-      .where(eq(customers.id, id));
+    const customer = await db.query.customers.findFirst({
+      where: eq(customers.id, id),
+      with: {
+        orders: {
+          orderBy: (orders, { asc }) => [asc(orders.orderDate)],
+        },
+      },
+    });
 
-    if (!customer) {
-      return null;
-    }
-
-    // Get customer's sales orders
-    const orders = await db
-      .select({
-        id: salesOrders.id,
-        orderDate: salesOrders.orderDate,
-        totalAmount: salesOrders.totalAmount,
-        status: salesOrders.status,
-        paymentMethod: salesOrders.paymentMethod,
-      })
-      .from(salesOrders)
-      .where(eq(salesOrders.customerId, id))
-      .orderBy(salesOrders.orderDate);
-
-    return {
-      ...customer,
-      orders,
-    };
+    return customer;
   },
 
   /**
    * Get customer by email
    */
   async getByEmail(email) {
-    const [customer] = await db
-      .select()
-      .from(customers)
-      .where(eq(customers.email, email));
+    const customer = await db.query.customers.findFirst({
+      where: eq(customers.email, email),
+      with: {
+        orders: {
+          orderBy: (orders, { asc }) => [asc(orders.orderDate)],
+        },
+      },
+    });
 
     return customer;
   },
@@ -105,10 +92,14 @@ export const customerService = {
    * Get customer by phone
    */
   async getByPhone(phone) {
-    const [customer] = await db
-      .select()
-      .from(customers)
-      .where(eq(customers.phone, phone));
+    const customer = await db.query.customers.findFirst({
+      where: eq(customers.phone, phone),
+      with: {
+        orders: {
+          orderBy: (orders, { asc }) => [asc(orders.orderDate)],
+        },
+      },
+    });
 
     return customer;
   },
@@ -130,11 +121,13 @@ export const customerService = {
    * Delete customer
    */
   async delete(id) {
-    // Check if customer has sales orders
-    const orders = await db
-      .select()
-      .from(salesOrders)
-      .where(eq(salesOrders.customerId, id));
+    // Check if customer has sales orders using db.query API
+    const orders = await db.query.salesOrders.findMany({
+      where: eq(salesOrders.customerId, id),
+      columns: {
+        id: true,
+      },
+    });
 
     if (orders.length > 0) {
       throw new Error(

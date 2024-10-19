@@ -25,7 +25,7 @@ export const warehouseRackController = {
     }
 
     const rack = await warehouseRackService.create({
-      zoneId: payload.zoneId ? Number.parseInt(payload.zoneId) : payload.zoneId,
+      zoneId: payload.zoneId, // UUID, no parsing needed
       code: payload.code,
       name: payload.name,
       description: payload.description,
@@ -40,7 +40,7 @@ export const warehouseRackController = {
   // Create warehouse racks in batch with auto-generated codes
   createBatch: asyncHandler(async (req, res) => {
     const { quantity, code_prefix = "RACK", name_prefix = "Rack" } = req.body;
-    const zoneId = Number.parseInt(req.params.zoneId);
+    const zoneId = req.params.zoneId; // UUID, no parsing needed
 
     // Generate rack data
     const racks = [];
@@ -64,7 +64,7 @@ export const warehouseRackController = {
   getAll: asyncHandler(async (req, res) => {
     const filters = {
       search: req.query.search,
-      zoneId: req.query.zoneId ? Number.parseInt(req.query.zoneId) : undefined,
+      zoneId: req.query.zoneId || undefined,
       limit: req.query.limit || 100,
       offset: req.query.offset || 0,
     };
@@ -92,9 +92,7 @@ export const warehouseRackController = {
 
   // Get racks by zone ID
   getByZoneId: asyncHandler(async (req, res) => {
-    const racks = await warehouseRackService.getByZoneId(
-      Number.parseInt(req.params.zoneId)
-    );
+    const racks = await warehouseRackService.getByZoneId(req.params.zoneId);
     res.json({
       success: true,
       data: racks,
@@ -104,11 +102,7 @@ export const warehouseRackController = {
   // Update warehouse rack
   update: asyncHandler(async (req, res) => {
     const updateData = { ...req.body };
-
-    // Convert numeric fields from strings to numbers if present
-    if (updateData.zoneId !== undefined) {
-      updateData.zoneId = Number.parseInt(updateData.zoneId);
-    }
+    // zoneId is UUID, no conversion needed
 
     const rack = await warehouseRackService.update(
       Number.parseInt(req.params.id),

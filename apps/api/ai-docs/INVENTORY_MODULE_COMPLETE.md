@@ -28,12 +28,12 @@ Completed OpenAPI specification for all inventory endpoints based on:
    - `GET /inventory` - List all inventory with filtering
    - Query params: page, limit, sortBy, sortOrder, medication_variant_id, bin_id, batchNumber, expiryDateFrom, expiryDateTo
 
-2. **`paths/inventory/inventory-inventoryId.yaml`**
-   - `GET /inventory/{inventoryId}` - Get inventory by ID
-   - `PATCH /inventory/{inventoryId}` - Update inventory (Owner only)
+2. **`paths/inventory/inventory-batches-inventoryBatchId.yaml`**
+   - `GET /inventory/batches/{inventoryBatchId}` - Get inventory by ID
+   - `PATCH /inventory/batches/{inventoryBatchId}` - Update inventory (Owner only)
 
-3. **`paths/inventory/inventory-inventoryId-adjust.yaml`**
-   - `PATCH /inventory/{inventoryId}/adjust` - Adjust inventory quantity (Owner only)
+3. **`paths/inventory/inventory-batches-inventoryBatchId-adjust.yaml`**
+   - `PATCH /inventory/batches/{inventoryBatchId}/adjust` - Adjust inventory quantity (Owner only)
    - Request body: newQuantity, reason
 
 4. **`paths/inventory/inventory-move.yaml`**
@@ -96,9 +96,9 @@ All OpenAPI endpoints align with the actual API routes in `inventoryRoutes.js`:
 - ✅ GET /inventory/summary/by-variant
 - ✅ GET /inventory/expiring
 - ✅ GET /inventory/low-stock
-- ✅ GET /inventory/:id
-- ✅ PATCH /inventory/:id
-- ✅ PATCH /inventory/:id/adjust
+- ✅ GET /inventory/batches/:inventoryBatchId
+- ✅ PATCH /inventory/batches/:inventoryBatchId
+- ✅ PATCH /inventory/batches/:inventoryBatchId/adjust
 - ✅ POST /inventory/move
 
 ## Next Steps
