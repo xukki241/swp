@@ -19,7 +19,8 @@ const AppNavbar = ({ onToggleSidebar, isSidebarOpen }) => {
         <Navbar
             maxWidth="full"
             isBordered
-            className="bg-white/80 backdrop-blur-md"
+            position="sticky"
+            className="bg-white/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50 h-16 min-h-16"
         >
             <NavbarContent className="gap-4">
                 <Button

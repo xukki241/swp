@@ -4,7 +4,7 @@ import Sidebar from "../components/Sidebar";
 
 const Layout = ({ children }) => {
     // Get stored sidebar state or default to open on desktop
-    const getSavedSidebarState = () => {
+    function getSavedSidebarState() {
         try {
             const saved = localStorage.getItem("sidebarOpen");
             return saved !== null ? JSON.parse(saved) : true;
@@ -13,11 +13,11 @@ const Layout = ({ children }) => {
         }
     };
 
-    const [isSidebarOpen, setIsSidebarOpen] = React.useState(getSavedSidebarState);
+    const [isSidebarOpen, setIsSidebarOpen] = React.useState(getSavedSidebarState());
     const [isDesktop, setIsDesktop] = React.useState(window.innerWidth >= 1024);
 
     // Toggle sidebar and save state to localStorage
-    const toggleSidebar = () => {
+    function toggleSidebar() {
         const newState = !isSidebarOpen;
         setIsSidebarOpen(newState);
 
@@ -32,7 +32,7 @@ const Layout = ({ children }) => {
     };
 
     // Close sidebar (mainly for mobile)
-    const closeSidebar = () => {
+    function closeSidebar() {
         if (!isDesktop) {
             setIsSidebarOpen(false);
         }
@@ -61,7 +61,7 @@ const Layout = ({ children }) => {
                 isSidebarOpen={isSidebarOpen}
             />
 
-            <div className="flex flex-1 pt-16">
+            <div className="flex flex-1 pt-16 relative">
                 <Sidebar
                     isOpen={isSidebarOpen}
                     onClose={closeSidebar}
@@ -69,10 +69,14 @@ const Layout = ({ children }) => {
                 />
 
                 <main
-                    className={`flex-1 transition-all duration-300 ${isDesktop && isSidebarOpen ? "lg:ml-60" : isDesktop ? "lg:ml-[72px]" : ""
+                    className={`flex-1 transition-all duration-300 min-h-[calc(100vh-4rem)] ${isDesktop && isSidebarOpen
+                        ? "ml-60"
+                        : isDesktop
+                            ? "ml-[72px]"
+                            : "ml-0"
                         }`}
                 >
-                    <div className="container mx-auto px-4 py-6 max-w-7xl">
+                    <div className="container mx-auto px-4 py-6 max-w-7xl h-full">
                         {children}
                     </div>
                 </main>
