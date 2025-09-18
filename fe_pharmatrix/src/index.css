@@ -1,0 +1,25 @@
+@import "tailwindcss";
+@layer theme, base, components, utilities;
+
+/* Đăng ký plugin HeroUI (đường dẫn tương đối tới hero.ts) */
+@plugin "./styles/hero.ts";
+
+/* Quan trọng cho styles của HeroUI (điều chỉnh path tùy vị trí file CSS) */
+@source "../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
+
+/* Token ví dụ (có thể đổi theo brand của bạn) */
+@theme {
+  --color-primary: #2563eb;
+  --color-primary-foreground: #ffffff;
+  --radius-lg: 1rem;
+}
+
+
+@utility scrollbar-hidden {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
