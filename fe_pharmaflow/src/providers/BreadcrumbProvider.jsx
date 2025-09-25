@@ -1,17 +1,21 @@
-import { useState, useCallback } from "react"
-import { BreadcrumbContext } from "../contexts/BreadcrumbContext"
+import { useState, useCallback, useMemo } from "react";
+import { BreadcrumbContext } from "../contexts/BreadcrumbContext";
+
 
 export function BreadcrumbProvider({ children }) {
-    const [items, setItems] = useState([])
+    const [items, setItems] = useState([]);
 
-    // memo hóa để tránh re-render thừa
     const setBreadcrumb = useCallback((newItems) => {
-        setItems(newItems)
-    }, [])
+        setItems(newItems);
+    }, []);
+
+    const value = useMemo(() => ({ items, setBreadcrumb }), [items, setBreadcrumb]);
 
     return (
-        <BreadcrumbContext.Provider value={{ items, setBreadcrumb }}>
+        <BreadcrumbContext.Provider value={value}>
             {children}
         </BreadcrumbContext.Provider>
-    )
+    );
 }
+
+
