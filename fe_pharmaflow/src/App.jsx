@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
-import { BreadcrumbProvider } from "@/hooks/useBreadcrumb"
+import { BreadcrumbProvider } from "@/providers/BreadcrumbProvider"
 import Layout from "@/layout/Layout"
 import AuthLayout from "@/layout/AuthLayout"
 import Dashboard from "@/pages/Dashboard"
