@@ -5,11 +5,11 @@ import { useNavigate } from "react-router-dom"
 export default function NotFoundPage() {
     const navigate = useNavigate()
 
-    const handleGoHome = () => {
+    function handleGoHome() {
         navigate("/dashboard")
     }
 
-    const handleGoBack = () => {
+    function handleGoBack() {
         navigate(-1)
     }
 
