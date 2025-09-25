@@ -1,4 +1,5 @@
-import { AppSidebar } from "@/components/app-sidebar"
+import { Outlet, Link } from "react-router-dom"
+import { useBreadcrumbItems } from "@/hooks/useBreadcrumb"
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -8,13 +9,12 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
-import {
-    SidebarInset,
-    SidebarProvider,
-    SidebarTrigger,
-} from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 
-export default function Layout({ children, breadcrumbItems = [] }) {
+export default function Layout() {
+    const breadcrumbItems = useBreadcrumbItems()
+
     return (
         <SidebarProvider>
             <AppSidebar />
@@ -31,13 +31,17 @@ export default function Layout({ children, breadcrumbItems = [] }) {
                                 {breadcrumbItems.length > 0 ? (
                                     breadcrumbItems.map((item, index) => (
                                         <div key={index} className="flex items-center">
-                                            {index > 0 && <BreadcrumbSeparator className="hidden md:block" />}
+                                            {index > 0 && (
+                                                <BreadcrumbSeparator className="hidden md:block" />
+                                            )}
                                             <BreadcrumbItem className={index === 0 ? "hidden md:block" : ""}>
                                                 {index === breadcrumbItems.length - 1 ? (
                                                     <BreadcrumbPage>{item.title}</BreadcrumbPage>
                                                 ) : (
-                                                    <BreadcrumbLink href={item.href || "#"}>
-                                                        {item.title}
+                                                    <BreadcrumbLink asChild>
+                                                        <Link to={item.href || "#"}>
+                                                            {item.title}
+                                                        </Link>
                                                     </BreadcrumbLink>
                                                 )}
                                             </BreadcrumbItem>
@@ -46,8 +50,8 @@ export default function Layout({ children, breadcrumbItems = [] }) {
                                 ) : (
                                     <>
                                         <BreadcrumbItem className="hidden md:block">
-                                            <BreadcrumbLink href="#">
-                                                Dashboard
+                                            <BreadcrumbLink asChild>
+                                                <Link to="/">Dashboard</Link>
                                             </BreadcrumbLink>
                                         </BreadcrumbItem>
                                         <BreadcrumbSeparator className="hidden md:block" />
@@ -60,8 +64,9 @@ export default function Layout({ children, breadcrumbItems = [] }) {
                         </Breadcrumb>
                     </div>
                 </header>
+
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                    {children}
+                    <Outlet />
                 </div>
             </SidebarInset>
         </SidebarProvider>

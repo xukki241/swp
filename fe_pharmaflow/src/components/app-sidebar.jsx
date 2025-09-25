@@ -1,4 +1,5 @@
 import * as React from "react"
+import { Link } from "react-router-dom"
 import {
   LayoutDashboard,
   Users,
@@ -11,7 +12,6 @@ import {
   Pill,
   FileText,
   AlertTriangle,
-  TrendingUp,
   ClipboardList,
   Layers,
   Sparkles
@@ -44,7 +44,6 @@ const data = {
         { title: "Overview", url: "#" },
         { title: "Low Stock", url: "#", icon: Package },
         { title: "Expiring Products", url: "#", icon: AlertTriangle },
-        { title: "Sales Forecast", url: "#", icon: TrendingUp },
       ],
     },
     {
@@ -122,7 +121,7 @@ export function AppSidebar({ ...props }) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
+              <Link to="/">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   {/* icon viên thuốc */}
                   <Pill className="size-5" />
@@ -131,7 +130,7 @@ export function AppSidebar({ ...props }) {
                   <span className="truncate font-medium">PharmaFlow</span>
                   <span className="truncate text-xs">Smart Pharmacy</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
