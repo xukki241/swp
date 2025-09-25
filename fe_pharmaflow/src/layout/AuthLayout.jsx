@@ -1,7 +1,7 @@
 import { Pill } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Outlet } from "react-router-dom"
-export default function AuthLayout({ children, title, subtitle }) {
+export default function AuthLayout() {
     return (
         <div className="grid min-h-svh lg:grid-cols-2">
             <div className="flex flex-col gap-4 p-6 md:p-10">
