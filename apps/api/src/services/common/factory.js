@@ -40,6 +40,8 @@ function crudServiceFactory(table, options = {}) {
    */
   async function create(data) {
     try {
+      const originalData = data; // Keep reference to original data
+
       // Execute before create hook if provided
       if (beforeCreate) {
         data = await beforeCreate(data);
@@ -49,7 +51,7 @@ function crudServiceFactory(table, options = {}) {
 
       // Execute after create hook if provided
       if (afterCreate) {
-        await afterCreate(created, data);
+        await afterCreate(created, originalData);
       }
 
       return created;

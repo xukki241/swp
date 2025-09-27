@@ -5,6 +5,7 @@ import {
   pgTable,
   pgEnum,
   unique,
+  index,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { sales } from "./sales.js";
@@ -28,7 +29,13 @@ export const customers = pgTable(
     phone: varchar("phone", { length: 20 }),
     address: text("address"),
   },
-  (table) => [unique().on(table.email), unique().on(table.phone)]
+  (table) => [
+    unique().on(table.email),
+    unique().on(table.phone),
+    index("idx_customers_type").on(table.type),
+    index("idx_customers_name").on(table.name),
+    index("idx_customers_email").on(table.email),
+  ]
 );
 
 export const customersRelations = relations(customers, ({ many }) => ({

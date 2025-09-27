@@ -1,162 +1,250 @@
-import { z } from "zod";
-import { createSelectSchema, createInsertSchema } from "drizzle-zod";
+import * as v from "valibot";
+import { createSelectSchema, createInsertSchema } from "drizzle-valibot";
 import { users, userStatusEnum } from "../../db/schema/users.js";
+import { userCredentials } from "../../db/schema/user-credentials.js";
+import {
+  userRegistrations,
+  registrationStatusEnum,
+} from "../../db/schema/user-registrations.js";
 
-// Base Drizzle Zod schemas
-export const selectUserSchema = createSelectSchema(users);
-export const insertUserSchema = createInsertSchema(users);
+// Base schemas generated from Drizzle tables
+export const userSelectSchema = createSelectSchema(users);
+export const userInsertSchema = createInsertSchema(users);
+export const userCredentialsSelectSchema = createSelectSchema(userCredentials);
+export const userCredentialsInsertSchema = createInsertSchema(userCredentials);
+export const userRegistrationSelectSchema =
+  createSelectSchema(userRegistrations);
+export const userRegistrationInsertSchema =
+  createInsertSchema(userRegistrations);
 
-// Custom validation schemas for API requests
-export const createUserSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Name is required")
-    .max(255, "Name must be less than 255 characters")
-    .trim(),
-  email: z
-    .string()
-    .email("Invalid email format")
-    .max(255, "Email must be less than 255 characters")
-    .trim()
-    .toLowerCase(),
-  phone: z
-    .string()
-    .min(1, "Phone is required")
-    .max(20, "Phone must be less than 20 characters")
-    .regex(/^\+?[\d\s\-\(\)]+$/, "Invalid phone format")
-    .trim(),
-  roleId: z
-    .number()
-    .int("Role ID must be an integer")
-    .positive("Role ID must be positive"),
-  status: z
-    .enum(["active", "inactive", "suspended"])
-    .optional()
-    .default("active"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(100, "Password must be less than 100 characters")
-    .optional(),
+// Custom validation schemas for API endpoints
+
+/**
+ * Schema for creating a new user
+ */
+export const userCreateSchema = v.object({
+  name: v.pipe(
+    v.string("Name must be a string"),
+    v.trim(),
+    v.minLength(1, "Name is required"),
+    v.maxLength(255, "Name must be 255 characters or less")
+  ),
+  email: v.pipe(
+    v.string("Email must be a string"),
+    v.trim(),
+    v.toLowerCase(),
+    v.email("Invalid email format"),
+    v.maxLength(255, "Email must be 255 characters or less")
+  ),
+  phone: v.pipe(
+    v.string("Phone must be a string"),
+    v.trim(),
+    v.minLength(1, "Phone is required"),
+    v.maxLength(20, "Phone must be 20 characters or less"),
+    v.regex(/^[\+]?[0-9\s\-\(\)]+$/, "Invalid phone number format")
+  ),
+  roleId: v.pipe(
+    v.number("Role ID must be a number"),
+    v.integer("Role ID must be an integer"),
+    v.minValue(1, "Role ID must be a positive integer")
+  ),
+  status: v.optional(
+    v.picklist(["active", "inactive", "suspended"], "Invalid user status")
+  ),
 });
 
-export const updateUserSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Name cannot be empty")
-    .max(255, "Name must be less than 255 characters")
-    .trim()
-    .optional(),
-  email: z
-    .string()
-    .email("Invalid email format")
-    .max(255, "Email must be less than 255 characters")
-    .trim()
-    .toLowerCase()
-    .optional(),
-  phone: z
-    .string()
-    .min(1, "Phone cannot be empty")
-    .max(20, "Phone must be less than 20 characters")
-    .regex(/^\+?[\d\s\-\(\)]+$/, "Invalid phone format")
-    .trim()
-    .optional(),
-  roleId: z
-    .number()
-    .int("Role ID must be an integer")
-    .positive("Role ID must be positive")
-    .optional(),
-  status: z.enum(["active", "inactive", "suspended"]).optional(),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(100, "Password must be less than 100 characters")
-    .optional(),
+/**
+ * Schema for updating user profile (partial update)
+ */
+export const userUpdateProfileSchema = v.object({
+  name: v.optional(
+    v.pipe(
+      v.string("Name must be a string"),
+      v.trim(),
+      v.minLength(1, "Name is required"),
+      v.maxLength(255, "Name must be 255 characters or less")
+    )
+  ),
+  email: v.optional(
+    v.pipe(
+      v.string("Email must be a string"),
+      v.trim(),
+      v.toLowerCase(),
+      v.email("Invalid email format"),
+      v.maxLength(255, "Email must be 255 characters or less")
+    )
+  ),
+  phone: v.optional(
+    v.pipe(
+      v.string("Phone must be a string"),
+      v.trim(),
+      v.minLength(1, "Phone is required"),
+      v.maxLength(20, "Phone must be 20 characters or less"),
+      v.regex(/^[\+]?[0-9\s\-\(\)]+$/, "Invalid phone number format")
+    )
+  ),
 });
 
-export const updateUserStatusSchema = z.object({
-  status: z.enum(["active", "inactive", "suspended"], {
-    required_error: "Status is required",
-    invalid_type_error: "Status must be one of: active, inactive, suspended",
-  }),
+/**
+ * Schema for updating user status
+ */
+export const userStatusUpdateSchema = v.object({
+  status: v.picklist(
+    ["active", "inactive", "suspended"],
+    "Status must be one of: active, inactive, suspended"
+  ),
 });
 
-// Query parameter schemas
-export const getUserByEmailParamsSchema = z.object({
-  email: z.string().email("Invalid email format").min(1, "Email is required"),
+/**
+ * Schema for bulk creating users
+ */
+export const userBulkCreateSchema = v.object({
+  users: v.pipe(
+    v.array(userCreateSchema, "Users must be an array"),
+    v.minLength(1, "At least one user is required"),
+    v.maxLength(100, "Maximum 100 users allowed per bulk operation")
+  ),
 });
 
-export const getUserByIdParamsSchema = z.object({
-  id: z
-    .string()
-    .regex(/^\d+$/, "ID must be a valid number")
-    .transform((val) => parseInt(val, 10)),
+/**
+ * Schema for user query parameters
+ */
+export const userQuerySchema = v.object({
+  page: v.optional(
+    v.pipe(
+      v.string("Page must be a string"),
+      v.transform((input) => parseInt(input, 10)),
+      v.number("Page must be a number"),
+      v.integer("Page must be an integer"),
+      v.minValue(1, "Page must be at least 1")
+    )
+  ),
+  limit: v.optional(
+    v.pipe(
+      v.string("Limit must be a string"),
+      v.transform((input) => parseInt(input, 10)),
+      v.number("Limit must be a number"),
+      v.integer("Limit must be an integer"),
+      v.minValue(1, "Limit must be at least 1"),
+      v.maxValue(100, "Limit must be at most 100")
+    )
+  ),
+  search: v.optional(
+    v.pipe(
+      v.string("Search must be a string"),
+      v.trim(),
+      v.maxLength(255, "Search term must be 255 characters or less")
+    )
+  ),
+  orderBy: v.optional(
+    v.picklist(
+      ["id", "name", "email", "phone", "status", "roleId"],
+      "Invalid orderBy field"
+    )
+  ),
+  orderDirection: v.optional(
+    v.picklist(["asc", "desc"], "Order direction must be 'asc' or 'desc'")
+  ),
+  status: v.optional(
+    v.picklist(["active", "inactive", "suspended"], "Invalid status filter")
+  ),
 });
 
-export const getUserByRoleParamsSchema = z.object({
-  roleId: z
-    .string()
-    .regex(/^\d+$/, "Role ID must be a valid number")
-    .transform((val) => parseInt(val, 10)),
+/**
+ * Schema for user query by role
+ */
+export const userByRoleQuerySchema = v.object({
+  page: v.optional(
+    v.pipe(
+      v.string("Page must be a string"),
+      v.transform((input) => parseInt(input, 10)),
+      v.number("Page must be a number"),
+      v.integer("Page must be an integer"),
+      v.minValue(1, "Page must be at least 1")
+    )
+  ),
+  limit: v.optional(
+    v.pipe(
+      v.string("Limit must be a string"),
+      v.transform((input) => parseInt(input, 10)),
+      v.number("Limit must be a number"),
+      v.integer("Limit must be an integer"),
+      v.minValue(1, "Limit must be at least 1"),
+      v.maxValue(100, "Limit must be at most 100")
+    )
+  ),
+  orderBy: v.optional(
+    v.picklist(
+      ["id", "name", "email", "phone", "status"],
+      "Invalid orderBy field"
+    )
+  ),
+  orderDirection: v.optional(
+    v.picklist(["asc", "desc"], "Order direction must be 'asc' or 'desc'")
+  ),
 });
 
-export const getUsersQuerySchema = z.object({
-  page: z
-    .union([z.string(), z.number()])
-    .optional()
-    .default(1)
-    .transform((val) => {
-      const num = typeof val === "string" ? parseInt(val, 10) : val;
-      return isNaN(num) ? 1 : num;
-    })
-    .refine((val) => val >= 1, "Page must be at least 1"),
-  limit: z
-    .union([z.string(), z.number()])
-    .optional()
-    .default(10)
-    .transform((val) => {
-      const num = typeof val === "string" ? parseInt(val, 10) : val;
-      return isNaN(num) ? 10 : num;
-    })
-    .refine((val) => val >= 1 && val <= 100, "Limit must be between 1 and 100"),
-  search: z
-    .string()
-    .max(255, "Search term must be less than 255 characters")
-    .optional(),
-  orderBy: z
-    .enum(["id", "name", "email", "phone", "status", "roleId"])
-    .optional()
-    .default("name"),
-  orderDirection: z.enum(["asc", "desc"]).optional().default("asc"),
+/**
+ * Schema for user registration
+ */
+export const userRegistrationCreateSchema = v.object({
+  fullName: v.pipe(
+    v.string("Full name must be a string"),
+    v.trim(),
+    v.minLength(1, "Full name is required"),
+    v.maxLength(255, "Full name must be 255 characters or less")
+  ),
+  email: v.pipe(
+    v.string("Email must be a string"),
+    v.trim(),
+    v.toLowerCase(),
+    v.email("Invalid email format"),
+    v.maxLength(255, "Email must be 255 characters or less")
+  ),
+  phone: v.optional(
+    v.pipe(
+      v.string("Phone must be a string"),
+      v.trim(),
+      v.maxLength(20, "Phone must be 20 characters or less"),
+      v.regex(/^[\+]?[0-9\s\-\(\)]+$/, "Invalid phone number format")
+    )
+  ),
+  password: v.pipe(
+    v.string("Password must be a string"),
+    v.minLength(8, "Password must be at least 8 characters long"),
+    v.maxLength(128, "Password must be 128 characters or less"),
+    v.regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+      "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character"
+    )
+  ),
 });
 
-// Bulk create schema
-export const bulkCreateUsersSchema = z.object({
-  users: z
-    .array(createUserSchema)
-    .min(1, "At least one user is required")
-    .max(50, "Cannot create more than 50 users at once"),
-});
-
-// Response transformation schemas
-export const userResponseSchema = selectUserSchema.omit({
-  // Exclude sensitive fields from response
-  password: true,
-});
-
-export const usersListResponseSchema = z.object({
-  success: z.boolean(),
-  data: z.array(userResponseSchema),
-  pagination: z.object({
-    page: z.number(),
-    limit: z.number(),
-    total: z.number(),
-    pages: z.number(),
-  }),
-});
-
-export const userResponseWrapper = z.object({
-  success: z.boolean(),
-  data: userResponseSchema,
-  message: z.string().optional(),
+/**
+ * Schema for user credentials creation
+ */
+export const userCredentialsCreateSchema = v.object({
+  userId: v.pipe(
+    v.number("User ID must be a number"),
+    v.integer("User ID must be an integer"),
+    v.minValue(1, "User ID must be a positive integer")
+  ),
+  provider: v.pipe(
+    v.string("Provider must be a string"),
+    v.trim(),
+    v.minLength(1, "Provider is required"),
+    v.maxLength(100, "Provider must be 100 characters or less")
+  ),
+  identifier: v.pipe(
+    v.string("Identifier must be a string"),
+    v.trim(),
+    v.minLength(1, "Identifier is required"),
+    v.maxLength(255, "Identifier must be 255 characters or less")
+  ),
+  secretHash: v.pipe(
+    v.string("Secret hash must be a string"),
+    v.trim(),
+    v.minLength(1, "Secret hash is required"),
+    v.maxLength(255, "Secret hash must be 255 characters or less")
+  ),
 });

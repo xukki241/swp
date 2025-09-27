@@ -1,11 +1,6 @@
-import { crudServiceFactory } from "../common/index.js";
+import { crudServiceFactory } from "./common/index.js";
 import { users, userCredentials } from "../db/schema/index.js";
 import { db } from "../db/connection.js";
-import {
-  createUserSchema,
-  updateUserSchema,
-  selectUserSchema,
-} from "../validation/schemas/users.js";
 import bcrypt from "bcrypt";
 
 // Password hashing utility
@@ -14,20 +9,11 @@ const hashPassword = async (password) => {
   return await bcrypt.hash(password, saltRounds);
 };
 
-// Hook to validate and hash password before creating user
+// Hook to hash password before creating user
 const beforeCreate = async (data) => {
-  try {
-    // Validate data using Zod schema
-    const validatedData = createUserSchema.parse(data);
-
-    // Remove password from user data (will be stored separately)
-    const { password, ...userData } = validatedData;
-
-    return userData;
-  } catch (error) {
-    // Re-throw validation errors
-    throw error;
-  }
+  // Remove password from user data (will be stored separately)
+  const { password, ...userData } = data;
+  return userData;
 };
 
 // Hook to create user credentials after user creation
@@ -51,20 +37,11 @@ const afterCreate = async (createdUser, originalData) => {
   }
 };
 
-// Hook to validate and hash password before updating user
+// Hook to hash password before updating user
 const beforeUpdate = async (id, data) => {
-  try {
-    // Validate data using Zod schema (partial update)
-    const validatedData = updateUserSchema.parse(data);
-
-    // Remove password from user data (will be handled separately)
-    const { password, ...userData } = validatedData;
-
-    return userData;
-  } catch (error) {
-    // Re-throw validation errors
-    throw error;
-  }
+  // Remove password from user data (will be handled separately)
+  const { password, ...userData } = data;
+  return userData;
 };
 
 // Create user service with password hashing support

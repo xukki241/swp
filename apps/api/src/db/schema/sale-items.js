@@ -1,4 +1,11 @@
-import { bigint, integer, decimal, pgTable, unique } from "drizzle-orm/pg-core";
+import {
+  bigint,
+  integer,
+  decimal,
+  pgTable,
+  unique,
+  index,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { sales } from "./sales.js";
 import { medicationVariants } from "./medication-variants.js";
@@ -23,7 +30,12 @@ export const saleItems = pgTable(
     quantity: integer("quantity").notNull(),
     unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
   },
-  (table) => [unique().on(table.saleId, table.medicationVariantId, table.lotId)]
+  (table) => [
+    unique().on(table.saleId, table.medicationVariantId, table.lotId),
+    index("idx_sale_items_sale_id").on(table.saleId),
+    index("idx_sale_items_medication_variant_id").on(table.medicationVariantId),
+    index("idx_sale_items_lot_id").on(table.lotId),
+  ]
 );
 
 export const saleItemsRelations = relations(saleItems, ({ one }) => ({

@@ -7,6 +7,7 @@ import {
   decimal,
   integer,
   unique,
+  index,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { medications } from "./medications.js";
@@ -31,7 +32,14 @@ export const medicationVariants = pgTable(
     description: text("description"),
     isActive: boolean("is_active").default(true),
   },
-  (table) => [unique().on(table.sku), unique().on(table.barcode)]
+  (table) => [
+    unique().on(table.sku),
+    unique().on(table.barcode),
+    index("idx_medication_variants_medication_id").on(table.medicationId),
+    index("idx_medication_variants_sku").on(table.sku),
+    index("idx_medication_variants_barcode").on(table.barcode),
+    index("idx_medication_variants_is_active").on(table.isActive),
+  ]
 );
 
 export const medicationVariantsRelations = relations(

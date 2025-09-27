@@ -1,4 +1,11 @@
-import { bigint, varchar, pgTable, pgEnum, unique } from "drizzle-orm/pg-core";
+import {
+  bigint,
+  varchar,
+  pgTable,
+  pgEnum,
+  unique,
+  index,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { roles } from "./roles.js";
 import { userCredentials } from "./user-credentials.js";
@@ -26,7 +33,13 @@ export const users = pgTable(
       .notNull()
       .references(() => roles.id, { onDelete: "restrict" }),
   },
-  (table) => [unique().on(table.email), unique().on(table.phone)]
+  (table) => [
+    unique().on(table.email),
+    unique().on(table.phone),
+    index("idx_users_role_id").on(table.roleId),
+    index("idx_users_status").on(table.status),
+    index("idx_users_email").on(table.email),
+  ]
 );
 
 export const usersRelations = relations(users, ({ one, many }) => ({

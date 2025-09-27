@@ -12,8 +12,6 @@
  * @param {Function} options.afterUpdate - Hook function called after update
  * @param {Function} options.beforeDelete - Hook function called before delete
  * @param {Function} options.afterDelete - Hook function called after delete
- * @param {Function} options.validateCreate - Validation function for create operations
- * @param {Function} options.validateUpdate - Validation function for update operations
  * @param {Function} options.transformResponse - Transform response data
  * @returns {Object} CRUD controller object
  */
@@ -27,8 +25,6 @@ function crudControllerFactory(service, options = {}) {
     afterUpdate,
     beforeDelete,
     afterDelete,
-    validateCreate,
-    validateUpdate,
     transformResponse,
   } = options;
 
@@ -38,18 +34,6 @@ function crudControllerFactory(service, options = {}) {
    */
   async function create(req, res) {
     try {
-      // Validation
-      if (validateCreate) {
-        const validationError = await validateCreate(req.body);
-        if (validationError) {
-          return res.status(400).json({
-            success: false,
-            error: validationError,
-            message: `Invalid data for creating ${entityName}`,
-          });
-        }
-      }
-
       // Before create hook
       let data = req.body;
       if (beforeCreate) {
@@ -90,8 +74,7 @@ function crudControllerFactory(service, options = {}) {
    */
   async function getById(req, res) {
     try {
-      // Use validated params if available, otherwise fall back to raw params
-      const params = req.validatedParams || req.params;
+      const params = req.params;
       const { id } = params;
 
       if (!id) {
@@ -137,8 +120,7 @@ function crudControllerFactory(service, options = {}) {
    */
   async function getMany(req, res) {
     try {
-      // Use validated query if available, otherwise fall back to raw query
-      const queryParams = req.validatedQuery || req.query;
+      const queryParams = req.query;
       const {
         page = 1,
         limit = 10,
@@ -226,8 +208,7 @@ function crudControllerFactory(service, options = {}) {
    */
   async function updateById(req, res) {
     try {
-      // Use validated params if available, otherwise fall back to raw params
-      const params = req.validatedParams || req.params;
+      const params = req.params;
       const { id } = params;
 
       if (!id) {
@@ -236,18 +217,6 @@ function crudControllerFactory(service, options = {}) {
           error: "ID is required",
           message: `ID parameter is missing`,
         });
-      }
-
-      // Validation
-      if (validateUpdate) {
-        const validationError = await validateUpdate(req.body);
-        if (validationError) {
-          return res.status(400).json({
-            success: false,
-            error: validationError,
-            message: `Invalid data for updating ${entityName}`,
-          });
-        }
       }
 
       // Before update hook
@@ -307,8 +276,7 @@ function crudControllerFactory(service, options = {}) {
    */
   async function deleteById(req, res) {
     try {
-      // Use validated params if available, otherwise fall back to raw params
-      const params = req.validatedParams || req.params;
+      const params = req.params;
       const { id } = params;
 
       if (!id) {
@@ -361,8 +329,7 @@ function crudControllerFactory(service, options = {}) {
    */
   async function count(req, res) {
     try {
-      // Use validated query if available, otherwise fall back to raw query
-      const queryParams = req.validatedQuery || req.query;
+      const queryParams = req.query;
       const { search, ...filters } = queryParams;
 
       let conditions = filters;
@@ -393,8 +360,7 @@ function crudControllerFactory(service, options = {}) {
    */
   async function existsById(req, res) {
     try {
-      // Use validated params if available, otherwise fall back to raw params
-      const params = req.validatedParams || req.params;
+      const params = req.params;
       const { id } = params;
 
       if (!id) {
@@ -432,20 +398,6 @@ function crudControllerFactory(service, options = {}) {
           error: "Invalid items array",
           message: "Items must be a non-empty array",
         });
-      }
-
-      // Validate each item if validation function is provided
-      if (validateCreate) {
-        for (let i = 0; i < items.length; i++) {
-          const validationError = await validateCreate(items[i]);
-          if (validationError) {
-            return res.status(400).json({
-              success: false,
-              error: validationError,
-              message: `Invalid data for item at index ${i}`,
-            });
-          }
-        }
       }
 
       const results = [];

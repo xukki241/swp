@@ -1,47 +1,12 @@
-import { crudControllerFactory } from "../common/index.js";
+import { crudControllerFactory } from "./common/index.js";
 import userService from "../services/users.service.js";
-import {
-  createUserSchema,
-  updateUserSchema,
-  updateUserStatusSchema,
-  getUserByEmailParamsSchema,
-  getUserByRoleParamsSchema,
-  getUsersQuerySchema,
-  userResponseSchema,
-} from "../validation/schemas/users.js";
 
 /**
- * Transform response to exclude sensitive data using Zod schema
+ * Transform response to exclude sensitive data
  */
 const transformResponse = (user) => {
-  try {
-    return userResponseSchema.parse(user);
-  } catch (error) {
-    // Fallback to manual exclusion if schema parsing fails
-    const { password, ...safeUser } = user;
-    return safeUser;
-  }
-};
-
-/**
- * Zod validation functions for CRUD factory
- */
-const validateCreate = (data) => {
-  try {
-    createUserSchema.parse(data);
-    return null; // No error
-  } catch (error) {
-    return error.errors.map((err) => err.message).join(", ");
-  }
-};
-
-const validateUpdate = (data) => {
-  try {
-    updateUserSchema.parse(data);
-    return null; // No error
-  } catch (error) {
-    return error.errors.map((err) => err.message).join(", ");
-  }
+  const { password, ...safeUser } = user;
+  return safeUser;
 };
 
 /**
@@ -50,8 +15,6 @@ const validateUpdate = (data) => {
 const userController = crudControllerFactory(userService, {
   entityName: "User",
   allowedSortFields: ["id", "name", "email", "phone", "status", "roleId"],
-  validateCreate,
-  validateUpdate,
   transformResponse,
 });
 
@@ -66,18 +29,6 @@ const userController = crudControllerFactory(userService, {
 userController.getByEmail = async (req, res) => {
   try {
     const { email } = req.params;
-
-    // Validate email parameter using Zod
-    try {
-      getUserByEmailParamsSchema.parse({ email });
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        error: "Validation Error",
-        message: "Invalid email parameter",
-        details: error.errors.map((err) => err.message),
-      });
-    }
 
     const user = await userService.findOne({ email });
 
@@ -115,27 +66,6 @@ userController.updateStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    // Validate ID parameter
-    if (!id || !/^\d+$/.test(id)) {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid ID",
-        message: "ID must be a valid number",
-      });
-    }
-
-    // Validate status using Zod
-    try {
-      updateUserStatusSchema.parse({ status });
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        error: "Validation Error",
-        message: "Invalid status",
-        details: error.errors.map((err) => err.message),
-      });
-    }
-
     const updated = await userService.updateById(id, { status });
 
     if (!updated) {
@@ -171,34 +101,22 @@ userController.updateStatus = async (req, res) => {
 userController.getByRole = async (req, res) => {
   try {
     const { roleId } = req.params;
-    // Use validated query if available, otherwise fall back to raw query
-    const queryParams = req.validatedQuery || req.query;
+    const queryParams = req.query;
 
-    let result;
-    // Validate role ID parameter using Zod
-    try {
-      const validatedParams = getUserByRoleParamsSchema.parse({ roleId });
-      const validatedQuery = getUsersQuerySchema.parse(queryParams);
+    // Convert roleId to number and set defaults for pagination
+    const roleIdNum = parseInt(roleId, 10);
+    const page = parseInt(queryParams.page, 10) || 1;
+    const limit = parseInt(queryParams.limit, 10) || 10;
+    const orderBy = queryParams.orderBy || "name";
+    const orderDirection = queryParams.orderDirection || "asc";
 
-      // Use validated and transformed values
-      const roleIdNum = validatedParams.roleId;
-      const { page, limit, orderBy, orderDirection } = validatedQuery;
-
-      result = await userService.findMany({
-        where: { roleId: roleIdNum },
-        page,
-        limit,
-        orderBy,
-        orderDirection,
-      });
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        error: "Validation Error",
-        message: "Invalid parameters",
-        details: error.errors?.map((err) => err.message) || [error.message],
-      });
-    }
+    const result = await userService.findMany({
+      where: { roleId: roleIdNum },
+      page,
+      limit,
+      orderBy,
+      orderDirection,
+    });
 
     // Transform response data to exclude sensitive information
     const responseData = {
@@ -226,23 +144,14 @@ userController.getByRole = async (req, res) => {
  */
 userController.getActive = async (req, res) => {
   try {
-    // Use validated query if available, otherwise fall back to raw query
-    const queryParams = req.validatedQuery || req.query;
+    const queryParams = req.query;
 
-    // Validate query parameters using Zod
-    let validatedQuery;
-    try {
-      validatedQuery = getUsersQuerySchema.parse(queryParams);
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        error: "Validation Error",
-        message: "Invalid query parameters",
-        details: error.errors?.map((err) => err.message) || [error.message],
-      });
-    }
-
-    const { page, limit, search, orderBy, orderDirection } = validatedQuery;
+    // Set defaults for pagination and search
+    const page = parseInt(queryParams.page, 10) || 1;
+    const limit = parseInt(queryParams.limit, 10) || 10;
+    const search = queryParams.search || "";
+    const orderBy = queryParams.orderBy || "name";
+    const orderDirection = queryParams.orderDirection || "asc";
 
     const result = await userService.findMany({
       where: { status: "active" },
@@ -296,23 +205,15 @@ userController.bulkCreate = async (req, res) => {
     for (let i = 0; i < users.length; i++) {
       try {
         const userData = users[i];
-
-        // Validate user data
-        try {
-          validateCreate(userData);
-        } catch (validationError) {
-          errors.push({
-            index: i,
-            error: validationError,
-            data: userData,
-          });
-          continue;
-        }
-
         const created = await userService.create(userData);
         const responseData = transformResponse(created);
         results.push(responseData);
       } catch (error) {
+        // If all previous attempts failed, this might be a system error
+        if (results.length === 0 && errors.length === i) {
+          // All attempts have failed so far, this could be a system error
+          throw error;
+        }
         errors.push({
           index: i,
           error: error.message,
