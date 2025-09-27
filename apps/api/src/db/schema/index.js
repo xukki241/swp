@@ -26,3 +26,6 @@ export * from "./sale-items.js";
 
 // Reporting
 export * from "./reports.js";
+
+// Relations (must be imported after all tables)
+export * from "./relations.js";

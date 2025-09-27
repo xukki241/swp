@@ -1,5 +1,6 @@
 import { eq, and, or, desc, asc, count, sql } from "drizzle-orm";
-import { db } from "../../db/connection.js";
+
+import { db as database } from "../../db/connection.js";
 
 /**
  * CRUD Service Factory
@@ -47,7 +48,7 @@ function crudServiceFactory(table, options = {}) {
         data = await beforeCreate(data);
       }
 
-      const [created] = await db.insert(table).values(data).returning();
+      const [created] = await database.insert(table).values(data).returning();
 
       // Execute after create hook if provided
       if (afterCreate) {
@@ -67,7 +68,10 @@ function crudServiceFactory(table, options = {}) {
    */
   async function findById(id) {
     try {
-      const [record] = await db.select().from(table).where(eq(table.id, id));
+      const [record] = await database
+        .select()
+        .from(table)
+        .where(eq(table.id, id));
       return record || null;
     } catch (error) {
       throw new Error(`Failed to find ${entityName} by ID: ${error.message}`);
@@ -82,7 +86,10 @@ function crudServiceFactory(table, options = {}) {
   async function findOne(conditions) {
     try {
       const whereConditions = buildWhereConditions(conditions);
-      const [record] = await db.select().from(table).where(whereConditions);
+      const [record] = await database
+        .select()
+        .from(table)
+        .where(whereConditions);
       return record || null;
     } catch (error) {
       throw new Error(`Failed to find ${entityName}: ${error.message}`);
@@ -111,8 +118,8 @@ function crudServiceFactory(table, options = {}) {
         orderDirection = defaultOrderDirection,
       } = options;
 
-      let query = db.select().from(table);
-      let countQuery = db.select({ count: count() }).from(table);
+      let query = database.select().from(table);
+      let countQuery = database.select({ count: count() }).from(table);
 
       // Build where conditions
       const whereConditions = [];
@@ -125,7 +132,7 @@ function crudServiceFactory(table, options = {}) {
       // Add search conditions
       if (search && searchableFields.length > 0) {
         const searchConditions = searchableFields.map(
-          (field) => sql`${table[field]}::text ILIKE ${`%${search}%`}`
+          field => sql`${table[field]}::text ILIKE ${`%${search}%`}`
         );
         whereConditions.push(or(...searchConditions));
       }
@@ -141,8 +148,8 @@ function crudServiceFactory(table, options = {}) {
       }
 
       // Apply ordering
-      const orderFn = orderDirection === "asc" ? asc : desc;
-      query = query.orderBy(orderFn(table[orderBy]));
+      const orderFunction = orderDirection === "asc" ? asc : desc;
+      query = query.orderBy(orderFunction(table[orderBy]));
 
       // Apply pagination
       const offset = (page - 1) * limit;
@@ -183,7 +190,7 @@ function crudServiceFactory(table, options = {}) {
         data = await beforeUpdate(id, data);
       }
 
-      const [updated] = await db
+      const [updated] = await database
         .update(table)
         .set(data)
         .where(eq(table.id, id))
@@ -219,7 +226,7 @@ function crudServiceFactory(table, options = {}) {
         data = await beforeUpdate(null, data);
       }
 
-      const updated = await db
+      const updated = await database
         .update(table)
         .set(data)
         .where(whereConditions)
@@ -252,7 +259,7 @@ function crudServiceFactory(table, options = {}) {
         await beforeDelete(id);
       }
 
-      const [deleted] = await db
+      const [deleted] = await database
         .delete(table)
         .where(eq(table.id, id))
         .returning();
@@ -282,7 +289,7 @@ function crudServiceFactory(table, options = {}) {
       const whereConditions = buildWhereConditions(conditions);
 
       // Get records before deletion for hooks
-      const recordsToDelete = await db
+      const recordsToDelete = await database
         .select()
         .from(table)
         .where(whereConditions);
@@ -294,7 +301,10 @@ function crudServiceFactory(table, options = {}) {
         }
       }
 
-      const deleted = await db.delete(table).where(whereConditions).returning();
+      const deleted = await database
+        .delete(table)
+        .where(whereConditions)
+        .returning();
 
       // Execute after delete hook if provided
       if (afterDelete) {
@@ -318,7 +328,7 @@ function crudServiceFactory(table, options = {}) {
    */
   async function countRecords(conditions = {}) {
     try {
-      let query = db.select({ count: count() }).from(table);
+      let query = database.select({ count: count() }).from(table);
 
       if (Object.keys(conditions).length > 0) {
         const whereConditions = buildWhereConditions(conditions);
@@ -359,10 +369,8 @@ function crudServiceFactory(table, options = {}) {
     const whereConditions = [];
 
     for (const [key, value] of Object.entries(conditions)) {
-      if (value !== null && value !== undefined) {
-        if (table[key]) {
-          whereConditions.push(eq(table[key], value));
-        }
+      if (value !== null && value !== undefined && table[key]) {
+        whereConditions.push(eq(table[key], value));
       }
     }
 

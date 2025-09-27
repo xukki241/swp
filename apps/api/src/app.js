@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/users", usersRoutes);
 
 // Basic routes
-app.get("/", (req, res) => {
+app.get("/", (request, res) => {
   res.json({
     message: "Welcome to the API!",
     timestamp: new Date().toISOString(),
@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/health", (req, res) => {
+app.get("/health", (request, res) => {
   res.json({
     status: "healthy",
     uptime: process.uptime(),
@@ -28,20 +28,20 @@ app.get("/health", (req, res) => {
 });
 
 // 404 handler
-app.use((req, res) => {
+app.use((request, res) => {
   res.status(404).json({
     error: "Route not found",
-    path: req.originalUrl,
-    method: req.method,
+    path: request.originalUrl,
+    method: request.method,
   });
 });
 
 // Error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
+app.use((error, request, res, _next) => {
+  console.error(error.stack);
   res.status(500).json({
     error: "Something went wrong!",
-    message: err.message,
+    message: error.message,
   });
 });
 

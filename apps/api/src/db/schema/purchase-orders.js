@@ -7,10 +7,9 @@ import {
   date,
   index,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import { users } from "./users.js";
+
 import { suppliers } from "./suppliers.js";
-import { purchaseOrderItems } from "./purchase-order-items.js";
+import { users } from "./users.js";
 
 export const purchaseOrderStatusEnum = pgEnum("purchase_order_status", [
   "draft",
@@ -37,7 +36,7 @@ export const purchaseOrders = pgTable(
     status: purchaseOrderStatusEnum("status").default("draft"),
     notes: text("notes"),
   },
-  (table) => [
+  table => [
     index("idx_purchase_orders_user_id").on(table.userId),
     index("idx_purchase_orders_supplier_id").on(table.supplierId),
     index("idx_purchase_orders_order_date").on(table.orderDate),
@@ -46,19 +45,4 @@ export const purchaseOrders = pgTable(
       table.expectedDeliveryDate
     ),
   ]
-);
-
-export const purchaseOrdersRelations = relations(
-  purchaseOrders,
-  ({ one, many }) => ({
-    user: one(users, {
-      fields: [purchaseOrders.userId],
-      references: [users.id],
-    }),
-    supplier: one(suppliers, {
-      fields: [purchaseOrders.supplierId],
-      references: [suppliers.id],
-    }),
-    items: many(purchaseOrderItems),
-  })
 );

@@ -8,10 +8,9 @@ import {
   pgEnum,
   index,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import { users } from "./users.js";
+
 import { customers } from "./customers.js";
-import { saleItems } from "./sale-items.js";
+import { users } from "./users.js";
 
 export const paymentMethodEnum = pgEnum("payment_method", [
   "cash",
@@ -47,7 +46,7 @@ export const sales = pgTable(
     status: saleStatusEnum("status").default("pending"),
     notes: text("notes"),
   },
-  (table) => [
+  table => [
     index("idx_sales_user_id").on(table.userId),
     index("idx_sales_customer_id").on(table.customerId),
     index("idx_sales_sale_date").on(table.saleDate),
@@ -55,15 +54,3 @@ export const sales = pgTable(
     index("idx_sales_payment_method").on(table.paymentMethod),
   ]
 );
-
-export const salesRelations = relations(sales, ({ one, many }) => ({
-  user: one(users, {
-    fields: [sales.userId],
-    references: [users.id],
-  }),
-  customer: one(customers, {
-    fields: [sales.customerId],
-    references: [customers.id],
-  }),
-  items: many(saleItems),
-}));

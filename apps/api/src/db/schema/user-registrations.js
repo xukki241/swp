@@ -28,5 +28,5 @@ export const userRegistrations = pgTable(
     }).defaultNow(),
     status: registrationStatusEnum("status").default("pending_verification"),
   },
-  (table) => [unique().on(table.email)]
+  table => [unique().on(table.email)]
 );

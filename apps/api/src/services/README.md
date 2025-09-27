@@ -1,6 +1,7 @@
 # Services Layer
 
-This directory contains the business logic layer of the application. Services handle data processing, business rules, and coordination between controllers and the database.
+This directory contains the business logic layer of the application. Services handle data
+processing, business rules, and coordination between controllers and the database.
 
 ## Overview
 
@@ -22,20 +23,21 @@ services/
 
 ## CRUD Service Factory
 
-The factory creates standardized services with full CRUD operations and utility methods using Drizzle ORM.
+The factory creates standardized services with full CRUD operations and utility methods using
+Drizzle ORM.
 
 ### Basic Usage
 
 ```javascript
 // src/services/products.service.js
-import { crudServiceFactory } from './common/factory.js';
-import { products } from '../db/schema/index.js';
+import { crudServiceFactory } from "./common/factory.js";
+import { products } from "../db/schema/index.js";
 
 export const productsService = crudServiceFactory(products, {
-  entityName: 'Product',
-  searchableFields: ['name', 'description'],
-  defaultOrderBy: 'name',
-  defaultOrderDirection: 'asc'
+  entityName: "Product",
+  searchableFields: ["name", "description"],
+  defaultOrderBy: "name",
+  defaultOrderDirection: "asc",
 });
 ```
 
@@ -43,50 +45,50 @@ export const productsService = crudServiceFactory(products, {
 
 ```javascript
 // src/services/users.service.js
-import { crudServiceFactory } from './common/factory.js';
-import { users } from '../db/schema/index.js';
-import bcrypt from 'bcrypt';
-import { emailService } from './email.service.js';
+import { crudServiceFactory } from "./common/factory.js";
+import { users } from "../db/schema/index.js";
+import bcrypt from "bcrypt";
+import { emailService } from "./email.service.js";
 
 export const usersService = crudServiceFactory(users, {
-  entityName: 'User',
-  searchableFields: ['name', 'email', 'phone'],
-  defaultOrderBy: 'createdAt',
-  defaultOrderDirection: 'desc',
-  
+  entityName: "User",
+  searchableFields: ["name", "email", "phone"],
+  defaultOrderBy: "createdAt",
+  defaultOrderDirection: "desc",
+
   // Hash password before creating user
-  beforeCreate: async (data) => {
+  beforeCreate: async data => {
     if (data.password) {
       data.password = await bcrypt.hash(data.password, 10);
     }
     return data;
   },
-  
+
   // Send welcome email after user creation
   afterCreate: async (user, originalData) => {
     await emailService.sendWelcomeEmail(user.email, user.name);
   },
-  
+
   // Prevent password updates through regular update
   beforeUpdate: async (id, data) => {
     delete data.password;
     return data;
   },
-  
+
   // Check business rules before deletion
-  beforeDelete: async (id) => {
+  beforeDelete: async id => {
     const user = await usersService.findById(id);
-    if (user.role === 'admin') {
-      const adminCount = await usersService.countRecords({ role: 'admin' });
+    if (user.role === "admin") {
+      const adminCount = await usersService.countRecords({ role: "admin" });
       if (adminCount <= 1) {
-        throw new Error('Cannot delete the last admin user');
+        throw new Error("Cannot delete the last admin user");
       }
     }
-  }
+  },
 });
 
 // Add custom methods to the service
-usersService.findByEmail = async (email) => {
+usersService.findByEmail = async email => {
   return await usersService.findOne({ email });
 };
 
@@ -98,7 +100,7 @@ usersService.updatePassword = async (userId, newPassword) => {
 usersService.findByRole = async (roleId, options = {}) => {
   return await usersService.findMany({
     ...options,
-    where: { roleId }
+    where: { roleId },
   });
 };
 ```
@@ -107,37 +109,38 @@ usersService.findByRole = async (roleId, options = {}) => {
 
 ### CRUD Operations
 
-| Method | Description | Parameters |
-|--------|-------------|------------|
-| `create(data)` | Create new record | `data` - Object with record data |
-| `findById(id)` | Find record by ID | `id` - Record identifier |
-| `findOne(conditions)` | Find single record by conditions | `conditions` - Where conditions object |
-| `findMany(options)` | Find multiple records with pagination | `options` - Query options object |
-| `updateById(id, data)` | Update record by ID | `id` - Record ID, `data` - Update data |
-| `updateMany(conditions, data)` | Update multiple records | `conditions` - Where conditions, `data` - Update data |
-| `deleteById(id)` | Delete record by ID | `id` - Record identifier |
-| `deleteMany(conditions)` | Delete multiple records | `conditions` - Where conditions |
+| Method                         | Description                           | Parameters                                            |
+| ------------------------------ | ------------------------------------- | ----------------------------------------------------- |
+| `create(data)`                 | Create new record                     | `data` - Object with record data                      |
+| `findById(id)`                 | Find record by ID                     | `id` - Record identifier                              |
+| `findOne(conditions)`          | Find single record by conditions      | `conditions` - Where conditions object                |
+| `findMany(options)`            | Find multiple records with pagination | `options` - Query options object                      |
+| `updateById(id, data)`         | Update record by ID                   | `id` - Record ID, `data` - Update data                |
+| `updateMany(conditions, data)` | Update multiple records               | `conditions` - Where conditions, `data` - Update data |
+| `deleteById(id)`               | Delete record by ID                   | `id` - Record identifier                              |
+| `deleteMany(conditions)`       | Delete multiple records               | `conditions` - Where conditions                       |
 
 ### Utility Operations
 
-| Method | Description | Parameters |
-|--------|-------------|------------|
+| Method                     | Description                       | Parameters                                 |
+| -------------------------- | --------------------------------- | ------------------------------------------ |
 | `countRecords(conditions)` | Count records matching conditions | `conditions` - Where conditions (optional) |
-| `exists(conditions)` | Check if record exists | `conditions` - Where conditions object |
+| `exists(conditions)`       | Check if record exists            | `conditions` - Where conditions object     |
 
 ### Query Options for findMany
 
 ```javascript
 const options = {
-  where: {               // Filter conditions
-    status: 'active',
-    roleId: 2
+  where: {
+    // Filter conditions
+    status: "active",
+    roleId: 2,
   },
-  search: 'john',        // Search term (searches in searchableFields)
-  page: 1,               // Page number (1-based)
-  limit: 20,             // Records per page
-  orderBy: 'name',       // Field to sort by
-  orderDirection: 'asc'  // Sort direction: 'asc' or 'desc'
+  search: "john", // Search term (searches in searchableFields)
+  page: 1, // Page number (1-based)
+  limit: 20, // Records per page
+  orderBy: "name", // Field to sort by
+  orderDirection: "asc", // Sort direction: 'asc' or 'desc'
 };
 
 const result = await usersService.findMany(options);
@@ -168,19 +171,19 @@ Add domain-specific methods to extend the factory-generated service:
 
 ```javascript
 // src/services/orders.service.js
-import { crudServiceFactory } from './common/factory.js';
-import { orders, orderItems } from '../db/schema/index.js';
-import { db } from '../db/connection.js';
+import { crudServiceFactory } from "./common/factory.js";
+import { orders, orderItems } from "../db/schema/index.js";
+import { db } from "../db/connection.js";
 
 export const ordersService = crudServiceFactory(orders, {
-  entityName: 'Order',
-  searchableFields: ['orderNumber', 'customerName'],
-  defaultOrderBy: 'createdAt',
-  defaultOrderDirection: 'desc'
+  entityName: "Order",
+  searchableFields: ["orderNumber", "customerName"],
+  defaultOrderBy: "createdAt",
+  defaultOrderDirection: "desc",
 });
 
 // Custom methods for order-specific business logic
-ordersService.findWithItems = async (orderId) => {
+ordersService.findWithItems = async orderId => {
   const order = await db
     .select({
       id: orders.id,
@@ -189,13 +192,13 @@ ordersService.findWithItems = async (orderId) => {
       total: orders.total,
       status: orders.status,
       createdAt: orders.createdAt,
-      items: sql`json_agg(${orderItems}.*)`
+      items: sql`json_agg(${orderItems}.*)`,
     })
     .from(orders)
     .leftJoin(orderItems, eq(orders.id, orderItems.orderId))
     .where(eq(orders.id, orderId))
     .groupBy(orders.id);
-    
+
   return order[0] || null;
 };
 
@@ -203,37 +206,37 @@ ordersService.updateStatus = async (orderId, status) => {
   // Add business logic for status transitions
   const order = await ordersService.findById(orderId);
   if (!order) {
-    throw new Error('Order not found');
+    throw new Error("Order not found");
   }
-  
+
   // Validate status transition
   const validTransitions = {
-    'pending': ['confirmed', 'cancelled'],
-    'confirmed': ['processing', 'cancelled'],
-    'processing': ['shipped', 'cancelled'],
-    'shipped': ['delivered'],
-    'delivered': [],
-    'cancelled': []
+    pending: ["confirmed", "cancelled"],
+    confirmed: ["processing", "cancelled"],
+    processing: ["shipped", "cancelled"],
+    shipped: ["delivered"],
+    delivered: [],
+    cancelled: [],
   };
-  
+
   if (!validTransitions[order.status]?.includes(status)) {
     throw new Error(`Cannot transition from ${order.status} to ${status}`);
   }
-  
-  return await ordersService.updateById(orderId, { 
+
+  return await ordersService.updateById(orderId, {
     status,
-    updatedAt: new Date()
+    updatedAt: new Date(),
   });
 };
 
-ordersService.calculateTotal = async (orderId) => {
+ordersService.calculateTotal = async orderId => {
   const result = await db
     .select({
-      total: sql`SUM(${orderItems.quantity} * ${orderItems.price})`
+      total: sql`SUM(${orderItems.quantity} * ${orderItems.price})`,
     })
     .from(orderItems)
     .where(eq(orderItems.orderId, orderId));
-    
+
   return result[0]?.total || 0;
 };
 ```
@@ -272,7 +275,7 @@ beforeDelete: async (id) => {
     userId: id,
     status: ['pending', 'processing']
   });
-  
+
   if (activeOrders > 0) {
     throw new Error('Cannot delete user with active orders');
   }
@@ -282,11 +285,11 @@ beforeDelete: async (id) => {
 beforeCreate: async (data) => {
   // Generate unique identifier
   data.code = await generateUniqueCode();
-  
+
   // Set default values
   data.createdAt = new Date();
   data.status = data.status || 'active';
-  
+
   return data;
 }
 ```
@@ -301,18 +304,18 @@ usersService.authenticate = async (email, password) => {
   try {
     const user = await usersService.findByEmail(email);
     if (!user) {
-      throw new Error('Invalid credentials');
+      throw new Error("Invalid credentials");
     }
-    
+
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
-      throw new Error('Invalid credentials');
+      throw new Error("Invalid credentials");
     }
-    
-    if (user.status !== 'active') {
-      throw new Error('Account is not active');
+
+    if (user.status !== "active") {
+      throw new Error("Account is not active");
     }
-    
+
     return user;
   } catch (error) {
     // Re-throw with context
@@ -328,17 +331,17 @@ usersService.authenticate = async (email, password) => {
 ```javascript
 // Using the factory methods
 const activeUsers = await usersService.findMany({
-  where: { status: 'active' },
-  orderBy: 'name',
-  orderDirection: 'asc'
+  where: { status: "active" },
+  orderBy: "name",
+  orderDirection: "asc",
 });
 
 // Count records
 const totalUsers = await usersService.countRecords();
-const activeUserCount = await usersService.countRecords({ status: 'active' });
+const activeUserCount = await usersService.countRecords({ status: "active" });
 
 // Check existence
-const emailExists = await usersService.exists({ email: 'user@example.com' });
+const emailExists = await usersService.exists({ email: "user@example.com" });
 ```
 
 ### Advanced Queries
@@ -346,9 +349,9 @@ const emailExists = await usersService.exists({ email: 'user@example.com' });
 For complex queries that don't fit the factory pattern, use direct database access:
 
 ```javascript
-import { db } from '../db/connection.js';
-import { users, roles, orders } from '../db/schema/index.js';
-import { eq, and, gte, count, desc } from 'drizzle-orm';
+import { db } from "../db/connection.js";
+import { users, roles, orders } from "../db/schema/index.js";
+import { eq, and, gte, count, desc } from "drizzle-orm";
 
 // Complex join query
 usersService.getUserStats = async () => {
@@ -358,7 +361,7 @@ usersService.getUserStats = async () => {
       userName: users.name,
       roleName: roles.name,
       orderCount: count(orders.id),
-      lastOrderDate: sql`MAX(${orders.createdAt})`
+      lastOrderDate: sql`MAX(${orders.createdAt})`,
     })
     .from(users)
     .leftJoin(roles, eq(users.roleId, roles.id))
@@ -373,11 +376,11 @@ usersService.getActiveUsersByRole = async () => {
     .select({
       roleId: users.roleId,
       roleName: roles.name,
-      userCount: count()
+      userCount: count(),
     })
     .from(users)
     .leftJoin(roles, eq(users.roleId, roles.id))
-    .where(eq(users.status, 'active'))
+    .where(eq(users.status, "active"))
     .groupBy(users.roleId, roles.name);
 };
 ```
@@ -387,41 +390,35 @@ usersService.getActiveUsersByRole = async () => {
 For operations that require multiple database operations, use transactions:
 
 ```javascript
-import { db } from '../db/connection.js';
+import { db } from "../db/connection.js";
 
 ordersService.createOrderWithItems = async (orderData, items) => {
-  return await db.transaction(async (tx) => {
+  return await db.transaction(async tx => {
     try {
       // Create the order
-      const [order] = await tx
-        .insert(orders)
-        .values(orderData)
-        .returning();
-      
+      const [order] = await tx.insert(orders).values(orderData).returning();
+
       // Create order items
       const orderItemsData = items.map(item => ({
         ...item,
-        orderId: order.id
+        orderId: order.id,
       }));
-      
-      const createdItems = await tx
-        .insert(orderItems)
-        .values(orderItemsData)
-        .returning();
-      
+
+      const createdItems = await tx.insert(orderItems).values(orderItemsData).returning();
+
       // Update inventory
       for (const item of items) {
         await tx
           .update(inventory)
           .set({
-            quantity: sql`${inventory.quantity} - ${item.quantity}`
+            quantity: sql`${inventory.quantity} - ${item.quantity}`,
           })
           .where(eq(inventory.productId, item.productId));
       }
-      
+
       return {
         order,
-        items: createdItems
+        items: createdItems,
       };
     } catch (error) {
       // Transaction will be automatically rolled back
@@ -435,58 +432,58 @@ ordersService.createOrderWithItems = async (orderData, items) => {
 
 ```javascript
 // tests/unit/services/users.service.test.js
-import { describe, test, expect, vi, beforeEach } from '@jest/globals';
-import { usersService } from '../../../src/services/users.service.js';
-import { db } from '../../../src/db/connection.js';
+import { describe, test, expect, vi, beforeEach } from "@jest/globals";
+import { usersService } from "../../../src/services/users.service.js";
+import { db } from "../../../src/db/connection.js";
 
 // Mock the database
-vi.mock('../../../src/db/connection.js');
+vi.mock("../../../src/db/connection.js");
 
-describe('Users Service', () => {
+describe("Users Service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-  
-  describe('create', () => {
-    test('should create user with hashed password', async () => {
+
+  describe("create", () => {
+    test("should create user with hashed password", async () => {
       const userData = {
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: 'password123'
+        name: "John Doe",
+        email: "john@example.com",
+        password: "password123",
       };
-      
+
       const mockUser = {
         id: 1,
         ...userData,
-        password: 'hashed_password'
+        password: "hashed_password",
       };
-      
+
       db.insert.mockReturnValue({
         values: vi.fn().mockReturnValue({
-          returning: vi.fn().mockResolvedValue([mockUser])
-        })
+          returning: vi.fn().mockResolvedValue([mockUser]),
+        }),
       });
-      
+
       const result = await usersService.create(userData);
-      
+
       expect(result).toEqual(mockUser);
       expect(result.password).not.toBe(userData.password);
     });
   });
-  
-  describe('findByEmail', () => {
-    test('should find user by email', async () => {
-      const email = 'john@example.com';
-      const mockUser = { id: 1, email, name: 'John' };
-      
+
+  describe("findByEmail", () => {
+    test("should find user by email", async () => {
+      const email = "john@example.com";
+      const mockUser = { id: 1, email, name: "John" };
+
       db.select.mockReturnValue({
         from: vi.fn().mockReturnValue({
-          where: vi.fn().mockResolvedValue([mockUser])
-        })
+          where: vi.fn().mockResolvedValue([mockUser]),
+        }),
       });
-      
+
       const result = await usersService.findByEmail(email);
-      
+
       expect(result).toEqual(mockUser);
     });
   });

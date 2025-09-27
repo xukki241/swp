@@ -1,0 +1,17 @@
+{
+  "extends": "@pharmaflow/jsconfig/javascript/jsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@controllers/*": ["./src/controllers/*"],
+      "@services/*": ["./src/services/*"],
+      "@middleware/*": ["./src/middleware/*"],
+      "@db/*": ["./src/db/*"],
+      "@validation/*": ["./src/validation/*"]
+    },
+    "lib": ["ES2022"]
+  },
+  "include": ["src/**/*", "**/*.js"],
+  "exclude": ["node_modules", "dist", "build", "coverage", "logs", "**/*.test.js", "**/*.spec.js"]
+}

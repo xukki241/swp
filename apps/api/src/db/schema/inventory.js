@@ -9,10 +9,9 @@ import {
   unique,
   index,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+
 import { medicationVariants } from "./medication-variants.js";
 import { users } from "./users.js";
-import { saleItems } from "./sale-items.js";
 
 export const inventoryTransactionTypeEnum = pgEnum(
   "inventory_transaction_type",
@@ -32,7 +31,7 @@ export const inventoryLots = pgTable(
     expirationDate: date("expiration_date"),
     receivedDate: timestamp("received_date").defaultNow(),
   },
-  (table) => [
+  table => [
     unique().on(table.medicationVariantId, table.lotNumber),
     index("idx_inventory_lots_medication_variant_id").on(
       table.medicationVariantId
@@ -54,7 +53,7 @@ export const inventoryLevels = pgTable(
     ),
     quantityOnHand: integer("quantity_on_hand").default(0),
   },
-  (table) => [index("idx_inventory_levels_lot_id").on(table.lotId)]
+  table => [index("idx_inventory_levels_lot_id").on(table.lotId)]
 );
 
 export const inventoryTransactions = pgTable(
@@ -75,7 +74,7 @@ export const inventoryTransactions = pgTable(
     transactionDate: timestamp("transaction_date").defaultNow(),
     reference: varchar("reference", { length: 255 }),
   },
-  (table) => [
+  table => [
     index("idx_inventory_transactions_user_id").on(table.userId),
     index("idx_inventory_transactions_lot_id").on(table.lotId),
     index("idx_inventory_transactions_transaction_date").on(
@@ -85,41 +84,4 @@ export const inventoryTransactions = pgTable(
       table.transactionType
     ),
   ]
-);
-
-export const inventoryLotsRelations = relations(
-  inventoryLots,
-  ({ one, many }) => ({
-    medicationVariant: one(medicationVariants, {
-      fields: [inventoryLots.medicationVariantId],
-      references: [medicationVariants.id],
-    }),
-    levels: many(inventoryLevels),
-    transactions: many(inventoryTransactions),
-    saleItems: many(saleItems),
-  })
-);
-
-export const inventoryLevelsRelations = relations(
-  inventoryLevels,
-  ({ one }) => ({
-    lot: one(inventoryLots, {
-      fields: [inventoryLevels.lotId],
-      references: [inventoryLots.id],
-    }),
-  })
-);
-
-export const inventoryTransactionsRelations = relations(
-  inventoryTransactions,
-  ({ one }) => ({
-    user: one(users, {
-      fields: [inventoryTransactions.userId],
-      references: [users.id],
-    }),
-    lot: one(inventoryLots, {
-      fields: [inventoryTransactions.lotId],
-      references: [inventoryLots.id],
-    }),
-  })
 );

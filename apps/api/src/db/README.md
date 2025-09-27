@@ -1,6 +1,7 @@
 # Database Layer
 
-This directory contains all database-related code including schemas, migrations, and seeding utilities.
+This directory contains all database-related code including schemas, migrations, and seeding
+utilities.
 
 ## Overview
 
@@ -26,34 +27,38 @@ db/
 ### Creating a New Schema
 
 1. **Create schema file** in `src/db/schema/`
+
 ```javascript
 // src/db/schema/products.js
-import { pgTable, serial, varchar, decimal, timestamp, integer } from 'drizzle-orm/pg-core';
-import { suppliers } from './suppliers.js';
+import { pgTable, serial, varchar, decimal, timestamp, integer } from "drizzle-orm/pg-core";
+import { suppliers } from "./suppliers.js";
 
-export const products = pgTable('products', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 255 }).notNull(),
-  description: varchar('description', { length: 1000 }),
-  price: decimal('price', { precision: 10, scale: 2 }).notNull(),
-  supplierId: integer('supplier_id').references(() => suppliers.id),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+export const products = pgTable("products", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: varchar("description", { length: 1000 }),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  supplierId: integer("supplier_id").references(() => suppliers.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 ```
 
 2. **Export from index.js**
+
 ```javascript
 // src/db/schema/index.js
-export * from './products.js';
+export * from "./products.js";
 ```
 
 3. **Generate migration**
+
 ```bash
 pnpm db:generate
 ```
 
 4. **Apply migration**
+
 ```bash
 pnpm db:migrate
 ```
@@ -71,25 +76,25 @@ pnpm db:migrate
 
 ```javascript
 // Standard ID column
-id: serial('id').primaryKey()
+id: serial("id").primaryKey();
 
 // Timestamps
-createdAt: timestamp('created_at').defaultNow()
-updatedAt: timestamp('updated_at').defaultNow()
+createdAt: timestamp("created_at").defaultNow();
+updatedAt: timestamp("updated_at").defaultNow();
 
 // Status enum
-export const statusEnum = pgEnum('status', ['active', 'inactive', 'pending']);
-status: statusEnum('status').default('active')
+export const statusEnum = pgEnum("status", ["active", "inactive", "pending"]);
+status: statusEnum("status").default("active");
 
 // Foreign key reference
-userId: integer('user_id').references(() => users.id)
+userId: integer("user_id").references(() => users.id);
 
 // Money/decimal fields
-price: decimal('price', { precision: 10, scale: 2 })
+price: decimal("price", { precision: 10, scale: 2 });
 
 // Text fields with limits
-name: varchar('name', { length: 255 }).notNull()
-description: varchar('description', { length: 1000 })
+name: varchar("name", { length: 255 }).notNull();
+description: varchar("description", { length: 1000 });
 ```
 
 ## Migrations
@@ -133,9 +138,9 @@ pnpm db:drop
 The connection is configured in `connection.js` using environment variables:
 
 ```javascript
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import * as schema from './schema/index.js';
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import * as schema from "./schema/index.js";
 
 const client = postgres(process.env.DATABASE_URL);
 export const db = drizzle(client, { schema });
@@ -144,6 +149,7 @@ export const db = drizzle(client, { schema });
 ### Environment Variables
 
 Required in `.env`:
+
 ```env
 DATABASE_URL=postgresql://username:password@localhost:5432/pharmacy_db
 ```
@@ -164,9 +170,9 @@ Edit `seed.js` to add initial data:
 ```javascript
 // Example seed data
 await db.insert(roles).values([
-  { name: 'Admin', description: 'System administrator' },
-  { name: 'Manager', description: 'Pharmacy manager' },
-  { name: 'Staff', description: 'Pharmacy staff' },
+  { name: "Admin", description: "System administrator" },
+  { name: "Manager", description: "Pharmacy manager" },
+  { name: "Staff", description: "Pharmacy staff" },
 ]);
 ```
 
@@ -182,14 +188,11 @@ await db.insert(roles).values([
 ### Basic Queries
 
 ```javascript
-import { db } from '../db/connection.js';
-import { users, roles } from '../db/schema/index.js';
+import { db } from "../db/connection.js";
+import { users, roles } from "../db/schema/index.js";
 
 // Find all active users
-const activeUsers = await db
-  .select()
-  .from(users)
-  .where(eq(users.status, 'active'));
+const activeUsers = await db.select().from(users).where(eq(users.status, "active"));
 
 // Find user with role
 const usersWithRoles = await db
@@ -205,8 +208,8 @@ const usersWithRoles = await db
 const [newUser] = await db
   .insert(users)
   .values({
-    name: 'John Doe',
-    email: 'john@example.com',
+    name: "John Doe",
+    email: "john@example.com",
     roleId: 1,
   })
   .returning();
@@ -215,20 +218,14 @@ const [newUser] = await db
 ### Advanced Queries
 
 ```javascript
-import { and, or, like, gte, count } from 'drizzle-orm';
+import { and, or, like, gte, count } from "drizzle-orm";
 
 // Complex filtering
 const results = await db
   .select()
   .from(users)
   .where(
-    and(
-      eq(users.status, 'active'),
-      or(
-        like(users.name, '%john%'),
-        like(users.email, '%john%')
-      )
-    )
+    and(eq(users.status, "active"), or(like(users.name, "%john%"), like(users.email, "%john%")))
   );
 
 // Pagination
@@ -236,16 +233,10 @@ const page = 1;
 const limit = 10;
 const offset = (page - 1) * limit;
 
-const paginatedUsers = await db
-  .select()
-  .from(users)
-  .limit(limit)
-  .offset(offset);
+const paginatedUsers = await db.select().from(users).limit(limit).offset(offset);
 
 // Counting
-const totalUsers = await db
-  .select({ count: count() })
-  .from(users);
+const totalUsers = await db.select({ count: count() }).from(users);
 ```
 
 ## Troubleshooting
@@ -253,16 +244,19 @@ const totalUsers = await db
 ### Common Issues
 
 **Connection Errors**
+
 - Verify DATABASE_URL is correct
 - Ensure PostgreSQL is running
 - Check firewall and network settings
 
 **Migration Errors**
+
 - Review SQL syntax in generated migrations
 - Check for constraint violations
 - Ensure proper column types and constraints
 
 **Schema Issues**
+
 - Verify imports and exports
 - Check for circular dependencies
 - Ensure proper type definitions

@@ -3,9 +3,9 @@ import "dotenv/config";
 /**
  * Environment configuration with environment variables and fallback values
  */
-export const env = {
+const environment = {
   // Server configuration
-  port: parseInt(process.env.PORT) || 3000,
+  port: Number.parseInt(process.env.PORT) || 3000,
   nodeEnv: process.env.NODE_ENV || "development",
 
   // Database configuration
@@ -16,9 +16,10 @@ export const env = {
       `postgresql://${process.env.DB_USER || "postgres"}:${process.env.DB_PASSWORD || "password"}@${process.env.DB_HOST || "localhost"}:${process.env.DB_PORT || "5432"}/${process.env.DB_NAME || "pharmacy_db"}`,
 
     // Pool configuration
-    poolSize: parseInt(process.env.DB_POOL_SIZE) || 20,
-    idleTimeout: parseInt(process.env.DB_IDLE_TIMEOUT) || 30000,
-    connectionTimeout: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 2000,
+    poolSize: Number.parseInt(process.env.DB_POOL_SIZE) || 20,
+    idleTimeout: Number.parseInt(process.env.DB_IDLE_TIMEOUT) || 30_000,
+    connectionTimeout:
+      Number.parseInt(process.env.DB_CONNECTION_TIMEOUT) || 2000,
 
     // SSL configuration
     ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
@@ -33,17 +34,24 @@ export const env = {
 /**
  * Validate required configuration
  */
-export function validateConfig() {
+function validateConfig() {
   const requiredFields = ["database.url"];
 
   const missing = [];
 
-  requiredFields.forEach((field) => {
-    const value = field.split(".").reduce((obj, key) => obj?.[key], env);
+  for (const field of requiredFields) {
+    const keys = field.split(".");
+    let value = environment;
+    for (const key of keys) {
+      value = value?.[key];
+      if (value === undefined) {
+        break;
+      }
+    }
     if (!value) {
       missing.push(field);
     }
-  });
+  }
 
   if (missing.length > 0) {
     throw new Error(`Missing required configuration: ${missing.join(", ")}`);
@@ -55,9 +63,13 @@ try {
   validateConfig();
 } catch (error) {
   console.error("Configuration validation failed:", error.message);
-  if (env.nodeEnv !== "test") {
-    process.exit(1);
+  if (environment.nodeEnv !== "test") {
+    throw error;
   }
 }
 
-export default env;
+// Backwards compatibility
+const env = environment;
+
+export { environment, validateConfig, env };
+export default environment;

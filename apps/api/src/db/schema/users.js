@@ -6,12 +6,8 @@ import {
   unique,
   index,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+
 import { roles } from "./roles.js";
-import { userCredentials } from "./user-credentials.js";
-import { sales } from "./sales.js";
-import { purchaseOrders } from "./purchase-orders.js";
-import { inventoryTransactions } from "./inventory.js";
 
 export const userStatusEnum = pgEnum("user_status", [
   "active",
@@ -33,7 +29,7 @@ export const users = pgTable(
       .notNull()
       .references(() => roles.id, { onDelete: "restrict" }),
   },
-  (table) => [
+  table => [
     unique().on(table.email),
     unique().on(table.phone),
     index("idx_users_role_id").on(table.roleId),
@@ -41,14 +37,3 @@ export const users = pgTable(
     index("idx_users_email").on(table.email),
   ]
 );
-
-export const usersRelations = relations(users, ({ one, many }) => ({
-  role: one(roles, {
-    fields: [users.roleId],
-    references: [roles.id],
-  }),
-  credentials: many(userCredentials),
-  sales: many(sales),
-  purchaseOrders: many(purchaseOrders),
-  inventoryTransactions: many(inventoryTransactions),
-}));

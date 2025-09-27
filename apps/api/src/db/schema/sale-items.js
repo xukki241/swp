@@ -6,10 +6,9 @@ import {
   unique,
   index,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import { sales } from "./sales.js";
+
 import { medicationVariants } from "./medication-variants.js";
-import { inventoryLots } from "./inventory.js";
+import { sales } from "./sales.js";
 
 export const saleItems = pgTable(
   "sale_items",
@@ -23,32 +22,14 @@ export const saleItems = pgTable(
     medicationVariantId: bigint("medication_variant_id", { mode: "number" })
       .notNull()
       .references(() => medicationVariants.id, { onDelete: "restrict" }),
-    lotId: bigint("lot_id", { mode: "number" }).references(
-      () => inventoryLots.id,
-      { onDelete: "set null" }
-    ),
+    lotId: bigint("lot_id", { mode: "number" }),
     quantity: integer("quantity").notNull(),
     unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
   },
-  (table) => [
+  table => [
     unique().on(table.saleId, table.medicationVariantId, table.lotId),
     index("idx_sale_items_sale_id").on(table.saleId),
     index("idx_sale_items_medication_variant_id").on(table.medicationVariantId),
     index("idx_sale_items_lot_id").on(table.lotId),
   ]
 );
-
-export const saleItemsRelations = relations(saleItems, ({ one }) => ({
-  sale: one(sales, {
-    fields: [saleItems.saleId],
-    references: [sales.id],
-  }),
-  medicationVariant: one(medicationVariants, {
-    fields: [saleItems.medicationVariantId],
-    references: [medicationVariants.id],
-  }),
-  lot: one(inventoryLots, {
-    fields: [saleItems.lotId],
-    references: [inventoryLots.id],
-  }),
-}));

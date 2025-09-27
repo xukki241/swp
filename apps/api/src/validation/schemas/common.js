@@ -3,10 +3,10 @@ import * as v from "valibot";
 /**
  * Schema for ID parameter validation
  */
-export const idParamSchema = v.object({
+export const idParameterSchema = v.object({
   id: v.pipe(
     v.string("ID must be a string"),
-    v.transform((input) => parseInt(input, 10)),
+    v.transform(input => Number.parseInt(input, 10)),
     v.number("ID must be a number"),
     v.integer("ID must be an integer"),
     v.minValue(1, "ID must be a positive integer")
@@ -16,7 +16,7 @@ export const idParamSchema = v.object({
 /**
  * Schema for email parameter validation
  */
-export const emailParamSchema = v.object({
+export const emailParameterSchema = v.object({
   email: v.pipe(
     v.string("Email must be a string"),
     v.trim(),
@@ -29,10 +29,10 @@ export const emailParamSchema = v.object({
 /**
  * Schema for role ID parameter validation
  */
-export const roleIdParamSchema = v.object({
+export const roleIdParameterSchema = v.object({
   roleId: v.pipe(
     v.string("Role ID must be a string"),
-    v.transform((input) => parseInt(input, 10)),
+    v.transform(input => Number.parseInt(input, 10)),
     v.number("Role ID must be a number"),
     v.integer("Role ID must be an integer"),
     v.minValue(1, "Role ID must be a positive integer")
@@ -46,7 +46,7 @@ export const paginationSchema = v.object({
   page: v.optional(
     v.pipe(
       v.string("Page must be a string"),
-      v.transform((input) => parseInt(input, 10)),
+      v.transform(input => Number.parseInt(input, 10)),
       v.number("Page must be a number"),
       v.integer("Page must be an integer"),
       v.minValue(1, "Page must be at least 1")
@@ -55,7 +55,7 @@ export const paginationSchema = v.object({
   limit: v.optional(
     v.pipe(
       v.string("Limit must be a string"),
-      v.transform((input) => parseInt(input, 10)),
+      v.transform(input => Number.parseInt(input, 10)),
       v.number("Limit must be a number"),
       v.integer("Limit must be an integer"),
       v.minValue(1, "Limit must be at least 1"),

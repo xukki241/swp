@@ -1,5 +1,3 @@
-import * as React from "react";
-import { Link } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -16,6 +14,8 @@ import {
   Layers,
   Sparkles,
 } from "lucide-react";
+import * as React from "react";
+import { Link } from "react-router-dom";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";

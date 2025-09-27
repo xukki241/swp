@@ -1,11 +1,12 @@
-import { crudControllerFactory } from "./common/index.js";
 import userService from "../services/users.service.js";
+
+import { crudControllerFactory } from "./common/index.js";
 
 /**
  * Transform response to exclude sensitive data
  */
-const transformResponse = (user) => {
-  const { password, ...safeUser } = user;
+const transformResponse = user => {
+  const { password: _password, ...safeUser } = user;
   return safeUser;
 };
 
@@ -26,9 +27,9 @@ const userController = crudControllerFactory(userService, {
  * Get user by email
  * GET /users/email/:email
  */
-userController.getByEmail = async (req, res) => {
+userController.getByEmail = async (request, res) => {
   try {
-    const { email } = req.params;
+    const { email } = request.params;
 
     const user = await userService.findOne({ email });
 
@@ -61,10 +62,10 @@ userController.getByEmail = async (req, res) => {
  * Update user status
  * PATCH /users/:id/status
  */
-userController.updateStatus = async (req, res) => {
+userController.updateStatus = async (request, res) => {
   try {
-    const { id } = req.params;
-    const { status } = req.body;
+    const { id } = request.params;
+    const { status } = request.body;
 
     const updated = await userService.updateById(id, { status });
 
@@ -98,20 +99,20 @@ userController.updateStatus = async (req, res) => {
  * Get users by role
  * GET /users/role/:roleId
  */
-userController.getByRole = async (req, res) => {
+userController.getByRole = async (request, res) => {
   try {
-    const { roleId } = req.params;
-    const queryParams = req.query;
+    const { roleId } = request.params;
+    const queryParameters = request.query;
 
     // Convert roleId to number and set defaults for pagination
-    const roleIdNum = parseInt(roleId, 10);
-    const page = parseInt(queryParams.page, 10) || 1;
-    const limit = parseInt(queryParams.limit, 10) || 10;
-    const orderBy = queryParams.orderBy || "name";
-    const orderDirection = queryParams.orderDirection || "asc";
+    const roleIdNumber = Number.parseInt(roleId, 10);
+    const page = Number.parseInt(queryParameters.page, 10) || 1;
+    const limit = Number.parseInt(queryParameters.limit, 10) || 10;
+    const orderBy = queryParameters.orderBy || "name";
+    const orderDirection = queryParameters.orderDirection || "asc";
 
     const result = await userService.findMany({
-      where: { roleId: roleIdNum },
+      where: { roleId: roleIdNumber },
       page,
       limit,
       orderBy,
@@ -142,16 +143,16 @@ userController.getByRole = async (req, res) => {
  * Get active users
  * GET /users/active
  */
-userController.getActive = async (req, res) => {
+userController.getActive = async (request, res) => {
   try {
-    const queryParams = req.query;
+    const queryParameters = request.query;
 
     // Set defaults for pagination and search
-    const page = parseInt(queryParams.page, 10) || 1;
-    const limit = parseInt(queryParams.limit, 10) || 10;
-    const search = queryParams.search || "";
-    const orderBy = queryParams.orderBy || "name";
-    const orderDirection = queryParams.orderDirection || "asc";
+    const page = Number.parseInt(queryParameters.page, 10) || 1;
+    const limit = Number.parseInt(queryParameters.limit, 10) || 10;
+    const search = queryParameters.search || "";
+    const orderBy = queryParameters.orderBy || "name";
+    const orderDirection = queryParameters.orderDirection || "asc";
 
     const result = await userService.findMany({
       where: { status: "active" },
@@ -186,9 +187,9 @@ userController.getActive = async (req, res) => {
  * Bulk create users
  * POST /users/bulk
  */
-userController.bulkCreate = async (req, res) => {
+userController.bulkCreate = async (request, res) => {
   try {
-    const { users } = req.body;
+    const { users } = request.body;
 
     if (!Array.isArray(users) || users.length === 0) {
       return res.status(400).json({
@@ -202,22 +203,21 @@ userController.bulkCreate = async (req, res) => {
     const errors = [];
 
     // Process each user
-    for (let i = 0; i < users.length; i++) {
+    for (const [index, userData] of users.entries()) {
       try {
-        const userData = users[i];
         const created = await userService.create(userData);
         const responseData = transformResponse(created);
         results.push(responseData);
       } catch (error) {
         // If all previous attempts failed, this might be a system error
-        if (results.length === 0 && errors.length === i) {
+        if (results.length === 0 && errors.length === index) {
           // All attempts have failed so far, this could be a system error
           throw error;
         }
         errors.push({
-          index: i,
+          index,
           error: error.message,
-          data: users[i],
+          data: userData,
         });
       }
     }

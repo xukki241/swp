@@ -1,18 +1,20 @@
-import { crudServiceFactory } from "./common/index.js";
-import { users, userCredentials } from "../db/schema/index.js";
-import { db } from "../db/connection.js";
 import bcrypt from "bcrypt";
 
+import { db as database } from "../db/connection.js";
+import { users, userCredentials } from "../db/schema/index.js";
+
+import { crudServiceFactory } from "./common/index.js";
+
 // Password hashing utility
-const hashPassword = async (password) => {
+const hashPassword = async password => {
   const saltRounds = 12;
   return await bcrypt.hash(password, saltRounds);
 };
 
 // Hook to hash password before creating user
-const beforeCreate = async (data) => {
+const beforeCreate = async data => {
   // Remove password from user data (will be stored separately)
-  const { password, ...userData } = data;
+  const { password: _password, ...userData } = data;
   return userData;
 };
 
@@ -23,7 +25,7 @@ const afterCreate = async (createdUser, originalData) => {
     if (originalData.password) {
       const hashedPassword = await hashPassword(originalData.password);
 
-      await db.insert(userCredentials).values({
+      await database.insert(userCredentials).values({
         userId: createdUser.id,
         provider: "local",
         identifier: createdUser.email,
@@ -40,7 +42,7 @@ const afterCreate = async (createdUser, originalData) => {
 // Hook to hash password before updating user
 const beforeUpdate = async (id, data) => {
   // Remove password from user data (will be handled separately)
-  const { password, ...userData } = data;
+  const { password: _password, ...userData } = data;
   return userData;
 };
 

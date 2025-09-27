@@ -9,12 +9,8 @@ import {
   unique,
   index,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+
 import { medications } from "./medications.js";
-import { supplierMedicationVariants } from "./supplier-medication-variants.js";
-import { purchaseOrderItems } from "./purchase-order-items.js";
-import { inventoryLots } from "./inventory.js";
-import { saleItems } from "./sale-items.js";
 
 export const medicationVariants = pgTable(
   "medication_variants",
@@ -32,7 +28,7 @@ export const medicationVariants = pgTable(
     description: text("description"),
     isActive: boolean("is_active").default(true),
   },
-  (table) => [
+  table => [
     unique().on(table.sku),
     unique().on(table.barcode),
     index("idx_medication_variants_medication_id").on(table.medicationId),
@@ -40,18 +36,4 @@ export const medicationVariants = pgTable(
     index("idx_medication_variants_barcode").on(table.barcode),
     index("idx_medication_variants_is_active").on(table.isActive),
   ]
-);
-
-export const medicationVariantsRelations = relations(
-  medicationVariants,
-  ({ one, many }) => ({
-    medication: one(medications, {
-      fields: [medicationVariants.medicationId],
-      references: [medications.id],
-    }),
-    supplierVariants: many(supplierMedicationVariants),
-    purchaseOrderItems: many(purchaseOrderItems),
-    inventoryLots: many(inventoryLots),
-    saleItems: many(saleItems),
-  })
 );

@@ -1,6 +1,9 @@
-import { bigint, varchar, integer, pgTable, unique } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import { users } from "./users.js";
+import {
+  bigint,
+  varchar,
+  /* integer, */ pgTable,
+  unique,
+} from "drizzle-orm/pg-core";
 
 export const roles = pgTable(
   "roles",
@@ -10,9 +13,5 @@ export const roles = pgTable(
       .generatedAlwaysAsIdentity(),
     name: varchar("name", { length: 100 }).notNull(),
   },
-  (table) => [unique().on(table.name)]
+  table => [unique().on(table.name)]
 );
-
-export const rolesRelations = relations(roles, ({ many }) => ({
-  users: many(users),
-}));

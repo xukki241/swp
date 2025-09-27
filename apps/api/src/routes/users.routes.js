@@ -1,9 +1,10 @@
 import { Router } from "express";
+
 import { userController } from "../controllers/index.js";
 import {
   validate,
   validateBody,
-  validateParams,
+  validateParams as validateParameters,
   validateQuery,
 } from "../middleware/index.js";
 import {
@@ -12,10 +13,10 @@ import {
   userStatusUpdateSchema,
   userBulkCreateSchema,
   userQuerySchema,
-  userByRoleQuerySchema,
-  idParamSchema,
-  emailParamSchema,
-  roleIdParamSchema,
+  // userByRoleQuerySchema,
+  idParameterSchema as idParameterSchema,
+  emailParameterSchema as emailParameterSchema,
+  roleIdParameterSchema as roleIdParameterSchema,
 } from "../validation/index.js";
 
 const router = Router();
@@ -35,40 +36,52 @@ router.post(
   userController.bulkCreate
 ); // POST /users/bulk
 
-router.get("/:id", validateParams(idParamSchema), userController.getById); // GET /users/:id
+router.get(
+  "/:id",
+  validateParameters(idParameterSchema),
+  userController.getById
+); // GET /users/:id
 
 router.put(
   "/:id",
-  validate({ params: idParamSchema, body: userCreateSchema }),
+  validate({ params: idParameterSchema, body: userCreateSchema }),
   userController.updateById
 ); // PUT /users/:id
 
 router.patch(
   "/:id",
-  validate({ params: idParamSchema, body: userUpdateProfileSchema }),
+  validate({ params: idParameterSchema, body: userUpdateProfileSchema }),
   userController.patchById
 ); // PATCH /users/:id
 
-router.delete("/:id", validateParams(idParamSchema), userController.deleteById); // DELETE /users/:id
+router.delete(
+  "/:id",
+  validateParameters(idParameterSchema),
+  userController.deleteById
+); // DELETE /users/:id
 
-router.head("/:id", validateParams(idParamSchema), userController.existsById); // HEAD /users/:id
+router.head(
+  "/:id",
+  validateParameters(idParameterSchema),
+  userController.existsById
+); // HEAD /users/:id
 
 // Custom user routes
 router.get(
   "/email/:email",
-  validateParams(emailParamSchema),
+  validateParameters(emailParameterSchema),
   userController.getByEmail
 ); // GET /users/email/:email
 
 router.patch(
   "/:id/status",
-  validate({ params: idParamSchema, body: userStatusUpdateSchema }),
+  validate({ params: idParameterSchema, body: userStatusUpdateSchema }),
   userController.updateStatus
 ); // PATCH /users/:id/status
 
 router.get(
   "/role/:roleId",
-  validate({ params: roleIdParamSchema, query: userQuerySchema }),
+  validate({ params: roleIdParameterSchema, query: userQuerySchema }),
   userController.getByRole
 ); // GET /users/role/:roleId
 

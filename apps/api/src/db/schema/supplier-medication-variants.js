@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   bigint,
   varchar,
@@ -6,9 +7,9 @@ import {
   pgTable,
   unique,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import { suppliers } from "./suppliers.js";
+
 import { medicationVariants } from "./medication-variants.js";
+import { suppliers } from "./suppliers.js";
 
 export const supplierMedicationVariants = pgTable(
   "supplier_medication_variants",
@@ -26,7 +27,7 @@ export const supplierMedicationVariants = pgTable(
     leadTimeDays: integer("lead_time_days"),
     costPrice: decimal("cost_price", { precision: 10, scale: 2 }).notNull(),
   },
-  (table) => [unique().on(table.supplierId, table.medicationVariantId)]
+  table => [unique().on(table.supplierId, table.medicationVariantId)]
 );
 
 export const supplierMedicationVariantsRelations = relations(

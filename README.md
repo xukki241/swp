@@ -46,7 +46,8 @@ Place your applications in the `apps/` directory. Each app should have its own `
 
 ### Packages
 
-Place your shared packages in the `packages/` directory. These can be shared utilities, UI components, configurations, etc.
+Place your shared packages in the `packages/` directory. These can be shared utilities, UI
+components, configurations, etc.
 
 ## Turborepo Features
 
@@ -60,7 +61,8 @@ This setup includes:
 
 ## Workspace Management
 
-This monorepo uses PNPM workspaces. All packages in `apps/*` and `packages/*` are automatically detected and managed.
+This monorepo uses PNPM workspaces. All packages in `apps/*` and `packages/*` are automatically
+detected and managed.
 
 To add dependencies:
 

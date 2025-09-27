@@ -1,15 +1,16 @@
-import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 export function RegisterForm({ className, ...props }) {
   return (
     <form className={cn("flex flex-col gap-6", className)} {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Create your account</h1>
-        <p className="text-muted-foreground text-sm text-balance">
+        <p className="text-muted-foreground text-balance text-sm">
           Enter your information below to create your account
         </p>
       </div>

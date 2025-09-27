@@ -1,6 +1,7 @@
 # Controllers Layer
 
-This directory contains all HTTP request handlers that process incoming API requests and coordinate responses.
+This directory contains all HTTP request handlers that process incoming API requests and coordinate
+responses.
 
 ## Overview
 
@@ -22,22 +23,23 @@ controllers/
 
 ## CRUD Controller Factory
 
-The factory creates standardized controllers with full CRUD operations and additional utility methods.
+The factory creates standardized controllers with full CRUD operations and additional utility
+methods.
 
 ### Basic Usage
 
 ```javascript
 // src/controllers/products.controller.js
-import { crudControllerFactory } from './common/factory.js';
-import { productsService } from '../services/index.js';
+import { crudControllerFactory } from "./common/factory.js";
+import { productsService } from "../services/index.js";
 
 export const productsController = crudControllerFactory(productsService, {
-  entityName: 'Product',
-  allowedSortFields: ['name', 'price', 'createdAt'],
-  transformResponse: (product) => ({
+  entityName: "Product",
+  allowedSortFields: ["name", "price", "createdAt"],
+  transformResponse: product => ({
     ...product,
     // Remove sensitive fields or add computed properties
-  })
+  }),
 });
 ```
 
@@ -45,16 +47,16 @@ export const productsController = crudControllerFactory(productsService, {
 
 ```javascript
 export const usersController = crudControllerFactory(usersService, {
-  entityName: 'User',
-  allowedSortFields: ['name', 'email', 'createdAt'],
-  
+  entityName: "User",
+  allowedSortFields: ["name", "email", "createdAt"],
+
   // Transform response to hide sensitive data
-  transformResponse: (user) => ({
+  transformResponse: user => ({
     ...user,
     password: undefined, // Remove password from response
     email: user.email?.toLowerCase(),
   }),
-  
+
   // Hooks for custom logic
   beforeCreate: async (data, req) => {
     // Hash password before creating user
@@ -63,26 +65,26 @@ export const usersController = crudControllerFactory(usersService, {
     }
     return data;
   },
-  
+
   afterCreate: async (user, originalData, req) => {
     // Send welcome email after user creation
     await emailService.sendWelcomeEmail(user.email);
   },
-  
+
   beforeUpdate: async (id, data, req) => {
     // Prevent updating certain fields
     delete data.createdAt;
     delete data.id;
     return data;
   },
-  
+
   beforeDelete: async (id, req) => {
     // Check if user can be deleted
     const user = await usersService.findById(id);
-    if (user.role === 'admin') {
-      throw new Error('Cannot delete admin users');
+    if (user.role === "admin") {
+      throw new Error("Cannot delete admin users");
     }
-  }
+  },
 });
 ```
 
@@ -90,21 +92,21 @@ export const usersController = crudControllerFactory(usersService, {
 
 ### Standard CRUD Operations
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `create` | `POST /resource` | Create new record |
-| `getById` | `GET /resource/:id` | Get record by ID |
-| `getMany` | `GET /resource` | Get multiple records with pagination |
-| `updateById` | `PUT /resource/:id` | Update entire record |
-| `patchById` | `PATCH /resource/:id` | Partially update record |
-| `deleteById` | `DELETE /resource/:id` | Delete record by ID |
+| Method       | Endpoint               | Description                          |
+| ------------ | ---------------------- | ------------------------------------ |
+| `create`     | `POST /resource`       | Create new record                    |
+| `getById`    | `GET /resource/:id`    | Get record by ID                     |
+| `getMany`    | `GET /resource`        | Get multiple records with pagination |
+| `updateById` | `PUT /resource/:id`    | Update entire record                 |
+| `patchById`  | `PATCH /resource/:id`  | Partially update record              |
+| `deleteById` | `DELETE /resource/:id` | Delete record by ID                  |
 
 ### Utility Operations
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `count` | `GET /resource/count` | Count total records |
-| `existsById` | `HEAD /resource/:id` | Check if record exists |
+| Method       | Endpoint              | Description             |
+| ------------ | --------------------- | ----------------------- |
+| `count`      | `GET /resource/count` | Count total records     |
+| `existsById` | `HEAD /resource/:id`  | Check if record exists  |
 | `bulkCreate` | `POST /resource/bulk` | Create multiple records |
 
 ### Query Parameters for getMany
@@ -207,42 +209,40 @@ For complex business logic that doesn't fit the CRUD pattern, create custom cont
 
 ```javascript
 // src/controllers/auth.controller.js
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { usersService } from '../services/index.js';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { usersService } from "../services/index.js";
 
 export const authController = {
   async login(req, res) {
     try {
       const { email, password } = req.body;
-      
+
       // Find user by email
       const user = await usersService.findByEmail(email);
       if (!user) {
         return res.status(401).json({
           success: false,
-          error: 'Authentication failed',
-          message: 'Invalid credentials'
+          error: "Authentication failed",
+          message: "Invalid credentials",
         });
       }
-      
+
       // Verify password
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
         return res.status(401).json({
           success: false,
-          error: 'Authentication failed',
-          message: 'Invalid credentials'
+          error: "Authentication failed",
+          message: "Invalid credentials",
         });
       }
-      
+
       // Generate JWT token
-      const token = jwt.sign(
-        { userId: user.id, email: user.email },
-        process.env.JWT_SECRET,
-        { expiresIn: '7d' }
-      );
-      
+      const token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET, {
+        expiresIn: "7d",
+      });
+
       res.json({
         success: true,
         data: {
@@ -251,32 +251,32 @@ export const authController = {
             id: user.id,
             name: user.name,
             email: user.email,
-            role: user.role
-          }
+            role: user.role,
+          },
         },
-        message: 'Login successful'
+        message: "Login successful",
       });
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       res.status(500).json({
         success: false,
         error: error.message,
-        message: 'Login failed'
+        message: "Login failed",
       });
     }
   },
-  
+
   async logout(req, res) {
     // Implement logout logic (token blacklisting, etc.)
     res.json({
       success: true,
-      message: 'Logout successful'
+      message: "Logout successful",
     });
   },
-  
+
   async refreshToken(req, res) {
     // Implement token refresh logic
-  }
+  },
 };
 ```
 
@@ -337,22 +337,23 @@ async function create(req, res) {
     // ... operation logic
   } catch (error) {
     // Log detailed error for debugging
-    console.error('Error creating user:', error);
-    
+    console.error("Error creating user:", error);
+
     // Send user-friendly error response
-    if (error.code === '23505') { // PostgreSQL unique violation
+    if (error.code === "23505") {
+      // PostgreSQL unique violation
       return res.status(409).json({
         success: false,
-        error: 'Conflict',
-        message: 'Email already exists'
+        error: "Conflict",
+        message: "Email already exists",
       });
     }
-    
+
     // Generic error response
     res.status(500).json({
       success: false,
-      error: 'Internal Server Error',
-      message: 'Failed to create user'
+      error: "Internal Server Error",
+      message: "Failed to create user",
     });
   }
 }
@@ -362,8 +363,8 @@ async function create(req, res) {
 
 ```javascript
 // tests/unit/controllers/users.controller.test.js
-import { describe, test, expect, vi, beforeEach } from '@jest/globals';
-import { usersController } from '../../../src/controllers/users.controller.js';
+import { describe, test, expect, vi, beforeEach } from "@jest/globals";
+import { usersController } from "../../../src/controllers/users.controller.js";
 
 // Mock the service
 const mockUsersService = {
@@ -371,14 +372,14 @@ const mockUsersService = {
   findById: vi.fn(),
   findMany: vi.fn(),
   updateById: vi.fn(),
-  deleteById: vi.fn()
+  deleteById: vi.fn(),
 };
 
 // Mock request and response objects
 const mockRequest = (body = {}, params = {}, query = {}) => ({
   body,
   params,
-  query
+  query,
 });
 
 const mockResponse = () => {
@@ -389,32 +390,32 @@ const mockResponse = () => {
   return res;
 };
 
-describe('Users Controller', () => {
+describe("Users Controller", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-  
-  describe('create', () => {
-    test('should create user successfully', async () => {
-      const req = mockRequest({ name: 'John Doe', email: 'john@example.com' });
+
+  describe("create", () => {
+    test("should create user successfully", async () => {
+      const req = mockRequest({ name: "John Doe", email: "john@example.com" });
       const res = mockResponse();
-      
+
       mockUsersService.create.mockResolvedValue({
         id: 1,
-        name: 'John Doe',
-        email: 'john@example.com'
+        name: "John Doe",
+        email: "john@example.com",
       });
-      
+
       await usersController.create(req, res);
-      
+
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: expect.objectContaining({
-          name: 'John Doe',
-          email: 'john@example.com'
+          name: "John Doe",
+          email: "john@example.com",
         }),
-        message: 'User created successfully'
+        message: "User created successfully",
       });
     });
   });

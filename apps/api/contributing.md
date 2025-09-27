@@ -1,6 +1,7 @@
 # Contributing to Pharmacy Management API
 
-Welcome to the Pharmacy Management API project! This guide will help you understand our codebase structure, development workflow, and contribution standards.
+Welcome to the Pharmacy Management API project! This guide will help you understand our codebase
+structure, development workflow, and contribution standards.
 
 ## Table of Contents
 
@@ -49,37 +50,42 @@ This is a modern Node.js Express API for pharmacy management, featuring:
 ### Initial Setup
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd apps/api
    ```
 
 2. **Install dependencies**
+
    ```bash
    pnpm install
    ```
 
 3. **Environment Configuration**
-   
-  Copy the `.env.example` file and rename it to `.env`.
 
-  Then edit `.env` with your specific configuration.
+Copy the `.env.example` file and rename it to `.env`.
 
-   > **Note**: The `env.example` file contains all available configuration options with example values. Never commit your actual `.env` file to version control.
+Then edit `.env` with your specific configuration.
+
+> **Note**: The `env.example` file contains all available configuration options with example values.
+> Never commit your actual `.env` file to version control.
 
 4. **Database Setup**
+
    ```bash
    # Generate and run migrations
    pnpm db:migrate
-   
+
    # Seed the database with initial data
    pnpm db:seed
-   
+
    # (Optional) Open Drizzle Studio for database management
    pnpm db:studio
    ```
 
 5. **Start Development Server**
+
    ```bash
    pnpm dev
    ```
@@ -118,7 +124,8 @@ src/
 - **Middleware Composition**: Layered request processing
 - **Service Layer**: Separation of business logic from HTTP handling
 
-> 📚 **Detailed Implementation**: Each directory has its own README with comprehensive guides, examples, and best practices.
+> 📚 **Detailed Implementation**: Each directory has its own README with comprehensive guides,
+> examples, and best practices.
 
 ## Development Workflow
 
@@ -146,6 +153,7 @@ refactor(controllers): extract common validation logic
 ### Development Process
 
 1. **Create a feature branch**
+
    ```bash
    git checkout develop
    git pull origin develop
@@ -158,12 +166,14 @@ refactor(controllers): extract common validation logic
    - Update documentation if needed
 
 3. **Test your changes**
+
    ```bash
    pnpm dev  # Test locally
    # Run any additional tests
    ```
 
 4. **Commit and push**
+
    ```bash
    git add .
    git commit -m "feat(scope): your descriptive message"
@@ -198,18 +208,18 @@ refactor(controllers): extract common validation logic
  */
 
 // Imports (external first, then internal)
-import express from 'express';
-import { crudControllerFactory } from './common/factory.js';
-import { usersService } from '../services/index.js';
+import express from "express";
+import { crudControllerFactory } from "./common/factory.js";
+import { usersService } from "../services/index.js";
 
 // Constants
-const ENTITY_NAME = 'User';
+const ENTITY_NAME = "User";
 
 // Main implementation
 export const usersController = crudControllerFactory(usersService, {
   entityName: ENTITY_NAME,
-  allowedSortFields: ['name', 'email', 'createdAt'],
-  transformResponse: (user) => ({ ...user, password: undefined })
+  allowedSortFields: ["name", "email", "createdAt"],
+  transformResponse: user => ({ ...user, password: undefined }),
 });
 
 // Default export (if applicable)
@@ -295,6 +305,7 @@ pnpm db:seed
 ```
 
 > 📚 **For detailed guides**, see:
+>
 > - [Controllers](src/controllers/README.md) - HTTP request handling
 > - [Services](src/services/README.md) - Business logic implementation
 > - [Validation](src/validation/README.md) - Input validation with Valibot
@@ -351,20 +362,24 @@ pnpm test:coverage
 
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Local testing completed
 - [ ] Database migrations tested
 - [ ] API endpoints verified
 
 ## Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Self-review completed
 - [ ] Documentation updated

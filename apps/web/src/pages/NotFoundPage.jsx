@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
 
 export default function NotFoundPage() {
   const navigate = useNavigate();
@@ -20,14 +21,14 @@ export default function NotFoundPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="bg-background flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-md">
         <Card className="shadow-lg">
-          <CardHeader className="text-center pb-2">
-            <div className="mx-auto mb-6 text-8xl font-bold text-primary/20">
+          <CardHeader className="pb-2 text-center">
+            <div className="text-primary/20 mx-auto mb-6 text-8xl font-bold">
               404
             </div>
-            <CardTitle className="text-3xl mb-2">Page Not Found</CardTitle>
+            <CardTitle className="mb-2 text-3xl">Page Not Found</CardTitle>
             <CardDescription className="text-base">
               The page you're looking for doesn't exist or has been moved.
             </CardDescription>

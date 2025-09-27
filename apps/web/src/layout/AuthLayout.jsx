@@ -6,7 +6,7 @@ export default function AuthLayout() {
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
-          <Link to="/" className="flex items-center gap-2 font-medium text-lg">
+          <Link to="/" className="flex items-center gap-2 text-lg font-medium">
             <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-md">
               <Pill className="size-5" />
             </div>

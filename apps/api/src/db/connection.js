@@ -1,29 +1,30 @@
-import pg from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
+import pg from "pg";
+
+import { env as environment } from "../config/env.js";
 
 import * as schema from "./schema/index.js";
-import { env } from "../config/env.js";
 
 const { Pool } = pg;
 
 // Create connection pool using DATABASE_URL or individual config values
 const pool = new Pool({
-  connectionString: env.database.url,
-  ssl: env.database.ssl,
-  max: env.database.poolSize,
-  idleTimeoutMillis: env.database.idleTimeout,
-  connectionTimeoutMillis: env.database.connectionTimeout,
+  connectionString: environment.database.url,
+  ssl: environment.database.ssl,
+  max: environment.database.poolSize,
+  idleTimeoutMillis: environment.database.idleTimeout,
+  connectionTimeoutMillis: environment.database.connectionTimeout,
 });
 
 // Create drizzle instance
-export const db = drizzle(pool, { schema });
+const db = drizzle(pool, { schema });
 
 // Auto-migrate on startup
 async function runMigrations() {
   try {
     console.log("Running database migrations...");
-    await migrate(db, { migrationsFolder: env.migrations.folder });
+    await migrate(db, { migrationsFolder: environment.migrations.folder });
     console.log("Database migrations completed successfully");
   } catch (error) {
     console.error("Database migration failed:", error);
@@ -32,7 +33,7 @@ async function runMigrations() {
 }
 
 // Initialize database and run migrations
-export async function initializeDatabase() {
+async function initializeDatabase() {
   try {
     // Test connection
     await pool.query("SELECT NOW()");
@@ -50,24 +51,23 @@ export async function initializeDatabase() {
 
 // Auto-initialize if not in test environment
 if (process.env.NODE_ENV !== "test") {
-  initializeDatabase().catch((error) => {
+  initializeDatabase().catch(error => {
     console.error("Fatal database error:", error);
-    process.exit(1);
+    throw new Error(`Database initialization failed: ${error.message}`);
   });
 }
-
-// Export pool for direct access if needed
-export { pool };
 
 // Graceful shutdown
 process.on("SIGINT", async () => {
   console.log("Closing database pool...");
   await pool.end();
-  process.exit(0);
+  throw new Error("Application terminated");
 });
 
 process.on("SIGTERM", async () => {
   console.log("Closing database pool...");
   await pool.end();
-  process.exit(0);
+  throw new Error("Application terminated");
 });
+
+export { db, pool, initializeDatabase };

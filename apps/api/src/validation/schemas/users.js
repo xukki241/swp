@@ -1,11 +1,12 @@
-import * as v from "valibot";
 import { createSelectSchema, createInsertSchema } from "drizzle-valibot";
-import { users, userStatusEnum } from "../../db/schema/users.js";
+import * as v from "valibot";
+
 import { userCredentials } from "../../db/schema/user-credentials.js";
 import {
   userRegistrations,
-  registrationStatusEnum,
+  // registrationStatusEnum,
 } from "../../db/schema/user-registrations.js";
+import { users /* userStatusEnum */ } from "../../db/schema/users.js";
 
 // Base schemas generated from Drizzle tables
 export const userSelectSchema = createSelectSchema(users);
@@ -41,7 +42,7 @@ export const userCreateSchema = v.object({
     v.trim(),
     v.minLength(1, "Phone is required"),
     v.maxLength(20, "Phone must be 20 characters or less"),
-    v.regex(/^[\+]?[0-9\s\-\(\)]+$/, "Invalid phone number format")
+    v.regex(/^\+?[\d\s()-]+$/, "Invalid phone number format")
   ),
   roleId: v.pipe(
     v.number("Role ID must be a number"),
@@ -80,7 +81,7 @@ export const userUpdateProfileSchema = v.object({
       v.trim(),
       v.minLength(1, "Phone is required"),
       v.maxLength(20, "Phone must be 20 characters or less"),
-      v.regex(/^[\+]?[0-9\s\-\(\)]+$/, "Invalid phone number format")
+      v.regex(/^\+?[\d\s()-]+$/, "Invalid phone number format")
     )
   ),
 });
@@ -113,7 +114,7 @@ export const userQuerySchema = v.object({
   page: v.optional(
     v.pipe(
       v.string("Page must be a string"),
-      v.transform((input) => parseInt(input, 10)),
+      v.transform(input => Number.parseInt(input, 10)),
       v.number("Page must be a number"),
       v.integer("Page must be an integer"),
       v.minValue(1, "Page must be at least 1")
@@ -122,7 +123,7 @@ export const userQuerySchema = v.object({
   limit: v.optional(
     v.pipe(
       v.string("Limit must be a string"),
-      v.transform((input) => parseInt(input, 10)),
+      v.transform(input => Number.parseInt(input, 10)),
       v.number("Limit must be a number"),
       v.integer("Limit must be an integer"),
       v.minValue(1, "Limit must be at least 1"),
@@ -157,7 +158,7 @@ export const userByRoleQuerySchema = v.object({
   page: v.optional(
     v.pipe(
       v.string("Page must be a string"),
-      v.transform((input) => parseInt(input, 10)),
+      v.transform(input => Number.parseInt(input, 10)),
       v.number("Page must be a number"),
       v.integer("Page must be an integer"),
       v.minValue(1, "Page must be at least 1")
@@ -166,7 +167,7 @@ export const userByRoleQuerySchema = v.object({
   limit: v.optional(
     v.pipe(
       v.string("Limit must be a string"),
-      v.transform((input) => parseInt(input, 10)),
+      v.transform(input => Number.parseInt(input, 10)),
       v.number("Limit must be a number"),
       v.integer("Limit must be an integer"),
       v.minValue(1, "Limit must be at least 1"),
@@ -206,7 +207,7 @@ export const userRegistrationCreateSchema = v.object({
       v.string("Phone must be a string"),
       v.trim(),
       v.maxLength(20, "Phone must be 20 characters or less"),
-      v.regex(/^[\+]?[0-9\s\-\(\)]+$/, "Invalid phone number format")
+      v.regex(/^\+?[\d\s()-]+$/, "Invalid phone number format")
     )
   ),
   password: v.pipe(
@@ -214,7 +215,7 @@ export const userRegistrationCreateSchema = v.object({
     v.minLength(8, "Password must be at least 8 characters long"),
     v.maxLength(128, "Password must be 128 characters or less"),
     v.regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!$%&*?@])[\d!$%&*?@A-Za-z]/,
       "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character"
     )
   ),

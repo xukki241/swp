@@ -64,12 +64,8 @@
           "name": "users_role_id_roles_id_fk",
           "tableFrom": "users",
           "tableTo": "roles",
-          "columnsFrom": [
-            "role_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["role_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -79,16 +75,12 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         },
         "users_phone_unique": {
           "name": "users_phone_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "phone"
-          ]
+          "columns": ["phone"]
         }
       },
       "policies": {},
@@ -130,9 +122,7 @@
         "roles_name_unique": {
           "name": "roles_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "policies": {},
@@ -191,12 +181,8 @@
           "name": "user_credentials_user_id_users_id_fk",
           "tableFrom": "user_credentials",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -206,18 +192,12 @@
         "user_credentials_user_id_provider_unique": {
           "name": "user_credentials_user_id_provider_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id",
-            "provider"
-          ]
+          "columns": ["user_id", "provider"]
         },
         "user_credentials_provider_identifier_unique": {
           "name": "user_credentials_provider_identifier_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "provider",
-            "identifier"
-          ]
+          "columns": ["provider", "identifier"]
         }
       },
       "policies": {},
@@ -292,9 +272,7 @@
         "user_registrations_email_unique": {
           "name": "user_registrations_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -429,12 +407,8 @@
           "name": "medication_variants_medication_id_medications_id_fk",
           "tableFrom": "medication_variants",
           "tableTo": "medications",
-          "columnsFrom": [
-            "medication_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["medication_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -444,16 +418,12 @@
         "medication_variants_sku_unique": {
           "name": "medication_variants_sku_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "sku"
-          ]
+          "columns": ["sku"]
         },
         "medication_variants_barcode_unique": {
           "name": "medication_variants_barcode_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "barcode"
-          ]
+          "columns": ["barcode"]
         }
       },
       "policies": {},
@@ -586,12 +556,8 @@
           "name": "supplier_medication_variants_supplier_id_suppliers_id_fk",
           "tableFrom": "supplier_medication_variants",
           "tableTo": "suppliers",
-          "columnsFrom": [
-            "supplier_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["supplier_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -599,12 +565,8 @@
           "name": "supplier_medication_variants_medication_variant_id_medication_variants_id_fk",
           "tableFrom": "supplier_medication_variants",
           "tableTo": "medication_variants",
-          "columnsFrom": [
-            "medication_variant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["medication_variant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -614,10 +576,7 @@
         "supplier_medication_variants_supplier_id_medication_variant_id_unique": {
           "name": "supplier_medication_variants_supplier_id_medication_variant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "supplier_id",
-            "medication_variant_id"
-          ]
+          "columns": ["supplier_id", "medication_variant_id"]
         }
       },
       "policies": {},
@@ -691,12 +650,8 @@
           "name": "purchase_orders_user_id_users_id_fk",
           "tableFrom": "purchase_orders",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -704,12 +659,8 @@
           "name": "purchase_orders_supplier_id_suppliers_id_fk",
           "tableFrom": "purchase_orders",
           "tableTo": "suppliers",
-          "columnsFrom": [
-            "supplier_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["supplier_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -779,12 +730,8 @@
           "name": "purchase_order_items_purchase_order_id_purchase_orders_id_fk",
           "tableFrom": "purchase_order_items",
           "tableTo": "purchase_orders",
-          "columnsFrom": [
-            "purchase_order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["purchase_order_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -792,12 +739,8 @@
           "name": "purchase_order_items_medication_variant_id_medication_variants_id_fk",
           "tableFrom": "purchase_order_items",
           "tableTo": "medication_variants",
-          "columnsFrom": [
-            "medication_variant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["medication_variant_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -807,10 +750,7 @@
         "purchase_order_items_purchase_order_id_medication_variant_id_unique": {
           "name": "purchase_order_items_purchase_order_id_medication_variant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "purchase_order_id",
-            "medication_variant_id"
-          ]
+          "columns": ["purchase_order_id", "medication_variant_id"]
         }
       },
       "policies": {},
@@ -858,12 +798,8 @@
           "name": "inventory_levels_lot_id_inventory_lots_id_fk",
           "tableFrom": "inventory_levels",
           "tableTo": "inventory_lots",
-          "columnsFrom": [
-            "lot_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["lot_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -927,12 +863,8 @@
           "name": "inventory_lots_medication_variant_id_medication_variants_id_fk",
           "tableFrom": "inventory_lots",
           "tableTo": "medication_variants",
-          "columnsFrom": [
-            "medication_variant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["medication_variant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -942,10 +874,7 @@
         "inventory_lots_medication_variant_id_lot_number_unique": {
           "name": "inventory_lots_medication_variant_id_lot_number_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "medication_variant_id",
-            "lot_number"
-          ]
+          "columns": ["medication_variant_id", "lot_number"]
         }
       },
       "policies": {},
@@ -1018,12 +947,8 @@
           "name": "inventory_transactions_user_id_users_id_fk",
           "tableFrom": "inventory_transactions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1031,12 +956,8 @@
           "name": "inventory_transactions_lot_id_inventory_lots_id_fk",
           "tableFrom": "inventory_transactions",
           "tableTo": "inventory_lots",
-          "columnsFrom": [
-            "lot_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["lot_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1120,16 +1041,12 @@
         "customers_email_unique": {
           "name": "customers_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         },
         "customers_phone_unique": {
           "name": "customers_phone_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "phone"
-          ]
+          "columns": ["phone"]
         }
       },
       "policies": {},
@@ -1216,12 +1133,8 @@
           "name": "sales_user_id_users_id_fk",
           "tableFrom": "sales",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1229,12 +1142,8 @@
           "name": "sales_customer_id_customers_id_fk",
           "tableFrom": "sales",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1303,12 +1212,8 @@
           "name": "sale_items_sale_id_sales_id_fk",
           "tableFrom": "sale_items",
           "tableTo": "sales",
-          "columnsFrom": [
-            "sale_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["sale_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1316,12 +1221,8 @@
           "name": "sale_items_medication_variant_id_medication_variants_id_fk",
           "tableFrom": "sale_items",
           "tableTo": "medication_variants",
-          "columnsFrom": [
-            "medication_variant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["medication_variant_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -1329,12 +1230,8 @@
           "name": "sale_items_lot_id_inventory_lots_id_fk",
           "tableFrom": "sale_items",
           "tableTo": "inventory_lots",
-          "columnsFrom": [
-            "lot_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["lot_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1344,11 +1241,7 @@
         "sale_items_sale_id_medication_variant_id_lot_id_unique": {
           "name": "sale_items_sale_id_medication_variant_id_lot_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "sale_id",
-            "medication_variant_id",
-            "lot_id"
-          ]
+          "columns": ["sale_id", "medication_variant_id", "lot_id"]
         }
       },
       "policies": {},
@@ -1414,9 +1307,7 @@
         "reports_daily_report_date_unique": {
           "name": "reports_daily_report_date_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "report_date"
-          ]
+          "columns": ["report_date"]
         }
       },
       "policies": {},
@@ -1464,9 +1355,7 @@
         "reports_monthly_month_start_date_unique": {
           "name": "reports_monthly_month_start_date_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "month_start_date"
-          ]
+          "columns": ["month_start_date"]
         }
       },
       "policies": {},
@@ -1520,9 +1409,7 @@
         "reports_weekly_week_start_date_unique": {
           "name": "reports_weekly_week_start_date_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "week_start_date"
-          ]
+          "columns": ["week_start_date"]
         }
       },
       "policies": {},
@@ -1534,87 +1421,47 @@
     "public.user_status": {
       "name": "user_status",
       "schema": "public",
-      "values": [
-        "active",
-        "inactive",
-        "suspended"
-      ]
+      "values": ["active", "inactive", "suspended"]
     },
     "public.registration_status": {
       "name": "registration_status",
       "schema": "public",
-      "values": [
-        "pending_verification",
-        "verified",
-        "rejected"
-      ]
+      "values": ["pending_verification", "verified", "rejected"]
     },
     "public.medication_status": {
       "name": "medication_status",
       "schema": "public",
-      "values": [
-        "active",
-        "inactive",
-        "discontinued"
-      ]
+      "values": ["active", "inactive", "discontinued"]
     },
     "public.supplier_status": {
       "name": "supplier_status",
       "schema": "public",
-      "values": [
-        "active",
-        "inactive",
-        "blacklisted"
-      ]
+      "values": ["active", "inactive", "blacklisted"]
     },
     "public.purchase_order_status": {
       "name": "purchase_order_status",
       "schema": "public",
-      "values": [
-        "draft",
-        "submitted",
-        "partially_received",
-        "completed",
-        "cancelled"
-      ]
+      "values": ["draft", "submitted", "partially_received", "completed", "cancelled"]
     },
     "public.inventory_transaction_type": {
       "name": "inventory_transaction_type",
       "schema": "public",
-      "values": [
-        "purchase",
-        "sale",
-        "adjustment",
-        "return"
-      ]
+      "values": ["purchase", "sale", "adjustment", "return"]
     },
     "public.customer_type": {
       "name": "customer_type",
       "schema": "public",
-      "values": [
-        "retail",
-        "wholesale"
-      ]
+      "values": ["retail", "wholesale"]
     },
     "public.payment_method": {
       "name": "payment_method",
       "schema": "public",
-      "values": [
-        "cash",
-        "credit_card",
-        "insurance",
-        "other"
-      ]
+      "values": ["cash", "credit_card", "insurance", "other"]
     },
     "public.sale_status": {
       "name": "sale_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "completed",
-        "refunded",
-        "cancelled"
-      ]
+      "values": ["pending", "completed", "refunded", "cancelled"]
     }
   },
   "schemas": {},

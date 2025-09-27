@@ -32,12 +32,12 @@ function crudControllerFactory(service, options = {}) {
    * Create a new record
    * POST /resource
    */
-  async function create(req, res) {
+  async function create(request, res) {
     try {
       // Before create hook
-      let data = req.body;
+      let data = request.body;
       if (beforeCreate) {
-        data = await beforeCreate(data, req);
+        data = await beforeCreate(data, request);
       }
 
       // Create record
@@ -45,7 +45,7 @@ function crudControllerFactory(service, options = {}) {
 
       // After create hook
       if (afterCreate) {
-        await afterCreate(created, data, req);
+        await afterCreate(created, data, request);
       }
 
       // Transform response if needed
@@ -72,10 +72,10 @@ function crudControllerFactory(service, options = {}) {
    * Get a record by ID
    * GET /resource/:id
    */
-  async function getById(req, res) {
+  async function getById(request, res) {
     try {
-      const params = req.params;
-      const { id } = params;
+      const parameters = request.params;
+      const { id } = parameters;
 
       if (!id) {
         return res.status(400).json({
@@ -118,9 +118,9 @@ function crudControllerFactory(service, options = {}) {
    * Get multiple records with pagination and filtering
    * GET /resource
    */
-  async function getMany(req, res) {
+  async function getMany(request, res) {
     try {
-      const queryParams = req.query;
+      const queryParameters = request.query;
       const {
         page = 1,
         limit = 10,
@@ -128,11 +128,11 @@ function crudControllerFactory(service, options = {}) {
         orderBy = service.config?.defaultOrderBy || "id",
         orderDirection = service.config?.defaultOrderDirection || "desc",
         ...filters
-      } = queryParams;
+      } = queryParameters;
 
       // Validate pagination parameters
-      const parsedPage = parseInt(page);
-      const parsedLimit = Math.min(parseInt(limit), 100); // Max 100 records per page
+      const parsedPage = Number.parseInt(page);
+      const parsedLimit = Math.min(Number.parseInt(limit), 100); // Max 100 records per page
 
       if (parsedPage < 1) {
         return res.status(400).json({
@@ -206,10 +206,10 @@ function crudControllerFactory(service, options = {}) {
    * Update a record by ID
    * PUT /resource/:id
    */
-  async function updateById(req, res) {
+  async function updateById(request, res) {
     try {
-      const params = req.params;
-      const { id } = params;
+      const parameters = request.params;
+      const { id } = parameters;
 
       if (!id) {
         return res.status(400).json({
@@ -220,9 +220,9 @@ function crudControllerFactory(service, options = {}) {
       }
 
       // Before update hook
-      let data = req.body;
+      let data = request.body;
       if (beforeUpdate) {
-        data = await beforeUpdate(id, data, req);
+        data = await beforeUpdate(id, data, request);
       }
 
       // Update record
@@ -238,7 +238,7 @@ function crudControllerFactory(service, options = {}) {
 
       // After update hook
       if (afterUpdate) {
-        await afterUpdate(updated, data, req);
+        await afterUpdate(updated, data, request);
       }
 
       // Transform response if needed
@@ -265,19 +265,19 @@ function crudControllerFactory(service, options = {}) {
    * Partially update a record by ID
    * PATCH /resource/:id
    */
-  async function patchById(req, res) {
+  async function patchById(request, res) {
     // For PATCH, we use the same logic as PUT but it's more semantic for partial updates
-    return updateById(req, res);
+    return updateById(request, res);
   }
 
   /**
    * Delete a record by ID
    * DELETE /resource/:id
    */
-  async function deleteById(req, res) {
+  async function deleteById(request, res) {
     try {
-      const params = req.params;
-      const { id } = params;
+      const parameters = request.params;
+      const { id } = parameters;
 
       if (!id) {
         return res.status(400).json({
@@ -289,7 +289,7 @@ function crudControllerFactory(service, options = {}) {
 
       // Before delete hook
       if (beforeDelete) {
-        await beforeDelete(id, req);
+        await beforeDelete(id, request);
       }
 
       // Delete record
@@ -305,7 +305,7 @@ function crudControllerFactory(service, options = {}) {
 
       // After delete hook
       if (afterDelete) {
-        await afterDelete(deleted, req);
+        await afterDelete(deleted, request);
       }
 
       res.json({
@@ -327,12 +327,12 @@ function crudControllerFactory(service, options = {}) {
    * Count records
    * GET /resource/count
    */
-  async function count(req, res) {
+  async function count(request, res) {
     try {
-      const queryParams = req.query;
-      const { search, ...filters } = queryParams;
+      const queryParameters = request.query;
+      const { search: _search, ...filters } = queryParameters;
 
-      let conditions = filters;
+      const conditions = filters;
 
       // If search is provided, we need to handle it differently
       // For now, we'll just count with basic filters
@@ -358,10 +358,10 @@ function crudControllerFactory(service, options = {}) {
    * Check if record exists
    * HEAD /resource/:id
    */
-  async function existsById(req, res) {
+  async function existsById(request, res) {
     try {
-      const params = req.params;
-      const { id } = params;
+      const parameters = request.params;
+      const { id } = parameters;
 
       if (!id) {
         return res.status(400).json({
@@ -388,9 +388,9 @@ function crudControllerFactory(service, options = {}) {
    * Bulk create records
    * POST /resource/bulk
    */
-  async function bulkCreate(req, res) {
+  async function bulkCreate(request, res) {
     try {
-      const { items } = req.body;
+      const { items } = request.body;
 
       if (!Array.isArray(items) || items.length === 0) {
         return res.status(400).json({
@@ -404,27 +404,26 @@ function crudControllerFactory(service, options = {}) {
       const errors = [];
 
       // Process each item
-      for (let i = 0; i < items.length; i++) {
+      for (const [index, itemData] of items.entries()) {
+        let data = itemData;
         try {
-          let data = items[i];
-
           // Before create hook
           if (beforeCreate) {
-            data = await beforeCreate(data, req);
+            data = await beforeCreate(data, request);
           }
 
           const created = await service.create(data);
 
           // After create hook
           if (afterCreate) {
-            await afterCreate(created, data, req);
+            await afterCreate(created, data, request);
           }
 
           results.push(created);
         } catch (error) {
           errors.push({
-            index: i,
-            item: items[i],
+            index,
+            item: data,
             error: error.message,
           });
         }
@@ -434,7 +433,7 @@ function crudControllerFactory(service, options = {}) {
         success: true,
         data: {
           created: results,
-          errors: errors,
+          errors,
           summary: {
             total: items.length,
             successful: results.length,

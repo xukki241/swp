@@ -12,7 +12,7 @@ export const reportsDaily = pgTable(
     lowStockItemsAlert: jsonb("low_stock_items_alert"),
     expiringLotsAlert: jsonb("expiring_lots_alert"),
   },
-  (table) => [unique().on(table.reportDate)]
+  table => [unique().on(table.reportDate)]
 );
 
 export const reportsWeekly = pgTable(
@@ -25,7 +25,7 @@ export const reportsWeekly = pgTable(
     salesSummary: jsonb("sales_summary"),
     productPerformance: jsonb("product_performance"),
   },
-  (table) => [unique().on(table.weekStartDate)]
+  table => [unique().on(table.weekStartDate)]
 );
 
 export const reportsMonthly = pgTable(
@@ -37,5 +37,5 @@ export const reportsMonthly = pgTable(
     monthStartDate: date("month_start_date").notNull(),
     salesSummary: jsonb("sales_summary"),
   },
-  (table) => [unique().on(table.monthStartDate)]
+  table => [unique().on(table.monthStartDate)]
 );

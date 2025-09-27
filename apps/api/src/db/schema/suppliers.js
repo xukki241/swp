@@ -6,9 +6,6 @@ import {
   pgEnum,
   index,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import { supplierMedicationVariants } from "./supplier-medication-variants.js";
-import { purchaseOrders } from "./purchase-orders.js";
 
 export const supplierStatusEnum = pgEnum("supplier_status", [
   "active",
@@ -29,14 +26,9 @@ export const suppliers = pgTable(
     address: text("address"),
     status: supplierStatusEnum("status").default("active"),
   },
-  (table) => [
+  table => [
     index("idx_suppliers_name").on(table.name),
     index("idx_suppliers_status").on(table.status),
     index("idx_suppliers_contact_email").on(table.contactEmail),
   ]
 );
-
-export const suppliersRelations = relations(suppliers, ({ many }) => ({
-  medicationVariants: many(supplierMedicationVariants),
-  purchaseOrders: many(purchaseOrders),
-}));

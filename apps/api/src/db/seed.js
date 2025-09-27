@@ -1,4 +1,4 @@
-import { db } from "./connection.js";
+import { db as database } from "./connection.js";
 import { roles } from "./schema/index.js";
 
 async function seedDatabase() {
@@ -6,7 +6,7 @@ async function seedDatabase() {
     console.log("Starting database seeding...");
 
     // Check if roles already exist
-    const existingRoles = await db.select().from(roles);
+    const existingRoles = await database.select().from(roles);
 
     if (existingRoles.length === 0) {
       console.log("Seeding default roles...");
@@ -21,7 +21,7 @@ async function seedDatabase() {
       ];
 
       for (const role of defaultRoles) {
-        await db.insert(roles).values(role);
+        await database.insert(roles).values(role);
       }
 
       console.log("Default roles seeded successfully");
@@ -41,11 +41,11 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   seedDatabase()
     .then(() => {
       console.log("Seeding process completed");
-      process.exit(0);
+      return true;
     })
-    .catch((error) => {
+    .catch(error => {
       console.error("Seeding process failed:", error);
-      process.exit(1);
+      throw error;
     });
 }
 

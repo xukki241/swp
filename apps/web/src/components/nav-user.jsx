@@ -1,4 +1,5 @@
 import { ChevronsUpDown, LogOut } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -15,7 +16,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Link } from "react-router-dom";
 
 export function NavUser({ user }) {
   const { isMobile } = useSidebar();
@@ -59,9 +59,9 @@ export function NavUser({ user }) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <Link to={"/login"}>
+            <Link to="/login">
               <DropdownMenuItem>
-                <LogOut></LogOut>
+                <LogOut />
                 Log out
               </DropdownMenuItem>
             </Link>

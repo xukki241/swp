@@ -1,5 +1,6 @@
 import { Outlet, Link } from "react-router-dom";
-import { useBreadcrumbItems } from "@/hooks/useBreadcrumb";
+
+import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,12 +10,12 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { AppSidebar } from "@/components/app-sidebar";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useBreadcrumbItems } from "@/hooks/useBreadcrumb";
 
 export default function Layout() {
   const breadcrumbItems = useBreadcrumbItems();
@@ -68,7 +69,6 @@ export default function Layout() {
             </Breadcrumb>
           </div>
         </header>
-
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <Outlet />
         </div>

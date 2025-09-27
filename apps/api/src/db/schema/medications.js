@@ -4,14 +4,12 @@ import {
   text,
   pgTable,
   pgEnum,
-  boolean,
-  decimal,
-  integer,
-  unique,
+  // boolean,
+  // decimal,
+  // integer,
+  // unique,
   index,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import { medicationVariants } from "./medication-variants.js";
 
 export const medicationStatusEnum = pgEnum("medication_status", [
   "active",
@@ -30,13 +28,9 @@ export const medications = pgTable(
     description: text("description"),
     status: medicationStatusEnum("status").default("active"),
   },
-  (table) => [
+  table => [
     index("idx_medications_name").on(table.name),
     index("idx_medications_brand").on(table.brand),
     index("idx_medications_status").on(table.status),
   ]
 );
-
-export const medicationsRelations = relations(medications, ({ many }) => ({
-  variants: many(medicationVariants),
-}));

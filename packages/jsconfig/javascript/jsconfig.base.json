@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/jsconfig",
+  "display": "PharmaFlow Base JavaScript Config",
+  "compilerOptions": {
+    // Module Resolution
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
+    "resolveJsonModule": true,
+
+    // JavaScript Support
+    "allowJs": true,
+    "checkJs": false,
+
+    // Interop Constraints
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Language and Environment
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+
+    // Editor Support
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "~/*": ["./src/*"]
+    },
+
+    // Type Checking (for JS files when checkJs is enabled)
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+
+    // Completeness
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*", "**/*.js", "**/*.jsx"],
+  "exclude": ["node_modules", "dist", "build", ".turbo", "coverage", "**/*.test.js", "**/*.spec.js"]
+}
