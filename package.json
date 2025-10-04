@@ -7,10 +7,14 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "preview": "turbo preview",
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {
+    "@pharmaflow/repoconfig": "workspace:*",
+    "prettier": "^3.6.2",
     "turbo": "^2.5.8"
   },
   "engines": {

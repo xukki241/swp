@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json.schemastore.org/jsconfig",
+  "extends": "./jsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx"
+  }
+}

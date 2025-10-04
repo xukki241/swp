@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/jsconfig",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowJs": true,
+    "checkJs": false,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "exclude": ["node_modules", "dist", "build", ".turbo"]
+}
