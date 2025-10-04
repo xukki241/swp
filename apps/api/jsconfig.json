@@ -1,0 +1,3 @@
+{
+  "extends": "@pharmaflow/repoconfig/javascript/jsconfig.node.json"
+}
