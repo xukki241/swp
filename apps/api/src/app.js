@@ -4,7 +4,11 @@ import helmet from "helmet";
 import morgan from "morgan";
 
 import config from "./config/environment.js";
-import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
+import {
+  errorHandler,
+  notFoundHandler,
+} from "./middleware/error-handler.middleware.js";
+import logger from "./utils/logger.js";
 
 const app = express();
 
@@ -16,7 +20,10 @@ app.use(
     credentials: config.corsCredentials === "true",
   })
 );
-app.use(morgan(config.isDevelopment ? "dev" : "combined"));
+// Use morgan for HTTP request logging, routed through winston
+app.use(
+  morgan(config.isDevelopment ? "dev" : "combined", { stream: logger.stream })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

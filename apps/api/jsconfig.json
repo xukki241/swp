@@ -1,3 +1,4 @@
 {
-  "extends": "@pharmaflow/repoconfig/javascript/jsconfig.node.json"
+  "extends": "@pharmaflow/repoconfig/javascript/jsconfig.node.json",
+  "include": ["src"]
 }

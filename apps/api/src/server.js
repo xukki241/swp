@@ -1,21 +1,22 @@
 import app from "./app.js";
 import config from "./config/environment.js";
+import logger from "./utils/logger.js";
 
 const PORT = config.port;
 
 // Start server
 const server = app.listen(PORT, () => {
-  console.log(
+  logger.info(
     `${config.name} (v${config.version}) is running on http://localhost:${PORT}`
   );
-  console.log(`Environment: ${config.nodeEnv}`);
+  logger.debug(`Environment: ${config.nodeEnv}`);
 });
 
 // Graceful shutdown
 const gracefulShutdown = (signal) => {
-  console.log(`\n${signal} received. Starting graceful shutdown...`);
+  logger.info(`\n${signal} received. Starting graceful shutdown...`);
   server.close(() => {
-    console.log("Server closed");
+    logger.info("Server closed");
 
     /* eslint-disable-next-line n/no-process-exit */
     process.exit(0);
@@ -23,7 +24,7 @@ const gracefulShutdown = (signal) => {
 
   // Force shutdown after 10 seconds
   setTimeout(() => {
-    console.error("Forced shutdown after timeout");
+    logger.error("Forced shutdown after timeout");
 
     /* eslint-disable-next-line n/no-process-exit */
     process.exit(1);
