@@ -25,6 +25,12 @@ const config = {
   corsOrigin: getEnv("CORS_ORIGIN", "*"),
   corsMethods: getEnv("CORS_METHODS", "GET,HEAD,PUT,PATCH,POST,DELETE"),
   corsCredentials: getEnv("CORS_CREDENTIALS", "true"),
+
+  // Database
+  databaseUrl: getEnv(
+    "DATABASE_URL",
+    "postgresql://postgres:postgres@localhost:5432/pharmaflow"
+  ),
 };
 
 export default config;

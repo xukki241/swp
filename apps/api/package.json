@@ -14,14 +14,17 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.44.6",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "morgan": "^1.10.1",
+    "pg": "^8.16.3",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "@pharmaflow/repoconfig": "workspace:*",
+    "drizzle-kit": "^0.31.5",
     "eslint": "^9.37.0"
   }
 }
