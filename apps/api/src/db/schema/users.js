@@ -39,7 +39,7 @@ export const users = pgTable(
     updated_at: timestamp("updated_at")
       .notNull()
       .defaultNow()
-      .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+      .$onUpdate(() => sql`now()`),
   },
   (table) => [
     // Unique constraints moved out as indexes
@@ -61,7 +61,7 @@ export const user_credentials = pgTable(
     updated_at: timestamp("updated_at")
       .notNull()
       .defaultNow()
-      .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+      .$onUpdate(() => sql`now()`),
   },
   (table) => [
     // Composite unique (user_id, provider)
