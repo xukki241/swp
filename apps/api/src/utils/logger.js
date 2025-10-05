@@ -1,4 +1,8 @@
+import fs from "fs";
+import path from "path";
+
 import { createLogger, format, transports } from "winston";
+import DailyRotateFile from "winston-daily-rotate-file";
 
 import config from "../config/environment.js";
 
@@ -19,6 +23,22 @@ const logger = createLogger({
     new transports.Console({
       format: combine(colorize({ all: true })),
     }),
+    // daily rotate for combined logs
+    new DailyRotateFile({
+      filename: path.join(getLogsDir(), "combined-%DATE%.log"),
+      datePattern: "YYYY-MM-DD",
+      zippedArchive: false,
+      maxFiles: "7d",
+      level: "info",
+    }),
+    // daily rotate for error logs
+    new DailyRotateFile({
+      filename: path.join(getLogsDir(), "error-%DATE%.log"),
+      datePattern: "YYYY-MM-DD",
+      zippedArchive: false,
+      maxFiles: "7d",
+      level: "error",
+    }),
   ],
 });
 
@@ -29,5 +49,16 @@ logger.stream = {
     logger.info(message.trim());
   },
 };
+
+function getLogsDir() {
+  // place logs in the current working directory under ./logs
+  const dir = path.resolve(process.cwd(), "logs");
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+  } catch {
+    // if creation fails, fall back to cwd
+  }
+  return dir;
+}
 
 export default logger;
