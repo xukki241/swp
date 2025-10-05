@@ -15,6 +15,13 @@
       "when": 1759674759095,
       "tag": "0001_steep_alex_power",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1759674928382,
+      "tag": "0002_nasty_spitfire",
+      "breakpoints": true
     }
   ]
 }
