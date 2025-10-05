@@ -16,12 +16,16 @@ const gracefulShutdown = (signal) => {
   console.log(`\n${signal} received. Starting graceful shutdown...`);
   server.close(() => {
     console.log("Server closed");
+
+    /* eslint-disable-next-line n/no-process-exit */
     process.exit(0);
   });
 
   // Force shutdown after 10 seconds
   setTimeout(() => {
     console.error("Forced shutdown after timeout");
+
+    /* eslint-disable-next-line n/no-process-exit */
     process.exit(1);
   }, 10000);
 };

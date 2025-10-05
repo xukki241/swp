@@ -1,3 +1,3 @@
-import nodeConfig from "@pharmaflow/repoconfig/eslint/node";
+import { nodeConfig } from "@pharmaflow/repoconfig/eslint";
 
 export default [...nodeConfig];

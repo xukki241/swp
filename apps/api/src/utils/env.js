@@ -16,7 +16,10 @@ export const getEnv = (key, fallback = undefined) => {
  */
 export const getEnvAsNumber = (key, fallback) => {
   const value = process.env[key];
-  if (value === undefined) return fallback;
+  if (value === undefined) {
+    return fallback;
+  }
+
   const parsed = Number(value);
   return isNaN(parsed) ? fallback : parsed;
 };
@@ -28,6 +31,9 @@ export const getEnvAsNumber = (key, fallback) => {
  */
 export const getEnvAsBoolean = (key, fallback) => {
   const value = process.env[key];
-  if (value === undefined) return fallback;
+  if (value === undefined) {
+    return fallback;
+  }
+
   return value.toLowerCase() === "true" || value === "1";
 };

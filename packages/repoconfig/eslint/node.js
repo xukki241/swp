@@ -17,10 +17,9 @@ export const nodeConfig = defineConfig([
       },
     },
     rules: {
-      "no-process-exit": "warn",
-      "n/no-missing-import": "off", // Turn off for monorepo workspaces
-      "n/no-unsupported-features/es-syntax": "off", // Allow modern ES syntax
-      "n/no-unpublished-import": "off", // Allow dev dependencies
+      "n/no-missing-import": "off",
+      "n/no-unsupported-features/es-syntax": "off",
+      "n/no-unpublished-import": "off",
     },
   },
 ]);
