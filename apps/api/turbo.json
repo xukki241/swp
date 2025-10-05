@@ -1,0 +1,28 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "db:generate": {
+      "cache": false,
+      "inputs": ["src/db/schema/**", "drizzle.config.js", ".env"]
+    },
+    "db:migrate": {
+      "cache": false,
+      "dependsOn": ["db:generate"],
+      "inputs": ["drizzle/**", ".env"]
+    },
+    "db:push": {
+      "cache": false,
+      "inputs": ["src/db/schema/**", "drizzle.config.js", ".env"]
+    },
+    "db:studio": {
+      "cache": false,
+      "persistent": true,
+      "inputs": [".env"]
+    },
+    "db:drop": {
+      "cache": false,
+      "inputs": [".env"]
+    }
+  }
+}
