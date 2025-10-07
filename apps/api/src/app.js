@@ -7,7 +7,7 @@ import config from "./config/environment.js";
 import {
   errorHandler,
   notFoundHandler,
-} from "./middleware/error-handler.middleware.js";
+} from "./middleware/errorHandler.js";
 import authRoutes from "./routes/authRoutes.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
