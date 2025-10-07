@@ -8,6 +8,8 @@ import {
   errorHandler,
   notFoundHandler,
 } from "./middleware/error-handler.middleware.js";
+import authRoutes from "./routes/authRoutes.js";
+import registrationRoutes from "./routes/registrationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import logger from "./utils/logger.js";
 
@@ -28,7 +30,12 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/registrations", registrationRoutes);
 app.use("/api/users", userRoutes);
+
 app.get("/", (req, res) => {
   res.json({
     name: config.name,
