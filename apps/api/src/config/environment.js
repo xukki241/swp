@@ -31,6 +31,10 @@ const config = {
     "DATABASE_URL",
     "postgresql://postgres:postgres@localhost:5432/pharmaflow"
   ),
+
+  // JWT
+  jwtSecret: getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
+  jwtExpiresIn: getEnv("JWT_EXPIRES_IN", "24h"),
 };
 
 export default config;
