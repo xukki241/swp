@@ -6,8 +6,8 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common";
-import { warehouseZones } from "./warehouseZones";
+import { identityPrimaryKey } from "./common.js";
+import { warehouseZones } from "./warehouseZones.js";
 
 export const warehouseRacks = pgTable(
   "warehouse_racks",

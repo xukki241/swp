@@ -1,7 +1,7 @@
 import { pgTable, varchar, text, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common";
-import { userRegistrationStatus } from "./enums";
+import { identityPrimaryKey } from "./common.js";
+import { userRegistrationStatus } from "./enums.js";
 
 export const userRegistrations = pgTable(
   "user_registrations",

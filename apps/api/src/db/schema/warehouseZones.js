@@ -1,7 +1,7 @@
 import { pgTable, varchar, text, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common";
-import { warehouseZoneType } from "./enums";
+import { identityPrimaryKey } from "./common.js";
+import { warehouseZoneType } from "./enums.js";
 
 export const warehouseZones = pgTable(
   "warehouse_zones",

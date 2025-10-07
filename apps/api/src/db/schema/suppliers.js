@@ -1,7 +1,7 @@
 import { pgTable, varchar, text, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common";
-import { supplierStatus } from "./enums";
+import { identityPrimaryKey } from "./common.js";
+import { supplierStatus } from "./enums.js";
 
 export const suppliers = pgTable(
   "suppliers",

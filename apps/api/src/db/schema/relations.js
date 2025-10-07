@@ -1,26 +1,26 @@
 import { relations } from "drizzle-orm";
 
-import { auditLogs } from "./auditLogs";
-import { customers } from "./customers";
-import { fileAttachments } from "./fileAttachments";
-import { files } from "./files";
-import { inventory } from "./inventory";
-import { medications } from "./medications";
-import { medicationVariants } from "./medicationVariants";
-import { notifications } from "./notifications";
-import { purchaseOrderItems } from "./purchaseOrderItems";
-import { purchaseOrderReceiptItems } from "./purchaseOrderReceiptItems";
-import { purchaseOrderReceipts } from "./purchaseOrderReceipts";
-import { purchaseOrders } from "./purchaseOrders";
-import { salesOrderItems } from "./salesOrderItems";
-import { salesOrders } from "./salesOrders";
-import { supplierMedicationVariants } from "./supplierMedicationVariants";
-import { suppliers } from "./suppliers";
-import { userCredentials } from "./userCredentials";
-import { users } from "./users";
-import { warehouseBins } from "./warehouseBins";
-import { warehouseRacks } from "./warehouseRacks";
-import { warehouseZones } from "./warehouseZones";
+import { auditLogs } from "./auditLogs.js";
+import { customers } from "./customers.js";
+import { fileAttachments } from "./fileAttachments.js";
+import { files } from "./files.js";
+import { inventory } from "./inventory.js";
+import { medications } from "./medications.js";
+import { medicationVariants } from "./medicationVariants.js";
+import { notifications } from "./notifications.js";
+import { purchaseOrderItems } from "./purchaseOrderItems.js";
+import { purchaseOrderReceiptItems } from "./purchaseOrderReceiptItems.js";
+import { purchaseOrderReceipts } from "./purchaseOrderReceipts.js";
+import { purchaseOrders } from "./purchaseOrders.js";
+import { salesOrderItems } from "./salesOrderItems.js";
+import { salesOrders } from "./salesOrders.js";
+import { supplierMedicationVariants } from "./supplierMedicationVariants.js";
+import { suppliers } from "./suppliers.js";
+import { userCredentials } from "./userCredentials.js";
+import { users } from "./users.js";
+import { warehouseBins } from "./warehouseBins.js";
+import { warehouseRacks } from "./warehouseRacks.js";
+import { warehouseZones } from "./warehouseZones.js";
 
 export const usersRelations = relations(users, ({ many }) => ({
   credentials: many(userCredentials),

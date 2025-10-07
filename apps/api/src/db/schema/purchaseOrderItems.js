@@ -1,8 +1,8 @@
 import { pgTable, bigint, integer } from "drizzle-orm/pg-core";
 
-import { decimalColumn, identityPrimaryKey } from "./common";
-import { purchaseOrders } from "./purchaseOrders";
-import { supplierMedicationVariants } from "./supplierMedicationVariants";
+import { decimalColumn, identityPrimaryKey } from "./common.js";
+import { purchaseOrders } from "./purchaseOrders.js";
+import { supplierMedicationVariants } from "./supplierMedicationVariants.js";
 
 export const purchaseOrderItems = pgTable("purchase_order_items", {
   id: identityPrimaryKey(),

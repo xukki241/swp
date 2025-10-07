@@ -1,6 +1,6 @@
 import { pgTable, varchar, text, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common";
+import { identityPrimaryKey } from "./common.js";
 
 export const settings = pgTable(
   "settings",

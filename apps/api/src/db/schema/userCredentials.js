@@ -1,7 +1,7 @@
 import { pgTable, bigint, varchar, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common";
-import { users } from "./users";
+import { identityPrimaryKey } from "./common.js";
+import { users } from "./users.js";
 
 export const userCredentials = pgTable(
   "user_credentials",

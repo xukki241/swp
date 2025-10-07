@@ -6,8 +6,8 @@ import {
   boolean,
 } from "drizzle-orm/pg-core";
 
-import { decimalColumn, identityPrimaryKey } from "./common";
-import { medications } from "./medications";
+import { decimalColumn, identityPrimaryKey } from "./common.js";
+import { medications } from "./medications.js";
 
 export const medicationVariants = pgTable(
   "medication_variants",

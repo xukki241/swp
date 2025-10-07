@@ -1,8 +1,7 @@
 import { pgTable, bigint, varchar, text, timestamp } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "../common";
-
-import { users } from "./users";
+import { identityPrimaryKey } from "./common.js";
+import { users } from "./users.js";
 
 export const files = pgTable("files", {
   id: identityPrimaryKey(),

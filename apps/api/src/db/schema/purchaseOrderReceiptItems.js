@@ -1,8 +1,8 @@
 import { pgTable, bigint, integer } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common";
-import { purchaseOrderItems } from "./purchaseOrderItems";
-import { purchaseOrderReceipts } from "./purchaseOrderReceipts";
+import { identityPrimaryKey } from "./common.js";
+import { purchaseOrderItems } from "./purchaseOrderItems.js";
+import { purchaseOrderReceipts } from "./purchaseOrderReceipts.js";
 
 export const purchaseOrderReceiptItems = pgTable(
   "purchase_order_receipt_items",

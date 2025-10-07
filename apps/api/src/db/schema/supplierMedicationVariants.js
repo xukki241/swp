@@ -6,9 +6,9 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common";
-import { medicationVariants } from "./medicationVariants";
-import { suppliers } from "./suppliers";
+import { identityPrimaryKey } from "./common.js";
+import { medicationVariants } from "./medicationVariants.js";
+import { suppliers } from "./suppliers.js";
 
 export const supplierMedicationVariants = pgTable(
   "supplier_medication_variants",

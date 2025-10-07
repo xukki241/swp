@@ -1,7 +1,7 @@
 import { pgTable, jsonb, timestamp } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common";
-import { reportType } from "./enums";
+import { identityPrimaryKey } from "./common.js";
+import { reportType } from "./enums.js";
 
 export const reports = pgTable("reports", {
   id: identityPrimaryKey(),

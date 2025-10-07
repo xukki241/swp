@@ -1,9 +1,9 @@
 import { pgTable, bigint, timestamp } from "drizzle-orm/pg-core";
 
-import { decimalColumn, identityPrimaryKey } from "./common";
-import { customers } from "./customers";
-import { salesOrderPaymentMethod, salesOrderStatus } from "./enums";
-import { users } from "./users";
+import { decimalColumn, identityPrimaryKey } from "./common.js";
+import { customers } from "./customers.js";
+import { salesOrderPaymentMethod, salesOrderStatus } from "./enums.js";
+import { users } from "./users.js";
 
 export const salesOrders = pgTable("sales_orders", {
   id: identityPrimaryKey(),

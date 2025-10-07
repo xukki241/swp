@@ -6,8 +6,8 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common";
-import { users } from "./users";
+import { identityPrimaryKey } from "./common.js";
+import { users } from "./users.js";
 
 export const auditLogs = pgTable("audit_logs", {
   id: identityPrimaryKey(),

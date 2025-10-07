@@ -1,7 +1,7 @@
 import { pgTable, varchar, text, boolean } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common";
-import { medicationStatus } from "./enums";
+import { identityPrimaryKey } from "./common.js";
+import { medicationStatus } from "./enums.js";
 
 export const medications = pgTable("medications", {
   id: identityPrimaryKey(),

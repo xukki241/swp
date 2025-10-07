@@ -1,7 +1,7 @@
 import { pgTable, bigint, varchar, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common";
-import { files } from "./files";
+import { identityPrimaryKey } from "./common.js";
+import { files } from "./files.js";
 
 export const fileAttachments = pgTable(
   "file_attachments",

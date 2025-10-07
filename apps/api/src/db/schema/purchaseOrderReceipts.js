@@ -1,8 +1,8 @@
 import { pgTable, bigint, timestamp } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common";
-import { purchaseOrders } from "./purchaseOrders";
-import { users } from "./users";
+import { identityPrimaryKey } from "./common.js";
+import { purchaseOrders } from "./purchaseOrders.js";
+import { users } from "./users.js";
 
 export const purchaseOrderReceipts = pgTable("purchase_order_receipts", {
   id: identityPrimaryKey(),

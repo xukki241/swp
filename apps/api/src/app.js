@@ -8,6 +8,7 @@ import {
   errorHandler,
   notFoundHandler,
 } from "./middleware/error-handler.middleware.js";
+import userRoutes from "./routes/userRoutes.js";
 import logger from "./utils/logger.js";
 
 const app = express();
@@ -27,7 +28,7 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use("/api/users", userRoutes);
 app.get("/", (req, res) => {
   res.json({
     name: config.name,

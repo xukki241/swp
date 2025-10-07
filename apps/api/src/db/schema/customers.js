@@ -1,6 +1,6 @@
 import { pgTable, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { address, email, identityPrimaryKey, name, phone } from "./common";
+import { address, email, identityPrimaryKey, name, phone } from "./common.js";
 
 export const customers = pgTable(
   "customers",

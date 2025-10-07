@@ -6,10 +6,10 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
-import { decimalColumn, identityPrimaryKey } from "./common";
-import { medicationVariants } from "./medicationVariants";
-import { purchaseOrderReceiptItems } from "./purchaseOrderReceiptItems";
-import { warehouseBins } from "./warehouseBins";
+import { decimalColumn, identityPrimaryKey } from "./common.js";
+import { medicationVariants } from "./medicationVariants.js";
+import { purchaseOrderReceiptItems } from "./purchaseOrderReceiptItems.js";
+import { warehouseBins } from "./warehouseBins.js";
 
 export const inventory = pgTable(
   "inventory",
