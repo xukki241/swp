@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Pill } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Pill, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,59 +12,31 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
+import { useRegister } from "@/hooks/useAuth";
 
 export default function RegisterPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      password: "",
+      confirmPassword: "",
+    },
   });
 
-  const validateForm = () => {
-    const newErrors = {};
+  const registerMutation = useRegister();
+  const password = watch("password");
 
-    if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsLoading(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    console.log("Register data:", formData);
-    setIsLoading(false);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+  const onSubmit = (data) => {
+    const { confirmPassword, ...registerData } = data;
+    registerMutation.mutate(registerData);
   };
 
   return (
@@ -87,21 +59,39 @@ export default function RegisterPage() {
         </CardHeader>
 
         <CardContent className="p-8 pt-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {registerMutation.isError && (
+            <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center gap-2 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4" />
+              <span>
+                {registerMutation.error?.message ||
+                  "Registration failed. Please try again."}
+              </span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">
                 Full Name
               </Label>
               <Input
                 id="name"
-                name="name"
                 type="text"
                 placeholder="John Doe"
-                value={formData.name}
-                onChange={handleChange}
-                required
+                {...register("name", {
+                  required: "Name is required",
+                  minLength: {
+                    value: 2,
+                    message: "Name must be at least 2 characters",
+                  },
+                })}
                 className="h-11 rounded-lg"
               />
+              {errors.name && (
+                <p className="text-sm text-destructive">
+                  {errors.name.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -110,14 +100,22 @@ export default function RegisterPage() {
               </Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
                 placeholder="your.email@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                required
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Invalid email address",
+                  },
+                })}
                 className="h-11 rounded-lg"
               />
+              {errors.email && (
+                <p className="text-sm text-destructive">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -126,14 +124,46 @@ export default function RegisterPage() {
               </Label>
               <Input
                 id="phone"
-                name="phone"
                 type="tel"
                 placeholder="+84 123 456 789"
-                value={formData.phone}
-                onChange={handleChange}
-                required
+                {...register("phone", {
+                  required: "Phone number is required",
+                  pattern: {
+                    value: /^[0-9+\s-()]+$/,
+                    message: "Invalid phone number",
+                  },
+                })}
                 className="h-11 rounded-lg"
               />
+              {errors.phone && (
+                <p className="text-sm text-destructive">
+                  {errors.phone.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address" className="text-sm font-medium">
+                Address
+              </Label>
+              <Input
+                id="address"
+                type="text"
+                placeholder="123 Main Street, District, City"
+                {...register("address", {
+                  required: "Address is required",
+                  minLength: {
+                    value: 5,
+                    message: "Address must be at least 5 characters",
+                  },
+                })}
+                className="h-11 rounded-lg"
+              />
+              {errors.address && (
+                <p className="text-sm text-destructive">
+                  {errors.address.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -142,16 +172,21 @@ export default function RegisterPage() {
               </Label>
               <Input
                 id="password"
-                name="password"
                 type="password"
                 placeholder="Create a strong password"
-                value={formData.password}
-                onChange={handleChange}
-                required
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters",
+                  },
+                })}
                 className="h-11 rounded-lg"
               />
               {errors.password && (
-                <p className="text-sm text-destructive">{errors.password}</p>
+                <p className="text-sm text-destructive">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
@@ -161,27 +196,28 @@ export default function RegisterPage() {
               </Label>
               <Input
                 id="confirmPassword"
-                name="confirmPassword"
                 type="password"
                 placeholder="Re-enter your password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
+                {...register("confirmPassword", {
+                  required: "Please confirm your password",
+                  validate: (value) =>
+                    value === password || "Passwords do not match",
+                })}
                 className="h-11 rounded-lg"
               />
               {errors.confirmPassword && (
                 <p className="text-sm text-destructive">
-                  {errors.confirmPassword}
+                  {errors.confirmPassword.message}
                 </p>
               )}
             </div>
 
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={registerMutation.isPending}
               className="w-full h-11 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium mt-6"
             >
-              {isLoading ? (
+              {registerMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <Loading className="h-4 w-4 text-white" />
                   Creating account...

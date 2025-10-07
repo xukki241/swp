@@ -1,8 +1,12 @@
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, TrendingUp, Users, DollarSign } from "lucide-react";
+import { useCurrentUser } from "@/hooks/useAuth";
 
 export default function DashboardPage() {
+  const { data: currentUser } = useCurrentUser();
+  const userName = currentUser?.user?.name || "User";
+
   const stats = [
     {
       title: "Total Products",
@@ -39,7 +43,7 @@ export default function DashboardPage() {
       <div className="space-y-6">
         {/* Welcome Section */}
         <div className="rounded-2xl bg-gradient-to-r from-primary to-primary/80 p-8 text-primary-foreground shadow-lg">
-          <h2 className="text-3xl font-bold">Welcome to PharmaFlow</h2>
+          <h2 className="text-3xl font-bold">Welcome back, {userName}! 👋</h2>
           <p className="mt-2 text-primary-foreground/90">
             Your comprehensive pharmacy management system
           </p>

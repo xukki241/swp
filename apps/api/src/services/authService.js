@@ -29,6 +29,17 @@ export const register = async ({ name, email, phone, address, password }) => {
       throw new Error("Email already registered");
     }
 
+    // Check if phone already exists
+    const existingPhone = await db
+      .select()
+      .from(users)
+      .where(eq(users.phone, phone))
+      .limit(1);
+
+    if (existingPhone.length > 0) {
+      throw new Error("Phone number already registered");
+    }
+
     // Check if email exists in pending registrations
     const existingRegistration = await db
       .select()
@@ -38,6 +49,17 @@ export const register = async ({ name, email, phone, address, password }) => {
 
     if (existingRegistration.length > 0) {
       throw new Error("Email already has a pending registration");
+    }
+
+    // Check if phone exists in pending registrations
+    const existingPhoneRegistration = await db
+      .select()
+      .from(userRegistrations)
+      .where(eq(userRegistrations.phone, phone))
+      .limit(1);
+
+    if (existingPhoneRegistration.length > 0) {
+      throw new Error("Phone number already has a pending registration");
     }
 
     // Check if this is the first user

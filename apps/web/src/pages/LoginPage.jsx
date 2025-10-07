@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Pill } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Pill, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,32 +13,31 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
+import { useLogin } from "@/hooks/useAuth";
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    remember: false,
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue,
+  } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+      remember: false,
+    },
   });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const loginMutation = useLogin();
+  const rememberValue = watch("remember");
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    console.log("Login data:", formData);
-    setIsLoading(false);
-  };
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+  const onSubmit = (data) => {
+    loginMutation.mutate({
+      email: data.email,
+      password: data.password,
+    });
   };
 
   return (
@@ -61,21 +60,39 @@ export default function LoginPage() {
         </CardHeader>
 
         <CardContent className="p-8 pt-4">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          {loginMutation.isError && (
+            <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center gap-2 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4" />
+              <span>
+                {loginMutation.error?.message ||
+                  "Login failed. Please try again."}
+              </span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">
                 Email
               </Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
                 placeholder="your.email@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                required
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Invalid email address",
+                  },
+                })}
                 className="h-11 rounded-lg"
               />
+              {errors.email && (
+                <p className="text-sm text-destructive">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -84,24 +101,29 @@ export default function LoginPage() {
               </Label>
               <Input
                 id="password"
-                name="password"
                 type="password"
                 placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
-                required
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters",
+                  },
+                })}
                 className="h-11 rounded-lg"
               />
+              {errors.password && (
+                <p className="text-sm text-destructive">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="remember"
-                name="remember"
-                checked={formData.remember}
-                onCheckedChange={(checked) =>
-                  setFormData((prev) => ({ ...prev, remember: checked }))
-                }
+                checked={rememberValue}
+                onCheckedChange={(checked) => setValue("remember", checked)}
               />
               <Label
                 htmlFor="remember"
@@ -113,10 +135,10 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={loginMutation.isPending}
               className="w-full h-11 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium"
             >
-              {isLoading ? (
+              {loginMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <Loading className="h-4 w-4 text-white" />
                   Signing in...

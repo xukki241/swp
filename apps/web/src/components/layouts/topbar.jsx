@@ -9,8 +9,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useLogout, useCurrentUser } from "@/hooks/useAuth";
 
 export function Topbar({ title, onToggleSidebar, sidebarCollapsed }) {
+  const logoutMutation = useLogout();
+  const { data: currentUser, isLoading } = useCurrentUser();
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
+
+  // Get user initials for avatar fallback
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const userName = currentUser?.user?.name || "User";
+  const userEmail = currentUser?.user?.email || "";
+  const userRole = currentUser?.user?.role || "user";
+  const userInitials = getInitials(userName);
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-border bg-card px-6 shadow-sm">
       <div className="flex items-center gap-4">
@@ -48,9 +71,12 @@ export function Topbar({ title, onToggleSidebar, sidebarCollapsed }) {
           <DropdownMenuTrigger asChild>
             <button className="relative h-10 w-10 rounded-full hover:bg-secondary outline-none focus:ring-2 focus:ring-primary">
               <Avatar className="h-10 w-10">
-                <AvatarImage src="/pharmacist-consultation.png" alt="User" />
+                <AvatarImage
+                  src="/pharmacist-consultation.png"
+                  alt={userName}
+                />
                 <AvatarFallback className="bg-primary text-primary-foreground">
-                  PH
+                  {userInitials}
                 </AvatarFallback>
               </Avatar>
             </button>
@@ -58,18 +84,27 @@ export function Topbar({ title, onToggleSidebar, sidebarCollapsed }) {
           <DropdownMenuContent align="end" className="w-56 rounded-xl">
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">Pharmacist Admin</p>
-                <p className="text-xs text-muted-foreground">
-                  admin@pharmaflow.com
+                <p className="text-sm font-medium">
+                  {isLoading ? "Loading..." : userName}
                 </p>
+                <p className="text-xs text-muted-foreground">{userEmail}</p>
+                {userRole && (
+                  <p className="text-xs text-muted-foreground capitalize">
+                    Role: {userRole}
+                  </p>
+                )}
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="rounded-lg">Profile</DropdownMenuItem>
             <DropdownMenuItem className="rounded-lg">Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="rounded-lg text-destructive">
-              Logout
+            <DropdownMenuItem
+              className="rounded-lg text-destructive cursor-pointer"
+              onClick={handleLogout}
+              disabled={logoutMutation.isPending}
+            >
+              {logoutMutation.isPending ? "Logging out..." : "Logout"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
