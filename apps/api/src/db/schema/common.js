@@ -8,7 +8,7 @@ import {
   numeric,
 } from "drizzle-orm/pg-core";
 
-export const id = bigint("id", { mode: "bigint" })
+export const id = bigint("id", { mode: "number" })
   .primaryKey()
   .generatedAlwaysAsIdentity();
 
@@ -41,14 +41,14 @@ export const isActive = (columnName = "is_active") =>
   boolean(columnName).notNull().default(true);
 
 export const identityPrimaryKey = (columnName = "id") =>
-  bigint(columnName, { mode: "bigint" })
+  bigint(columnName, { mode: "number" })
     .primaryKey()
     .primaryKey()
     .notNull()
     .generatedAlwaysAsIdentity();
 
 export const foreignKey = (columnName, references) =>
-  bigint(columnName, { mode: "bigint" }).references(references, {
+  bigint(columnName, { mode: "number" }).references(references, {
     onDelete: "cascade",
     onUpdate: "cascade",
   });

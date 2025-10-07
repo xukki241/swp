@@ -7,14 +7,14 @@ export const fileAttachments = pgTable(
   "file_attachments",
   {
     id: identityPrimaryKey(),
-    fileId: bigint("file_id", { mode: "bigint" })
+    fileId: bigint("file_id", { mode: "number" })
       .notNull()
       .references(() => files.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
     entityType: varchar("entity_type", { length: 100 }).notNull(),
-    entityId: bigint("entity_id", { mode: "bigint" }).notNull(),
+    entityId: bigint("entity_id", { mode: "number" }).notNull(),
   },
   (table) => [
     uniqueIndex("file_attachments_file_id_entity_type_entity_id_unique").on(

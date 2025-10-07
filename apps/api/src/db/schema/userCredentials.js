@@ -7,7 +7,7 @@ export const userCredentials = pgTable(
   "user_credentials",
   {
     id: identityPrimaryKey(),
-    userId: bigint("user_id", { mode: "bigint" })
+    userId: bigint("user_id", { mode: "number" })
       .notNull()
       .references(() => users.id, {
         onDelete: "cascade",

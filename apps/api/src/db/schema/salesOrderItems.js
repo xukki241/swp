@@ -6,13 +6,13 @@ import { salesOrders } from "./salesOrders.js";
 
 export const salesOrderItems = pgTable("sales_order_items", {
   id: identityPrimaryKey(),
-  salesOrderId: bigint("sales_order_id", { mode: "bigint" })
+  salesOrderId: bigint("sales_order_id", { mode: "number" })
     .notNull()
     .references(() => salesOrders.id, {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
-  medicationVariantId: bigint("medication_variant_id", { mode: "bigint" })
+  medicationVariantId: bigint("medication_variant_id", { mode: "number" })
     .notNull()
     .references(() => medicationVariants.id, {
       onDelete: "restrict",

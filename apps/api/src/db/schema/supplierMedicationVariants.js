@@ -14,13 +14,13 @@ export const supplierMedicationVariants = pgTable(
   "supplier_medication_variants",
   {
     id: identityPrimaryKey(),
-    supplierId: bigint("supplier_id", { mode: "bigint" })
+    supplierId: bigint("supplier_id", { mode: "number" })
       .notNull()
       .references(() => suppliers.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    medicationVariantId: bigint("medication_variant_id", { mode: "bigint" })
+    medicationVariantId: bigint("medication_variant_id", { mode: "number" })
       .notNull()
       .references(() => medicationVariants.id, {
         onDelete: "cascade",

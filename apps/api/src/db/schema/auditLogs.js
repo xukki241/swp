@@ -11,13 +11,13 @@ import { users } from "./users.js";
 
 export const auditLogs = pgTable("audit_logs", {
   id: identityPrimaryKey(),
-  userId: bigint("user_id", { mode: "bigint" }).references(() => users.id, {
+  userId: bigint("user_id", { mode: "number" }).references(() => users.id, {
     onDelete: "set null",
     onUpdate: "cascade",
   }),
   action: varchar("action", { length: 100 }).notNull(),
   entity: varchar("entity", { length: 100 }).notNull(),
-  entityId: bigint("entity_id", { mode: "bigint" }),
+  entityId: bigint("entity_id", { mode: "number" }),
   changes: jsonb("changes"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
