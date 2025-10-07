@@ -8,13 +8,9 @@ import * as schema from "./schema/index.js";
 
 export const pool = new Pool({
   connectionString: config.databaseUrl,
-
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
 });
 
-export const db = drizzle(pool, { schema });
+export const db = drizzle(pool, { schema: schema });
 
 export const testConnection = async () => {
   try {
