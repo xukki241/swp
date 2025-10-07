@@ -1,7 +1,7 @@
 import express from "express";
 
 import * as registrationController from "../controllers/registrationController.js";
-import { authenticate, authorize } from "../middleware/auth.middleware.js";
+import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 const router = express.Router();
 
