@@ -13,7 +13,7 @@ export const medicationVariants = pgTable(
   "medication_variants",
   {
     id: identityPrimaryKey(),
-    medicationId: bigint("medication_id", { mode: "bigint" })
+    medicationId: bigint("medication_id", { mode: "number" })
       .notNull()
       .references(() => medications.id, {
         onDelete: "cascade",

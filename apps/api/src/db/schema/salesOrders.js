@@ -7,7 +7,7 @@ import { users } from "./users.js";
 
 export const salesOrders = pgTable("sales_orders", {
   id: identityPrimaryKey(),
-  customerId: bigint("customer_id", { mode: "bigint" })
+  customerId: bigint("customer_id", { mode: "number" })
     .notNull()
     .references(() => customers.id, {
       onDelete: "restrict",
@@ -21,7 +21,7 @@ export const salesOrders = pgTable("sales_orders", {
   paymentMethod: salesOrderPaymentMethod("payment_method")
     .notNull()
     .default("cash"),
-  salespersonId: bigint("salesperson_id", { mode: "bigint" }).references(
+  salespersonId: bigint("salesperson_id", { mode: "number" }).references(
     () => users.id,
     {
       onDelete: "set null",

@@ -16,7 +16,7 @@ export const purchaseOrderReceiptItems = pgTable(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    purchaseOrderItemId: bigint("purchase_order_item_id", { mode: "bigint" })
+    purchaseOrderItemId: bigint("purchase_order_item_id", { mode: "number" })
       .notNull()
       .references(() => purchaseOrderItems.id, {
         onDelete: "cascade",

@@ -14,7 +14,7 @@ export const warehouseBins = pgTable(
   "warehouse_bins",
   {
     id: identityPrimaryKey(),
-    rackId: bigint("rack_id", { mode: "bigint" })
+    rackId: bigint("rack_id", { mode: "number" })
       .notNull()
       .references(() => warehouseRacks.id, {
         onDelete: "cascade",

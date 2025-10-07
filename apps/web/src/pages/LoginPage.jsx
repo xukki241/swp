@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { useForm } from "react-hook-form";
 import { Pill, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";

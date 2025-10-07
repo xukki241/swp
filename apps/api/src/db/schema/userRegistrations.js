@@ -11,6 +11,7 @@ export const userRegistrations = pgTable(
     email: varchar("email", { length: 255 }).notNull(),
     phone: varchar("phone", { length: 10 }).notNull(),
     address: text("address").notNull(),
+    password: varchar("password", { length: 255 }).notNull(),
     status: userRegistrationStatus("status").notNull().default("pending"),
   },
   (table) => [

@@ -6,7 +6,7 @@ import { supplierMedicationVariants } from "./supplierMedicationVariants.js";
 
 export const purchaseOrderItems = pgTable("purchase_order_items", {
   id: identityPrimaryKey(),
-  purchaseOrderId: bigint("purchase_order_id", { mode: "bigint" })
+  purchaseOrderId: bigint("purchase_order_id", { mode: "number" })
     .notNull()
     .references(() => purchaseOrders.id, {
       onDelete: "cascade",

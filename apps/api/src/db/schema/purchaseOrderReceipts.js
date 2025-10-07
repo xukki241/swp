@@ -6,14 +6,14 @@ import { users } from "./users.js";
 
 export const purchaseOrderReceipts = pgTable("purchase_order_receipts", {
   id: identityPrimaryKey(),
-  purchaseOrderId: bigint("purchase_order_id", { mode: "bigint" })
+  purchaseOrderId: bigint("purchase_order_id", { mode: "number" })
     .notNull()
     .references(() => purchaseOrders.id, {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
   receivedDate: timestamp("received_date").notNull().defaultNow(),
-  receivedBy: bigint("received_by", { mode: "bigint" }).references(
+  receivedBy: bigint("received_by", { mode: "number" }).references(
     () => users.id,
     {
       onDelete: "set null",

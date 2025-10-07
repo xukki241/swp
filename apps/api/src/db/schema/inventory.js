@@ -15,7 +15,7 @@ export const inventory = pgTable(
   "inventory",
   {
     id: identityPrimaryKey(),
-    medicationVariantId: bigint("medication_variant_id", { mode: "bigint" })
+    medicationVariantId: bigint("medication_variant_id", { mode: "number" })
       .notNull()
       .references(() => medicationVariants.id, {
         onDelete: "restrict",
@@ -29,7 +29,7 @@ export const inventory = pgTable(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    binId: bigint("bin_id", { mode: "bigint" })
+    binId: bigint("bin_id", { mode: "number" })
       .notNull()
       .references(() => warehouseBins.id, {
         onDelete: "restrict",

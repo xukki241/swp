@@ -5,7 +5,7 @@ import { users } from "./users.js";
 
 export const notifications = pgTable("notifications", {
   id: identityPrimaryKey(),
-  userId: bigint("user_id", { mode: "bigint" })
+  userId: bigint("user_id", { mode: "number" })
     .notNull()
     .references(() => users.id, {
       onDelete: "cascade",
