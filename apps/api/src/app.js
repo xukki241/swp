@@ -7,6 +7,7 @@ import config from "./config/environment.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/authRoutes.js";
 import medicationRoutes from "./routes/medicationRoutes.js";
+import medicationVariantRoutes from "./routes/medicationVariantRoutes.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import logger from "./utils/logger.js";
@@ -34,7 +35,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/registrations", registrationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/medications", medicationRoutes);
-
+app.use("/api/medication-variants", medicationVariantRoutes);
 app.get("/", (req, res) => {
   res.json({
     name: config.name,

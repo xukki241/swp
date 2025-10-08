@@ -250,6 +250,266 @@ Authorization: Bearer <owner-token>
 
 ---
 
+### Medication Management Routes (`/api/medications`)
+
+**Read operations:** Requires authentication (Owner or Staff)  
+**Create/Update/Delete operations:** Requires Owner authentication only
+
+#### 1. Get All Medications
+
+\`\`\`http
+GET /api/medications?search=aspirin&status=active&page=1&limit=10
+Authorization: Bearer <token>
+\`\`\`
+
+**Query Parameters:**
+
+- `search`: Search by name or description
+- `status`: Filter by status (active, discontinued)
+- `page`: Page number (default: 1)
+- `limit`: Items per page (default: 10)
+
+**Response:**
+\`\`\`json
+{
+"success": true,
+"data": [
+{
+"id": "1",
+"name": "Aspirin",
+"description": "Pain reliever and fever reducer",
+"status": "active",
+"createdAt": "2025-01-01T00:00:00.000Z",
+"updatedAt": "2025-01-01T00:00:00.000Z"
+}
+],
+"pagination": {
+"page": 1,
+"limit": 10,
+"total": 1,
+"totalPages": 1
+}
+}
+\`\`\`
+
+#### 2. Get Medication by ID
+
+\`\`\`http
+GET /api/medications/:id
+Authorization: Bearer <token>
+\`\`\`
+
+**Response:**
+\`\`\`json
+{
+"success": true,
+"data": {
+"id": "1",
+"name": "Aspirin",
+"description": "Pain reliever and fever reducer",
+"status": "active",
+"createdAt": "2025-01-01T00:00:00.000Z",
+"updatedAt": "2025-01-01T00:00:00.000Z"
+}
+}
+\`\`\`
+
+#### 3. Create Medication (Owner Only)
+
+\`\`\`http
+POST /api/medications
+Authorization: Bearer <owner-token>
+Content-Type: application/json
+
+{
+"name": "Aspirin",
+"description": "Pain reliever and fever reducer",
+"status": "active"
+}
+\`\`\`
+
+**Response:**
+\`\`\`json
+{
+"success": true,
+"message": "Medication created successfully",
+"data": {
+"id": "1",
+"name": "Aspirin",
+"description": "Pain reliever and fever reducer",
+"status": "active",
+"createdAt": "2025-01-01T00:00:00.000Z",
+"updatedAt": "2025-01-01T00:00:00.000Z"
+}
+}
+\`\`\`
+
+#### 4. Update Medication (Owner Only)
+
+\`\`\`http
+PUT /api/medications/:id
+Authorization: Bearer <owner-token>
+Content-Type: application/json
+
+{
+"name": "Aspirin 500mg",
+"description": "Updated description",
+"status": "active"
+}
+\`\`\`
+
+#### 5. Delete Medication (Owner Only)
+
+\`\`\`http
+DELETE /api/medications/:id
+Authorization: Bearer <owner-token>
+\`\`\`
+
+**Response:**
+\`\`\`json
+{
+"success": true,
+"message": "Medication deleted successfully"
+}
+\`\`\`
+
+---
+
+### Medication Variant Management Routes (`/api/medication-variants`)
+
+**Read operations:** Requires authentication (Owner or Staff)  
+**Create/Update/Delete operations:** Requires Owner authentication only
+
+#### 1. Get All Medication Variants
+
+\`\`\`http
+GET /api/medication-variants?medicationId=1&search=500mg&status=active&page=1&limit=10
+Authorization: Bearer <token>
+\`\`\`
+
+**Query Parameters:**
+
+- `medicationId`: Filter by medication ID
+- `search`: Search by dosage, form, or packaging
+- `status`: Filter by status (active, discontinued)
+- `page`: Page number (default: 1)
+- `limit`: Items per page (default: 10)
+
+**Response:**
+\`\`\`json
+{
+"success": true,
+"data": [
+{
+"id": "1",
+"medicationId": "1",
+"dosage": "500mg",
+"form": "tablet",
+"packaging": "bottle",
+"status": "active",
+"createdAt": "2025-01-01T00:00:00.000Z",
+"updatedAt": "2025-01-01T00:00:00.000Z"
+}
+],
+"pagination": {
+"page": 1,
+"limit": 10,
+"total": 1,
+"totalPages": 1
+}
+}
+\`\`\`
+
+#### 2. Get Medication Variant by ID
+
+\`\`\`http
+GET /api/medication-variants/:id
+Authorization: Bearer <token>
+\`\`\`
+
+**Response:**
+\`\`\`json
+{
+"success": true,
+"data": {
+"id": "1",
+"medicationId": "1",
+"dosage": "500mg",
+"form": "tablet",
+"packaging": "bottle",
+"status": "active",
+"createdAt": "2025-01-01T00:00:00.000Z",
+"updatedAt": "2025-01-01T00:00:00.000Z"
+}
+}
+\`\`\`
+
+#### 3. Create Medication Variant (Owner Only)
+
+\`\`\`http
+POST /api/medication-variants
+Authorization: Bearer <owner-token>
+Content-Type: application/json
+
+{
+"medicationId": 1,
+"dosage": "500mg",
+"form": "tablet",
+"packaging": "bottle",
+"status": "active"
+}
+\`\`\`
+
+**Response:**
+\`\`\`json
+{
+"success": true,
+"message": "Medication variant created successfully",
+"data": {
+"id": "1",
+"medicationId": "1",
+"dosage": "500mg",
+"form": "tablet",
+"packaging": "bottle",
+"status": "active",
+"createdAt": "2025-01-01T00:00:00.000Z",
+"updatedAt": "2025-01-01T00:00:00.000Z"
+}
+}
+\`\`\`
+
+#### 4. Update Medication Variant (Owner Only)
+
+\`\`\`http
+PUT /api/medication-variants/:id
+Authorization: Bearer <owner-token>
+Content-Type: application/json
+
+{
+"dosage": "1000mg",
+"form": "capsule",
+"packaging": "blister",
+"status": "active"
+}
+\`\`\`
+
+#### 5. Delete Medication Variant (Owner Only)
+
+\`\`\`http
+DELETE /api/medication-variants/:id
+Authorization: Bearer <owner-token>
+\`\`\`
+
+**Response:**
+\`\`\`json
+{
+"success": true,
+"message": "Medication variant deleted successfully"
+}
+\`\`\`
+
+---
+
 ## 🔐 Authentication & Authorization
 
 ### JWT Token
@@ -264,7 +524,6 @@ Authorization: Bearer <your-jwt-token>
 
 - **owner**: Full access to all features
 - **staff**: Limited access (to be defined)
-- **sales**: Limited access (to be defined)
 
 ### User Status
 
