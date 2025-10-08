@@ -6,6 +6,8 @@ import {
   registerUser,
   getCurrentUser,
   logoutUser,
+  requestPasswordReset,
+  verifyResetOTP,
 } from "@/services/authService";
 
 /**
@@ -26,7 +28,7 @@ export const useLogin = () => {
       }
 
       // Redirect to dashboard
-      navigate("/dashboard");
+      window.location.href = "/dashboard";
     },
     onError: (error) => {
       console.error("Login failed:", error);
@@ -43,16 +45,12 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
-      // Store token and user info if returned
-      if (data.token) {
+      if (data.token && data.user?.role === "owner") {
         localStorage.setItem("token", data.token);
-      }
-      if (data.user) {
         localStorage.setItem("user", JSON.stringify(data.user));
       }
-
-      // Redirect to dashboard or login
       navigate("/dashboard");
+      // For non-owner users, don't auto-login, they need approval
     },
     onError: (error) => {
       console.error("Registration failed:", error);
@@ -95,5 +93,35 @@ export const useCurrentUser = () => {
     enabled: !!localStorage.getItem("token"), // Only fetch if token exists
     retry: 1,
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+/**
+ * Hook for requesting password reset OTP
+ */
+export const useRequestPasswordReset = () => {
+  return useMutation({
+    mutationFn: requestPasswordReset,
+    onError: (error) => {
+      console.error("Request password reset failed:", error);
+    },
+  });
+};
+
+/**
+ * Hook for verifying OTP and resetting password
+ */
+export const useVerifyResetOTP = () => {
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: verifyResetOTP,
+    onSuccess: () => {
+      // Redirect to login after successful password reset
+      navigate("/login");
+    },
+    onError: (error) => {
+      console.error("Verify OTP failed:", error);
+    },
   });
 };

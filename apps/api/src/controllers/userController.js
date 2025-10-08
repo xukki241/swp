@@ -111,6 +111,7 @@ export const createUser = async (req, res, next) => {
 export const updateUser = async (req, res, next) => {
   try {
     const id = BigInt(req.params.id);
+    const currentUserId = BigInt(req.user.userId);
     const { name, email, phone, address, role, status } = req.body;
 
     // Check if user exists
@@ -119,6 +120,30 @@ export const updateUser = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: "User not found",
+      });
+    }
+
+    // Prevent changing own role
+    if (
+      id === currentUserId &&
+      role !== undefined &&
+      role !== existingUser.role
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You cannot change your own role",
+      });
+    }
+
+    // Prevent changing own status
+    if (
+      id === currentUserId &&
+      status !== undefined &&
+      status !== existingUser.status
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You cannot change your own status",
       });
     }
 
@@ -178,14 +203,24 @@ export const updateUser = async (req, res, next) => {
 };
 
 /**
- * Delete user by ID
+ * Delete user by ID (Soft delete - sets status to suspended)
  * @route DELETE /api/users/:id
  */
 export const deleteUser = async (req, res, next) => {
   try {
     const id = BigInt(req.params.id);
+    const currentUserId = BigInt(req.user.userId);
 
-    const user = await userService.deleteUser(id);
+    // Prevent deleting self
+    if (id === currentUserId) {
+      return res.status(403).json({
+        success: false,
+        message: "You cannot delete your own account",
+      });
+    }
+
+    // Soft delete: suspend the user instead of hard delete
+    const user = await userService.suspendUser(id);
 
     if (!user) {
       return res.status(404).json({
@@ -196,7 +231,7 @@ export const deleteUser = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "User deleted successfully",
+      message: "User deleted (suspended) successfully",
       data: convertBigIntIds(user),
     });
   } catch (error) {
@@ -260,6 +295,15 @@ export const activateUser = async (req, res, next) => {
 export const deactivateUser = async (req, res, next) => {
   try {
     const id = BigInt(req.params.id);
+    const currentUserId = BigInt(req.user.userId);
+
+    // Prevent deactivating self
+    if (id === currentUserId) {
+      return res.status(403).json({
+        success: false,
+        message: "You cannot deactivate your own account",
+      });
+    }
 
     const user = await userService.deactivateUser(id);
 
@@ -288,6 +332,15 @@ export const deactivateUser = async (req, res, next) => {
 export const suspendUser = async (req, res, next) => {
   try {
     const id = BigInt(req.params.id);
+    const currentUserId = BigInt(req.user.userId);
+
+    // Prevent suspending self
+    if (id === currentUserId) {
+      return res.status(403).json({
+        success: false,
+        message: "You cannot suspend your own account",
+      });
+    }
 
     const user = await userService.suspendUser(id);
 

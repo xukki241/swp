@@ -19,6 +19,7 @@ export * from "./suppliers.js";
 export * from "./userCredentials.js";
 export * from "./userRegistrations.js";
 export * from "./users.js";
+export * from "./passwordResetTokens.js";
 export * from "./warehouseBins.js";
 export * from "./warehouseRacks.js";
 export * from "./warehouseZones.js";

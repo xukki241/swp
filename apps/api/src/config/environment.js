@@ -35,6 +35,14 @@ const config = {
   // JWT
   jwtSecret: getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
   jwtExpiresIn: getEnv("JWT_EXPIRES_IN", "24h"),
+
+  // Email (SMTP)
+  smtpHost: getEnv("SMTP_HOST", "smtp.gmail.com"),
+  smtpPort: getEnvAsNumber("SMTP_PORT", 587),
+  smtpUser: getEnv("SMTP_USER", ""),
+  smtpPass: getEnv("SMTP_PASS", ""),
+  smtpFrom: getEnv("SMTP_FROM", "noreply@pharmaflow.com"),
 };
+// SMS Configuration removed - only email OTP supported
 
 export default config;

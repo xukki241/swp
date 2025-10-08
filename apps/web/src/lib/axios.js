@@ -32,22 +32,31 @@ instance.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Handle 401 Unauthorized - redirect to login
+    // Handle 401 Unauthorized - clear auth data
+    // Note: Don't redirect here, let the component handle it
+    // The ProtectedRoute will automatically redirect to login
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      window.location.href = "/login";
+      // Only reload if we're not already on a public page
+      const publicPaths = [
+        "/login",
+        "/register",
+        "/forgot-password",
+        "/reset-password",
+      ];
+      const currentPath = window.location.pathname;
+      if (!publicPaths.includes(currentPath)) {
+        // Use setTimeout to avoid interrupting the current request
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 100);
+      }
     }
 
-    // Handle other errors
-    const message =
-      error.response?.data?.message || error.message || "An error occurred";
-
-    return Promise.reject({
-      message,
-      status: error.response?.status,
-      data: error.response?.data,
-    });
+    // Preserve the original axios error structure
+    // This allows error.response.data.message to work in components
+    return Promise.reject(error);
   }
 );
 

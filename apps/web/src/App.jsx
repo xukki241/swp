@@ -2,8 +2,11 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import DashboardPage from "@/pages/Dashboard";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
+import UserListPage from "@/pages/UserListPage";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 
 function App() {
@@ -30,7 +33,15 @@ function App() {
           }
         />
         <Route
-          path="/registration-requests"
+          path="/users/list"
+          element={
+            <ProtectedRoute>
+              <UserListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users/registrations"
           element={
             <ProtectedRoute>
               <RegistrationRequestsPage />
@@ -52,6 +63,22 @@ function App() {
           element={
             <PublicRoute>
               <RegisterPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPasswordPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <PublicRoute>
+              <ResetPasswordPage />
             </PublicRoute>
           }
         />
