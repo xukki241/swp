@@ -78,3 +78,43 @@ export const getMedicationVariantBySku = async (sku) => {
     throw new Error(`Failed to fetch medication variant: ${error.message}`);
   }
 };
+/**
+ * Create a new medication variant
+ * @param {Object} variantData - Medication variant data
+ * @returns {Promise<Object>} Created medication variant
+ */
+export const createMedicationVariant = async (variantData) => {
+  try {
+    const result = await db
+      .insert(medicationVariants)
+      .values(variantData)
+      .returning();
+    return result[0];
+  } catch (error) {
+    if (error.code === "23505") {
+      throw new Error("Medication variant with this SKU already exists");
+    }
+    throw new Error(`Failed to create medication variant: ${error.message}`);
+  }
+};
+/**
+ * Update medication variant by ID
+ * @param {bigint} id - Medication variant ID
+ * @param {Object} variantData - Medication variant data to update
+ * @returns {Promise<Object|null>} Updated medication variant or null
+ */
+export const updateMedicationVariant = async (id, variantData) => {
+  try {
+    const result = await db
+      .update(medicationVariants)
+      .set(variantData)
+      .where(eq(medicationVariants.id, id))
+      .returning();
+    return result[0] || null;
+  } catch (error) {
+    if (error.code === "23505") {
+      throw new Error("Medication variant with this SKU already exists");
+    }
+    throw new Error(`Failed to update medication variant: ${error.message}`);
+  }
+};
