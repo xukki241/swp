@@ -8,7 +8,13 @@ import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/authRoutes.js";
 import medicationRoutes from "./routes/medicationRoutes.js";
 import medicationVariantRoutes from "./routes/medicationVariantRoutes.js";
+import purchaseOrderItemRoutes from "./routes/purchaseOrderItemRoutes.js";
+import purchaseOrderReceiptItemRoutes from "./routes/purchaseOrderReceiptItemRoutes.js";
+import purchaseOrderReceiptRoutes from "./routes/purchaseOrderReceiptRoutes.js";
+import purchaseOrderRoutes from "./routes/purchaseOrderRoutes.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
+import supplierMedicationVariantRoutes from "./routes/supplierMedicationVariantRoutes.js";
+import supplierRoutes from "./routes/supplierRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import logger from "./utils/logger.js";
 
@@ -36,6 +42,13 @@ app.use("/api/registrations", registrationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/medications", medicationRoutes);
 app.use("/api/medication-variants", medicationVariantRoutes);
+app.use("/api/suppliers", supplierRoutes);
+app.use("/api/supplier-medication-variants", supplierMedicationVariantRoutes);
+app.use("/api/purchase-orders", purchaseOrderRoutes);
+app.use("/api/purchase-order-items", purchaseOrderItemRoutes);
+app.use("/api/purchase-order-receipts", purchaseOrderReceiptRoutes);
+app.use("/api/purchase-order-receipt-items", purchaseOrderReceiptItemRoutes);
+
 app.get("/", (req, res) => {
   res.json({
     name: config.name,
