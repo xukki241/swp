@@ -85,3 +85,57 @@ export const createMedication = async (req, res, next) => {
     next(error);
   }
 };
+/**
+ * Update medication by ID
+ * @route PUT /api/medications/:id
+ */
+export const updateMedication = async (req, res, next) => {
+  try {
+    const id = BigInt(req.params.id);
+    const {
+      name,
+      brand,
+      description,
+      isPrescriptionRequired,
+      isControlledSubstance,
+      status,
+    } = req.body;
+    const existingMedication = await medicationService.getMedicationById(id);
+    if (!existingMedication) {
+      return res.status(404).json({
+        success: false,
+        message: "Medication not found",
+      });
+    }
+    const medicationData = {};
+    if (name !== undefined) {
+      medicationData.name = name;
+    }
+    if (brand !== undefined) {
+      medicationData.brand = brand;
+    }
+    if (description !== undefined) {
+      medicationData.description = description;
+    }
+    if (isPrescriptionRequired !== undefined) {
+      medicationData.isPrescriptionRequired = isPrescriptionRequired;
+    }
+    if (isControlledSubstance !== undefined) {
+      medicationData.isControlledSubstance = isControlledSubstance;
+    }
+    if (status !== undefined) {
+      medicationData.status = status;
+    }
+    const updatedMedication = await medicationService.updateMedication(
+      id,
+      medicationData
+    );
+    res.status(200).json({
+      success: true,
+      data: convertBigIntIds(updatedMedication),
+    });
+  } catch (error) {
+    logger.error("Error in updateMedication controller:", error);
+    next(error);
+  }
+};
