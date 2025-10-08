@@ -11,26 +11,26 @@ export const supplierService = {
     const { medicationVariants: variants, ...supplierInfo } = supplierData;
 
     return await db.transaction(async (tx) => {
-      // Create the supplier first
+      // ✅ Tạo supplier
       const [supplier] = await tx
         .insert(suppliers)
         .values(supplierInfo)
         .returning();
 
-      // If medication variants are provided, create them
+      // ✅ Nếu có danh sách thuốc, insert liên kết
       if (variants && Array.isArray(variants) && variants.length > 0) {
         const variantsToInsert = variants.map((variant) => ({
           supplierId: supplier.id,
-          medicationVariantId: variant.medicationVariantId,
+          medicationVariantId: Number(variant.medicationVariantId),
           supplierSku: variant.supplierSku,
-          leadTimeDays: variant.leadTimeDays,
+          leadTimeDays: Number(variant.leadTimeDays),
         }));
 
         await tx.insert(supplierMedicationVariants).values(variantsToInsert);
       }
 
-      // Return supplier with its medication variants
-      return await tx
+      // ✅ Trả về supplier cùng danh sách thuốc
+      const result = await tx
         .select({
           id: suppliers.id,
           name: suppliers.name,
@@ -39,13 +39,21 @@ export const supplierService = {
           phone: suppliers.phone,
           address: suppliers.address,
           status: suppliers.status,
-          notes: suppliers.notes,
-          createdAt: suppliers.createdAt,
-          updatedAt: suppliers.updatedAt,
         })
         .from(suppliers)
-        .where(eq(suppliers.id, supplier.id))
-        .then((rows) => rows[0]);
+        .where(eq(suppliers.id, supplier.id));
+
+      const supplierVariants = await tx
+        .select({
+          id: supplierMedicationVariants.id,
+          medicationVariantId: supplierMedicationVariants.medicationVariantId,
+          supplierSku: supplierMedicationVariants.supplierSku,
+          leadTimeDays: supplierMedicationVariants.leadTimeDays,
+        })
+        .from(supplierMedicationVariants)
+        .where(eq(supplierMedicationVariants.supplierId, supplier.id));
+
+      return { ...result[0], medicationVariants: supplierVariants };
     });
   },
 

@@ -16,7 +16,16 @@ export const purchaseOrderService = {
       const { items, ...poData } = data;
 
       // Create purchase order
-      const [po] = await tx.insert(purchaseOrders).values(poData).returning();
+      const [po] = await tx
+        .insert(purchaseOrders)
+        .values({
+          ...poData,
+          orderDate: poData.orderDate ? new Date(poData.orderDate) : new Date(),
+          expectedDate: poData.expectedDate
+            ? new Date(poData.expectedDate)
+            : null,
+        })
+        .returning();
 
       // Create items if provided
       let createdItems = [];

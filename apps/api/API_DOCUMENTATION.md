@@ -1558,7 +1558,7 @@ curl -X POST http://localhost:80/api/medications \
 #### 3. Create Supplier with Medication Variants (Single API Call) ⭐
 
 \`\`\`bash
-curl -X POST http://localhost:80/api/suppliers \
+curl -X POST \/api/suppliers \
  -H "Authorization: Bearer <owner-token>" \
  -H "Content-Type: application/json" \
  -d '{
@@ -1586,12 +1586,14 @@ curl -X POST http://localhost:80/api/suppliers \
 #### 4. Create Purchase Order with Items (Single API Call) ⭐
 
 \`\`\`bash
-curl -X POST http://localhost:80/api/purchase-orders \
+curl -X POST /api/purchase-orders \
  -H "Authorization: Bearer <owner-token>" \
  -H "Content-Type: application/json" \
- -d '{
+ -d '
+{
 "supplierId": 1,
-"expectedDate": "2025-01-22T00:00:00.000Z",
+"orderDate": "2025-10-08",
+"expectedDate": "2025-10-15",
 "status": "pending",
 "totalAmount": 2500.00,
 "createdBy": 1,
@@ -1615,7 +1617,7 @@ curl -X POST http://localhost:80/api/purchase-orders \
 #### 5. Create Purchase Order Receipt with Items (Single API Call) ⭐
 
 \`\`\`bash
-curl -X POST http://localhost:80/api/purchase-order-receipts \
+curl -X POST api/purchase-order-receipts \
  -H "Authorization: Bearer <owner-token>" \
  -H "Content-Type: application/json" \
  -d '{
