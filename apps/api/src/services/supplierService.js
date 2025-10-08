@@ -1,18 +1,54 @@
 import { eq, ilike, or, and } from "drizzle-orm";
 
 import { db } from "../db/index.js";
+import { medications } from "../db/schema/medications.js";
+import { medicationVariants } from "../db/schema/medicationVariants.js";
+import { supplierMedicationVariants } from "../db/schema/supplierMedicationVariants.js";
 import { suppliers } from "../db/schema/suppliers.js";
+
 export const supplierService = {
-  // Create a new supplier
   async create(supplierData) {
-    const [supplier] = await db
-      .insert(suppliers)
-      .values(supplierData)
-      .returning();
-    return supplier;
+    const { medicationVariants: variants, ...supplierInfo } = supplierData;
+
+    return await db.transaction(async (tx) => {
+      // Create the supplier first
+      const [supplier] = await tx
+        .insert(suppliers)
+        .values(supplierInfo)
+        .returning();
+
+      // If medication variants are provided, create them
+      if (variants && Array.isArray(variants) && variants.length > 0) {
+        const variantsToInsert = variants.map((variant) => ({
+          supplierId: supplier.id,
+          medicationVariantId: variant.medicationVariantId,
+          supplierSku: variant.supplierSku,
+          leadTimeDays: variant.leadTimeDays,
+        }));
+
+        await tx.insert(supplierMedicationVariants).values(variantsToInsert);
+      }
+
+      // Return supplier with its medication variants
+      return await tx
+        .select({
+          id: suppliers.id,
+          name: suppliers.name,
+          contactName: suppliers.contactName,
+          email: suppliers.email,
+          phone: suppliers.phone,
+          address: suppliers.address,
+          status: suppliers.status,
+          notes: suppliers.notes,
+          createdAt: suppliers.createdAt,
+          updatedAt: suppliers.updatedAt,
+        })
+        .from(suppliers)
+        .where(eq(suppliers.id, supplier.id))
+        .then((rows) => rows[0]);
+    });
   },
 
-  // Get all suppliers with optional filtering
   async getAll(filters = {}) {
     const { search, status, limit = 100, offset = 0 } = filters;
 
@@ -42,31 +78,130 @@ export const supplierService = {
     return results;
   },
 
-  // Get supplier by ID
   async getById(id) {
     const [supplier] = await db
       .select()
       .from(suppliers)
       .where(eq(suppliers.id, id));
-    return supplier;
+
+    if (!supplier) {
+      return null;
+    }
+
+    // Get all medication variants for this supplier
+    const variants = await db
+      .select({
+        id: supplierMedicationVariants.id,
+        medicationVariantId: supplierMedicationVariants.medicationVariantId,
+        supplierSku: supplierMedicationVariants.supplierSku,
+        leadTimeDays: supplierMedicationVariants.leadTimeDays,
+        medicationName: medications.name,
+        variantName: medicationVariants.name,
+      })
+      .from(supplierMedicationVariants)
+      .leftJoin(
+        medicationVariants,
+        eq(
+          supplierMedicationVariants.medicationVariantId,
+          medicationVariants.id
+        )
+      )
+      .leftJoin(
+        medications,
+        eq(medicationVariants.medicationId, medications.id)
+      )
+      .where(eq(supplierMedicationVariants.supplierId, id));
+
+    return {
+      ...supplier,
+      medicationVariants: variants,
+    };
   },
 
-  // Update supplier
   async update(id, supplierData) {
-    const [supplier] = await db
-      .update(suppliers)
-      .set(supplierData)
-      .where(eq(suppliers.id, id))
-      .returning();
-    return supplier;
+    const { medicationVariants: variants, ...supplierInfo } = supplierData;
+
+    return await db.transaction(async (tx) => {
+      // Update supplier info
+      const [supplier] = await tx
+        .update(suppliers)
+        .set(supplierInfo)
+        .where(eq(suppliers.id, id))
+        .returning();
+
+      if (!supplier) {
+        return null;
+      }
+
+      // If medication variants are provided, replace all existing ones
+      if (variants && Array.isArray(variants)) {
+        // Delete existing variants
+        await tx
+          .delete(supplierMedicationVariants)
+          .where(eq(supplierMedicationVariants.supplierId, id));
+
+        // Insert new variants if any
+        if (variants.length > 0) {
+          const variantsToInsert = variants.map((variant) => ({
+            supplierId: id,
+            medicationVariantId: variant.medicationVariantId,
+            supplierSku: variant.supplierSku,
+            leadTimeDays: variant.leadTimeDays,
+          }));
+
+          await tx.insert(supplierMedicationVariants).values(variantsToInsert);
+        }
+      }
+
+      // Return updated supplier with medication variants
+      const [updatedSupplier] = await tx
+        .select()
+        .from(suppliers)
+        .where(eq(suppliers.id, id));
+
+      const updatedVariants = await tx
+        .select({
+          id: supplierMedicationVariants.id,
+          medicationVariantId: supplierMedicationVariants.medicationVariantId,
+          supplierSku: supplierMedicationVariants.supplierSku,
+          leadTimeDays: supplierMedicationVariants.leadTimeDays,
+          medicationName: medications.name,
+          variantName: medicationVariants.name,
+        })
+        .from(supplierMedicationVariants)
+        .leftJoin(
+          medicationVariants,
+          eq(
+            supplierMedicationVariants.medicationVariantId,
+            medicationVariants.id
+          )
+        )
+        .leftJoin(
+          medications,
+          eq(medicationVariants.medicationId, medications.id)
+        )
+        .where(eq(supplierMedicationVariants.supplierId, id));
+
+      return {
+        ...updatedSupplier,
+        medicationVariants: updatedVariants,
+      };
+    });
   },
 
-  // Delete supplier
   async delete(id) {
-    const [supplier] = await db
-      .delete(suppliers)
-      .where(eq(suppliers.id, id))
-      .returning();
-    return supplier;
+    return await db.transaction(async (tx) => {
+      // Delete all medication variants first
+      await tx
+        .delete(supplierMedicationVariants)
+        .where(eq(supplierMedicationVariants.supplierId, id));
+
+      // Delete the supplier
+      const [supplier] = await tx
+        .delete(suppliers)
+        .where(eq(suppliers.id, id))
+        .returning();
+      return supplier;
+    });
   },
 };

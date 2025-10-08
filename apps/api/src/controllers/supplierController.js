@@ -8,10 +8,32 @@ const convertBigIntToString = (obj) => {
     )
   );
 };
+
 export const supplierController = {
-  // Create a new supplier
+  // Create a new supplier with medication variants
   async create(req, res) {
     try {
+      // Validate required fields
+      const { name, contactName, email, phone, address, medicationVariants } =
+        req.body;
+
+      if (!name || !contactName || !email || !phone || !address) {
+        return res.status(400).json({
+          error: "Missing required fields: name, contactName, email, phone",
+        });
+      }
+
+      // Validate medication variants if provided
+      if (medicationVariants && Array.isArray(medicationVariants)) {
+        for (const variant of medicationVariants) {
+          if (!variant.medicationVariantId) {
+            return res.status(400).json({
+              error: "Each medication variant must have medicationVariantId",
+            });
+          }
+        }
+      }
+
       const supplier = await supplierService.create(req.body);
       res.status(201).json(convertBigIntToString(supplier));
     } catch (error) {
@@ -35,7 +57,6 @@ export const supplierController = {
     }
   },
 
-  // Get supplier by ID
   async getById(req, res) {
     try {
       const supplier = await supplierService.getById(
@@ -49,7 +70,7 @@ export const supplierController = {
       res.status(500).json({ error: error.message });
     }
   },
-  // Update supplier
+
   async update(req, res) {
     try {
       const supplier = await supplierService.update(
