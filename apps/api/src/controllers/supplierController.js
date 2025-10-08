@@ -49,4 +49,37 @@ export const supplierController = {
       res.status(500).json({ error: error.message });
     }
   },
+  // Update supplier
+  async update(req, res) {
+    try {
+      const supplier = await supplierService.update(
+        Number.parseInt(req.params.id),
+        req.body
+      );
+      if (!supplier) {
+        return res.status(404).json({ error: "Supplier not found" });
+      }
+      res.json(convertBigIntToString(supplier));
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
+  // Delete supplier
+  async delete(req, res) {
+    try {
+      const supplier = await supplierService.delete(
+        Number.parseInt(req.params.id)
+      );
+      if (!supplier) {
+        return res.status(404).json({ error: "Supplier not found" });
+      }
+      res.json({
+        message: "Supplier deleted successfully",
+        supplier: convertBigIntToString(supplier),
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 };
