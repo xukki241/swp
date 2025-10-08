@@ -50,3 +50,67 @@ export const getMedicationVariantById = async (req, res, next) => {
     next(error);
   }
 };
+/**
+ * Create a new medication variant
+ * @route POST /api/medication-variants
+ */
+export const createMedicationVariant = async (req, res, next) => {
+  try {
+    const {
+      medicationId,
+      sku,
+      name,
+      unit,
+      unitFactor,
+      barcode,
+      sellPrice,
+      isActive,
+      isForSale,
+    } = req.body;
+
+    // Validation
+    if (!medicationId || !sku || !name || !unit || !sellPrice) {
+      return res.status(400).json({
+        success: false,
+        message: "medicationId, sku, name, unit, and sellPrice are required",
+      });
+    }
+
+    // Check if SKU already exists
+    const existingVariant =
+      await medicationVariantService.getMedicationVariantBySku(sku);
+    if (existingVariant) {
+      return res.status(409).json({
+        success: false,
+        message: "Medication variant with this SKU already exists",
+      });
+    }
+
+    const variantData = {
+      medicationId: BigInt(medicationId),
+      sku,
+      name,
+      unit,
+      unitFactor: unitFactor || "1.00",
+      barcode: barcode || null,
+      sellPrice,
+      isActive: isActive !== undefined ? isActive : true,
+      isForSale: isForSale !== undefined ? isForSale : false,
+    };
+
+    const variant =
+      await medicationVariantService.createMedicationVariant(variantData);
+
+    res.status(201).json({
+      success: true,
+      message: "Medication variant created successfully",
+      data: convertBigIntIds(variant),
+    });
+  } catch (error) {
+    logger.error("Error in createMedicationVariant controller:", error);
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
