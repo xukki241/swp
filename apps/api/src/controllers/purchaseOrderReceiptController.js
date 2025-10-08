@@ -55,4 +55,41 @@ export const purchaseOrderReceiptController = {
       res.status(500).json({ error: error.message });
     }
   },
+  // Update purchase order receipt
+  async update(req, res) {
+    try {
+      const receipt = await purchaseOrderReceiptService.update(
+        Number.parseInt(req.params.id),
+        req.body
+      );
+      if (!receipt) {
+        return res
+          .status(404)
+          .json({ error: "Purchase order receipt not found" });
+      }
+      res.json(convertBigIntToString(receipt));
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
+  // Delete purchase order receipt
+  async delete(req, res) {
+    try {
+      const receipt = await purchaseOrderReceiptService.delete(
+        Number.parseInt(req.params.id)
+      );
+      if (!receipt) {
+        return res
+          .status(404)
+          .json({ error: "Purchase order receipt not found" });
+      }
+      res.json({
+        message: "Purchase order receipt deleted successfully",
+        purchaseOrderReceipt: convertBigIntToString(receipt),
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 };
