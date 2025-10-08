@@ -136,12 +136,13 @@ Authorization: Bearer <owner-token>
 Content-Type: application/json
 
 {
-  "password": "temporaryPassword123",
   "role": "staff"
 }
 ```
 
 **Roles:** `staff` | `sales`
+
+**Note:** Password is retrieved from the registration request (stored during user registration). Owner only needs to specify the role.
 
 #### 4. Reject Registration
 
@@ -311,6 +312,7 @@ Authorization: Bearer <your-jwt-token>
   email: varchar(255) unique,
   phone: varchar(10) unique,
   address: text,
+  password: varchar(255), // hashed password
   status: enum('pending', 'approved', 'rejected')
 }
 ```
@@ -380,10 +382,11 @@ curl -X POST http://localhost:80/api/registrations/2/approve \
   -H "Authorization: Bearer <owner-token>" \
   -H "Content-Type: application/json" \
   -d '{
-    "password": "staff123",
     "role": "staff"
   }'
 ```
+
+**Note:** The password from step 3 is stored securely and will be used automatically.
 
 ### 5. View All Staff
 

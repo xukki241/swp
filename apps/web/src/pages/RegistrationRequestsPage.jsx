@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Search, CheckCircle, XCircle, Clock } from "lucide-react";
-import { useForm } from "react-hook-form";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -30,22 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import {
   useRegistrationRequests,
   useApproveRegistration,
@@ -57,34 +40,18 @@ export default function RegistrationRequestsPage() {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
-  const { toast } = useToast();
 
   // Fetch registration requests with pending status
   const {
     data: apiResponse,
     isLoading,
     error,
+    refetch,
   } = useRegistrationRequests({ status: "pending" });
   const approveMutation = useApproveRegistration();
   const rejectMutation = useRejectRegistration();
 
-  // Form for approval with password and role
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue,
-    watch,
-  } = useForm({
-    defaultValues: {
-      password: "",
-      role: "staff",
-    },
-  });
-
   // Safely extract registrations array from API response
-  // Handle cases: array directly, object with data property, null/undefined
   const registrations = Array.isArray(apiResponse)
     ? apiResponse
     : Array.isArray(apiResponse?.data)
@@ -93,101 +60,68 @@ export default function RegistrationRequestsPage() {
 
   const filteredRequests = registrations.filter(
     (req) =>
-      req.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      req.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       req.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleApproveClick = (request) => {
+  function handleApproveClick(request) {
     setSelectedRequest(request);
     setShowApproveDialog(true);
-    reset();
-  };
+  }
 
-  const handleRejectClick = (request) => {
+  function handleRejectClick(request) {
     setSelectedRequest(request);
     setShowRejectDialog(true);
-  };
+  }
 
-  const onApproveSubmit = async (data) => {
+  async function confirmApprove() {
     if (!selectedRequest) return;
 
     try {
       await approveMutation.mutateAsync({
         id: selectedRequest.id,
-        password: data.password,
-        role: data.role,
+        role: "staff", // Auto assign as staff
       });
 
-      toast({
-        title: "Request Approved",
-        description: `${selectedRequest.fullName}'s registration has been approved as ${data.role}.`,
+      toast.success("Request Approved", {
+        description: `${selectedRequest.name}'s registration has been approved as staff.`,
       });
 
       setShowApproveDialog(false);
       setSelectedRequest(null);
-      reset();
+
+      // No need to call refetch() here, the useApproveRegistration hook handles it.
     } catch (err) {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description:
           err.response?.data?.message || "Failed to approve registration",
-        variant: "destructive",
       });
     }
-  };
+  }
 
-  const confirmReject = async () => {
+  async function confirmReject() {
     if (!selectedRequest) return;
 
     try {
       await rejectMutation.mutateAsync(selectedRequest.id);
 
-      toast({
-        title: "Request Rejected",
-        description: `${selectedRequest.fullName}'s registration has been rejected.`,
+      toast.success("Request Rejected", {
+        description: `${selectedRequest.name}'s registration has been rejected.`,
       });
 
       setShowRejectDialog(false);
       setSelectedRequest(null);
+
+      // No need to call refetch() here, the useRejectRegistration hook handles it.
     } catch (err) {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description:
-          err.response?.data?.message || "Failed to reject registration",
-        variant: "destructive",
+          err.response?.data?.message ||
+          error?.message ||
+          "Failed to reject registration",
       });
     }
-  };
-
-  const getStatusBadge = (status) => {
-    const variants = {
-      pending: {
-        variant: "secondary",
-        icon: Clock,
-        className: "bg-orange-100 text-orange-700 hover:bg-orange-100",
-      },
-      approved: {
-        variant: "default",
-        icon: CheckCircle,
-        className: "bg-primary/10 text-primary hover:bg-primary/10",
-      },
-      rejected: {
-        variant: "destructive",
-        icon: XCircle,
-        className: "bg-red-100 text-red-700 hover:bg-red-100",
-      },
-    };
-
-    const config = variants[status];
-    const Icon = config.icon;
-
-    return (
-      <Badge variant={config.variant} className={config.className}>
-        <Icon className="h-3 w-3 mr-1" />
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
-    );
-  };
+  }
 
   if (isLoading) {
     return (
@@ -238,7 +172,7 @@ export default function RegistrationRequestsPage() {
                     "Failed to load registration requests"}
                 </p>
                 <Button
-                  onClick={() => window.location.reload()}
+                  onClick={() => refetch()}
                   className="mt-4"
                   variant="outline"
                 >
@@ -291,7 +225,7 @@ export default function RegistrationRequestsPage() {
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Phone</TableHead>
-                    <TableHead>Created At</TableHead>
+                    <TableHead>Address</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -328,15 +262,11 @@ export default function RegistrationRequestsPage() {
                     filteredRequests.map((request) => (
                       <TableRow key={request.id}>
                         <TableCell className="font-medium">
-                          {request.fullName || "N/A"}
+                          {request.name || "N/A"}
                         </TableCell>
                         <TableCell>{request.email || "N/A"}</TableCell>
-                        <TableCell>{request.phoneNumber || "N/A"}</TableCell>
-                        <TableCell>
-                          {request.createdAt
-                            ? new Date(request.createdAt).toLocaleDateString()
-                            : "N/A"}
-                        </TableCell>
+                        <TableCell>{request.phone || "N/A"}</TableCell>
+                        <TableCell>{request.address || "N/A"}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Button
@@ -369,77 +299,29 @@ export default function RegistrationRequestsPage() {
         </Card>
       </div>
 
-      {/* Approve Dialog with Password and Role */}
-      <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Approve Registration</DialogTitle>
-            <DialogDescription>
-              Set password and role for{" "}
-              <span className="font-semibold">{selectedRequest?.fullName}</span>
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit(onApproveSubmit)}>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium">
-                  Password
-                </label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter password for new account"
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: {
-                      value: 6,
-                      message: "Password must be at least 6 characters",
-                    },
-                  })}
-                />
-                {errors.password && (
-                  <p className="text-sm text-red-500">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="role" className="text-sm font-medium">
-                  Role
-                </label>
-                <Select
-                  value={watch("role")}
-                  onValueChange={(value) => setValue("role", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="staff">Staff</SelectItem>
-                    <SelectItem value="sales">Sales</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowApproveDialog(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={approveMutation.isPending}
-                className="bg-primary hover:bg-primary/90"
-              >
-                {approveMutation.isPending ? "Approving..." : "Approve"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      {/* Approve Confirmation Dialog */}
+      <AlertDialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Approve Registration</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to approve the registration request from{" "}
+              <span className="font-semibold">{selectedRequest?.name}</span>?
+              They will be assigned as a staff member.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmApprove}
+              disabled={approveMutation.isPending}
+              className="bg-primary hover:bg-primary/90"
+            >
+              {approveMutation.isPending ? "Approving..." : "Approve"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Reject Confirmation Dialog */}
       <AlertDialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
@@ -448,8 +330,8 @@ export default function RegistrationRequestsPage() {
             <AlertDialogTitle>Reject Registration</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to reject the registration request from{" "}
-              <span className="font-semibold">{selectedRequest?.fullName}</span>
-              ? This action cannot be undone.
+              <span className="font-semibold">{selectedRequest?.name}</span>?
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

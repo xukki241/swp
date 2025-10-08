@@ -33,3 +33,27 @@ export const refreshToken = async () => {
   const response = await instance.post("/auth/refresh");
   return response.data;
 };
+
+// Reset password
+export const resetPassword = async (data) => {
+  const response = await instance.post("/auth/reset-password", data);
+  return response.data;
+};
+
+// Change password
+export const changePassword = async (data) => {
+  const response = await instance.post("/auth/change-password", data);
+  return response.data;
+};
+
+// Request password reset OTP
+export const requestPasswordReset = async (data) => {
+  const response = await instance.post("/auth/forgot-password", data);
+  return response.data;
+};
+
+// Verify OTP and reset password
+export const verifyResetOTP = async (data) => {
+  const response = await instance.post("/auth/verify-reset-otp", data);
+  return response.data;
+};

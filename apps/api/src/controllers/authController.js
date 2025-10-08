@@ -201,3 +201,82 @@ export const getCurrentUser = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Request password reset OTP (Forgot Password Step 1)
+ * @route POST /api/auth/forgot-password
+ */
+export const requestPasswordReset = async (req, res, next) => {
+  try {
+    const { identifier } = req.body;
+
+    // Validation
+    if (!identifier) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    // Only support email now (SMS removed)
+    const result = await authService.requestPasswordReset(identifier, "email");
+
+    res.status(200).json(result);
+  } catch (error) {
+    logger.error("Error in requestPasswordReset controller:", error);
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * Verify OTP and reset password (Forgot Password Step 2)
+ * @route POST /api/auth/verify-reset-otp
+ */
+export const verifyOTPAndResetPassword = async (req, res, next) => {
+  try {
+    const { identifier, otp, newPassword, method } = req.body;
+
+    // Validation
+    if (!identifier || !otp || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Email, OTP, and new password are required",
+      });
+    }
+
+    // Validate OTP format (6 digits)
+    if (!/^\d{6}$/.test(otp)) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP must be 6 digits",
+      });
+    }
+
+    // Validate password strength
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters",
+      });
+    }
+
+    // Only support email now (SMS removed)
+    const result = await authService.verifyOTPAndResetPassword(
+      identifier,
+      otp,
+      newPassword,
+      "email"
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    logger.error("Error in verifyOTPAndResetPassword controller:", error);
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

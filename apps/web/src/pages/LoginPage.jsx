@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { useForm } from "react-hook-form";
 import { Pill, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,10 +35,27 @@ export default function LoginPage() {
   const rememberValue = watch("remember");
 
   const onSubmit = (data) => {
-    loginMutation.mutate({
-      email: data.email,
-      password: data.password,
-    });
+    loginMutation.mutate(
+      {
+        email: data.email,
+        password: data.password,
+      },
+      {
+        onError: (error) => {
+          toast.error("Login Failed", {
+            description:
+              error?.response?.data?.message ||
+              error?.message ||
+              "Invalid email or password. Please try again.",
+          });
+        },
+        onSuccess: () => {
+          toast.success("Login Successful", {
+            description: "Welcome back! Redirecting to dashboard...",
+          });
+        },
+      }
+    );
   };
 
   return (
@@ -60,16 +78,6 @@ export default function LoginPage() {
         </CardHeader>
 
         <CardContent className="p-8 pt-4">
-          {loginMutation.isError && (
-            <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center gap-2 text-sm text-destructive">
-              <AlertCircle className="h-4 w-4" />
-              <span>
-                {loginMutation.error?.message ||
-                  "Login failed. Please try again."}
-              </span>
-            </div>
-          )}
-
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">
@@ -148,7 +156,14 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-
+          <div className="mt-4 text-center">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-primary font-medium hover:underline"
+            >
+              Forgot Password?
+            </Link>
+          </div>
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               Don't have an account?{" "}

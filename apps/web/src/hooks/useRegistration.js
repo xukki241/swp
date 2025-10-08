@@ -34,7 +34,7 @@ export const useRegistrationRequest = (id) => {
 
 /**
  * Hook to approve a registration request
- * Requires: { id, password, role } where role is 'staff' or 'sales'
+ * Requires: { id, password, role } where role is 'staff' or 'owner'
  */
 export const useApproveRegistration = () => {
   const queryClient = useQueryClient();

@@ -51,4 +51,20 @@ router.post("/change-password", authenticate, authController.changePassword);
  */
 router.get("/me", authenticate, authController.getCurrentUser);
 
+/**
+ * @route   POST /api/auth/forgot-password
+ * @desc    Request password reset OTP (Step 1: Send OTP)
+ * @access  Public
+ * @body    { identifier (email or phone), method ('email' or 'sms') }
+ */
+router.post("/forgot-password", authController.requestPasswordReset);
+
+/**
+ * @route   POST /api/auth/verify-reset-otp
+ * @desc    Verify OTP and reset password (Step 2: Verify OTP + Reset)
+ * @access  Public
+ * @body    { identifier, otp, newPassword, method }
+ */
+router.post("/verify-reset-otp", authController.verifyOTPAndResetPassword);
+
 export default router;

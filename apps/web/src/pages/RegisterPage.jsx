@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { useForm } from "react-hook-form";
-import { Pill, AlertCircle } from "lucide-react";
+import { Pill } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,7 +37,19 @@ export default function RegisterPage() {
 
   const onSubmit = (data) => {
     const { confirmPassword, ...registerData } = data;
-    registerMutation.mutate(registerData);
+    registerMutation.mutate(registerData, {
+      onSuccess: () => {
+        toast.success(
+          "Registration submitted successfully! Please wait for approval."
+        );
+      },
+      onError: (error) => {
+        toast.error(
+          error?.response?.data?.message ||
+            "Registration failed. Please try again."
+        );
+      },
+    });
   };
 
   return (
@@ -59,16 +72,6 @@ export default function RegisterPage() {
         </CardHeader>
 
         <CardContent className="p-8 pt-4">
-          {registerMutation.isError && (
-            <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center gap-2 text-sm text-destructive">
-              <AlertCircle className="h-4 w-4" />
-              <span>
-                {registerMutation.error?.message ||
-                  "Registration failed. Please try again."}
-              </span>
-            </div>
-          )}
-
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">

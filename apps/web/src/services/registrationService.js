@@ -17,7 +17,7 @@ export const getRegistrationRequestById = async (id) => {
 };
 
 // Approve registration request
-// payload: { password, role } where role is 'staff' or 'sales'
+// payload: { password, role } where role is 'staff' or 'owner'
 export const approveRegistrationRequest = async ({ id, password, role }) => {
   const response = await instance.post(`/registrations/${id}/approve`, {
     password,
