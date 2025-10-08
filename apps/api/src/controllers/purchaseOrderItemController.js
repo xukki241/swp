@@ -51,4 +51,37 @@ export const purchaseOrderItemController = {
       res.status(500).json({ error: error.message });
     }
   },
+  // Update purchase order item
+  async update(req, res) {
+    try {
+      const item = await purchaseOrderItemService.update(
+        Number.parseInt(req.params.id),
+        req.body
+      );
+      if (!item) {
+        return res.status(404).json({ error: "Purchase order item not found" });
+      }
+      res.json(convertBigIntToString(item));
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
+  // Delete purchase order item
+  async delete(req, res) {
+    try {
+      const item = await purchaseOrderItemService.delete(
+        Number.parseInt(req.params.id)
+      );
+      if (!item) {
+        return res.status(404).json({ error: "Purchase order item not found" });
+      }
+      res.json({
+        message: "Purchase order item deleted successfully",
+        purchaseOrderItem: convertBigIntToString(item),
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 };
