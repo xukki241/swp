@@ -44,3 +44,37 @@ export const getAllMedicationVariants = async ({
     throw new Error(`Failed to fetch medication variants: ${error.message}`);
   }
 };
+/**
+ * Get medication variant by ID
+ * @param {bigint} id - Medication variant ID
+ * @returns {Promise<Object|null>} Medication variant object or null
+ */
+export const getMedicationVariantById = async (id) => {
+  try {
+    const result = await db
+      .select()
+      .from(medicationVariants)
+      .where(eq(medicationVariants.id, id))
+      .limit(1);
+    return result[0] || null;
+  } catch (error) {
+    throw new Error(`Failed to fetch medication variant: ${error.message}`);
+  }
+};
+/**
+ * Get medication variant by SKU
+ * @param {string} sku - Medication variant SKU
+ * @returns {Promise<Object|null>} Medication variant object or null
+ */
+export const getMedicationVariantBySku = async (sku) => {
+  try {
+    const result = await db
+      .select()
+      .from(medicationVariants)
+      .where(eq(medicationVariants.sku, sku))
+      .limit(1);
+    return result[0] || null;
+  } catch (error) {
+    throw new Error(`Failed to fetch medication variant: ${error.message}`);
+  }
+};
