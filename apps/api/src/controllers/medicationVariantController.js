@@ -114,3 +114,91 @@ export const createMedicationVariant = async (req, res, next) => {
     });
   }
 };
+/**
+ * Update medication variant by ID
+ * @route PUT /api/medication-variants/:id
+ */
+export const updateMedicationVariant = async (req, res, next) => {
+  try {
+    const id = BigInt(req.params.id);
+    const {
+      medicationId,
+      sku,
+      name,
+      unit,
+      unitFactor,
+      barcode,
+      sellPrice,
+      isActive,
+      isForSale,
+    } = req.body;
+
+    // Check if variant exists
+    const existingVariant =
+      await medicationVariantService.getMedicationVariantById(id);
+    if (!existingVariant) {
+      return res.status(404).json({
+        success: false,
+        message: "Medication variant not found",
+      });
+    }
+
+    // Check if SKU is being changed and already exists
+    if (sku && sku !== existingVariant.sku) {
+      const existingBySku =
+        await medicationVariantService.getMedicationVariantBySku(sku);
+      if (existingBySku) {
+        return res.status(409).json({
+          success: false,
+          message: "Medication variant with this SKU already exists",
+        });
+      }
+    }
+
+    const variantData = {};
+    if (medicationId !== undefined) {
+      variantData.medicationId = BigInt(medicationId);
+    }
+    if (sku !== undefined) {
+      variantData.sku = sku;
+    }
+    if (name !== undefined) {
+      variantData.name = name;
+    }
+    if (unit !== undefined) {
+      variantData.unit = unit;
+    }
+    if (unitFactor !== undefined) {
+      variantData.unitFactor = unitFactor;
+    }
+    if (barcode !== undefined) {
+      variantData.barcode = barcode;
+    }
+    if (sellPrice !== undefined) {
+      variantData.sellPrice = sellPrice;
+    }
+    if (isActive !== undefined) {
+      variantData.isActive = isActive;
+    }
+    if (isForSale !== undefined) {
+      variantData.isForSale = isForSale;
+    }
+
+    const variant = await medicationVariantService.updateMedicationVariant(
+      id,
+      variantData
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Medication variant updated successfully",
+      data: convertBigIntIds(variant),
+    });
+  } catch (error) {
+    logger.error("Error in updateMedicationVariant controller:", error);
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
