@@ -56,4 +56,41 @@ export const supplierMedicationVariantController = {
       res.status(500).json({ error: error.message });
     }
   },
+  // Update supplier medication variant
+  async update(req, res) {
+    try {
+      const smv = await supplierMedicationVariantService.update(
+        Number.parseInt(req.params.id),
+        req.body
+      );
+      if (!smv) {
+        return res
+          .status(404)
+          .json({ error: "Supplier medication variant not found" });
+      }
+      res.json(convertBigIntToString(smv));
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
+  // Delete supplier medication variant
+  async delete(req, res) {
+    try {
+      const smv = await supplierMedicationVariantService.delete(
+        Number.parseInt(req.params.id)
+      );
+      if (!smv) {
+        return res
+          .status(404)
+          .json({ error: "Supplier medication variant not found" });
+      }
+      res.json({
+        message: "Supplier medication variant deleted successfully",
+        supplierMedicationVariant: convertBigIntToString(smv),
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 };
