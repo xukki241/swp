@@ -118,3 +118,19 @@ export const updateMedicationVariant = async (id, variantData) => {
     throw new Error(`Failed to update medication variant: ${error.message}`);
   }
 };
+/**
+ * Delete medication variant by ID
+ * @param {bigint} id - Medication variant ID
+ * @returns {Promise<Object|null>} Deleted medication variant or null
+ */
+export const deleteMedicationVariant = async (id) => {
+  try {
+    const result = await db
+      .delete(medicationVariants)
+      .where(eq(medicationVariants.id, id))
+      .returning();
+    return result[0] || null;
+  } catch (error) {
+    throw new Error(`Failed to delete medication variant: ${error.message}`);
+  }
+};
