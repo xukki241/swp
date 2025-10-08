@@ -139,3 +139,27 @@ export const updateMedication = async (req, res, next) => {
     next(error);
   }
 };
+/**
+ * Delete medication by ID
+ * @route DELETE /api/medications/:id
+ */
+export const deleteMedication = async (req, res, next) => {
+  try {
+    const id = BigInt(req.params.id);
+    const medication = await medicationService.deleteMedication(id);
+    if (!medication) {
+      return res.status(404).json({
+        success: false,
+        message: "Medication not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Medication deleted successfully",
+      data: convertBigIntIds(medication),
+    });
+  } catch (error) {
+    logger.error("Error in deleteMedication controller:", error);
+    next(error);
+  }
+};
