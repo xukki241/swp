@@ -12,14 +12,14 @@
 6. **View & Search Staff Account** - Owner can view and search staff
 7. **Edit Staff Account** - Owner can edit staff details
 8. **Active/Deactive Staff Account** - Owner can manage staff status
-9. **Manage Medications** - Owner can create, update, and delete medications
-10. **Manage Medication Variants** - Owner can create, update, and delete medication variants
-11. **Manage Suppliers** - Owner can create, update, and delete suppliers
-12. **Manage Supplier Medication Variants** - Owner can create, update, and delete supplier medication variants
-13. **Manage Purchase Orders** - Owner can create, update, and delete purchase orders
-14. **Manage Purchase Order Items** - Owner can create, update, and delete purchase order items
-15. **Manage Purchase Order Receipts** - Owner can create, update, and delete purchase order receipts
-16. **Manage Purchase Order Receipt Items** - Owner can create, update, and delete purchase order receipt items
+9. **Manage Medications** - Owner can CUD, Staff can Read (with nested variants creation)
+10. **Manage Medication Variants** - Owner can CUD, Staff can Read
+11. **Manage Suppliers** - Owner only (with nested medication variants creation)
+12. **Manage Supplier Medication Variants** - Owner only
+13. **Manage Purchase Orders** - Owner only (with nested items creation)
+14. **Manage Purchase Order Items** - Owner only
+15. **Manage Purchase Order Receipts** - Owner only (with nested items creation)
+16. **Manage Purchase Order Receipt Items** - Owner only
 
 ## 📚 API Endpoints
 
@@ -288,7 +288,16 @@ Authorization: Bearer <token>
 "description": "Pain reliever and fever reducer",
 "status": "active",
 "createdAt": "2025-01-01T00:00:00.000Z",
-"updatedAt": "2025-01-01T00:00:00.000Z"
+"updatedAt": "2025-01-01T00:00:00.000Z",
+"variants": [
+{
+"id": "1",
+"dosage": "500mg",
+"form": "tablet",
+"packaging": "bottle",
+"status": "active"
+}
+]
 }
 ],
 "pagination": {
@@ -317,12 +326,23 @@ Authorization: Bearer <token>
 "description": "Pain reliever and fever reducer",
 "status": "active",
 "createdAt": "2025-01-01T00:00:00.000Z",
-"updatedAt": "2025-01-01T00:00:00.000Z"
+"updatedAt": "2025-01-01T00:00:00.000Z",
+"variants": [
+{
+"id": "1",
+"dosage": "500mg",
+"form": "tablet",
+"packaging": "bottle",
+"status": "active"
+}
+]
 }
 }
 \`\`\`
 
-#### 3. Create Medication (Owner Only)
+#### 3. Create Medication with Variants (Owner Only) ⭐ NEW
+
+**This endpoint now supports creating medication and its variants in a single transaction!**
 
 \`\`\`http
 POST /api/medications
@@ -332,7 +352,21 @@ Content-Type: application/json
 {
 "name": "Aspirin",
 "description": "Pain reliever and fever reducer",
+"status": "active",
+"variants": [
+{
+"dosage": "500mg",
+"form": "tablet",
+"packaging": "bottle",
 "status": "active"
+},
+{
+"dosage": "1000mg",
+"form": "capsule",
+"packaging": "blister",
+"status": "active"
+}
+]
 }
 \`\`\`
 
@@ -340,19 +374,39 @@ Content-Type: application/json
 \`\`\`json
 {
 "success": true,
-"message": "Medication created successfully",
+"message": "Medication created successfully with 2 variants",
 "data": {
 "id": "1",
 "name": "Aspirin",
 "description": "Pain reliever and fever reducer",
 "status": "active",
 "createdAt": "2025-01-01T00:00:00.000Z",
-"updatedAt": "2025-01-01T00:00:00.000Z"
+"updatedAt": "2025-01-01T00:00:00.000Z",
+"variants": [
+{
+"id": "1",
+"medicationId": "1",
+"dosage": "500mg",
+"form": "tablet",
+"packaging": "bottle",
+"status": "active"
+},
+{
+"id": "2",
+"medicationId": "1",
+"dosage": "1000mg",
+"form": "capsule",
+"packaging": "blister",
+"status": "active"
+}
+]
 }
 }
 \`\`\`
 
-#### 4. Update Medication (Owner Only)
+#### 4. Update Medication with Variants (Owner Only) ⭐ UPDATED
+
+**This endpoint now supports updating medication and adding/updating variants in a single transaction!**
 
 \`\`\`http
 PUT /api/medications/:id
@@ -360,9 +414,17 @@ Authorization: Bearer <owner-token>
 Content-Type: application/json
 
 {
-"name": "Aspirin 500mg",
+"name": "Aspirin Updated",
 "description": "Updated description",
+"status": "active",
+"variants": [
+{
+"dosage": "250mg",
+"form": "tablet",
+"packaging": "bottle",
 "status": "active"
+}
+]
 }
 \`\`\`
 
@@ -546,7 +608,17 @@ Authorization: Bearer <owner-token>
 "email": "contact@pharmacorp.com",
 "phone": "0123456789",
 "address": "123 Supplier St",
-"status": "active"
+"status": "active",
+"medicationVariants": [
+{
+"id": "1",
+"medicationVariantId": "1",
+"supplierSku": "SKU-12345",
+"leadTimeDays": 7,
+"medicationName": "Aspirin",
+"variantName": "500mg Tablet"
+}
+]
 }
 ]
 \`\`\`
@@ -558,7 +630,35 @@ GET /api/suppliers/:id
 Authorization: Bearer <owner-token>
 \`\`\`
 
-#### 3. Create Supplier
+**Response includes all medication variants for this supplier:**
+\`\`\`json
+{
+"success": true,
+"data": {
+"id": "1",
+"name": "PharmaCorp",
+"contactName": "John Smith",
+"email": "contact@pharmacorp.com",
+"phone": "0123456789",
+"address": "123 Supplier St",
+"status": "active",
+"medicationVariants": [
+{
+"id": "1",
+"medicationVariantId": "1",
+"supplierSku": "SKU-12345",
+"leadTimeDays": 7,
+"medicationName": "Aspirin",
+"variantName": "500mg Tablet"
+}
+]
+}
+}
+\`\`\`
+
+#### 3. Create Supplier with Medication Variants ⭐ NEW
+
+**This endpoint now supports creating supplier and its medication variants in a single transaction!**
 
 \`\`\`http
 POST /api/suppliers
@@ -571,11 +671,58 @@ Content-Type: application/json
 "email": "contact@pharmacorp.com",
 "phone": "0123456789",
 "address": "123 Supplier St",
-"status": "active"
+"status": "active",
+"medicationVariants": [
+{
+"medicationVariantId": 1,
+"supplierSku": "SKU-12345",
+"leadTimeDays": 7
+},
+{
+"medicationVariantId": 2,
+"supplierSku": "SKU-67890",
+"leadTimeDays": 5
+}
+]
 }
 \`\`\`
 
-#### 4. Update Supplier
+**Response:**
+\`\`\`json
+{
+"success": true,
+"message": "Supplier created successfully with 2 medication variants",
+"data": {
+"id": "1",
+"name": "PharmaCorp",
+"contactName": "John Smith",
+"email": "contact@pharmacorp.com",
+"phone": "0123456789",
+"address": "123 Supplier St",
+"status": "active",
+"medicationVariants": [
+{
+"id": "1",
+"supplierId": "1",
+"medicationVariantId": "1",
+"supplierSku": "SKU-12345",
+"leadTimeDays": 7
+},
+{
+"id": "2",
+"supplierId": "1",
+"medicationVariantId": "2",
+"supplierSku": "SKU-67890",
+"leadTimeDays": 5
+}
+]
+}
+}
+\`\`\`
+
+#### 4. Update Supplier with Medication Variants ⭐ UPDATED
+
+**This endpoint now supports updating supplier and adding/updating medication variants in a single transaction!**
 
 \`\`\`http
 PUT /api/suppliers/:id
@@ -584,7 +731,14 @@ Content-Type: application/json
 
 {
 "name": "PharmaCorp Updated",
-"status": "inactive"
+"status": "active",
+"medicationVariants": [
+{
+"medicationVariantId": 3,
+"supplierSku": "SKU-11111",
+"leadTimeDays": 10
+}
+]
 }
 \`\`\`
 
@@ -707,7 +861,18 @@ Authorization: Bearer <owner-token>
 "totalAmount": "1500.00",
 "createdBy": "1",
 "supplierName": "PharmaCorp",
-"createdByName": "Owner User"
+"createdByName": "Owner User",
+"items": [
+{
+"id": "1",
+"supplierMedicationVariantId": "1",
+"quantity": 100,
+"unitPrice": "10.00",
+"totalPrice": "1000.00",
+"medicationName": "Aspirin",
+"variantName": "500mg Tablet"
+}
+]
 }
 ]
 \`\`\`
@@ -719,7 +884,38 @@ GET /api/purchase-orders/:id
 Authorization: Bearer <owner-token>
 \`\`\`
 
-#### 3. Create Purchase Order
+**Response includes all items for this purchase order:**
+\`\`\`json
+{
+"success": true,
+"data": {
+"id": "1",
+"supplierId": "1",
+"orderDate": "2025-01-15T00:00:00.000Z",
+"expectedDate": "2025-01-22T00:00:00.000Z",
+"status": "pending",
+"totalAmount": "1500.00",
+"createdBy": "1",
+"supplierName": "PharmaCorp",
+"createdByName": "Owner User",
+"items": [
+{
+"id": "1",
+"supplierMedicationVariantId": "1",
+"quantity": 100,
+"unitPrice": "10.00",
+"totalPrice": "1000.00",
+"medicationName": "Aspirin",
+"variantName": "500mg Tablet"
+}
+]
+}
+}
+\`\`\`
+
+#### 3. Create Purchase Order with Items ⭐ NEW
+
+**This endpoint now supports creating purchase order and its items in a single transaction!**
 
 \`\`\`http
 POST /api/purchase-orders
@@ -730,12 +926,63 @@ Content-Type: application/json
 "supplierId": 1,
 "expectedDate": "2025-01-22T00:00:00.000Z",
 "status": "pending",
-"totalAmount": 1500.00,
-"createdBy": 1
+"totalAmount": 2500.00,
+"createdBy": 1,
+"items": [
+{
+"supplierMedicationVariantId": 1,
+"quantity": 100,
+"unitPrice": 10.00,
+"totalPrice": 1000.00
+},
+{
+"supplierMedicationVariantId": 2,
+"quantity": 50,
+"unitPrice": 30.00,
+"totalPrice": 1500.00
+}
+]
 }
 \`\`\`
 
-#### 4. Update Purchase Order
+**Response:**
+\`\`\`json
+{
+"success": true,
+"message": "Purchase order created successfully with 2 items",
+"data": {
+"id": "1",
+"supplierId": "1",
+"orderDate": "2025-01-15T00:00:00.000Z",
+"expectedDate": "2025-01-22T00:00:00.000Z",
+"status": "pending",
+"totalAmount": "2500.00",
+"createdBy": "1",
+"items": [
+{
+"id": "1",
+"purchaseOrderId": "1",
+"supplierMedicationVariantId": "1",
+"quantity": 100,
+"unitPrice": "10.00",
+"totalPrice": "1000.00"
+},
+{
+"id": "2",
+"purchaseOrderId": "1",
+"supplierMedicationVariantId": "2",
+"quantity": 50,
+"unitPrice": "30.00",
+"totalPrice": "1500.00"
+}
+]
+}
+}
+\`\`\`
+
+#### 4. Update Purchase Order with Items ⭐ UPDATED
+
+**This endpoint now supports updating purchase order and adding/updating items in a single transaction!**
 
 \`\`\`http
 PUT /api/purchase-orders/:id
@@ -744,7 +991,15 @@ Content-Type: application/json
 
 {
 "status": "ordered",
-"totalAmount": 1600.00
+"totalAmount": 3000.00,
+"items": [
+{
+"supplierMedicationVariantId": 3,
+"quantity": 20,
+"unitPrice": 25.00,
+"totalPrice": 500.00
+}
+]
 }
 \`\`\`
 
@@ -865,7 +1120,18 @@ Authorization: Bearer <owner-token>
 "receivedByName": "Owner User",
 "poOrderDate": "2025-01-15T00:00:00.000Z",
 "poStatus": "received",
-"supplierName": "PharmaCorp"
+"supplierName": "PharmaCorp",
+"items": [
+{
+"id": "1",
+"purchaseOrderItemId": "1",
+"quantity": 95,
+"orderedQuantity": 100,
+"unitPrice": "10.00",
+"medicationName": "Aspirin",
+"variantName": "500mg Tablet"
+}
+]
 }
 ]
 \`\`\`
@@ -877,7 +1143,37 @@ GET /api/purchase-order-receipts/:id
 Authorization: Bearer <owner-token>
 \`\`\`
 
-#### 3. Create Purchase Order Receipt
+**Response includes all items for this receipt:**
+\`\`\`json
+{
+"success": true,
+"data": {
+"id": "1",
+"purchaseOrderId": "1",
+"receivedDate": "2025-01-20T00:00:00.000Z",
+"receivedBy": "1",
+"receivedByName": "Owner User",
+"poOrderDate": "2025-01-15T00:00:00.000Z",
+"poStatus": "received",
+"supplierName": "PharmaCorp",
+"items": [
+{
+"id": "1",
+"purchaseOrderItemId": "1",
+"quantity": 95,
+"orderedQuantity": 100,
+"unitPrice": "10.00",
+"medicationName": "Aspirin",
+"variantName": "500mg Tablet"
+}
+]
+}
+}
+\`\`\`
+
+#### 3. Create Purchase Order Receipt with Items ⭐ NEW
+
+**This endpoint now supports creating purchase order receipt and its items in a single transaction!**
 
 \`\`\`http
 POST /api/purchase-order-receipts
@@ -886,11 +1182,51 @@ Content-Type: application/json
 
 {
 "purchaseOrderId": 1,
-"receivedBy": 1
+"receivedBy": 1,
+"items": [
+{
+"purchaseOrderItemId": 1,
+"quantity": 95
+},
+{
+"purchaseOrderItemId": 2,
+"quantity": 48
+}
+]
 }
 \`\`\`
 
-#### 4. Update Purchase Order Receipt
+**Response:**
+\`\`\`json
+{
+"success": true,
+"message": "Purchase order receipt created successfully with 2 items",
+"data": {
+"id": "1",
+"purchaseOrderId": "1",
+"receivedDate": "2025-01-20T00:00:00.000Z",
+"receivedBy": "1",
+"items": [
+{
+"id": "1",
+"purchaseOrderReceiptId": "1",
+"purchaseOrderItemId": "1",
+"quantity": 95
+},
+{
+"id": "2",
+"purchaseOrderReceiptId": "1",
+"purchaseOrderItemId": "2",
+"quantity": 48
+}
+]
+}
+}
+\`\`\`
+
+#### 4. Update Purchase Order Receipt with Items ⭐ UPDATED
+
+**This endpoint now supports updating purchase order receipt and adding/updating items in a single transaction!**
 
 \`\`\`http
 PUT /api/purchase-order-receipts/:id
@@ -898,7 +1234,13 @@ Authorization: Bearer <owner-token>
 Content-Type: application/json
 
 {
-"receivedDate": "2025-01-21T00:00:00.000Z"
+"receivedDate": "2025-01-21T00:00:00.000Z",
+"items": [
+{
+"purchaseOrderItemId": 3,
+"quantity": 20
+}
+]
 }
 \`\`\`
 
@@ -1156,11 +1498,16 @@ quantity: integer
 
 ---
 
-## 🧪 Testing Workflow
+## 🧪 Testing Workflow with Nested Creation
 
-### 1. Register First User (Owner)
+### Complete Workflow Example
+
+#### 1. Register & Login as Owner
 
 \`\`\`bash
+
+# Register first user (becomes owner)
+
 curl -X POST http://localhost:80/api/auth/register \
  -H "Content-Type: application/json" \
  -d '{
@@ -1170,11 +1517,9 @@ curl -X POST http://localhost:80/api/auth/register \
 "address": "123 Main St",
 "password": "owner123"
 }'
-\`\`\`
 
-### 2. Login as Owner
+# Login
 
-\`\`\`bash
 curl -X POST http://localhost:80/api/auth/login \
  -H "Content-Type: application/json" \
  -d '{
@@ -1183,47 +1528,7 @@ curl -X POST http://localhost:80/api/auth/login \
 }'
 \`\`\`
 
-### 3. Register Staff (Creates Registration Request)
-
-\`\`\`bash
-curl -X POST http://localhost:80/api/auth/register \
- -H "Content-Type: application/json" \
- -d '{
-"name": "Staff User",
-"email": "staff@pharmaflow.com",
-"phone": "0987654321",
-"address": "456 Oak St",
-"password": "staff123"
-}'
-\`\`\`
-
-### 4. Owner Approves Registration
-
-\`\`\`bash
-curl -X POST http://localhost:80/api/registrations/2/approve \
- -H "Authorization: Bearer <owner-token>" \
- -H "Content-Type: application/json" \
- -d '{
-"password": "staff123",
-"role": "staff"
-}'
-\`\`\`
-
-### 5. View All Staff
-
-\`\`\`bash
-curl -X GET "http://localhost:80/api/users/staff?status=active" \
- -H "Authorization: Bearer <owner-token>"
-\`\`\`
-
-### 6. Deactivate Staff
-
-\`\`\`bash
-curl -X PATCH http://localhost:80/api/users/2/deactivate \
- -H "Authorization: Bearer <owner-token>"
-\`\`\`
-
-### 7. Create Medication (Owner Only)
+#### 2. Create Medication with Variants (Single API Call) ⭐
 
 \`\`\`bash
 curl -X POST http://localhost:80/api/medications \
@@ -1232,59 +1537,25 @@ curl -X POST http://localhost:80/api/medications \
  -d '{
 "name": "Aspirin",
 "description": "Pain reliever and fever reducer",
-"status": "active"
-}'
-\`\`\`
-
-### 8. Get All Medications (Owner or Staff)
-
-\`\`\`bash
-curl -X GET "http://localhost:80/api/medications?status=active" \
- -H "Authorization: Bearer <token>"
-\`\`\`
-
-### 9. Create Medication Variant (Owner Only)
-
-\`\`\`bash
-curl -X POST http://localhost:80/api/medication-variants \
- -H "Authorization: Bearer <owner-token>" \
- -H "Content-Type: application/json" \
- -d '{
-"medicationId": 1,
+"status": "active",
+"variants": [
+{
 "dosage": "500mg",
 "form": "tablet",
 "packaging": "bottle",
 "status": "active"
-}'
-\`\`\`
-
-### 10. Get Medication Variants by Medication (Owner or Staff)
-
-\`\`\`bash
-curl -X GET "http://localhost:80/api/medication-variants?medicationId=1" \
- -H "Authorization: Bearer <token>"
-\`\`\`
-
-### 11. Update Medication (Owner Only)
-
-\`\`\`bash
-curl -X PUT http://localhost:80/api/medications/1 \
- -H "Authorization: Bearer <owner-token>" \
- -H "Content-Type: application/json" \
- -d '{
-"name": "Aspirin 500mg",
+},
+{
+"dosage": "1000mg",
+"form": "capsule",
+"packaging": "blister",
 "status": "active"
+}
+]
 }'
 \`\`\`
 
-### 12. Delete Medication Variant (Owner Only)
-
-\`\`\`bash
-curl -X DELETE http://localhost:80/api/medication-variants/1 \
- -H "Authorization: Bearer <owner-token>"
-\`\`\`
-
-### 13. Create Supplier (Owner Only)
+#### 3. Create Supplier with Medication Variants (Single API Call) ⭐
 
 \`\`\`bash
 curl -X POST http://localhost:80/api/suppliers \
@@ -1296,32 +1567,23 @@ curl -X POST http://localhost:80/api/suppliers \
 "email": "contact@pharmacorp.com",
 "phone": "0123456789",
 "address": "123 Supplier St",
-"status": "active"
-}'
-\`\`\`
-
-### 14. Get All Suppliers (Owner Only)
-
-\`\`\`bash
-curl -X GET "http://localhost:80/api/suppliers?status=active" \
- -H "Authorization: Bearer <owner-token>"
-\`\`\`
-
-### 15. Create Supplier Medication Variant (Owner Only)
-
-\`\`\`bash
-curl -X POST http://localhost:80/api/supplier-medication-variants \
- -H "Authorization: Bearer <owner-token>" \
- -H "Content-Type: application/json" \
- -d '{
-"supplierId": 1,
+"status": "active",
+"medicationVariants": [
+{
 "medicationVariantId": 1,
 "supplierSku": "SKU-12345",
 "leadTimeDays": 7
+},
+{
+"medicationVariantId": 2,
+"supplierSku": "SKU-67890",
+"leadTimeDays": 5
+}
+]
 }'
 \`\`\`
 
-### 16. Create Purchase Order (Owner Only)
+#### 4. Create Purchase Order with Items (Single API Call) ⭐
 
 \`\`\`bash
 curl -X POST http://localhost:80/api/purchase-orders \
@@ -1331,27 +1593,26 @@ curl -X POST http://localhost:80/api/purchase-orders \
 "supplierId": 1,
 "expectedDate": "2025-01-22T00:00:00.000Z",
 "status": "pending",
-"totalAmount": 1500.00,
-"createdBy": 1
-}'
-\`\`\`
-
-### 17. Create Purchase Order Item (Owner Only)
-
-\`\`\`bash
-curl -X POST http://localhost:80/api/purchase-order-items \
- -H "Authorization: Bearer <owner-token>" \
- -H "Content-Type: application/json" \
- -d '{
-"purchaseOrderId": 1,
+"totalAmount": 2500.00,
+"createdBy": 1,
+"items": [
+{
 "supplierMedicationVariantId": 1,
 "quantity": 100,
 "unitPrice": 10.00,
 "totalPrice": 1000.00
+},
+{
+"supplierMedicationVariantId": 2,
+"quantity": 50,
+"unitPrice": 30.00,
+"totalPrice": 1500.00
+}
+]
 }'
 \`\`\`
 
-### 18. Create Purchase Order Receipt (Owner Only)
+#### 5. Create Purchase Order Receipt with Items (Single API Call) ⭐
 
 \`\`\`bash
 curl -X POST http://localhost:80/api/purchase-order-receipts \
@@ -1359,29 +1620,74 @@ curl -X POST http://localhost:80/api/purchase-order-receipts \
  -H "Content-Type: application/json" \
  -d '{
 "purchaseOrderId": 1,
-"receivedBy": 1
-}'
-\`\`\`
-
-### 19. Create Purchase Order Receipt Item (Owner Only)
-
-\`\`\`bash
-curl -X POST http://localhost:80/api/purchase-order-receipt-items \
- -H "Authorization: Bearer <owner-token>" \
- -H "Content-Type: application/json" \
- -d '{
-"purchaseOrderReceiptId": 1,
+"receivedBy": 1,
+"items": [
+{
 "purchaseOrderItemId": 1,
 "quantity": 95
+},
+{
+"purchaseOrderItemId": 2,
+"quantity": 48
+}
+]
 }'
 \`\`\`
 
-### 20. Get Purchase Orders by Supplier (Owner Only)
+#### 6. Get Complete Data with Nested Relations
 
 \`\`\`bash
-curl -X GET "http://localhost:80/api/purchase-orders?supplierId=1&status=pending" \
+
+# Get medication with all variants
+
+curl -X GET http://localhost:80/api/medications/1 \
+ -H "Authorization: Bearer <owner-token>"
+
+# Get supplier with all medication variants
+
+curl -X GET http://localhost:80/api/suppliers/1 \
+ -H "Authorization: Bearer <owner-token>"
+
+# Get purchase order with all items
+
+curl -X GET http://localhost:80/api/purchase-orders/1 \
+ -H "Authorization: Bearer <owner-token>"
+
+# Get purchase order receipt with all items
+
+curl -X GET http://localhost:80/api/purchase-order-receipts/1 \
  -H "Authorization: Bearer <owner-token>"
 \`\`\`
+
+---
+
+## 🎯 Key Features
+
+### ✨ Nested Creation Support
+
+All major entities now support creating related records in a single API call:
+
+1. **Medications**: Create medication + variants together
+2. **Suppliers**: Create supplier + medication variants together
+3. **Purchase Orders**: Create PO + items together
+4. **Purchase Order Receipts**: Create receipt + items together
+
+### 🔒 Transaction Safety
+
+All nested creations are wrapped in database transactions, ensuring:
+
+- **Atomicity**: All records are created or none are created
+- **Data Integrity**: No orphaned records if creation fails
+- **Rollback**: Automatic rollback on any error
+
+### 📊 Complete Data Retrieval
+
+GET endpoints return complete data with nested relations:
+
+- Medications include their variants
+- Suppliers include their medication variants
+- Purchase orders include their items
+- Purchase order receipts include their items
 
 ---
 
@@ -1398,24 +1704,6 @@ curl -X GET "http://localhost:80/api/purchase-orders?supplierId=1&status=pending
 
 ---
 
-## 🔄 User Registration Flow
-
-\`\`\`mermaid
-graph TD
-A[User Registers] --> B{Is First User?}
-B -->|Yes| C[Create Owner Account]
-B -->|No| D[Create Registration Request]
-C --> E[Can Login Immediately]
-D --> F[Wait for Owner Approval]
-F --> G[Owner Reviews Request]
-G --> H{Approved?}
-H -->|Yes| I[Create Staff Account]
-H -->|No| J[Reject Request]
-I --> K[Staff Can Login]
-\`\`\`
-
----
-
 ## 🎯 Next Steps
 
 1. Add email notifications for registration approval/rejection
@@ -1424,22 +1712,7 @@ I --> K[Staff Can Login]
 4. Add rate limiting for login attempts
 5. Implement session management
 6. Add audit logs for user actions
-7. Define permissions for Staff and Sales roles
-8. Implement pagination for user lists
-9. Add search functionality for medications and variants
-10. Implement status updates for medications and variants
-11. Implement email notifications for supplier management actions
-12. Define permissions for Supplier management actions
-13. Implement pagination for supplier lists
-14. Add search functionality for suppliers and their medication variants
-15. Implement status updates for suppliers and their medication variants
-16. Implement email notifications for purchase order actions
-17. Define permissions for Purchase order actions
-18. Implement pagination for purchase order lists
-19. Add search functionality for purchase orders and their items
-20. Implement status updates for purchase orders and their items
-21. Implement email notifications for purchase order receipt actions
-22. Define permissions for Purchase order receipt actions
-23. Implement pagination for purchase order receipt lists
-24. Add search functionality for purchase order receipts and their items
-25. Implement status updates for purchase order receipts and their items
+7. Add inventory management integration
+8. Implement automatic inventory updates on PO receipt
+9. Add reporting and analytics endpoints
+10. Implement bulk operations for efficiency
