@@ -46,3 +46,42 @@ export const getMedicationById = async (req, res, next) => {
     next(error);
   }
 };
+/**
+ * Create a new medication
+ * @route POST /api/medications
+ */
+export const createMedication = async (req, res, next) => {
+  try {
+    const {
+      name,
+      brand,
+      description,
+      isPrescriptionRequired,
+      isControlledSubstance,
+      status,
+    } = req.body;
+    // Validation
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: "Name is required",
+      });
+    }
+    const medicationData = {
+      name,
+      brand: brand || null,
+      description: description || null,
+      isPrescriptionRequired: isPrescriptionRequired || false,
+      isControlledSubstance: isControlledSubstance || false,
+      status: status || "active",
+    };
+    const medication = await medicationService.createMedication(medicationData);
+    res.status(201).json({
+      success: true,
+      data: convertBigIntIds(medication),
+    });
+  } catch (error) {
+    logger.error("Error in createMedication controller:", error);
+    next(error);
+  }
+};
