@@ -158,10 +158,11 @@ curl -X POST http://localhost:80/api/registrations/2/approve \
   -H "Authorization: Bearer YOUR_OWNER_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "password": "staff123",
     "role": "staff"
   }'
 ```
+
+**Note:** Password from Step 3 is automatically used (stored securely during registration).
 
 ### Step 6: View All Staff (as Owner)
 

@@ -1,4 +1,3 @@
-import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 
 import { db } from "../db/index.js";
@@ -50,15 +49,10 @@ export const getRegistrationById = async (id) => {
 /**
  * Approve registration request (User Story 2)
  * @param {bigint} registrationId - Registration ID
- * @param {string} password - Password for the new user
  * @param {string} role - Role to assign (staff, sales)
  * @returns {Promise<Object>} Approval result with created user
  */
-export const approveRegistration = async (
-  registrationId,
-  password,
-  role = "staff"
-) => {
+export const approveRegistration = async (registrationId, role = "staff") => {
   try {
     // Get registration
     const [registration] = await db
@@ -73,6 +67,10 @@ export const approveRegistration = async (
 
     if (registration.status !== "pending") {
       throw new Error(`Registration already ${registration.status}`);
+    }
+
+    if (!registration.password) {
+      throw new Error("Registration password is missing");
     }
 
     // Check if email already exists in users
@@ -99,13 +97,12 @@ export const approveRegistration = async (
       })
       .returning();
 
-    // Hash password and create credentials
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Use stored hashed password from registration to create credentials
     await db.insert(userCredentials).values({
       userId: newUser.id,
       provider: "local",
       identifier: registration.email,
-      secret: hashedPassword,
+      secret: registration.password, // Already hashed during registration
     });
 
     // Update registration status

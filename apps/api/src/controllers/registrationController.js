@@ -57,23 +57,7 @@ export const getRegistrationById = async (req, res, next) => {
 export const approveRegistration = async (req, res, next) => {
   try {
     const id = BigInt(req.params.id);
-    const { password, role } = req.body;
-
-    // Validation
-    if (!password) {
-      return res.status(400).json({
-        success: false,
-        message: "Password is required to approve registration",
-      });
-    }
-
-    // Validate password strength
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 6 characters",
-      });
-    }
+    const { role } = req.body;
 
     // Validate role
     const validRoles = ["staff", "sales"];
@@ -86,7 +70,6 @@ export const approveRegistration = async (req, res, next) => {
 
     const result = await registrationService.approveRegistration(
       id,
-      password,
       role || "staff"
     );
 

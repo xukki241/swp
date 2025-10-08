@@ -144,12 +144,19 @@ Authorization: Bearer <owner-token>
 Content-Type: application/json
 
 {
+<<<<<<< HEAD:apps/api/API_DOCUMENTATION.md
 "password": "temporaryPassword123",
 "role": "staff"
-}
-\`\`\`
+=======
+"role": "staff"
+
+> > > > > > > next:apps/api/API_DOCUMENTATIO.USER-MANAGEMENT.md
+> > > > > > > }
+> > > > > > > \`\`\`
 
 **Roles:** `staff` | `sales`
+
+**Note:** Password is retrieved from the registration request (stored during user registration). Owner only needs to specify the role.
 
 #### 4. Reject Registration
 
@@ -1384,14 +1391,25 @@ secret: varchar(255) // hashed password
 
 \`\`\`javascript
 {
+<<<<<<< HEAD:apps/api/API_DOCUMENTATION.md
 id: bigint (primary key),
 name: varchar(100),
 email: varchar(255) unique,
 phone: varchar(10) unique,
 address: text,
 status: enum('pending', 'approved', 'rejected')
-}
-\`\`\`
+=======
+id: bigint (primary key),
+name: varchar(100),
+email: varchar(255) unique,
+phone: varchar(10) unique,
+address: text,
+password: varchar(255), // hashed password
+status: enum('pending', 'approved', 'rejected')
+
+> > > > > > > next:apps/api/API_DOCUMENTATIO.USER-MANAGEMENT.md
+> > > > > > > }
+> > > > > > > \`\`\`
 
 ### Medications Table
 
@@ -1557,6 +1575,7 @@ curl -X POST http://localhost:80/api/medications \
 
 #### 3. Create Supplier with Medication Variants (Single API Call) ⭐
 
+<<<<<<< HEAD:apps/api/API_DOCUMENTATION.md
 \`\`\`bash
 curl -X POST \/api/suppliers \
  -H "Authorization: Bearer <owner-token>" \
@@ -1584,6 +1603,23 @@ curl -X POST \/api/suppliers \
 \`\`\`
 
 #### 4. Create Purchase Order with Items (Single API Call) ⭐
+
+=======
+
+```bash
+curl -X POST http://localhost:80/api/registrations/2/approve \
+  -H "Authorization: Bearer <owner-token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "role": "staff"
+  }'
+```
+
+**Note:** The password from step 3 is stored securely and will be used automatically.
+
+### 5. View All Staff
+
+> > > > > > > next:apps/api/API_DOCUMENTATIO.USER-MANAGEMENT.md
 
 \`\`\`bash
 curl -X POST /api/purchase-orders \
