@@ -98,19 +98,19 @@ async function seed() {
         userId: owner.id,
         provider: "local",
         identifier: "owner@pharmacy.com",
-        secret: "$2b$10$example.hashed.password.owner",
+        secret: "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
       },
       {
         userId: staff1.id,
         provider: "local",
         identifier: "jane@pharmacy.com",
-        secret: "$2b$10$example.hashed.password.jane",
+        secret: "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
       },
       {
         userId: staff2.id,
         provider: "local",
         identifier: "mike@pharmacy.com",
-        secret: "$2b$10$example.hashed.password.mike",
+        secret: "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
       },
     ]);
 
@@ -122,7 +122,8 @@ async function seed() {
         email: "alice@example.com",
         phone: "0111222333",
         address: "321 Elm St, Suburb",
-        password: "$2b$10$example.hashed.password.alice",
+        password:
+          "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
         status: "pending",
       },
       {
@@ -130,7 +131,8 @@ async function seed() {
         email: "bob@example.com",
         phone: "0444555666",
         address: "654 Maple Dr, Village",
-        password: "$2b$10$example.hashed.password.bob",
+        password:
+          "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
         status: "approved",
       },
     ]);
