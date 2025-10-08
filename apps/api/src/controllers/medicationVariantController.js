@@ -202,3 +202,30 @@ export const updateMedicationVariant = async (req, res, next) => {
     });
   }
 };
+/**
+ * Delete medication variant by ID
+ * @route DELETE /api/medication-variants/:id
+ */
+export const deleteMedicationVariant = async (req, res, next) => {
+  try {
+    const id = BigInt(req.params.id);
+
+    const variant = await medicationVariantService.deleteMedicationVariant(id);
+
+    if (!variant) {
+      return res.status(404).json({
+        success: false,
+        message: "Medication variant not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Medication variant deleted successfully",
+      data: convertBigIntIds(variant),
+    });
+  } catch (error) {
+    logger.error("Error in deleteMedicationVariant controller:", error);
+    next(error);
+  }
+};
