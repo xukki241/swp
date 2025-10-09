@@ -17,7 +17,7 @@ export const getAllMedications = async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: medications.length,
-      data: convertBigIntIds(medications),
+      data: medications,
     });
   } catch (error) {
     logger.error("Error in getAllMedications controller:", error);
@@ -43,7 +43,7 @@ export const getMedicationById = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: convertBigIntIds(medication),
+      data: medication,
     });
   } catch (error) {
     logger.error("Error in getMedicationById controller:", error);
@@ -90,7 +90,7 @@ export const createMedication = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: "Medication created successfully",
-      data: convertBigIntIds(medication),
+      data: medication,
     });
   } catch (error) {
     logger.error("Error in createMedication controller:", error);
@@ -155,7 +155,7 @@ export const updateMedication = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Medication updated successfully",
-      data: convertBigIntIds(medication),
+      data: medication,
     });
   } catch (error) {
     logger.error("Error in updateMedication controller:", error);
@@ -183,7 +183,7 @@ export const deleteMedication = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Medication deleted successfully",
-      data: convertBigIntIds(medication),
+      data: medication,
     });
   } catch (error) {
     logger.error("Error in deleteMedication controller:", error);

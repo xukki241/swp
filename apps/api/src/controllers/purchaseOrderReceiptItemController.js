@@ -1,20 +1,11 @@
 import { purchaseOrderReceiptItemService } from "../services/purchaseOrderReceiptItemService.js";
 
-// Helper function to convert BigInt to string for JSON serialization
-const convertBigIntToString = (obj) => {
-  return JSON.parse(
-    JSON.stringify(obj, (key, value) =>
-      typeof value === "bigint" ? value.toString() : value
-    )
-  );
-};
-
 export const purchaseOrderReceiptItemController = {
   // Create a new purchase order receipt item
   async create(req, res) {
     try {
       const item = await purchaseOrderReceiptItemService.create(req.body);
-      res.status(201).json(convertBigIntToString(item));
+      res.status(201).json(item);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -31,7 +22,7 @@ export const purchaseOrderReceiptItemController = {
         offset: Number.parseInt(req.query.offset) || 0,
       };
       const items = await purchaseOrderReceiptItemService.getAll(filters);
-      res.json(convertBigIntToString(items));
+      res.json(items);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -48,7 +39,7 @@ export const purchaseOrderReceiptItemController = {
           .status(404)
           .json({ error: "Purchase order receipt item not found" });
       }
-      res.json(convertBigIntToString(item));
+      res.json(item);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -65,7 +56,7 @@ export const purchaseOrderReceiptItemController = {
           .status(404)
           .json({ error: "Purchase order receipt item not found" });
       }
-      res.json(convertBigIntToString(item));
+      res.json(item);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -84,7 +75,7 @@ export const purchaseOrderReceiptItemController = {
       }
       res.json({
         message: "Purchase order receipt item deleted successfully",
-        purchaseOrderReceiptItem: convertBigIntToString(item),
+        purchaseOrderReceiptItem: item,
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

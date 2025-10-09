@@ -1,14 +1,5 @@
 import { supplierService } from "../services/supplierService.js";
 
-// Helper function to convert BigInt to string for JSON serialization
-const convertBigIntToString = (obj) => {
-  return JSON.parse(
-    JSON.stringify(obj, (key, value) =>
-      typeof value === "bigint" ? value.toString() : value
-    )
-  );
-};
-
 export const supplierController = {
   // Create a new supplier with medication variants
   async create(req, res) {
@@ -35,7 +26,7 @@ export const supplierController = {
       }
 
       const supplier = await supplierService.create(req.body);
-      res.status(201).json(convertBigIntToString(supplier));
+      res.status(201).json(supplier);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -51,7 +42,7 @@ export const supplierController = {
         offset: Number.parseInt(req.query.offset) || 0,
       };
       const suppliers = await supplierService.getAll(filters);
-      res.json(convertBigIntToString(suppliers));
+      res.json(suppliers);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -65,7 +56,7 @@ export const supplierController = {
       if (!supplier) {
         return res.status(404).json({ error: "Supplier not found" });
       }
-      res.json(convertBigIntToString(supplier));
+      res.json(supplier);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -80,7 +71,7 @@ export const supplierController = {
       if (!supplier) {
         return res.status(404).json({ error: "Supplier not found" });
       }
-      res.json(convertBigIntToString(supplier));
+      res.json(supplier);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -97,7 +88,7 @@ export const supplierController = {
       }
       res.json({
         message: "Supplier deleted successfully",
-        supplier: convertBigIntToString(supplier),
+        supplier: supplier,
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

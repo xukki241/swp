@@ -1,3 +1,6 @@
+// Register module aliases so imports using '@' map to the src/ directory
+import "module-alias/register.js";
+
 import app from "./app.js";
 import config from "./config/environment.js";
 import { closeConnection, testConnection } from "./db/connection.js";

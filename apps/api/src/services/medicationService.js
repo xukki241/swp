@@ -44,7 +44,7 @@ export const getAllMedications = async ({ search, status } = {}) => {
 
 /**
  * Get medication by ID with variants
- * @param {bigint} id - Medication ID
+ * @param {number} id - Medication ID
  * @returns {Promise<Object|null>} Medication object with variants or null
  */
 export const getMedicationById = async (id) => {
@@ -117,7 +117,7 @@ export const createMedication = async (medicationData) => {
 
 /**
  * Update medication by ID with optional variants
- * @param {bigint} id - Medication ID
+ * @param {number} id - Medication ID
  * @param {Object} medicationData - Medication data to update
  * @param {Array} medicationData.variants - Optional array of medication variants to replace existing ones
  * @returns {Promise<Object|null>} Updated medication with variants or null
@@ -177,7 +177,7 @@ export const updateMedication = async (id, medicationData) => {
 
 /**
  * Delete medication by ID
- * @param {bigint} id - Medication ID
+ * @param {number} id - Medication ID
  * @returns {Promise<Object|null>} Deleted medication or null
  */
 export const deleteMedication = async (id) => {
