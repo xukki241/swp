@@ -15,7 +15,7 @@ export const getAllRegistrations = async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: registrations.length,
-      data: convertBigIntIds(registrations),
+      data: registrations,
     });
   } catch (error) {
     logger.error("Error in getAllRegistrations controller:", error);
@@ -42,7 +42,7 @@ export const getRegistrationById = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: convertBigIntIds(registration),
+      data: registration,
     });
   } catch (error) {
     logger.error("Error in getRegistrationById controller:", error);
@@ -73,7 +73,7 @@ export const approveRegistration = async (req, res, next) => {
       role || "staff"
     );
 
-    res.status(200).json(convertBigIntIds(result));
+    res.status(200).json(result);
   } catch (error) {
     logger.error("Error in approveRegistration controller:", error);
     res.status(400).json({
@@ -93,7 +93,7 @@ export const rejectRegistration = async (req, res, next) => {
 
     const result = await registrationService.rejectRegistration(id);
 
-    res.status(200).json(convertBigIntIds(result));
+    res.status(200).json(result);
   } catch (error) {
     logger.error("Error in rejectRegistration controller:", error);
     res.status(400).json({
@@ -113,7 +113,7 @@ export const deleteRegistration = async (req, res, next) => {
 
     const result = await registrationService.deleteRegistration(id);
 
-    res.status(200).json(convertBigIntIds(result));
+    res.status(200).json(result);
   } catch (error) {
     logger.error("Error in deleteRegistration controller:", error);
     res.status(400).json({

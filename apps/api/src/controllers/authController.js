@@ -52,7 +52,7 @@ export const register = async (req, res, next) => {
       password,
     });
 
-    res.status(201).json(convertBigIntIds(result));
+    res.status(201).json(result);
   } catch (error) {
     logger.error("Error in register controller:", error);
     res.status(400).json({
@@ -80,7 +80,7 @@ export const login = async (req, res, next) => {
 
     const result = await authService.login(email, password);
 
-    res.status(200).json(convertBigIntIds(result));
+    res.status(200).json(result);
   } catch (error) {
     logger.error("Error in login controller:", error);
     res.status(401).json({

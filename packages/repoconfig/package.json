@@ -6,13 +6,9 @@
   "description": "Shared configuration for the PharmaFlow monorepo",
   "exports": {
     "./eslint": "./eslint/index.js",
-    "./prettier": "./prettier/index.js"
+    "./prettier": "./prettier/index.js",
+    "./javascript/*": "./javascript/*"
   },
-  "files": [
-    "eslint",
-    "jsconfig",
-    "prettier"
-  ],
   "dependencies": {
     "@eslint/js": "^9.37.0",
     "eslint": "^9.37.0",

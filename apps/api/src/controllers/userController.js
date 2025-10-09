@@ -14,7 +14,7 @@ export const getAllUsers = async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: users.length,
-      data: convertBigIntIds(users),
+      data: users,
     });
   } catch (error) {
     logger.error("Error in getAllUsers controller:", error);
@@ -40,7 +40,7 @@ export const getUserById = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: convertBigIntIds(user),
+      data: user,
     });
   } catch (error) {
     logger.error("Error in getUserById controller:", error);
@@ -96,7 +96,7 @@ export const createUser = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: "User created successfully",
-      data: convertBigIntIds(user),
+      data: user,
     });
   } catch (error) {
     logger.error("Error in createUser controller:", error);
@@ -194,7 +194,7 @@ export const updateUser = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "User updated successfully",
-      data: convertBigIntIds(user),
+      data: user,
     });
   } catch (error) {
     logger.error("Error in updateUser controller:", error);
@@ -232,7 +232,7 @@ export const deleteUser = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "User deleted (suspended) successfully",
-      data: convertBigIntIds(user),
+      data: user,
     });
   } catch (error) {
     logger.error("Error in deleteUser controller:", error);
@@ -252,7 +252,7 @@ export const getAllStaff = async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: staff.length,
-      data: convertBigIntIds(staff),
+      data: staff,
     });
   } catch (error) {
     logger.error("Error in getAllStaff controller:", error);
@@ -280,7 +280,7 @@ export const activateUser = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "User activated successfully",
-      data: convertBigIntIds(user),
+      data: user,
     });
   } catch (error) {
     logger.error("Error in activateUser controller:", error);
@@ -317,7 +317,7 @@ export const deactivateUser = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "User deactivated successfully",
-      data: convertBigIntIds(user),
+      data: user,
     });
   } catch (error) {
     logger.error("Error in deactivateUser controller:", error);
@@ -354,7 +354,7 @@ export const suspendUser = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "User suspended successfully",
-      data: convertBigIntIds(user),
+      data: user,
     });
   } catch (error) {
     logger.error("Error in suspendUser controller:", error);

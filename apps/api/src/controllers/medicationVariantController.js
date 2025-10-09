@@ -17,7 +17,7 @@ export const getAllMedicationVariants = async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: variants.length,
-      data: convertBigIntIds(variants),
+      data: variants,
     });
   } catch (error) {
     logger.error("Error in getAllMedicationVariants controller:", error);
@@ -43,7 +43,7 @@ export const getMedicationVariantById = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: convertBigIntIds(variant),
+      data: variant,
     });
   } catch (error) {
     logger.error("Error in getMedicationVariantById controller:", error);
@@ -104,7 +104,7 @@ export const createMedicationVariant = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: "Medication variant created successfully",
-      data: convertBigIntIds(variant),
+      data: variant,
     });
   } catch (error) {
     logger.error("Error in createMedicationVariant controller:", error);
@@ -192,7 +192,7 @@ export const updateMedicationVariant = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Medication variant updated successfully",
-      data: convertBigIntIds(variant),
+      data: variant,
     });
   } catch (error) {
     logger.error("Error in updateMedicationVariant controller:", error);
@@ -222,7 +222,7 @@ export const deleteMedicationVariant = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Medication variant deleted successfully",
-      data: convertBigIntIds(variant),
+      data: variant,
     });
   } catch (error) {
     logger.error("Error in deleteMedicationVariant controller:", error);
