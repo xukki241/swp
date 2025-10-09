@@ -23,6 +23,10 @@
     "db:drop": {
       "cache": false,
       "inputs": [".env"]
+    },
+    "db:seed": {
+      "cache": false,
+      "inputs": [".env"]
     }
   }
 }

@@ -1,20 +1,11 @@
 import { purchaseOrderReceiptService } from "../services/purchaseOrderReceiptService.js";
 
-// Helper function to convert BigInt to string for JSON serialization
-const convertBigIntToString = (obj) => {
-  return JSON.parse(
-    JSON.stringify(obj, (key, value) =>
-      typeof value === "bigint" ? value.toString() : value
-    )
-  );
-};
-
 export const purchaseOrderReceiptController = {
   // Create a new purchase order receipt
   async create(req, res) {
     try {
       const receipt = await purchaseOrderReceiptService.create(req.body);
-      res.status(201).json(convertBigIntToString(receipt));
+      res.status(201).json(receipt);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -33,7 +24,7 @@ export const purchaseOrderReceiptController = {
         offset: Number.parseInt(req.query.offset) || 0,
       };
       const receipts = await purchaseOrderReceiptService.getAll(filters);
-      res.json(convertBigIntToString(receipts));
+      res.json(receipts);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -50,7 +41,7 @@ export const purchaseOrderReceiptController = {
           .status(404)
           .json({ error: "Purchase order receipt not found" });
       }
-      res.json(convertBigIntToString(receipt));
+      res.json(receipt);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -67,7 +58,7 @@ export const purchaseOrderReceiptController = {
           .status(404)
           .json({ error: "Purchase order receipt not found" });
       }
-      res.json(convertBigIntToString(receipt));
+      res.json(receipt);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -86,7 +77,7 @@ export const purchaseOrderReceiptController = {
       }
       res.json({
         message: "Purchase order receipt deleted successfully",
-        purchaseOrderReceipt: convertBigIntToString(receipt),
+        purchaseOrderReceipt: receipt,
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

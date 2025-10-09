@@ -5,17 +5,22 @@ import morgan from "morgan";
 
 import config from "./config/environment.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
-import authRoutes from "./routes/authRoutes.js";
-import medicationRoutes from "./routes/medicationRoutes.js";
-import medicationVariantRoutes from "./routes/medicationVariantRoutes.js";
-import purchaseOrderItemRoutes from "./routes/purchaseOrderItemRoutes.js";
-import purchaseOrderReceiptItemRoutes from "./routes/purchaseOrderReceiptItemRoutes.js";
-import purchaseOrderReceiptRoutes from "./routes/purchaseOrderReceiptRoutes.js";
-import purchaseOrderRoutes from "./routes/purchaseOrderRoutes.js";
-import registrationRoutes from "./routes/registrationRoutes.js";
-import supplierMedicationVariantRoutes from "./routes/supplierMedicationVariantRoutes.js";
-import supplierRoutes from "./routes/supplierRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
+import {
+  authRoutes,
+  medicationRoutes,
+  medicationVariantRoutes,
+  purchaseOrderItemRoutes,
+  purchaseOrderReceiptItemRoutes,
+  purchaseOrderReceiptRoutes,
+  purchaseOrderRoutes,
+  registrationRoutes,
+  supplierMedicationVariantRoutes,
+  supplierRoutes,
+  userRoutes,
+  warehouseBinRoutes,
+  warehouseRackRoutes,
+  warehouseZoneRoutes,
+} from "./routes/index.js";
 import logger from "./utils/logger.js";
 
 const app = express();
@@ -48,6 +53,9 @@ app.use("/api/purchase-orders", purchaseOrderRoutes);
 app.use("/api/purchase-order-items", purchaseOrderItemRoutes);
 app.use("/api/purchase-order-receipts", purchaseOrderReceiptRoutes);
 app.use("/api/purchase-order-receipt-items", purchaseOrderReceiptItemRoutes);
+app.use("/api/warehouse-zones", warehouseZoneRoutes);
+app.use("/api/warehouse-racks", warehouseRackRoutes);
+app.use("/api/warehouse-bins", warehouseBinRoutes);
 
 app.get("/", (req, res) => {
   res.json({

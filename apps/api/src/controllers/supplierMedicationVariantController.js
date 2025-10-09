@@ -1,20 +1,11 @@
 import { supplierMedicationVariantService } from "../services/supplierMedicationVariantService.js";
 
-// Helper function to convert BigInt to string for JSON serialization
-const convertBigIntToString = (obj) => {
-  return JSON.parse(
-    JSON.stringify(obj, (key, value) =>
-      typeof value === "bigint" ? value.toString() : value
-    )
-  );
-};
-
 export const supplierMedicationVariantController = {
   // Create a new supplier medication variant
   async create(req, res) {
     try {
       const smv = await supplierMedicationVariantService.create(req.body);
-      res.status(201).json(convertBigIntToString(smv));
+      res.status(201).json(smv);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -34,7 +25,7 @@ export const supplierMedicationVariantController = {
         offset: Number.parseInt(req.query.offset) || 0,
       };
       const smvs = await supplierMedicationVariantService.getAll(filters);
-      res.json(convertBigIntToString(smvs));
+      res.json(smvs);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -51,7 +42,7 @@ export const supplierMedicationVariantController = {
           .status(404)
           .json({ error: "Supplier medication variant not found" });
       }
-      res.json(convertBigIntToString(smv));
+      res.json(smv);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -68,7 +59,7 @@ export const supplierMedicationVariantController = {
           .status(404)
           .json({ error: "Supplier medication variant not found" });
       }
-      res.json(convertBigIntToString(smv));
+      res.json(smv);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -87,7 +78,7 @@ export const supplierMedicationVariantController = {
       }
       res.json({
         message: "Supplier medication variant deleted successfully",
-        supplierMedicationVariant: convertBigIntToString(smv),
+        supplierMedicationVariant: smv,
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

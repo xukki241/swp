@@ -6,7 +6,7 @@ import { medicationVariants } from "../db/schema/index.js";
  * Get all medication variants with optional search and filters
  * @param {Object} options - Query options
  * @param {string} options.search - Search term for name, sku, or barcode
- * @param {bigint} options.medicationId - Filter by medication ID
+ * @param {number} options.medicationId - Filter by medication ID
  * @param {boolean} options.isActive - Filter by active status
  * @returns {Promise<Array>} List of medication variants
  */
@@ -46,7 +46,7 @@ export const getAllMedicationVariants = async ({
 };
 /**
  * Get medication variant by ID
- * @param {bigint} id - Medication variant ID
+ * @param {number} id - Medication variant ID
  * @returns {Promise<Object|null>} Medication variant object or null
  */
 export const getMedicationVariantById = async (id) => {
@@ -99,7 +99,7 @@ export const createMedicationVariant = async (variantData) => {
 };
 /**
  * Update medication variant by ID
- * @param {bigint} id - Medication variant ID
+ * @param {number} id - Medication variant ID
  * @param {Object} variantData - Medication variant data to update
  * @returns {Promise<Object|null>} Updated medication variant or null
  */
@@ -120,7 +120,7 @@ export const updateMedicationVariant = async (id, variantData) => {
 };
 /**
  * Delete medication variant by ID
- * @param {bigint} id - Medication variant ID
+ * @param {number} id - Medication variant ID
  * @returns {Promise<Object|null>} Deleted medication variant or null
  */
 export const deleteMedicationVariant = async (id) => {

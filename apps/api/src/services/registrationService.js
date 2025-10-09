@@ -29,7 +29,7 @@ export const getAllRegistrations = async (status = null) => {
 
 /**
  * Get registration by ID
- * @param {bigint} id - Registration ID
+ * @param {number} id - Registration ID
  * @returns {Promise<Object|null>} Registration object or null
  */
 export const getRegistrationById = async (id) => {
@@ -48,7 +48,7 @@ export const getRegistrationById = async (id) => {
 
 /**
  * Approve registration request (User Story 2)
- * @param {bigint} registrationId - Registration ID
+ * @param {number} registrationId - Registration ID
  * @param {string} role - Role to assign (staff, sales)
  * @returns {Promise<Object>} Approval result with created user
  */
@@ -123,7 +123,7 @@ export const approveRegistration = async (registrationId, role = "staff") => {
 
 /**
  * Reject registration request (User Story 2)
- * @param {bigint} registrationId - Registration ID
+ * @param {number} registrationId - Registration ID
  * @returns {Promise<Object>} Rejection result
  */
 export const rejectRegistration = async (registrationId) => {
@@ -162,7 +162,7 @@ export const rejectRegistration = async (registrationId) => {
 
 /**
  * Delete registration request
- * @param {bigint} registrationId - Registration ID
+ * @param {number} registrationId - Registration ID
  * @returns {Promise<Object>} Deletion result
  */
 export const deleteRegistration = async (registrationId) => {

@@ -284,7 +284,7 @@ export const resetPassword = async (email, newPassword) => {
 
 /**
  * Change password (for logged-in users)
- * @param {bigint} userId - User ID
+ * @param {number} userId - User ID
  * @param {string} oldPassword - Current password
  * @param {string} newPassword - New password
  * @returns {Promise<Object>} Change result

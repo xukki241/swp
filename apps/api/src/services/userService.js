@@ -197,7 +197,7 @@ export const getAllStaff = async ({ search, role, status } = {}) => {
 
 /**
  * Activate user account (User Story 8)
- * @param {bigint} id - User ID
+ * @param {number} id - User ID
  * @returns {Promise<Object|null>} Updated user or null
  */
 export const activateUser = async (id) => {
@@ -216,7 +216,7 @@ export const activateUser = async (id) => {
 
 /**
  * Deactivate user account (User Story 8)
- * @param {bigint} id - User ID
+ * @param {number} id - User ID
  * @returns {Promise<Object|null>} Updated user or null
  */
 export const deactivateUser = async (id) => {
@@ -235,7 +235,7 @@ export const deactivateUser = async (id) => {
 
 /**
  * Suspend user account (User Story 8)
- * @param {bigint} id - User ID
+ * @param {number} id - User ID
  * @returns {Promise<Object|null>} Updated user or null
  */
 export const suspendUser = async (id) => {
