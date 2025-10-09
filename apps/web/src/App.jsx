@@ -8,6 +8,7 @@ import NotFoundPage from "@/pages/NotFoundPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import UserListPage from "@/pages/UserListPage";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
+import SupplierListPage from "./pages/Supplier";
 
 function App() {
   return (
@@ -80,6 +81,14 @@ function App() {
             <PublicRoute>
               <ResetPasswordPage />
             </PublicRoute>
+          }
+        />
+        <Route
+          path="/suppliers"
+          element={
+            <ProtectedRoute>
+              <SupplierListPage />
+            </ProtectedRoute>
           }
         />
 
