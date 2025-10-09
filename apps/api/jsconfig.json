@@ -1,4 +1,10 @@
 {
   "extends": "@pharmaflow/repoconfig/javascript/jsconfig.node.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
   "include": ["src"]
 }
