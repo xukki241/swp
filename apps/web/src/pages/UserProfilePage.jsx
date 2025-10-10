@@ -9,9 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -28,9 +25,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Mail, Phone, User, KeyRound, PenBox } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
@@ -47,7 +47,7 @@ export default function UserProfile() {
     [currentUser]
   );
 
-  useState(() => {
+  useEffect(() => {
     if (currentUser?.user) {
       setFormData({
         name: currentUser.user.name || "",
@@ -216,7 +216,7 @@ export default function UserProfile() {
                     className="w-full sm:w-auto gap-2 cursor-pointer"
                   >
                     <PenBox className="h-4 w-4" />
-                    Change Profile
+                    Update Profile
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px] p-8">
