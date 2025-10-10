@@ -18,7 +18,6 @@ export const getSupplierById = async (id) => {
 
 // Create new supplier with optional medication variants
 export const createSupplier = async (supplierData) => {
-  a;
   const response = await instance.post("/suppliers", supplierData);
   return response.data;
 };
