@@ -31,6 +31,17 @@ router.get(
 );
 
 /**
+ * @route   GET /api/medication-variants/:id/inventory
+ * @desc    Get inventory for a medication variant
+ * @access  Private (Owner, Staff)
+ */
+router.get(
+  "/:id/inventory",
+  authenticate,
+  medicationVariantController.getMedicationVariantInventory
+);
+
+/**
  * @route   POST /api/medication-variants
  * @desc    Create a new medication variant (owner only)
  * @access  Private (Owner)

@@ -22,6 +22,17 @@ router.get("/", authenticate, medicationController.getAllMedications);
 router.get("/:id", authenticate, medicationController.getMedicationById);
 
 /**
+ * @route   GET /api/medications/:id/inventory
+ * @desc    Get inventory for a medication
+ * @access  Private (Owner, Staff)
+ */
+router.get(
+  "/:id/inventory",
+  authenticate,
+  medicationController.getMedicationInventory
+);
+
+/**
  * @route   POST /api/medications
  * @desc    Create a new medication (owner only)
  * @access  Private (Owner)

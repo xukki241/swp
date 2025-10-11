@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import * as medicationController from "@/controllers/medicationController.js";
+import { inventoryService } from "@/services/inventoryService.js";
 import * as medicationService from "@/services/medicationService.js";
 import logger from "@/utils/logger.js";
 
+vi.mock("@/services/inventoryService.js");
 vi.mock("@/services/medicationService.js");
 
 describe("MedicationController", () => {
@@ -300,6 +302,59 @@ describe("MedicationController", () => {
       medicationService.deleteMedication.mockRejectedValue(error);
 
       await medicationController.deleteMedication(req, res, next);
+
+      expect(logger.error).toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe("getMedicationInventory", () => {
+    it("should return inventory for a medication", async () => {
+      req.params = { id: "1" };
+      const mockInventory = [
+        {
+          id: 1,
+          variantId: 10n,
+          variantName: "Paracetamol 500mg",
+          variantSku: "PAR500",
+          batchNumber: "BATCH001",
+          expiryDate: "2026-01-15",
+          quantity: 500,
+          quantityReserved: 50,
+          quantityAvailable: 450,
+        },
+      ];
+      inventoryService.getByMedicationId.mockResolvedValue(mockInventory);
+
+      await medicationController.getMedicationInventory(req, res, next);
+
+      expect(inventoryService.getByMedicationId).toHaveBeenCalledWith(1);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 1,
+        data: mockInventory,
+      });
+    });
+
+    it("should return empty array if no inventory found", async () => {
+      req.params = { id: "999" };
+      inventoryService.getByMedicationId.mockResolvedValue([]);
+
+      await medicationController.getMedicationInventory(req, res, next);
+
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 0,
+        data: [],
+      });
+    });
+
+    it("should handle errors", async () => {
+      req.params = { id: "1" };
+      const error = new Error("Database error");
+      inventoryService.getByMedicationId.mockRejectedValue(error);
+
+      await medicationController.getMedicationInventory(req, res, next);
 
       expect(logger.error).toHaveBeenCalled();
       expect(next).toHaveBeenCalledWith(error);

@@ -1,3 +1,4 @@
+import { inventoryService } from "../services/inventoryService.js";
 import * as medicationService from "../services/medicationService.js";
 import { convertBigIntIds } from "../utils/bigint.js";
 import logger from "../utils/logger.js";
@@ -187,6 +188,26 @@ export const deleteMedication = async (req, res, next) => {
     });
   } catch (error) {
     logger.error("Error in deleteMedication controller:", error);
+    next(error);
+  }
+};
+
+/**
+ * Get inventory for a medication
+ * @route GET /api/medications/:id/inventory
+ */
+export const getMedicationInventory = async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id);
+    const items = await inventoryService.getByMedicationId(id);
+
+    res.status(200).json({
+      success: true,
+      count: items.length,
+      data: items,
+    });
+  } catch (error) {
+    logger.error("Error in getMedicationInventory controller:", error);
     next(error);
   }
 };

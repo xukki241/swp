@@ -1,0 +1,2994 @@
+{
+  "info": {
+    "_postman_id": "4f628407-ba20-4972-8de0-831360f844b9",
+    "name": "PharmaFlow API",
+    "description": "Postman Collection cho hệ thống quản lý nhà thuốc PharmaFlow. Collection này bao gồm cấu trúc thư mục cho các tài nguyên API chính.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "32583411",
+    "_collection_link": "https://www.postman.com/jsclub-0048/workspace/pharmaflow-api/collection/32583411-4f628407-ba20-4972-8de0-831360f844b9?action=share&source=collection_link&creator=32583411"
+  },
+  "item": [
+    {
+      "name": "Xác thực & Phân quyền (Authentication)",
+      "item": [
+        {
+          "name": "Đăng ký (Register)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Tên Người Dùng Mới\",\n    \"email\": \"newuser@example.com\",\n    \"phone\": \"0901234567\",\n    \"address\": \"Địa chỉ người dùng\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Tạo một yêu cầu đăng ký tài khoản mới. Yêu cầu này cần được quản trị viên phê duyệt trước khi tài khoản được kích hoạt."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Tên Người Dùng Mới\",\n    \"email\": \"newuser@example.com\",\n    \"phone\": \"0901234567\",\n    \"address\": \"Địa chỉ người dùng\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "register"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Yêu cầu đăng ký đã được gửi thành công. Vui lòng chờ phê duyệt.\"\n}"
+            },
+            {
+              "name": "Error - Email Exists",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Tên Người Dùng Mới\",\n    \"email\": \"existinguser@example.com\",\n    \"phone\": \"0901234567\",\n    \"address\": \"Địa chỉ người dùng\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "register"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"error\": \"Email đã tồn tại.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Đăng nhập (Login)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
+                  "pm.collectionVariables.set(\"refreshToken\", jsonData.refreshToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"staff@example.com\",\n    \"password\": \"stringpassword123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Xác thực người dùng bằng email và mật khẩu. Nếu thành công, API sẽ trả về một `accessToken` (JWT) để sử dụng cho các yêu cầu cần xác thực và một `refreshToken` để làm mới `accessToken` khi hết hạn.\n\n**Post-response Script:** Script sẽ tự động lưu `accessToken` và `refreshToken` vào biến của collection để các request khác có thể tái sử dụng."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"staff@example.com\",\n    \"password\": \"stringpassword123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"accessToken\": \"{{vault:json-web-token}}\",\n    \"refreshToken\": \"def50200f09856e432a7a50e98034546456e342217c4e51e4e098a7a50e98034546456e342217c4e51e457ca50200f09856e\"\n}"
+            },
+            {
+              "name": "Error - Invalid Credentials",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"staff@example.com\",\n    \"password\": \"wrongpassword\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "login"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"error\": \"Email hoặc mật khẩu không chính xác.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Yêu cầu đặt lại mật khẩu (Forgot Password)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"user-to-reset@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "forgot-password"]
+            },
+            "description": "Bắt đầu quy trình đặt lại mật khẩu. Cung cấp email của tài khoản, hệ thống sẽ gửi một email chứa token/liên kết để đặt lại mật khẩu."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"user-to-reset@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/forgot-password",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "forgot-password"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Một email hướng dẫn đặt lại mật khẩu đã được gửi đến địa chỉ của bạn.\"\n}"
+            },
+            {
+              "name": "Error - User Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"nonexistent@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/forgot-password",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "forgot-password"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"error\": \"Không tìm thấy người dùng với email này.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Đặt lại mật khẩu (Reset Password)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"token\": \"very-secret-reset-token-from-email\",\n    \"newPassword\": \"NewSecurePassword123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "reset-password"]
+            },
+            "description": "Hoàn tất quy trình đặt lại mật khẩu. Gửi token nhận được từ email cùng với mật khẩu mới."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"token\": \"very-secret-reset-token-from-email\",\n    \"newPassword\": \"NewSecurePassword123!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/reset-password",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "reset-password"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Mật khẩu đã được đặt lại thành công.\"\n}"
+            },
+            {
+              "name": "Error - Invalid Token",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"token\": \"invalid-or-expired-token\",\n    \"newPassword\": \"NewSecurePassword123!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/reset-password",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "reset-password"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"error\": \"Token không hợp lệ hoặc đã hết hạn.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Làm mới Token (Refresh Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "refresh-token"]
+            },
+            "description": "Sử dụng `refreshToken` (lấy được sau khi đăng nhập) để nhận một `accessToken` mới mà không cần đăng nhập lại.\n\n**Post-response Script:** Script sẽ tự động cập nhật `accessToken` trong biến của collection."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"refreshToken\": \"your_valid_refresh_token\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/refresh-token",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "refresh-token"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"accessToken\": \"{{vault:json-web-token}}\"\n}"
+            },
+            {
+              "name": "Error - Invalid Refresh Token",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"refreshToken\": \"invalid_or_expired_token\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/refresh-token",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "refresh-token"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"error\": \"Refresh token không hợp lệ.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Lấy thông tin người dùng hiện tại (Get Me)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            },
+            "description": "Lấy thông tin chi tiết của người dùng đang đăng nhập dựa trên `accessToken` hiện tại. Yêu cầu này cần có header `Authorization: Bearer {{accessToken}}`."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "me"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"id\": 1,\n    \"name\": \"Tên Nhân Viên\",\n    \"email\": \"staff@example.com\",\n    \"phone\": \"0987654321\",\n    \"address\": \"123 Đường ABC, Quận 1, TP. HCM\",\n    \"status\": \"active\",\n    \"role\": \"staff\"\n}"
+            },
+            {
+              "name": "Error - Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "auth", "me"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"error\": \"Token không hợp lệ hoặc đã hết hạn.\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Các API liên quan đến đăng ký, đăng nhập, quản lý token, đặt lại mật khẩu và phân quyền người dùng."
+    },
+    {
+      "name": "Quản lý Thuốc (Products)",
+      "item": [
+        {
+          "name": "Medications",
+          "item": [
+            {
+              "name": "Medication Variants",
+              "item": [
+                {
+                  "name": "Tạo biến thể thuốc (Hàng loạt)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{accessToken}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "[{\n    \"sku\": \"PARA-500-TRA-VI-100\",\n    \"name\": \"Vỉ 10 viên\",\n    \"unit\": \"Vỉ\",\n    \"unit_factor\": 10,\n    \"barcode\": \"8934589000118\",\n    \"sell_price\": 15000.00,\n    \"is_active\": true,\n    \"is_for_sale\": true\n}]",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/api/medications/1/variants",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["api", "medications", "1", "variants"]
+                    },
+                    "description": "Tạo một hoặc nhiều biến thể mới (ví dụ: hộp, vỉ, viên) cho một loại thuốc đã có."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Lấy danh sách biến thể của thuốc",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{accessToken}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/medications/1/variants",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["api", "medications", "1", "variants"]
+                    },
+                    "description": "Lấy danh sách tất cả các biến thể của một loại thuốc cụ thể."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Lấy chi tiết biến thể thuốc",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{accessToken}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/medications/1/variants/1",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["api", "medications", "1", "variants", "1"]
+                    },
+                    "description": "Lấy thông tin chi tiết của một biến thể thuốc cụ thể."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Xem tồn kho của biến thể thuốc",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{accessToken}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/medications/variants/1/inventory",
+                      "host": ["{{baseUrl}}"],
+                      "path": [
+                        "api",
+                        "medications",
+                        "variants",
+                        "1",
+                        "inventory"
+                      ]
+                    },
+                    "description": "Lấy danh sách tất cả các lô hàng tồn kho của một biến thể thuốc cụ thể, bao gồm thông tin về vị trí, số lô, và ngày hết hạn."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Cập nhật biến thể thuốc",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{accessToken}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PATCH",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n    \"sell_price\": 16000.00,\n    \"is_for_sale\": true\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/api/medications/1/variants/1",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["api", "medications", "1", "variants", "1"]
+                    },
+                    "description": "Cập nhật thông tin của một biến thể thuốc cụ thể."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Xóa biến thể thuốc",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{accessToken}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/medications/1/variants/1",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["api", "medications", "1", "variants", "1"]
+                    },
+                    "description": "Xóa một biến thể thuốc."
+                  },
+                  "response": []
+                }
+              ],
+              "description": "CRUD cho các biến thể của thuốc (hộp, vỉ, viên,...)"
+            },
+            {
+              "name": "Tạo thuốc (Hàng loạt)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[{\n    \"name\": \"Paracetamol 500mg\",\n    \"brand\": \"Traphaco\",\n    \"description\": \"Thuốc giảm đau, hạ sốt\",\n    \"is_prescription_required\": false,\n    \"is_controlled_substance\": false,\n    \"status\": \"active\"\n}]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/medications",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "medications"]
+                },
+                "description": "Tạo một hoặc nhiều loại thuốc mới trong hệ thống."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy danh sách thuốc",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/medications",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "medications"]
+                },
+                "description": "Lấy danh sách tất cả các loại thuốc có trong hệ thống, có thể kèm theo filter và pagination."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy chi tiết thuốc",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/medications/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "medications", "1"]
+                },
+                "description": "Lấy thông tin chi tiết của một loại thuốc bằng ID."
+              },
+              "response": []
+            },
+            {
+              "name": "Cập nhật thông tin thuốc",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Paracetamol 500mg (updated)\",\n    \"description\": \"Thuốc giảm đau, hạ sốt, chống viêm nhẹ.\",\n    \"status\": \"active\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/medications/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "medications", "1"]
+                },
+                "description": "Cập nhật thông tin của một loại thuốc bằng ID."
+              },
+              "response": []
+            },
+            {
+              "name": "Xóa thuốc",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/medications/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "medications", "1"]
+                },
+                "description": "Xóa một loại thuốc (có thể là xóa mềm bằng cách cập nhật status)."
+              },
+              "response": []
+            },
+            {
+              "name": "Tra cứu nhà cung cấp của thuốc",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/medications/1/suppliers",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "medications", "1", "suppliers"]
+                },
+                "description": "Lấy danh sách các nhà cung cấp cho một loại thuốc cụ thể (dựa trên các biến thể của nó)."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy danh sách Đơn nhập hàng chứa thuốc",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/medications/1/purchases",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "medications", "1", "purchases"]
+                },
+                "description": "Lấy danh sách tất cả các đơn nhập hàng (Purchases) có chứa một loại thuốc cụ thể (thông qua các biến thể của nó)."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy danh sách Đơn bán hàng chứa thuốc",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/medications/1/sales",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "medications", "1", "sales"]
+                },
+                "description": "Lấy danh sách tất cả các đơn bán hàng (Sales Orders) có chứa một loại thuốc cụ thể."
+              },
+              "response": []
+            },
+            {
+              "name": "Xem tồn kho của thuốc",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/medications/1/inventory",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "medications", "1", "inventory"]
+                },
+                "description": "Lấy danh sách tất cả các lô hàng tồn kho của một loại thuốc cụ thể (tổng hợp từ tất cả các biến thể của nó)."
+              },
+              "response": []
+            }
+          ],
+          "description": "CRUD cho thuốc và các biến thể của chúng"
+        }
+      ],
+      "description": "CRUD (Tạo, Đọc, Cập nhật, Xóa) và quản lý thông tin các sản phẩm thuốc."
+    },
+    {
+      "name": "Quản lý Cấu trúc Kho (Warehouse Structure)",
+      "item": [
+        {
+          "name": "Zones",
+          "item": [
+            {
+              "name": "Tạo Khu vực (Hàng loạt)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[{\n    \"code\": \"Z01\",\n    \"name\": \"Khu A\",\n    \"type\": \"normal\",\n    \"location\": \"Tầng 1\",\n    \"description\": \"Khu hàng thường\"\n}]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/zones",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "zones"]
+                },
+                "description": "Tạo một hoặc nhiều khu vực (zone) mới trong kho."
+              },
+              "response": []
+            },
+            {
+              "name": "Tạo Khu vực Tự động (Batch)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"quantity\": 3,\n    \"code_prefix\": \"ZONE\",\n    \"name_prefix\": \"Khu vực\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/zones/batch",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "zones", "batch"]
+                },
+                "description": "Tạo hàng loạt khu vực trong kho bằng cách cung cấp số lượng để tạo tự động."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy danh sách Khu vực",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/zones",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "zones"]
+                },
+                "description": "Lấy danh sách tất cả các khu vực trong kho."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy chi tiết Khu vực",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/zones/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "zones", "1"]
+                },
+                "description": "Lấy thông tin chi tiết của một khu vực bằng ID."
+              },
+              "response": []
+            },
+            {
+              "name": "Cập nhật Khu vực",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Khu A (Đã cập nhật)\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/zones/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "zones", "1"]
+                },
+                "description": "Cập nhật thông tin của một khu vực."
+              },
+              "response": []
+            },
+            {
+              "name": "Xóa Khu vực",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/zones/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "zones", "1"]
+                },
+                "description": "Xóa một khu vực."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Racks",
+          "item": [
+            {
+              "name": "Tạo Kệ (Hàng loạt)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[{\n    \"code\": \"R01\",\n    \"name\": \"Kệ 01\",\n    \"description\": \"Kệ hàng Paracetamol\"\n}]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/zones/1/racks",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "zones", "1", "racks"]
+                },
+                "description": "Tạo một hoặc nhiều kệ mới trong một khu vực bằng cách cung cấp danh sách thông tin kệ."
+              },
+              "response": []
+            },
+            {
+              "name": "Tạo Kệ Tự động (Batch)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"quantity\": 5,\n    \"code_prefix\": \"RACK\",\n    \"name_prefix\": \"Kệ\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/zones/1/racks/batch",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "zones", "1", "racks", "batch"]
+                },
+                "description": "Tạo hàng loạt kệ trong một khu vực bằng cách cung cấp số lượng để tạo tự động."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy danh sách Kệ trong Khu vực",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/zones/1/racks",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "zones", "1", "racks"]
+                },
+                "description": "Lấy danh sách tất cả các kệ trong một khu vực cụ thể."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy chi tiết Kệ",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/racks/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "racks", "1"]
+                },
+                "description": "Lấy thông tin chi tiết của một kệ bằng ID."
+              },
+              "response": []
+            },
+            {
+              "name": "Cập nhật Kệ",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Kệ 01 (Đã cập nhật)\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/racks/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "racks", "1"]
+                },
+                "description": "Cập nhật thông tin của một kệ."
+              },
+              "response": []
+            },
+            {
+              "name": "Xóa Kệ",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/racks/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "racks", "1"]
+                },
+                "description": "Xóa một kệ."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Bins",
+          "item": [
+            {
+              "name": "Tạo Ô chứa (Hàng loạt)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[{\n    \"code\": \"B01\",\n    \"name\": \"Ô 01\",\n    \"level\": 1,\n    \"number\": 1,\n    \"description\": \"Ngăn trên cùng\"\n}]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/racks/1/bins",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "racks", "1", "bins"]
+                },
+                "description": "Tạo một hoặc nhiều ô chứa mới trong một kệ bằng cách cung cấp danh sách thông tin ô chứa."
+              },
+              "response": []
+            },
+            {
+              "name": "Tạo Ô chứa Tự động (Batch)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"mode\": \"list\",\n    \"bins_per_level_list\": [2, 3, 4],\n    \"code_prefix\": \"BIN\",\n    \"name_prefix\": \"Ô\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/racks/1/bins/batch",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "racks", "1", "bins", "batch"]
+                },
+                "description": "Tạo hàng loạt ô chứa trong một kệ. Chế độ 'grid': cung cấp 'levels' và 'bins_per_level'. Chế độ 'list': cung cấp mảng 'bins_per_level_list' (ví dụ: [2, 3, 4] tạo 3 ngăn với 2, 3, và 4 ô)."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy danh sách Ô chứa trong Kệ",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/racks/1/bins",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "racks", "1", "bins"]
+                },
+                "description": "Lấy danh sách tất cả các ô chứa trong một kệ cụ thể."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy chi tiết Ô chứa",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/bins/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "bins", "1"]
+                },
+                "description": "Lấy thông tin chi tiết của một ô chứa bằng ID."
+              },
+              "response": []
+            },
+            {
+              "name": "Xem tồn kho trong Ô chứa",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/bins/1/inventory",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "bins", "1", "inventory"]
+                },
+                "description": "Lấy danh sách tất cả các mặt hàng tồn kho đang được lưu trữ trong một ô chứa cụ thể."
+              },
+              "response": []
+            },
+            {
+              "name": "Cập nhật Ô chứa",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"description\": \"Ngăn trên cùng, bên trái\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/bins/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "bins", "1"]
+                },
+                "description": "Cập nhật thông tin của một ô chứa."
+              },
+              "response": []
+            },
+            {
+              "name": "Xóa Ô chứa",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/warehouse/bins/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "warehouse", "bins", "1"]
+                },
+                "description": "Xóa một ô chứa."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Quản lý Nhập hàng (Purchasing)",
+      "item": [
+        {
+          "name": "Purchases",
+          "item": [
+            {
+              "name": "Receipts",
+              "item": [
+                {
+                  "name": "Tạo Phiếu nhận hàng",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{accessToken}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n    \"items\": [\n        {\n            \"purchase_order_item_id\": 1,\n            \"quantity\": 100,\n            \"bin_id\": 5,\n            \"batch_number\": \"L012345\",\n            \"manufacture_date\": \"2024-01-01\",\n            \"expiry_date\": \"2026-01-01\"\n        },\n        {\n            \"purchase_order_item_id\": 2,\n            \"quantity\": 50,\n            \"bin_id\": 6,\n            \"batch_number\": \"L054321\",\n            \"manufacture_date\": \"2024-02-01\",\n            \"expiry_date\": \"2025-02-01\"\n        }\n    ]\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/api/purchases/1/receipts",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["api", "purchases", "1", "receipts"]
+                    },
+                    "description": "Tạo một phiếu nhận hàng mới cho một đơn nhập hàng. Hành động này sẽ TỰ ĐỘNG tạo ra các bản ghi tồn kho (inventory) tương ứng với từng mặt hàng được nhận. Nếu tất cả các mặt hàng đã được nhận đủ, trạng thái của đơn nhập hàng (PO) sẽ được cập nhật thành 'completed'."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Lấy danh sách Phiếu nhận hàng",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{accessToken}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/purchases/1/receipts",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["api", "purchases", "1", "receipts"]
+                    },
+                    "description": "Lấy danh sách tất cả các phiếu nhận hàng của một đơn nhập hàng cụ thể."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Lấy chi tiết Phiếu nhận hàng",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{accessToken}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/receipts/1",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["api", "receipts", "1"]
+                    },
+                    "description": "Lấy thông tin chi tiết của một phiếu nhận hàng cụ thể bằng ID."
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Tạo Đơn nhập hàng (Hàng loạt)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[{\n    \"supplier_id\": 1,\n    \"items\": [\n        {\n            \"supplier_medication_variant_id\": 1,\n            \"quantity\": 100,\n            \"unit_price\": 12000.00\n        },\n        {\n            \"supplier_medication_variant_id\": 2,\n            \"quantity\": 50,\n            \"unit_price\": 50000.00\n        }\n    ]\n}]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/purchases",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "purchases"]
+                },
+                "description": "Tạo một hoặc nhiều đơn nhập hàng mới. Hệ thống sẽ tự động gán trạng thái và ngày dự kiến nhận hàng. Cung cấp một danh sách các đơn hàng trong body request."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy danh sách Đơn nhập hàng",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/purchases",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "purchases"]
+                },
+                "description": "Lấy danh sách tất cả các đơn nhập hàng, có thể lọc theo nhà cung cấp, trạng thái, ..."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy chi tiết Đơn nhập hàng",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/purchases/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "purchases", "1"]
+                },
+                "description": "Lấy thông tin chi tiết của một đơn nhập hàng bằng ID, bao gồm danh sách các sản phẩm."
+              },
+              "response": []
+            },
+            {
+              "name": "Cập nhật Đơn nhập hàng",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"status\": \"completed\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/purchases/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "purchases", "1"]
+                },
+                "description": "Cập nhật thông tin của một đơn nhập hàng (ví dụ: thay đổi trạng thái). Không dùng để thay đổi danh sách sản phẩm."
+              },
+              "response": []
+            },
+            {
+              "name": "Xóa Đơn nhập hàng",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/purchases/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "purchases", "1"]
+                },
+                "description": "Xóa một đơn nhập hàng (chỉ nên thực hiện khi đơn hàng ở trạng thái 'pending')."
+              },
+              "response": []
+            }
+          ]
+        }
+      ],
+      "description": "Các API liên quan đến việc tạo và quản lý đơn nhập hàng từ nhà cung cấp."
+    },
+    {
+      "name": "Quản lý Tồn kho (Inventory Management)",
+      "item": [
+        {
+          "name": "Lấy danh sách tồn kho",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/inventory",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "inventory"],
+              "query": [
+                {
+                  "key": "medication_variant_id",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "bin_id",
+                  "value": "5",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Lấy danh sách tất cả các bản ghi tồn kho. Hỗ trợ lọc theo biến thể thuốc, vị trí ô chứa, số lô, hoặc các thuốc sắp hết hạn."
+          },
+          "response": []
+        },
+        {
+          "name": "Lấy chi tiết bản ghi tồn kho",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/inventory/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "inventory", "1"]
+            },
+            "description": "Lấy thông tin chi tiết của một bản ghi tồn kho cụ thể (một lô hàng tại một vị trí nhất định)."
+          },
+          "response": []
+        },
+        {
+          "name": "Điều chỉnh tồn kho",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"new_quantity\": 98,\n    \"reason\": \"Kiểm kê thực tế chênh lệch 2 đơn vị\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/inventory/1/adjust",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "inventory", "1", "adjust"]
+            },
+            "description": "Điều chỉnh số lượng của một bản ghi tồn kho. Dùng trong các trường hợp kiểm kê, hàng hỏng, ..."
+          },
+          "response": []
+        },
+        {
+          "name": "Di chuyển tồn kho",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"from_inventory_id\": 1,\n    \"to_bin_id\": 10,\n    \"quantity\": 20,\n    \"reason\": \"Sắp xếp lại kho hàng\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/inventory/move",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "inventory", "move"]
+            },
+            "description": "Di chuyển một số lượng hàng hóa từ một lô/vị trí này sang một ô chứa khác."
+          },
+          "response": []
+        }
+      ],
+      "description": "Các API để theo dõi, điều chỉnh và di chuyển hàng hóa tồn kho."
+    },
+    {
+      "name": "Quản lý Bán hàng & Đơn thuốc (Sales & Prescriptions)",
+      "item": [
+        {
+          "name": "Sales Orders",
+          "item": [
+            {
+              "name": "Tạo Đơn bán hàng",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"customer_id\": 1,\n    \"payment_method\": \"cash\",\n    \"items\": [\n        {\n            \"medication_variant_id\": 1,\n            \"quantity\": 2\n        }\n    ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/sales",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "sales"]
+                },
+                "description": "Tạo một đơn bán hàng mới. Hệ thống sẽ tự động kiểm tra và tạm giữ (reserve) số lượng tồn kho tương ứng. Sau khi đơn hàng hoàn tất, số lượng sẽ được trừ chính thức."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy danh sách Đơn bán hàng",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sales",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "sales"]
+                },
+                "description": "Lấy danh sách tất cả các đơn bán hàng."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy chi tiết Đơn bán hàng",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sales/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "sales", "1"]
+                },
+                "description": "Lấy thông tin chi tiết của một đơn bán hàng bằng ID."
+              },
+              "response": []
+            },
+            {
+              "name": "Cập nhật trạng thái Đơn bán hàng",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"status\": \"completed\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/sales/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "sales", "1"]
+                },
+                "description": "Cập nhật trạng thái của một đơn bán hàng (ví dụ: từ 'pending' sang 'completed' hoặc 'cancelled')."
+              },
+              "response": []
+            },
+            {
+              "name": "Hủy Đơn bán hàng",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/sales/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "sales", "1"]
+                },
+                "description": "Hủy một đơn bán hàng. Thao tác này sẽ giải phóng số lượng hàng đã tạm giữ (reserved)."
+              },
+              "response": []
+            }
+          ]
+        }
+      ],
+      "description": "Các API xử lý việc tạo đơn hàng, bán thuốc theo đơn và không theo đơn."
+    },
+    {
+      "name": "Quản lý Khách hàng (Customers)",
+      "item": [
+        {
+          "name": "Tạo Khách hàng (Hàng loạt)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[{\n    \"name\": \"Nguyễn Thị C\",\n    \"email\": \"customer@example.com\",\n    \"phone\": \"0912345678\",\n    \"address\": \"789 Đường LMN, Quận 3, TP. HCM\"\n}]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/customers",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers"]
+            },
+            "description": "Tạo một hoặc nhiều khách hàng mới."
+          },
+          "response": []
+        },
+        {
+          "name": "Lấy danh sách Khách hàng",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/customers",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers"]
+            },
+            "description": "Lấy danh sách tất cả các khách hàng."
+          },
+          "response": []
+        },
+        {
+          "name": "Lấy chi tiết Khách hàng",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/customers/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers", "1"]
+            },
+            "description": "Lấy thông tin chi tiết của một khách hàng bằng ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Cập nhật Khách hàng",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"phone\": \"0987654321\",\n    \"address\": \"Địa chỉ mới\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/customers/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers", "1"]
+            },
+            "description": "Cập nhật thông tin của một khách hàng."
+          },
+          "response": []
+        },
+        {
+          "name": "Xóa Khách hàng",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/customers/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers", "1"]
+            },
+            "description": "Xóa một khách hàng."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD và quản lý thông tin khách hàng thân thiết."
+    },
+    {
+      "name": "Quản lý Nhà cung cấp (Suppliers)",
+      "item": [
+        {
+          "name": "Quản lý thuốc cung cấp",
+          "item": [
+            {
+              "name": "Thêm biến thể thuốc cho NCC (Hàng loạt)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[{\n    \"medication_variant_id\": 1,\n    \"supplier_sku\": \"DHG-PARA-500\",\n    \"lead_time_days\": 3\n}]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/suppliers/1/medications",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "suppliers", "1", "medications"]
+                },
+                "description": "Thêm một hoặc nhiều biến thể thuốc mà nhà cung cấp này có thể cung cấp."
+              },
+              "response": []
+            },
+            {
+              "name": "Lấy danh sách thuốc của nhà cung cấp",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/suppliers/1/medications",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "suppliers", "1", "medications"]
+                },
+                "description": "Lấy danh sách các biến thể thuốc được cung cấp bởi nhà cung cấp này."
+              },
+              "response": []
+            },
+            {
+              "name": "Cập nhật thông tin thuốc cung cấp",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"supplier_sku\": \"DHG-PARA-500-NEW\",\n    \"lead_time_days\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/suppliers/1/medications/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "suppliers", "1", "medications", "1"]
+                },
+                "description": "Cập nhật thông tin của một loại thuốc được cung cấp bởi nhà cung cấp (ví dụ: SKU, thời gian giao hàng)."
+              },
+              "response": []
+            },
+            {
+              "name": "Xóa biến thể thuốc khỏi nhà cung cấp",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/suppliers/1/medications/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "suppliers", "1", "medications", "1"]
+                },
+                "description": "Xóa liên kết giữa một biến thể thuốc và nhà cung cấp."
+              },
+              "response": []
+            }
+          ],
+          "description": "Quản lý các loại thuốc mà một nhà cung cấp có thể cung cấp."
+        },
+        {
+          "name": "Tạo nhà cung cấp (Hàng loạt)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[{\n    \"name\": \"Công ty Dược Hậu Giang\",\n    \"contact_name\": \"Nguyễn Văn A\",\n    \"email\": \"contact@dhgpharma.com.vn\",\n    \"phone\": \"02923891433\",\n    \"address\": \"288 Bis Nguyễn Văn Cừ, P. An Hòa, Q. Ninh Kiều, TP. Cần Thơ\",\n    \"status\": \"active\"\n}]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/suppliers",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "suppliers"]
+            },
+            "description": "Tạo một hoặc nhiều nhà cung cấp mới."
+          },
+          "response": []
+        },
+        {
+          "name": "Lấy danh sách nhà cung cấp",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/suppliers",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "suppliers"]
+            },
+            "description": "Lấy danh sách tất cả các nhà cung cấp."
+          },
+          "response": []
+        },
+        {
+          "name": "Lấy chi tiết nhà cung cấp",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/suppliers/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "suppliers", "1"]
+            },
+            "description": "Lấy thông tin chi tiết của một nhà cung cấp bằng ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Cập nhật nhà cung cấp",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"contact_name\": \"Trần Thị B\",\n    \"phone\": \"0909123456\",\n    \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/suppliers/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "suppliers", "1"]
+            },
+            "description": "Cập nhật thông tin của một nhà cung cấp."
+          },
+          "response": []
+        },
+        {
+          "name": "Xóa nhà cung cấp",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/suppliers/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "suppliers", "1"]
+            },
+            "description": "Xóa một nhà cung cấp (có thể là xóa mềm bằng cách cập nhật status)."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD và quản lý thông tin các nhà cung cấp thuốc."
+    },
+    {
+      "name": "Quản lý Nhân viên (Users/Staff)",
+      "item": [
+        {
+          "name": "Quản lý Đăng ký (Registration Management)",
+          "item": [
+            {
+              "name": "Lấy danh sách yêu cầu đăng ký",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/registrations",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "users", "registrations"]
+                },
+                "description": "Lấy danh sách các yêu cầu đăng ký đang chờ xử lý. Yêu cầu quyền admin."
+              },
+              "response": []
+            },
+            {
+              "name": "Phê duyệt yêu cầu đăng ký",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"password\": \"defaultPassword123\",\n    \"role\": \"staff\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/registrations/1/approve",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "users", "registrations", "1", "approve"]
+                },
+                "description": "Phê duyệt một yêu cầu đăng ký, tạo tài khoản người dùng mới và gán mật khẩu, vai trò. Yêu cầu quyền admin."
+              },
+              "response": []
+            },
+            {
+              "name": "Từ chối yêu cầu đăng ký",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/registrations/1/reject",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "users", "registrations", "1", "reject"]
+                },
+                "description": "Từ chối một yêu cầu đăng ký. Yêu cầu quyền admin."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Tạo người dùng (Hàng loạt)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[{\n    \"name\": \"Tên Nhân Viên Mới\",\n    \"email\": \"newstaff@example.com\",\n    \"phone\": \"0987654321\",\n    \"address\": \"123 Đường ABC, Quận 1, TP. HCM\",\n    \"password\": \"stringpassword123\",\n    \"role\": \"staff\"\n}]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Tạo một hoặc nhiều người dùng mới. Yêu cầu quyền admin."
+          },
+          "response": []
+        },
+        {
+          "name": "Lấy danh sách người dùng",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Lấy danh sách tất cả người dùng trong hệ thống. Yêu cầu quyền admin."
+          },
+          "response": []
+        },
+        {
+          "name": "Lấy thông tin chi tiết người dùng",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "1"]
+            },
+            "description": "Lấy thông tin chi tiết của một người dùng cụ thể bằng ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Cập nhật thông tin người dùng",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Tên Nhân Viên Đã Cập Nhật\",\n    \"address\": \"456 Đường XYZ, Quận 2, TP. HCM\",\n    \"status\": \"active\",\n    \"role\": \"staff\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "1"]
+            },
+            "description": "Cập nhật thông tin cho một người dùng. Admin có thể cập nhật cho bất kỳ ai, người dùng thường chỉ có thể tự cập nhật thông tin của mình."
+          },
+          "response": []
+        },
+        {
+          "name": "Xóa người dùng",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "1"]
+            },
+            "description": "Xóa một người dùng (có thể là xóa mềm, chuyển status thành 'inactive'). Yêu cầu quyền admin."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD và quản lý thông tin tài khoản nhân viên trong hệ thống."
+    },
+    {
+      "name": "Báo cáo & Thống kê (Reports)",
+      "item": [
+        {
+          "name": "Tạo Báo cáo",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"type\": \"sales_summary\",\n    \"parameters\": {\n        \"start_date\": \"2025-10-01T00:00:00.000Z\",\n        \"end_date\": \"2025-10-31T23:59:59.000Z\"\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reports"]
+            },
+            "description": "Tạo một báo cáo mới. 'type' có thể là 'sales_summary', 'inventory_on_hand', 'expiry_dates', etc. 'parameters' chứa các bộ lọc như khoảng thời gian."
+          },
+          "response": []
+        },
+        {
+          "name": "Lấy danh sách Báo cáo",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reports"]
+            },
+            "description": "Lấy danh sách tất cả các báo cáo đã được tạo."
+          },
+          "response": []
+        },
+        {
+          "name": "Lấy chi tiết Báo cáo",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reports", "1"]
+            },
+            "description": "Lấy thông tin chi tiết và dữ liệu của một báo cáo cụ thể."
+          },
+          "response": []
+        },
+        {
+          "name": "Xóa Báo cáo",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reports", "1"]
+            },
+            "description": "Xóa một báo cáo đã tạo."
+          },
+          "response": []
+        }
+      ],
+      "description": "Các API dùng để trích xuất dữ liệu báo cáo doanh thu, tồn kho, v.v."
+    },
+    {
+      "name": "Hệ thống (System)",
+      "item": [
+        {
+          "name": "Cài đặt (Settings)",
+          "item": [
+            {
+              "name": "Lấy danh sách Cài đặt",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/settings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "settings"]
+                },
+                "description": "Lấy danh sách tất cả các cài đặt hệ thống."
+              },
+              "response": []
+            },
+            {
+              "name": "Tạo/Cập nhật Cài đặt",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"key\": \"low_stock_threshold\",\n    \"value\": \"10\",\n    \"description\": \"Ngưỡng cảnh báo tồn kho thấp\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/settings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "settings"]
+                },
+                "description": "Tạo mới hoặc cập nhật giá trị của một cài đặt đã có."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Thông báo (Notifications)",
+          "item": [
+            {
+              "name": "Lấy Thông báo của người dùng",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "notifications"]
+                },
+                "description": "Lấy danh sách tất cả các thông báo cho người dùng đang đăng nhập."
+              },
+              "response": []
+            },
+            {
+              "name": "Đánh dấu đã đọc",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/notifications/1/read",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "notifications", "1", "read"]
+                },
+                "description": "Đánh dấu một thông báo cụ thể là đã đọc."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Lịch sử hoạt động (Audit Logs)",
+          "item": [
+            {
+              "name": "Lấy Lịch sử hoạt động",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/audit-logs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "audit-logs"]
+                },
+                "description": "Lấy danh sách lịch sử hoạt động trong hệ thống. Yêu cầu quyền admin."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    }
+  ]
+}

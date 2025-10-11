@@ -1,3 +1,4 @@
+import { inventoryService } from "../services/inventoryService.js";
 import { warehouseBinService } from "../services/warehouseBinService.js";
 
 export const warehouseBinController = {
@@ -154,6 +155,24 @@ export const warehouseBinController = {
       });
     } catch (error) {
       res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+
+  // Get inventory in a bin
+  async getInventory(req, res) {
+    try {
+      const items = await inventoryService.getByBinId(
+        Number.parseInt(req.params.id)
+      );
+      res.json({
+        success: true,
+        data: items,
+      });
+    } catch (error) {
+      res.status(500).json({
         success: false,
         message: error.message,
       });
