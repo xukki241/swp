@@ -1,20 +1,65 @@
-import express from "express";
+import { purchaseOrderItemService } from "../services/purchaseOrderItemService.js";
 
-import { purchaseOrderItemController } from "../controllers/purchaseOrderItemController.js";
-import { authenticate, authorize } from "../middleware/checkAuth.js";
+export const purchaseOrderItemController = {
+  async getAllByPurchaseOrder(req, res) {
+    try {
+      const purchaseOrderId = Number.parseInt(req.params.purchaseOrderId);
+      const items = await purchaseOrderItemService.getAll({ purchaseOrderId });
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 
-const router = express.Router();
+  async getById(req, res) {
+    try {
+      const id = Number.parseInt(req.params.itemId);
+      const item = await purchaseOrderItemService.getById(id);
+      if (!item) {
+        return res.status(404).json({ error: "Purchase order item not found" });
+      }
+      res.json(item);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 
-// All routes require authentication
-router.use(authenticate);
+  async create(req, res) {
+    try {
+      const purchaseOrderId = Number.parseInt(req.params.purchaseOrderId);
+      const newItem = await purchaseOrderItemService.create({
+        ...req.body,
+        purchaseOrderId,
+      });
+      res.status(201).json(newItem);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
 
-// GET routes - accessible by both Owner and Staff
-router.get("/", purchaseOrderItemController.getAll);
-router.get("/:id", purchaseOrderItemController.getById);
+  async update(req, res) {
+    try {
+      const id = Number.parseInt(req.params.itemId);
+      const updated = await purchaseOrderItemService.update(id, req.body);
+      if (!updated) {
+        return res.status(404).json({ error: "Purchase order item not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
 
-// CUD routes - only accessible by Owner
-router.post("/", authorize("owner"), purchaseOrderItemController.create);
-router.put("/:id", authorize("owner"), purchaseOrderItemController.update);
-router.delete("/:id", authorize("owner"), purchaseOrderItemController.delete);
-
-export default router;
+  async delete(req, res) {
+    try {
+      const id = Number.parseInt(req.params.itemId);
+      const deleted = await purchaseOrderItemService.delete(id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Purchase order item not found" });
+      }
+      res.json({ message: "Item deleted successfully", item: deleted });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+};

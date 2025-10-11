@@ -8,13 +8,8 @@ import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import {
   authRoutes,
   medicationRoutes,
-  medicationVariantRoutes,
-  purchaseOrderItemRoutes,
-  purchaseOrderReceiptItemRoutes,
-  purchaseOrderReceiptRoutes,
   purchaseOrderRoutes,
   registrationRoutes,
-  supplierMedicationVariantRoutes,
   supplierRoutes,
   userRoutes,
   warehouseBinRoutes,
@@ -46,13 +41,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/registrations", registrationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/medications", medicationRoutes);
-app.use("/api/medication-variants", medicationVariantRoutes);
 app.use("/api/suppliers", supplierRoutes);
-app.use("/api/supplier-medication-variants", supplierMedicationVariantRoutes);
 app.use("/api/purchase-orders", purchaseOrderRoutes);
-app.use("/api/purchase-order-items", purchaseOrderItemRoutes);
-app.use("/api/purchase-order-receipts", purchaseOrderReceiptRoutes);
-app.use("/api/purchase-order-receipt-items", purchaseOrderReceiptItemRoutes);
 app.use("/api/warehouse-zones", warehouseZoneRoutes);
 app.use("/api/warehouse-racks", warehouseRackRoutes);
 app.use("/api/warehouse-bins", warehouseBinRoutes);
