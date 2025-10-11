@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import * as medicationVariantController from "@/controllers/medicationVariantController.js";
+import { inventoryService } from "@/services/inventoryService.js";
 import * as medicationVariantService from "@/services/medicationVariantService.js";
 import logger from "@/utils/logger.js";
 
+vi.mock("@/services/inventoryService.js");
 vi.mock("@/services/medicationVariantService.js");
 
 describe("MedicationVariantController", () => {
@@ -411,6 +413,72 @@ describe("MedicationVariantController", () => {
         success: false,
         message: "Medication variant not found",
       });
+    });
+  });
+
+  describe("getMedicationVariantInventory", () => {
+    it("should return inventory for a medication variant", async () => {
+      req.params = { id: "1" };
+      const mockInventory = [
+        {
+          id: 1,
+          binId: 3,
+          binCode: "B001",
+          batchNumber: "BATCH001",
+          quantity: 500,
+          quantityReserved: 50,
+          quantityAvailable: 450,
+        },
+      ];
+      inventoryService.getByMedicationVariantId.mockResolvedValue(
+        mockInventory
+      );
+
+      await medicationVariantController.getMedicationVariantInventory(
+        req,
+        res,
+        next
+      );
+
+      expect(inventoryService.getByMedicationVariantId).toHaveBeenCalledWith(1);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 1,
+        data: mockInventory,
+      });
+    });
+
+    it("should return empty array if no inventory found", async () => {
+      req.params = { id: "999" };
+      inventoryService.getByMedicationVariantId.mockResolvedValue([]);
+
+      await medicationVariantController.getMedicationVariantInventory(
+        req,
+        res,
+        next
+      );
+
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 0,
+        data: [],
+      });
+    });
+
+    it("should handle errors", async () => {
+      req.params = { id: "1" };
+      inventoryService.getByMedicationVariantId.mockRejectedValue(
+        new Error("Database error")
+      );
+
+      await medicationVariantController.getMedicationVariantInventory(
+        req,
+        res,
+        next
+      );
+
+      expect(logger.error).toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 });

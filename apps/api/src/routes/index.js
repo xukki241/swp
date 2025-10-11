@@ -1,4 +1,5 @@
 export { default as authRoutes } from "./authRoutes.js";
+export { default as inventoryRoutes } from "./inventoryRoutes.js";
 export { default as medicationRoutes } from "./medicationRoutes.js";
 export { default as medicationVariantRoutes } from "./medicationVariantRoutes.js";
 export { default as purchaseOrderItemRoutes } from "./purchaseOrderItemRoutes.js";
@@ -11,4 +12,5 @@ export { default as supplierRoutes } from "./supplierRoutes.js";
 export { default as userRoutes } from "./userRoutes.js";
 export { default as warehouseBinRoutes } from "./warehouseBinRoutes.js";
 export { default as warehouseRackRoutes } from "./warehouseRackRoutes.js";
+export { default as warehouseRoutes } from "./warehouseRoutes.js";
 export { default as warehouseZoneRoutes } from "./warehouseZoneRoutes.js";

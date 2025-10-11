@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import { warehouseBinController } from "@/controllers/warehouseBinController.js";
+import { inventoryService } from "@/services/inventoryService.js";
 import { warehouseBinService } from "@/services/warehouseBinService.js";
 
+vi.mock("@/services/inventoryService.js");
 vi.mock("@/services/warehouseBinService.js");
 
 describe("WarehouseBinController", () => {
@@ -179,6 +181,55 @@ describe("WarehouseBinController", () => {
       await warehouseBinController.delete(req, res);
 
       expect(res.status).toHaveBeenCalledWith(404);
+    });
+  });
+
+  describe("getInventory", () => {
+    it("should return inventory items for a bin", async () => {
+      req.params = { id: "1" };
+      const mockInventory = [
+        {
+          id: 1,
+          medicationVariantId: 10,
+          variantName: "Paracetamol 500mg",
+          batchNumber: "BATCH001",
+          quantity: 500,
+          quantityReserved: 50,
+          quantityAvailable: 450,
+        },
+      ];
+      inventoryService.getByBinId.mockResolvedValue(mockInventory);
+
+      await warehouseBinController.getInventory(req, res);
+
+      expect(inventoryService.getByBinId).toHaveBeenCalledWith(1);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: mockInventory,
+      });
+    });
+
+    it("should return empty array if no inventory found", async () => {
+      req.params = { id: "999" };
+      inventoryService.getByBinId.mockResolvedValue([]);
+
+      await warehouseBinController.getInventory(req, res);
+
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: [],
+      });
+    });
+
+    it("should handle errors", async () => {
+      req.params = { id: "1" };
+      inventoryService.getByBinId.mockRejectedValue(
+        new Error("Database error")
+      );
+
+      await warehouseBinController.getInventory(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
     });
   });
 });

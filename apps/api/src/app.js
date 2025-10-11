@@ -7,6 +7,7 @@ import config from "./config/environment.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import {
   authRoutes,
+  inventoryRoutes,
   medicationRoutes,
   medicationVariantRoutes,
   purchaseOrderItemRoutes,
@@ -19,6 +20,7 @@ import {
   userRoutes,
   warehouseBinRoutes,
   warehouseRackRoutes,
+  warehouseRoutes,
   warehouseZoneRoutes,
 } from "./routes/index.js";
 import logger from "./utils/logger.js";
@@ -53,9 +55,11 @@ app.use("/api/purchase-orders", purchaseOrderRoutes);
 app.use("/api/purchase-order-items", purchaseOrderItemRoutes);
 app.use("/api/purchase-order-receipts", purchaseOrderReceiptRoutes);
 app.use("/api/purchase-order-receipt-items", purchaseOrderReceiptItemRoutes);
+app.use("/api/warehouse", warehouseRoutes);
 app.use("/api/warehouse-zones", warehouseZoneRoutes);
 app.use("/api/warehouse-racks", warehouseRackRoutes);
 app.use("/api/warehouse-bins", warehouseBinRoutes);
+app.use("/api/inventory", inventoryRoutes);
 
 app.get("/", (req, res) => {
   res.json({

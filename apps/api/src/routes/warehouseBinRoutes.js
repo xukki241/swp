@@ -16,6 +16,7 @@ router.use(authenticate);
 // GET routes - accessible by both Owner and Staff
 router.get("/", warehouseBinController.getAll);
 router.get("/:id", warehouseBinController.getById);
+router.get("/:id/inventory", warehouseBinController.getInventory);
 router.get("/rack/:rackId", warehouseBinController.getByRackId);
 
 // CUD routes - only accessible by Owner
