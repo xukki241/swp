@@ -27,13 +27,12 @@ router.put("/:id", authorize("owner"), supplierController.update);
 router.delete("/:id", authorize("owner"), supplierController.delete);
 
 /* -------------------- SUPPLIER MEDICATION VARIANTS (Nested) -------------------- */
-
 /**
- * @route   GET /api/suppliers/:supplierId/medication-variants
- * @desc    Get all medication variants for supplier
+ * @route   GET /api/suppliers/:supplierId/medications
+ * @desc    Get all medications provided by this supplier
  */
 router.get(
-  "/:supplierId/medication-variants",
+  "/:supplierId/medications",
   (req, res, next) => {
     req.query.supplierId = req.params.supplierId;
     next();
@@ -42,56 +41,45 @@ router.get(
 );
 
 /**
- * @route   GET /api/suppliers/:supplierId/medication-variants/:variantId
- * @desc    Get one medication variant by ID for supplier
- */
-router.get(
-  "/:supplierId/medication-variants/:variantId",
-  (req, res, next) => {
-    req.params.id = req.params.variantId;
-    next();
-  },
-  supplierMedicationVariantController.getById
-);
-
-/**
- * @route   POST /api/suppliers/:supplierId/medication-variants
- * @desc    Create new medication variant for supplier
+ * @route   POST /api/suppliers/:supplierId/medications
+ * @desc    Bulk add medications that this supplier provides
  */
 router.post(
-  "/:supplierId/medication-variants",
+  "/:supplierId/medications",
   authorize("owner"),
   (req, res, next) => {
-    req.body.supplierId = req.params.supplierId;
+    req.body = Array.isArray(req.body) ? req.body : [req.body];
+    req.body.forEach((item) => {
+      item.supplierId = req.params.supplierId;
+    });
     next();
   },
-  supplierMedicationVariantController.create
+  supplierMedicationVariantController.bulkCreate
 );
 
 /**
- * @route   PUT /api/suppliers/:supplierId/medication-variants/:variantId
- * @desc    Update a supplier’s medication variant
+ * @route   PATCH /api/suppliers/:supplierId/medications/:id
+ * @desc    Update supplier medication info (SKU, lead time)
  */
-router.put(
-  "/:supplierId/medication-variants/:variantId",
+router.patch(
+  "/:supplierId/medications/:id",
   authorize("owner"),
   (req, res, next) => {
-    req.body.supplierId = req.params.supplierId;
-    req.params.id = req.params.variantId;
+    req.params.variantId = req.params.id;
     next();
   },
   supplierMedicationVariantController.update
 );
 
 /**
- * @route   DELETE /api/suppliers/:supplierId/medication-variants/:variantId
- * @desc    Delete a supplier’s medication variant
+ * @route   DELETE /api/suppliers/:supplierId/medications/:id
+ * @desc    Remove medication link from supplier
  */
 router.delete(
-  "/:supplierId/medication-variants/:variantId",
+  "/:supplierId/medications/:id",
   authorize("owner"),
   (req, res, next) => {
-    req.params.id = req.params.variantId;
+    req.params.variantId = req.params.id;
     next();
   },
   supplierMedicationVariantController.delete

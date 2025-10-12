@@ -1,7 +1,6 @@
 export { default as authRoutes } from "./authRoutes.js";
 export { default as medicationRoutes } from "./medicationRoutes.js";
 export { default as medicationVariantRoutes } from "./medicationVariantRoutes.js";
-export { default as purchaseOrderItemRoutes } from "./purchaseOrderItemRoutes.js";
 export { default as purchaseOrderReceiptItemRoutes } from "./purchaseOrderReceiptItemRoutes.js";
 export { default as purchaseOrderReceiptRoutes } from "./purchaseOrderReceiptRoutes.js";
 export { default as purchaseOrderRoutes } from "./purchaseOrderRoutes.js";
