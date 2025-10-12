@@ -7,7 +7,34 @@ import { warehouseZones } from "../db/schema/warehouseZones.js";
 
 export const warehouseRackService = {
   async create(rackData) {
-    // Verify zone exists
+    // Support single object or array for batch creation
+    if (Array.isArray(rackData)) {
+      if (rackData.length === 0) {
+        return [];
+      }
+
+      // Validate referenced zones exist
+      const zoneIds = Array.from(new Set(rackData.map((r) => r.zoneId)));
+      for (const zid of zoneIds) {
+        const [zone] = await db
+          .select()
+          .from(warehouseZones)
+          .where(eq(warehouseZones.id, zid));
+
+        if (!zone) {
+          throw new Error(`Zone with ID ${zid} not found`);
+        }
+      }
+
+      const results = await db
+        .insert(warehouseRacks)
+        .values(rackData)
+        .returning();
+
+      return results;
+    }
+
+    // Single create
     const [zone] = await db
       .select()
       .from(warehouseZones)

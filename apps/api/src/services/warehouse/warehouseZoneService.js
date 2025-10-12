@@ -6,6 +6,18 @@ import { warehouseZones } from "../db/schema/warehouseZones.js";
 
 export const warehouseZoneService = {
   async create(zoneData) {
+    // Support single object or array for batch creation
+    if (Array.isArray(zoneData)) {
+      if (zoneData.length === 0) {
+        return [];
+      }
+      const results = await db
+        .insert(warehouseZones)
+        .values(zoneData)
+        .returning();
+      return results;
+    }
+
     const [zone] = await db.insert(warehouseZones).values(zoneData).returning();
 
     return zone;

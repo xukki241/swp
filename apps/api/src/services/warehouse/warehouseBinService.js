@@ -7,7 +7,34 @@ import { warehouseZones } from "../db/schema/warehouseZones.js";
 
 export const warehouseBinService = {
   async create(binData) {
-    // Verify rack exists
+    // Support single object or array for batch creation
+    if (Array.isArray(binData)) {
+      if (binData.length === 0) {
+        return [];
+      }
+
+      // Validate referenced racks exist
+      const rackIds = Array.from(new Set(binData.map((b) => b.rackId)));
+      for (const rid of rackIds) {
+        const [rack] = await db
+          .select()
+          .from(warehouseRacks)
+          .where(eq(warehouseRacks.id, rid));
+
+        if (!rack) {
+          throw new Error(`Rack with ID ${rid} not found`);
+        }
+      }
+
+      const results = await db
+        .insert(warehouseBins)
+        .values(binData)
+        .returning();
+
+      return results;
+    }
+
+    // Single create
     const [rack] = await db
       .select()
       .from(warehouseRacks)
