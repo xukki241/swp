@@ -2,22 +2,31 @@ import express from "express";
 
 import { purchaseOrderReceiptController } from "../controllers/purchaseOrderReceiptController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
-const router = express.Router();
+
+export const purchaseOrderReceiptRouter = express.Router();
 
 // All routes require authentication
-router.use(authenticate);
+purchaseOrderReceiptRouter.use(authenticate);
 
 // GET routes - accessible by both Owner and Staff
-router.get("/", purchaseOrderReceiptController.getAll);
-router.get("/:id", purchaseOrderReceiptController.getById);
+purchaseOrderReceiptRouter.get("/", purchaseOrderReceiptController.getAll);
+purchaseOrderReceiptRouter.get("/:id", purchaseOrderReceiptController.getById);
 
 // CUD routes - only accessible by Owner
-router.post("/", authorize("owner"), purchaseOrderReceiptController.create);
-router.put("/:id", authorize("owner"), purchaseOrderReceiptController.update);
-router.delete(
+purchaseOrderReceiptRouter.post(
+  "/",
+  authorize("owner"),
+  purchaseOrderReceiptController.create
+);
+purchaseOrderReceiptRouter.put(
+  "/:id",
+  authorize("owner"),
+  purchaseOrderReceiptController.update
+);
+purchaseOrderReceiptRouter.delete(
   "/:id",
   authorize("owner"),
   purchaseOrderReceiptController.delete
 );
 
-export default router;
+export default purchaseOrderReceiptRouter;

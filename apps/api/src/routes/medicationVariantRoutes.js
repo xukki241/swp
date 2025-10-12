@@ -3,7 +3,7 @@ import express from "express";
 import * as medicationVariantController from "../controllers/medicationVariantController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
-const router = express.Router();
+export const medicationVariantRouter = express.Router();
 
 /**
  * @route   GET /api/medication-variants
@@ -13,7 +13,7 @@ const router = express.Router();
  * @query   medicationId - Filter by medication ID
  * @query   isActive - Filter by active status (true/false)
  */
-router.get(
+medicationVariantRouter.get(
   "/",
   authenticate,
   medicationVariantController.getAllMedicationVariants
@@ -24,7 +24,7 @@ router.get(
  * @desc    Get medication variant by ID
  * @access  Private (Owner, Staff)
  */
-router.get(
+medicationVariantRouter.get(
   "/:id",
   authenticate,
   medicationVariantController.getMedicationVariantById
@@ -35,7 +35,7 @@ router.get(
  * @desc    Get inventory for a medication variant
  * @access  Private (Owner, Staff)
  */
-router.get(
+medicationVariantRouter.get(
   "/:id/inventory",
   authenticate,
   medicationVariantController.getMedicationVariantInventory
@@ -47,7 +47,7 @@ router.get(
  * @access  Private (Owner)
  * @body    { medicationId, sku, name, unit, unitFactor?, barcode?, sellPrice, isActive?, isForSale? }
  */
-router.post(
+medicationVariantRouter.post(
   "/",
   authenticate,
   authorize("owner"),
@@ -60,7 +60,7 @@ router.post(
  * @access  Private (Owner)
  * @body    { medicationId?, sku?, name?, unit?, unitFactor?, barcode?, sellPrice?, isActive?, isForSale? }
  */
-router.put(
+medicationVariantRouter.put(
   "/:id",
   authenticate,
   authorize("owner"),
@@ -72,11 +72,11 @@ router.put(
  * @desc    Delete medication variant by ID (owner only)
  * @access  Private (Owner)
  */
-router.delete(
+medicationVariantRouter.delete(
   "/:id",
   authenticate,
   authorize("owner"),
   medicationVariantController.deleteMedicationVariant
 );
 
-export default router;
+export default medicationVariantRouter;

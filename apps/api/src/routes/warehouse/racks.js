@@ -1,0 +1,71 @@
+import {
+  createWarehouseBinSchema,
+  createWarehouseRackSchema,
+  updateWarehouseRackSchema,
+} from "@pharmaflow/dto";
+import express from "express";
+
+import { warehouseBinController } from "../../controllers/warehouseBinController.js";
+import { warehouseRackController } from "../../controllers/warehouseRackController.js";
+import { authorize } from "../../middleware/checkAuth.js";
+import { validateBody } from "../../middleware/validate.js";
+
+export const warehouseRacksRouter = express.Router();
+
+// POST /api/warehouse/zones/:zoneId/racks (create racks in a zone)
+warehouseRacksRouter.post(
+  "/zones/:zoneId/racks",
+  authorize("owner"),
+  validateBody(createWarehouseRackSchema),
+  (req, res, next) => {
+    // Inject zoneId from params into body for controller
+    req.body.zoneId = req.params.zoneId;
+    next();
+  },
+  warehouseRackController.create
+);
+
+// GET /api/warehouse/zones/:zoneId/racks (get racks in a zone)
+warehouseRacksRouter.get(
+  "/zones/:zoneId/racks",
+  warehouseRackController.getByZoneId
+);
+
+// GET /api/warehouse/racks/:id
+warehouseRacksRouter.get("/racks/:id", warehouseRackController.getById);
+
+// PATCH /api/warehouse/racks/:id
+warehouseRacksRouter.patch(
+  "/racks/:id",
+  authorize("owner"),
+  validateBody(updateWarehouseRackSchema),
+  warehouseRackController.update
+);
+
+// DELETE /api/warehouse/racks/:id
+warehouseRacksRouter.delete(
+  "/racks/:id",
+  authorize("owner"),
+  warehouseRackController.delete
+);
+
+// POST /api/warehouse/racks/:rackId/bins (create bins in a rack)
+warehouseRacksRouter.post(
+  "/racks/:rackId/bins",
+  authorize("owner"),
+  validateBody(createWarehouseBinSchema),
+  (req, res, next) => {
+    // Inject rackId from params into body for controller
+    req.body.rackId = req.params.rackId;
+    next();
+  },
+  warehouseBinController.create
+);
+
+// GET /api/warehouse/racks/:rackId/bins (get bins in a rack)
+warehouseRacksRouter.get(
+  "/racks/:rackId/bins",
+  warehouseBinController.getByRackId
+);
+
+export default warehouseRacksRouter; // POST /api/warehouse/racks/:rackId/bins (create bins in a rack)
