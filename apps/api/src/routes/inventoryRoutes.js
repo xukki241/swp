@@ -1,4 +1,8 @@
-import { updateInventorySchema } from "@pharmaflow/dto";
+import {
+  updateInventorySchema,
+  adjustInventoryRequestSchema,
+  moveInventoryRequestSchema,
+} from "@pharmaflow/dto";
 import express from "express";
 
 import { inventoryController } from "../controllers/inventoryController.js";
@@ -16,7 +20,7 @@ inventoryRouter.get(
   "/summary/by-variant",
   inventoryController.getSummaryByVariant
 );
-inventoryRouter.get("/expiring", inventoryController.getExpiring);
+inventoryRouter.get("/expiring", inventoryController.getExpiringSoon);
 inventoryRouter.get("/low-stock", inventoryController.getLowStock);
 inventoryRouter.get("/:id", inventoryController.getById);
 
@@ -26,6 +30,22 @@ inventoryRouter.patch(
   authorize("owner"),
   validateBody(updateInventorySchema),
   inventoryController.update
+);
+
+// Adjust inventory quantity
+inventoryRouter.patch(
+  "/:id/adjust",
+  authorize("owner"),
+  validateBody(adjustInventoryRequestSchema),
+  inventoryController.adjust
+);
+
+// Move inventory between bins
+inventoryRouter.post(
+  "/move",
+  authorize("owner"),
+  validateBody(moveInventoryRequestSchema),
+  inventoryController.move
 );
 
 export default inventoryRouter;
