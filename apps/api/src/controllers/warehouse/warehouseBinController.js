@@ -1,5 +1,5 @@
-import { inventoryService } from "../services/inventoryService.js";
-import { warehouseBinService } from "../services/warehouseBinService.js";
+import { inventoryService } from "../../services/inventoryService.js";
+import { warehouseBinService } from "../../services/warehouse/warehouseBinService.js";
 
 export const warehouseBinController = {
   // Create a new warehouse bin
@@ -179,3 +179,5 @@ export const warehouseBinController = {
     }
   },
 };
+
+export default warehouseBinController;

@@ -1,7 +1,7 @@
 import { updateWarehouseBinSchema } from "@pharmaflow/dto";
 import express from "express";
 
-import { warehouseBinController } from "../../controllers/warehouseBinController.js";
+import { warehouseBinController } from "../../controllers/warehouse/warehouseBinController.js";
 import { authorize } from "../../middleware/checkAuth.js";
 import { validateBody } from "../../middleware/validate.js";
 

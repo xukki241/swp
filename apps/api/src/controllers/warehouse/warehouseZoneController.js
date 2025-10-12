@@ -1,4 +1,4 @@
-import { warehouseZoneService } from "../services/warehouseZoneService.js";
+import { warehouseZoneService } from "../../services/warehouse/warehouseZoneService.js";
 
 export const warehouseZoneController = {
   // Create a new warehouse zone
@@ -136,3 +136,5 @@ export const warehouseZoneController = {
     }
   },
 };
+
+export default warehouseZoneController;
