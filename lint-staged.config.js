@@ -1,5 +1,5 @@
 export const lintStagedConfig = {
-  "*": ["pnpm run lint:fix --", "pnpm run format --"],
+  "*": ["pnpm run format --", "pnpm run lint:fix --"],
 };
 
 export default lintStagedConfig;
