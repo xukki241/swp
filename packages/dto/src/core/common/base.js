@@ -1,0 +1,36 @@
+import { z } from "zod";
+
+// UUID validation
+export const uuidSchema = z.string().uuid();
+
+// Common string fields
+export const nameSchema = z.string().min(1).max(100);
+export const codeSchema = z.string().min(1).max(50);
+export const descriptionSchema = z.string().nullable().optional();
+export const emailSchema = z.string().email().max(255).nullable().optional();
+export const phoneSchema = z
+  .string()
+  .regex(/^\d{10}$/, "Phone must be exactly 10 digits")
+  .nullable()
+  .optional();
+export const addressSchema = z.string().nullable().optional();
+
+// Numeric fields
+export const intSchema = z.number().int();
+export const positiveIntSchema = z.number().int().positive();
+export const nonNegativeIntSchema = z.number().int().nonnegative();
+export const decimalSchema = z.number();
+export const positiveDecimalSchema = z.number().nonnegative();
+
+// Date/time fields
+export const dateSchema = z.union([
+  z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  z.date(),
+]);
+export const timestampSchema = z.union([z.string().datetime(), z.date()]);
+
+// Boolean
+export const booleanSchema = z.boolean();
+
+// JSON
+export const jsonSchema = z.record(z.any()).or(z.array(z.any()));
