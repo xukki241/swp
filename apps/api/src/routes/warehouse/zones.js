@@ -1,6 +1,7 @@
 import {
   createWarehouseZoneSchema,
   updateWarehouseZoneSchema,
+  batchCreateZonesRequestSchema,
 } from "@pharmaflow/dto";
 import express from "express";
 
@@ -20,6 +21,14 @@ warehouseZonesRouter.post(
   authorize("owner"),
   validateBody(createWarehouseZoneSchema),
   warehouseZoneController.create
+);
+
+// POST /api/warehouse/zones/batch (batch create with auto-generated codes)
+warehouseZonesRouter.post(
+  "/zones/batch",
+  authorize("owner"),
+  validateBody(batchCreateZonesRequestSchema),
+  warehouseZoneController.createBatch
 );
 
 // GET /api/warehouse/zones/:id

@@ -2,6 +2,8 @@ import {
   createWarehouseBinSchema,
   createWarehouseRackSchema,
   updateWarehouseRackSchema,
+  batchCreateRacksRequestSchema,
+  batchCreateBinsRequestSchema,
 } from "@pharmaflow/dto";
 import express from "express";
 
@@ -23,6 +25,14 @@ warehouseRacksRouter.post(
     next();
   },
   warehouseRackController.create
+);
+
+// POST /api/warehouse/zones/:zoneId/racks/batch (batch create racks with auto-generated codes)
+warehouseRacksRouter.post(
+  "/zones/:zoneId/racks/batch",
+  authorize("owner"),
+  validateBody(batchCreateRacksRequestSchema),
+  warehouseRackController.createBatch
 );
 
 // GET /api/warehouse/zones/:zoneId/racks (get racks in a zone)
@@ -62,10 +72,18 @@ warehouseRacksRouter.post(
   warehouseBinController.create
 );
 
+// POST /api/warehouse/racks/:rackId/bins/batch (batch create bins with auto-generated codes)
+warehouseRacksRouter.post(
+  "/racks/:rackId/bins/batch",
+  authorize("owner"),
+  validateBody(batchCreateBinsRequestSchema),
+  warehouseBinController.createBatch
+);
+
 // GET /api/warehouse/racks/:rackId/bins (get bins in a rack)
 warehouseRacksRouter.get(
   "/racks/:rackId/bins",
   warehouseBinController.getByRackId
 );
 
-export default warehouseRacksRouter; // POST /api/warehouse/racks/:rackId/bins (create bins in a rack)
+export default warehouseRacksRouter;

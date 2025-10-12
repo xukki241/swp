@@ -1,9 +1,9 @@
 import { eq, ilike, or, and } from "drizzle-orm";
 
-import { db } from "../db/index.js";
-import { warehouseBins } from "../db/schema/warehouseBins.js";
-import { warehouseRacks } from "../db/schema/warehouseRacks.js";
-import { warehouseZones } from "../db/schema/warehouseZones.js";
+import { db } from "../../db/index.js";
+import { warehouseBins } from "../../db/schema/warehouseBins.js";
+import { warehouseRacks } from "../../db/schema/warehouseRacks.js";
+import { warehouseZones } from "../../db/schema/warehouseZones.js";
 
 export const warehouseBinService = {
   async create(binData) {

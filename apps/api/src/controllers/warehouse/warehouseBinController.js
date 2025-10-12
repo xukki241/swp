@@ -27,11 +27,11 @@ export const warehouseBinController = {
     }
 
     const bin = await warehouseBinService.create({
-      rackId: payload.rackId,
+      rackId: payload.rackId ? Number.parseInt(payload.rackId) : payload.rackId,
       code: payload.code,
       name: payload.name,
-      level: payload.level,
-      number: payload.number,
+      level: payload.level ? Number.parseInt(payload.level) : payload.level,
+      number: payload.number ? Number.parseInt(payload.number) : payload.number,
       description: payload.description,
     });
     res.status(201).json({
@@ -41,13 +41,63 @@ export const warehouseBinController = {
     });
   }),
 
+  // Create warehouse bins in batch with auto-generated codes
+  createBatch: asyncHandler(async (req, res) => {
+    const { mode, codePrefix = "BIN", namePrefix = "Bin" } = req.body;
+    const rackId = Number.parseInt(req.params.rackId);
+
+    const bins = [];
+    let binCounter = 1;
+
+    if (mode === "grid") {
+      const { levels, binsPerLevel } = req.body;
+      for (let level = 1; level <= levels; level++) {
+        for (let number = 1; number <= binsPerLevel; number++) {
+          bins.push({
+            rackId,
+            code: `${codePrefix}-${String(binCounter).padStart(3, "0")}`,
+            name: `${namePrefix} ${binCounter}`,
+            level,
+            number,
+          });
+          binCounter++;
+        }
+      }
+    } else if (mode === "list") {
+      const { binsPerLevelList } = req.body;
+      for (let level = 0; level < binsPerLevelList.length; level++) {
+        const binsInThisLevel = binsPerLevelList[level];
+        for (let number = 1; number <= binsInThisLevel; number++) {
+          bins.push({
+            rackId,
+            code: `${codePrefix}-${String(binCounter).padStart(3, "0")}`,
+            name: `${namePrefix} ${binCounter}`,
+            level: level + 1,
+            number,
+          });
+          binCounter++;
+        }
+      }
+    }
+
+    const createdBins = await warehouseBinService.create(bins);
+    res.status(201).json({
+      success: true,
+      message: `${bins.length} warehouse bins created successfully`,
+      data: createdBins,
+    });
+  }),
+
   // Get all warehouse bins
   getAll: asyncHandler(async (req, res) => {
     const filters = {
       search: req.query.search,
-      rackId: req.query.rackId ? req.query.rackId : undefined,
-      zoneId: req.query.zoneId ? req.query.zoneId : undefined,
-      level: req.query.level !== undefined ? req.query.level : undefined,
+      rackId: req.query.rackId ? Number.parseInt(req.query.rackId) : undefined,
+      zoneId: req.query.zoneId ? Number.parseInt(req.query.zoneId) : undefined,
+      level:
+        req.query.level !== undefined
+          ? Number.parseInt(req.query.level)
+          : undefined,
       limit: req.query.limit || 100,
       offset: req.query.offset || 0,
     };
@@ -77,7 +127,9 @@ export const warehouseBinController = {
 
   // Get bins by rack ID
   getByRackId: asyncHandler(async (req, res) => {
-    const bins = await warehouseBinService.getByRackId(req.params.rackId);
+    const bins = await warehouseBinService.getByRackId(
+      Number.parseInt(req.params.rackId)
+    );
     res.json({
       success: true,
       data: bins,
@@ -88,7 +140,18 @@ export const warehouseBinController = {
   update: asyncHandler(async (req, res) => {
     const updateData = { ...req.body };
 
-    const bin = await warehouseBinService.update(req.params.id, updateData);
+    // Convert numeric fields from strings to numbers if present
+    if (updateData.level !== undefined) {
+      updateData.level = Number.parseInt(updateData.level);
+    }
+    if (updateData.number !== undefined) {
+      updateData.number = Number.parseInt(updateData.number);
+    }
+
+    const bin = await warehouseBinService.update(
+      Number.parseInt(req.params.id),
+      updateData
+    );
     if (!bin) {
       return res.status(404).json({
         success: false,
@@ -120,7 +183,9 @@ export const warehouseBinController = {
 
   // Get inventory in a bin
   getInventory: asyncHandler(async (req, res) => {
-    const items = await inventoryService.getByBinId(req.params.id);
+    const items = await inventoryService.getByBinId(
+      Number.parseInt(req.params.id)
+    );
     res.json({
       success: true,
       data: items,
