@@ -1,16 +1,37 @@
-export { default as authRoutes } from "./authRoutes.js";
-export { default as inventoryRoutes } from "./inventoryRoutes.js";
-export { default as medicationRoutes } from "./medicationRoutes.js";
-export { default as medicationVariantRoutes } from "./medicationVariantRoutes.js";
-export { default as purchaseOrderItemRoutes } from "./purchaseOrderItemRoutes.js";
-export { default as purchaseOrderReceiptItemRoutes } from "./purchaseOrderReceiptItemRoutes.js";
-export { default as purchaseOrderReceiptRoutes } from "./purchaseOrderReceiptRoutes.js";
-export { default as purchaseOrderRoutes } from "./purchaseOrderRoutes.js";
-export { default as registrationRoutes } from "./registrationRoutes.js";
-export { default as supplierMedicationVariantRoutes } from "./supplierMedicationVariantRoutes.js";
-export { default as supplierRoutes } from "./supplierRoutes.js";
-export { default as userRoutes } from "./userRoutes.js";
-export { default as warehouseBinRoutes } from "./warehouseBinRoutes.js";
-export { default as warehouseRackRoutes } from "./warehouseRackRoutes.js";
-export { default as warehouseRoutes } from "./warehouseRoutes.js";
-export { default as warehouseZoneRoutes } from "./warehouseZoneRoutes.js";
+import { Router } from "express";
+
+import { authRouter } from "./authRoutes.js";
+import { customerRouter } from "./customerRoutes.js";
+import { inventoryRouter } from "./inventoryRoutes.js";
+import { medicationRouter } from "./medicationRoutes.js";
+import { medicationVariantRouter } from "./medicationVariantRoutes.js";
+import { purchaseOrderItemRouter } from "./purchaseOrderItemRoutes.js";
+import { purchaseOrderReceiptItemRouter } from "./purchaseOrderReceiptItemRoutes.js";
+import { purchaseOrderReceiptRouter } from "./purchaseOrderReceiptRoutes.js";
+import { purchaseOrderRouter } from "./purchaseOrderRoutes.js";
+import { registrationRouter } from "./registrationRoutes.js";
+import { salesOrderRouter } from "./salesOrderRoutes.js";
+import { supplierMedicationVariantRouter } from "./supplierMedicationVariantRoutes.js";
+import { supplierRouter } from "./supplierRoutes.js";
+import { userRouter } from "./userRoutes.js";
+import { warehouseRouter } from "./warehouse/index.js";
+
+export const apiRouter = Router();
+
+apiRouter.use("/auth", authRouter);
+apiRouter.use("/registrations", registrationRouter);
+apiRouter.use("/users", userRouter);
+apiRouter.use("/customers", customerRouter);
+apiRouter.use("/medications", medicationRouter);
+apiRouter.use("/medication-variants", medicationVariantRouter);
+apiRouter.use("/suppliers", supplierRouter);
+apiRouter.use("/supplier-medication-variants", supplierMedicationVariantRouter);
+apiRouter.use("/purchase-orders", purchaseOrderRouter);
+apiRouter.use("/purchase-order-items", purchaseOrderItemRouter);
+apiRouter.use("/purchase-order-receipts", purchaseOrderReceiptRouter);
+apiRouter.use("/purchase-order-receipt-items", purchaseOrderReceiptItemRouter);
+apiRouter.use("/warehouse", warehouseRouter);
+apiRouter.use("/inventory", inventoryRouter);
+apiRouter.use("/sales", salesOrderRouter);
+
+export default apiRouter;

@@ -1,16 +1,15 @@
 import { sql } from "drizzle-orm";
 import {
   varchar,
-  bigint,
   boolean,
   timestamp,
   text,
-  numeric,
+  doublePrecision,
+  uuid,
+  integer,
 } from "drizzle-orm/pg-core";
 
-export const id = bigint("id", { mode: "number" })
-  .primaryKey()
-  .generatedAlwaysAsIdentity();
+export const id = uuid("id").primaryKey().defaultRandom();
 
 export const name = (columnName = "name") =>
   varchar(columnName, { length: 100 }).notNull();
@@ -41,22 +40,20 @@ export const isActive = (columnName = "is_active") =>
   boolean(columnName).notNull().default(true);
 
 export const identityPrimaryKey = (columnName = "id") =>
-  bigint(columnName, { mode: "number" })
-    .primaryKey()
-    .primaryKey()
-    .notNull()
-    .generatedAlwaysAsIdentity();
+  uuid(columnName).primaryKey().defaultRandom();
 
-export const foreignKey = (columnName, references) =>
-  bigint(columnName, { mode: "number" }).references(references, {
-    onDelete: "cascade",
-    onUpdate: "cascade",
-  });
+export const foreignKey = (columnName, references, actions) =>
+  uuid(columnName).references(
+    () => references,
+    actions ?? {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }
+  );
 
-export const decimalColumn = (
-  columnName,
-  config = { precision: 10, scale: 2 }
-) => numeric(columnName, config);
+export const int = (columnName) => integer(columnName);
+
+export const decimalColumn = (columnName) => doublePrecision(columnName);
 
 export const basicInfo = {
   name,

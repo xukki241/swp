@@ -1,32 +1,22 @@
-import { pgTable, bigint, integer } from "drizzle-orm/pg-core";
+import { pgTable } from "drizzle-orm/pg-core";
 
-import { decimalColumn, identityPrimaryKey } from "./common.js";
+import {
+  decimalColumn,
+  identityPrimaryKey,
+  foreignKey,
+  int,
+} from "./common.js";
 import { purchaseOrders } from "./purchaseOrders.js";
 import { supplierMedicationVariants } from "./supplierMedicationVariants.js";
 
 export const purchaseOrderItems = pgTable("purchase_order_items", {
   id: identityPrimaryKey(),
-  purchaseOrderId: bigint("purchase_order_id", { mode: "number" })
-    .notNull()
-    .references(() => purchaseOrders.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  supplierMedicationVariantId: bigint("supplier_medication_variant_id", {
-    mode: "bigint",
-  })
-    .notNull()
-    .references(() => supplierMedicationVariants.id, {
-      onDelete: "restrict",
-      onUpdate: "cascade",
-    }),
-  quantity: integer("quantity").notNull(),
-  unitPrice: decimalColumn("unit_price", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  totalPrice: decimalColumn("total_price", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
+  purchaseOrderId: foreignKey("purchase_order_id", purchaseOrders.id).notNull(),
+  supplierMedicationVariantId: foreignKey(
+    "supplier_medication_variant_id",
+    supplierMedicationVariants.id
+  ).notNull(),
+  quantity: int("quantity").notNull(),
+  unitPrice: decimalColumn("unit_price").notNull(),
+  totalPrice: decimalColumn("total_price").notNull(),
 });

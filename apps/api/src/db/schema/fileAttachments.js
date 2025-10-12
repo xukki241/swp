@@ -1,20 +1,15 @@
-import { pgTable, bigint, varchar, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, varchar, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common.js";
+import { identityPrimaryKey, foreignKey, int } from "./common.js";
 import { files } from "./files.js";
 
 export const fileAttachments = pgTable(
   "file_attachments",
   {
     id: identityPrimaryKey(),
-    fileId: bigint("file_id", { mode: "number" })
-      .notNull()
-      .references(() => files.id, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
+    fileId: foreignKey("file_id", files.id).notNull(),
     entityType: varchar("entity_type", { length: 100 }).notNull(),
-    entityId: bigint("entity_id", { mode: "number" }).notNull(),
+    entityId: int("entity_id").notNull(),
   },
   (table) => [
     uniqueIndex("file_attachments_file_id_entity_type_entity_id_unique").on(

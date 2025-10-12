@@ -253,9 +253,9 @@ async function seed() {
         sku: "PAR-500-TAB",
         name: "Paracetamol 500mg Tablets",
         unit: "tablet",
-        unitFactor: "1.00",
+        unitFactor: 1.0,
         barcode: "1234567890001",
-        sellPrice: "0.50",
+        sellPrice: 0.5,
         isActive: true,
         isForSale: true,
       },
@@ -264,9 +264,9 @@ async function seed() {
         sku: "PAR-250-SYR",
         name: "Paracetamol 250mg/5ml Syrup",
         unit: "ml",
-        unitFactor: "5.00",
+        unitFactor: 5.0,
         barcode: "1234567890002",
-        sellPrice: "0.10",
+        sellPrice: 0.1,
         isActive: true,
         isForSale: true,
       },
@@ -276,9 +276,9 @@ async function seed() {
         sku: "AMX-500-CAP",
         name: "Amoxicillin 500mg Capsules",
         unit: "capsule",
-        unitFactor: "1.00",
+        unitFactor: 1.0,
         barcode: "1234567890003",
-        sellPrice: "1.25",
+        sellPrice: 1.25,
         isActive: true,
         isForSale: true,
       },
@@ -287,9 +287,9 @@ async function seed() {
         sku: "AMX-250-SUS",
         name: "Amoxicillin 250mg/5ml Suspension",
         unit: "ml",
-        unitFactor: "5.00",
+        unitFactor: 5.0,
         barcode: "1234567890004",
-        sellPrice: "0.25",
+        sellPrice: 0.25,
         isActive: true,
         isForSale: true,
       },
@@ -299,9 +299,9 @@ async function seed() {
         sku: "IBU-400-TAB",
         name: "Ibuprofen 400mg Tablets",
         unit: "tablet",
-        unitFactor: "1.00",
+        unitFactor: 1.0,
         barcode: "1234567890005",
-        sellPrice: "0.75",
+        sellPrice: 0.75,
         isActive: true,
         isForSale: true,
       },
@@ -311,9 +311,9 @@ async function seed() {
         sku: "OME-20-CAP",
         name: "Omeprazole 20mg Capsules",
         unit: "capsule",
-        unitFactor: "1.00",
+        unitFactor: 1.0,
         barcode: "1234567890006",
-        sellPrice: "1.50",
+        sellPrice: 1.5,
         isActive: true,
         isForSale: true,
       },
@@ -323,9 +323,9 @@ async function seed() {
         sku: "MOR-10-TAB",
         name: "Morphine 10mg Tablets",
         unit: "tablet",
-        unitFactor: "1.00",
+        unitFactor: 1.0,
         barcode: "1234567890007",
-        sellPrice: "5.00",
+        sellPrice: 5.0,
         isActive: true,
         isForSale: false, // Controlled substance
       },
@@ -453,7 +453,7 @@ async function seed() {
           orderDate: new Date("2024-01-15"),
           expectedDate: new Date("2024-01-29"),
           status: "received",
-          totalAmount: "2500.00",
+          totalAmount: 2500.0,
           createdBy: owner.id,
         },
         {
@@ -461,7 +461,7 @@ async function seed() {
           orderDate: new Date("2024-02-01"),
           expectedDate: new Date("2024-02-15"),
           status: "ordered",
-          totalAmount: "1800.50",
+          totalAmount: 1800.5,
           createdBy: staff1.id,
         },
         {
@@ -469,7 +469,7 @@ async function seed() {
           orderDate: new Date("2024-02-10"),
           expectedDate: new Date("2024-02-24"),
           status: "pending",
-          totalAmount: "3200.75",
+          totalAmount: 3200.75,
           createdBy: staff2.id,
         },
       ])
@@ -483,37 +483,37 @@ async function seed() {
         purchaseOrderId: po1.id,
         supplierMedicationVariantId: supplierMedicationVariantsResults[0].id,
         quantity: 1000,
-        unitPrice: "0.40",
-        totalPrice: "400.00",
+        unitPrice: 0.4,
+        totalPrice: 400.0,
       },
       {
         purchaseOrderId: po1.id,
         supplierMedicationVariantId: supplierMedicationVariantsResults[2].id,
         quantity: 500,
-        unitPrice: "1.00",
-        totalPrice: "500.00",
+        unitPrice: 1.0,
+        totalPrice: 500.0,
       },
       {
         purchaseOrderId: po1.id,
         supplierMedicationVariantId: supplierMedicationVariantsResults[4].id,
         quantity: 800,
-        unitPrice: "0.60",
-        totalPrice: "480.00",
+        unitPrice: 0.6,
+        totalPrice: 480.0,
       },
       // PO2 Items
       {
         purchaseOrderId: po2.id,
         supplierMedicationVariantId: supplierMedicationVariantsResults[1].id,
         quantity: 200,
-        unitPrice: "0.08",
-        totalPrice: "16.00",
+        unitPrice: 0.08,
+        totalPrice: 16.0,
       },
       {
         purchaseOrderId: po2.id,
         supplierMedicationVariantId: supplierMedicationVariantsResults[3].id,
         quantity: 300,
-        unitPrice: "0.20",
-        totalPrice: "60.00",
+        unitPrice: 0.2,
+        totalPrice: 60.0,
       },
     ];
 
@@ -565,7 +565,7 @@ async function seed() {
         manufactureDate: new Date("2024-01-01"),
         expiryDate: new Date("2026-01-01"),
         quantity: receiptItem.quantity.toString(),
-        quantityReserved: "0",
+        quantityReserved: 0,
       };
     });
 
@@ -579,7 +579,7 @@ async function seed() {
         {
           customerId: customer1.id,
           orderDate: new Date("2024-02-05"),
-          totalAmount: "45.50",
+          totalAmount: 45.5,
           status: "delivered",
           paymentMethod: "cash",
           salespersonId: staff1.id,
@@ -587,7 +587,7 @@ async function seed() {
         {
           customerId: customer2.id,
           orderDate: new Date("2024-02-08"),
-          totalAmount: "78.25",
+          totalAmount: 78.25,
           status: "paid",
           paymentMethod: "credit_card",
           salespersonId: staff2.id,
@@ -595,7 +595,7 @@ async function seed() {
         {
           customerId: customer3.id,
           orderDate: new Date("2024-02-12"),
-          totalAmount: "32.00",
+          totalAmount: 32.0,
           status: "pending",
           paymentMethod: "bank_transfer",
           salespersonId: staff1.id,
@@ -611,14 +611,14 @@ async function seed() {
         salesOrderId: sale1.id,
         medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
         quantity: 20,
-        unitPrice: "0.50",
-        totalPrice: "10.00",
+        unitPrice: 0.5,
+        totalPrice: 10.0,
       },
       {
         salesOrderId: sale1.id,
         medicationVariantId: medicationVariantsResults[4].id, // Ibuprofen 400mg
         quantity: 30,
-        unitPrice: "0.75",
+        unitPrice: 0.75,
         totalPrice: "22.50",
       },
       // Sale 2 items
@@ -626,23 +626,23 @@ async function seed() {
         salesOrderId: sale2.id,
         medicationVariantId: medicationVariantsResults[2].id, // Amoxicillin 500mg
         quantity: 24,
-        unitPrice: "1.25",
+        unitPrice: 1.25,
         totalPrice: "30.00",
       },
       {
         salesOrderId: sale2.id,
         medicationVariantId: medicationVariantsResults[5].id, // Omeprazole 20mg
         quantity: 14,
-        unitPrice: "1.50",
-        totalPrice: "21.00",
+        unitPrice: 1.5,
+        totalPrice: 21.0,
       },
       // Sale 3 items
       {
         salesOrderId: sale3.id,
         medicationVariantId: medicationVariantsResults[1].id, // Paracetamol Syrup
         quantity: 100, // 100ml
-        unitPrice: "0.10",
-        totalPrice: "10.00",
+        unitPrice: 0.1,
+        totalPrice: 10.0,
       },
     ]);
 
@@ -724,7 +724,7 @@ async function seed() {
         entityId: po1.id,
         changes: {
           supplierId: supplier1.id,
-          totalAmount: "2500.00",
+          totalAmount: 2500.0,
           status: "pending",
         },
       },
@@ -744,7 +744,7 @@ async function seed() {
         entityId: sale1.id,
         changes: {
           customerId: customer1.id,
-          totalAmount: "45.50",
+          totalAmount: 45.5,
           status: "pending",
         },
       },
@@ -810,61 +810,111 @@ async function seed() {
     console.log("⚙️ Seeding settings...");
     await db.insert(settings).values([
       {
-        key: "pharmacy_name",
-        value: "Central Pharmacy",
+        key: "pharmacyInfo.name",
+        name: "Pharmacy Name",
+        value: {
+          pharmacyInfo: {
+            name: "Central Pharmacy",
+          },
+        },
         description: "Name of the pharmacy business",
       },
       {
-        key: "pharmacy_address",
-        value: "123 Healthcare Boulevard, Medical District, City 12345",
+        key: "pharmacyInfo.address",
+        name: "Pharmacy Address",
+        value: {
+          pharmacyInfo: {
+            address: "123 Healthcare Boulevard, Medical District, City 12345",
+          },
+        },
         description: "Physical address of the pharmacy",
       },
       {
-        key: "pharmacy_phone",
-        value: "0123-456-7890",
+        key: "pharmacyInfo.phone",
+        name: "Pharmacy Phone",
+        value: {
+          pharmacyInfo: {
+            phone: "0123-456-7890",
+          },
+        },
         description: "Main contact phone number",
       },
       {
-        key: "pharmacy_email",
-        value: "info@centralpharmacy.com",
+        key: "pharmacyInfo.email",
+        name: "Pharmacy Email",
+        value: {
+          pharmacyInfo: {
+            email: "info@centralpharmacy.com",
+          },
+        },
         description: "Main contact email address",
       },
       {
-        key: "low_stock_threshold",
-        value: "50",
+        key: "reporting.lowStockThreshold",
+        name: "Low Stock Threshold",
+        value: {
+          reporting: {
+            lowStockThreshold: 50,
+          },
+        },
         description: "Minimum quantity threshold for low stock alerts",
       },
       {
-        key: "expiry_warning_days",
-        value: "90",
+        key: "reporting.expiryWarningDays",
+        name: "Expiry Warning Days",
+        value: {
+          reporting: {
+            expiryWarningDays: 90,
+          },
+        },
         description: "Number of days before expiry to show warnings",
       },
       {
-        key: "tax_rate",
-        value: "0.08",
+        key: "sales.taxRate",
+        name: "Tax Rate",
+        value: {
+          sales: {
+            taxRate: 0.08,
+          },
+        },
         description: "Sales tax rate (as decimal)",
       },
       {
-        key: "currency",
-        value: "USD",
+        key: "sales.currency",
+        name: "Currency",
+        value: {
+          sales: {
+            currency: "USD",
+          },
+        },
         description: "Currency code for all monetary values",
       },
       {
-        key: "business_hours",
-        value: JSON.stringify({
-          monday: "9:00-18:00",
-          tuesday: "9:00-18:00",
-          wednesday: "9:00-18:00",
-          thursday: "9:00-18:00",
-          friday: "9:00-18:00",
-          saturday: "9:00-14:00",
-          sunday: "closed",
-        }),
+        key: "sales.businessHours",
+        name: "Business Hours",
+        value: {
+          sales: {
+            businessHours: {
+              monday: "9:00-18:00",
+              tuesday: "9:00-18:00",
+              wednesday: "9:00-18:00",
+              thursday: "9:00-18:00",
+              friday: "9:00-18:00",
+              saturday: "9:00-14:00",
+              sunday: "closed",
+            },
+          },
+        },
         description: "Business operating hours",
       },
       {
-        key: "prescription_retention_days",
-        value: "30",
+        key: "sales.prescriptionRetentionDays",
+        name: "Prescription Retention Days",
+        value: {
+          sales: {
+            prescriptionRetentionDays: 30,
+          },
+        },
         description: "Number of days to retain prescription records",
       },
     ]);
