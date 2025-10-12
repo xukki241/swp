@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { authRouter } from "./authRoutes.js";
+import { customerRouter } from "./customerRoutes.js";
 import { inventoryRouter } from "./inventoryRoutes.js";
 import { medicationRouter } from "./medicationRoutes.js";
 import { medicationVariantRouter } from "./medicationVariantRoutes.js";
@@ -9,6 +10,7 @@ import { purchaseOrderReceiptItemRouter } from "./purchaseOrderReceiptItemRoutes
 import { purchaseOrderReceiptRouter } from "./purchaseOrderReceiptRoutes.js";
 import { purchaseOrderRouter } from "./purchaseOrderRoutes.js";
 import { registrationRouter } from "./registrationRoutes.js";
+import { salesOrderRouter } from "./salesOrderRoutes.js";
 import { supplierMedicationVariantRouter } from "./supplierMedicationVariantRoutes.js";
 import { supplierRouter } from "./supplierRoutes.js";
 import { userRouter } from "./userRoutes.js";
@@ -19,6 +21,7 @@ export const apiRouter = Router();
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/registrations", registrationRouter);
 apiRouter.use("/users", userRouter);
+apiRouter.use("/customers", customerRouter);
 apiRouter.use("/medications", medicationRouter);
 apiRouter.use("/medication-variants", medicationVariantRouter);
 apiRouter.use("/suppliers", supplierRouter);
@@ -29,5 +32,6 @@ apiRouter.use("/purchase-order-receipts", purchaseOrderReceiptRouter);
 apiRouter.use("/purchase-order-receipt-items", purchaseOrderReceiptItemRouter);
 apiRouter.use("/warehouse", warehouseRouter);
 apiRouter.use("/inventory", inventoryRouter);
+apiRouter.use("/sales", salesOrderRouter);
 
 export default apiRouter;
