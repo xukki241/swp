@@ -6,11 +6,11 @@ export const warehouseBinController = {
   async create(req, res) {
     try {
       const bin = await warehouseBinService.create({
-        rackId: Number.parseInt(req.body.rackId),
+        rackId: req.body.rackId,
         code: req.body.code,
         name: req.body.name,
-        level: Number.parseInt(req.body.level),
-        number: Number.parseInt(req.body.number),
+        level: req.body.level,
+        number: req.body.number,
         description: req.body.description,
       });
       res.status(201).json({
@@ -31,18 +31,11 @@ export const warehouseBinController = {
     try {
       const filters = {
         search: req.query.search,
-        rackId: req.query.rackId
-          ? Number.parseInt(req.query.rackId)
-          : undefined,
-        zoneId: req.query.zoneId
-          ? Number.parseInt(req.query.zoneId)
-          : undefined,
-        level:
-          req.query.level !== undefined
-            ? Number.parseInt(req.query.level)
-            : undefined,
-        limit: Number.parseInt(req.query.limit) || 100,
-        offset: Number.parseInt(req.query.offset) || 0,
+        rackId: req.query.rackId ? req.query.rackId : undefined,
+        zoneId: req.query.zoneId ? req.query.zoneId : undefined,
+        level: req.query.level !== undefined ? req.query.level : undefined,
+        limit: req.query.limit || 100,
+        offset: req.query.offset || 0,
       };
       const bins = await warehouseBinService.getAll(filters);
       res.json({
@@ -84,9 +77,7 @@ export const warehouseBinController = {
   // Get bins by rack ID
   async getByRackId(req, res) {
     try {
-      const bins = await warehouseBinService.getByRackId(
-        Number.parseInt(req.params.rackId)
-      );
+      const bins = await warehouseBinService.getByRackId(req.params.rackId);
       res.json({
         success: true,
         data: bins,
@@ -103,20 +94,8 @@ export const warehouseBinController = {
   async update(req, res) {
     try {
       const updateData = { ...req.body };
-      if (updateData.rackId) {
-        updateData.rackId = Number.parseInt(updateData.rackId);
-      }
-      if (updateData.level !== undefined) {
-        updateData.level = Number.parseInt(updateData.level);
-      }
-      if (updateData.number !== undefined) {
-        updateData.number = Number.parseInt(updateData.number);
-      }
 
-      const bin = await warehouseBinService.update(
-        Number.parseInt(req.params.id),
-        updateData
-      );
+      const bin = await warehouseBinService.update(req.params.id, updateData);
       if (!bin) {
         return res.status(404).json({
           success: false,
@@ -139,9 +118,7 @@ export const warehouseBinController = {
   // Delete warehouse bin
   async delete(req, res) {
     try {
-      const bin = await warehouseBinService.delete(
-        Number.parseInt(req.params.id)
-      );
+      const bin = await warehouseBinService.delete(req.params.id);
       if (!bin) {
         return res.status(404).json({
           success: false,
@@ -164,9 +141,7 @@ export const warehouseBinController = {
   // Get inventory in a bin
   async getInventory(req, res) {
     try {
-      const items = await inventoryService.getByBinId(
-        Number.parseInt(req.params.id)
-      );
+      const items = await inventoryService.getByBinId(req.params.id);
       res.json({
         success: true,
         data: items,

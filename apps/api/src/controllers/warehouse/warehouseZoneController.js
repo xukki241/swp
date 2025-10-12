@@ -33,8 +33,8 @@ export const warehouseZoneController = {
       const filters = {
         search: req.query.search,
         type: req.query.type,
-        limit: Number.parseInt(req.query.limit) || 100,
-        offset: Number.parseInt(req.query.offset) || 0,
+        limit: req.query.limit || 100,
+        offset: req.query.offset || 0,
       };
       const zones = await warehouseZoneService.getAll(filters);
       res.json({
@@ -52,9 +52,7 @@ export const warehouseZoneController = {
   // Get warehouse zone by ID
   async getById(req, res) {
     try {
-      const zone = await warehouseZoneService.getById(
-        Number.parseInt(req.params.id)
-      );
+      const zone = await warehouseZoneService.getById(req.params.id);
       if (!zone) {
         return res.status(404).json({
           success: false,
@@ -76,7 +74,7 @@ export const warehouseZoneController = {
   // Update warehouse zone
   async update(req, res) {
     try {
-      const id = Number.parseInt(req.params.id);
+      const id = req.params.id;
 
       // If code is being updated, check if new code already exists
       if (req.body.code) {
@@ -114,9 +112,7 @@ export const warehouseZoneController = {
   // Delete warehouse zone
   async delete(req, res) {
     try {
-      const zone = await warehouseZoneService.delete(
-        Number.parseInt(req.params.id)
-      );
+      const zone = await warehouseZoneService.delete(req.params.id);
       if (!zone) {
         return res.status(404).json({
           success: false,

@@ -5,7 +5,7 @@ export const warehouseRackController = {
   async create(req, res) {
     try {
       const rack = await warehouseRackService.create({
-        zoneId: Number.parseInt(req.body.zoneId),
+        zoneId: req.body.zoneId,
         code: req.body.code,
         name: req.body.name,
         description: req.body.description,
@@ -28,11 +28,9 @@ export const warehouseRackController = {
     try {
       const filters = {
         search: req.query.search,
-        zoneId: req.query.zoneId
-          ? Number.parseInt(req.query.zoneId)
-          : undefined,
-        limit: Number.parseInt(req.query.limit) || 100,
-        offset: Number.parseInt(req.query.offset) || 0,
+        zoneId: req.query.zoneId ? req.query.zoneId : undefined,
+        limit: req.query.limit || 100,
+        offset: req.query.offset || 0,
       };
       const racks = await warehouseRackService.getAll(filters);
       res.json({
@@ -50,9 +48,7 @@ export const warehouseRackController = {
   // Get warehouse rack by ID
   async getById(req, res) {
     try {
-      const rack = await warehouseRackService.getById(
-        Number.parseInt(req.params.id)
-      );
+      const rack = await warehouseRackService.getById(req.params.id);
       if (!rack) {
         return res.status(404).json({
           success: false,
@@ -74,9 +70,7 @@ export const warehouseRackController = {
   // Get racks by zone ID
   async getByZoneId(req, res) {
     try {
-      const racks = await warehouseRackService.getByZoneId(
-        Number.parseInt(req.params.zoneId)
-      );
+      const racks = await warehouseRackService.getByZoneId(req.params.zoneId);
       res.json({
         success: true,
         data: racks,
@@ -93,14 +87,8 @@ export const warehouseRackController = {
   async update(req, res) {
     try {
       const updateData = { ...req.body };
-      if (updateData.zoneId) {
-        updateData.zoneId = Number.parseInt(updateData.zoneId);
-      }
 
-      const rack = await warehouseRackService.update(
-        Number.parseInt(req.params.id),
-        updateData
-      );
+      const rack = await warehouseRackService.update(req.params.id, updateData);
       if (!rack) {
         return res.status(404).json({
           success: false,
@@ -123,9 +111,7 @@ export const warehouseRackController = {
   // Delete warehouse rack
   async delete(req, res) {
     try {
-      const rack = await warehouseRackService.delete(
-        Number.parseInt(req.params.id)
-      );
+      const rack = await warehouseRackService.delete(req.params.id);
       if (!rack) {
         return res.status(404).json({
           success: false,
