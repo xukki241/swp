@@ -1,16 +1,16 @@
-import { pgTable, varchar, text, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, varchar, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common.js";
+import { identityPrimaryKey, name, email, phone, address } from "./common.js";
 import { userRegistrationStatus } from "./enums.js";
 
 export const userRegistrations = pgTable(
   "user_registrations",
   {
     id: identityPrimaryKey(),
-    name: varchar("name", { length: 100 }).notNull(),
-    email: varchar("email", { length: 255 }).notNull(),
-    phone: varchar("phone", { length: 10 }).notNull(),
-    address: text("address").notNull(),
+    name: name(),
+    email: email().notNull(),
+    phone: phone().notNull(),
+    address: address().notNull(),
     password: varchar("password", { length: 255 }).notNull(),
     status: userRegistrationStatus("status").notNull().default("pending"),
   },

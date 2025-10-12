@@ -1,23 +1,14 @@
-import {
-  pgTable,
-  bigint,
-  varchar,
-  jsonb,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { pgTable, varchar, jsonb, uuid } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common.js";
+import { identityPrimaryKey, foreignKey, createdAt } from "./common.js";
 import { users } from "./users.js";
 
 export const auditLogs = pgTable("audit_logs", {
   id: identityPrimaryKey(),
-  userId: bigint("user_id", { mode: "number" }).references(() => users.id, {
-    onDelete: "set null",
-    onUpdate: "cascade",
-  }),
+  userId: foreignKey("user_id", users.id),
   action: varchar("action", { length: 100 }).notNull(),
   entity: varchar("entity", { length: 100 }).notNull(),
-  entityId: bigint("entity_id", { mode: "number" }),
+  entityId: uuid("entity_id"),
   changes: jsonb("changes"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: createdAt(),
 });

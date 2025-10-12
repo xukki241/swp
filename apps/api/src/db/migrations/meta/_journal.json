@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1759848955975,
-      "tag": "0000_flowery_machine_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1759848984281,
-      "tag": "0001_gray_karnak",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1759906754477,
-      "tag": "0002_flawless_ghost_rider",
+      "when": 1760276305946,
+      "tag": "0000_smart_slayback",
       "breakpoints": true
     }
   ]
