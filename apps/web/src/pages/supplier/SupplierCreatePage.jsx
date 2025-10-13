@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { toast } from "sonner"; // Add toast import
 
 export default function SupplierCreatePage() {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ export default function SupplierCreatePage() {
     name: "",
     contactName: "",
     email: "",
+    phone: "",
     address: "",
   });
   const [meds, setMeds] = useState([
@@ -74,13 +76,21 @@ export default function SupplierCreatePage() {
         }));
 
       const payload = { ...form, medicationVariants: variants };
-      console.log("Payload gửi lên:", payload); // Thêm dòng này
 
       await createSupplier.mutateAsync(payload);
+
+      toast.success("Supplier created successfully!", {
+        description: "The supplier has been added.",
+      });
       navigate("/suppliers");
     } catch (error) {
-      console.error("Lỗi khi tạo nhà cung cấp:", error);
-      alert("Tạo nhà cung cấp thất bại!");
+      toast.error("Failed to create supplier!", {
+        description:
+          error?.response?.data?.error ||
+          error?.message ||
+          "Please check your information and try again.",
+      });
+      console.error("Error creating supplier:", error);
     }
   };
 
@@ -88,17 +98,17 @@ export default function SupplierCreatePage() {
     <AppLayout>
       <Card className="max-w-3xl mx-auto">
         <CardHeader>
-          <CardTitle>Thêm Nhà Cung Cấp Mới</CardTitle>
+          <CardTitle>Add New Supplier</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
-              placeholder="Tên nhà cung cấp"
+              placeholder="Supplier Name"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
             <Input
-              placeholder="Người liên hệ"
+              placeholder="Contact Name"
               value={form.contactName}
               onChange={(e) =>
                 setForm({ ...form, contactName: e.target.value })
@@ -110,18 +120,18 @@ export default function SupplierCreatePage() {
               onChange={(e) => setForm({ ...form, email: e.target.value })}
             />
             <Input
-              placeholder="Số điện thoại"
+              placeholder="Phone Number"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />
             <Input
-              placeholder="Địa chỉ"
+              placeholder="Address"
               value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
             />
 
             <div className="space-y-2">
-              <h3 className="font-semibold">Danh sách thuốc</h3>
+              <h3 className="font-semibold">Medications List</h3>
               {meds.map((m, i) => (
                 <div key={i} className="grid grid-cols-5 gap-2 items-center">
                   <Select
@@ -130,7 +140,7 @@ export default function SupplierCreatePage() {
                   >
                     <SelectTrigger>
                       <SelectValue
-                        placeholder={m.medicationName || "Chọn thuốc"}
+                        placeholder={m.medicationName || "Select medication"}
                       />
                     </SelectTrigger>
                     <SelectContent>
@@ -143,7 +153,7 @@ export default function SupplierCreatePage() {
                   </Select>
 
                   <Input
-                    placeholder="Biến thể"
+                    placeholder="Variant"
                     value={m.variantName}
                     onChange={(e) =>
                       handleChangeMed(i, "variantName", e.target.value)
@@ -157,7 +167,7 @@ export default function SupplierCreatePage() {
                     }
                   />
                   <Input
-                    placeholder="Thời gian giao"
+                    placeholder="Lead Time (days)"
                     type="number"
                     value={m.leadTimeDays}
                     onChange={(e) =>
@@ -169,17 +179,17 @@ export default function SupplierCreatePage() {
                     variant="destructive"
                     onClick={() => handleRemoveMed(i)}
                   >
-                    Xóa
+                    Delete
                   </Button>
                 </div>
               ))}
               <Button type="button" variant="outline" onClick={handleAddMed}>
-                + Thêm thuốc
+                + Add medication
               </Button>
             </div>
 
             <Button type="submit" className="w-full">
-              Tạo mới
+              Create
             </Button>
           </form>
         </CardContent>

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useSuppliers, useDeleteSupplier } from "@/hooks/useSuppliers";
 import { AppLayout } from "@/components/layouts/app-layout";
@@ -12,39 +13,74 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { PlusCircle, Edit, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export default function SupplierListPage() {
   const navigate = useNavigate();
   const { data: suppliers = [], isLoading } = useSuppliers();
   const { mutate: deleteSupplier } = useDeleteSupplier();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+
+  const handleDelete = (id) => {
+    setSelectedId(id);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = () => {
+    deleteSupplier(selectedId, {
+      onSuccess: () => {
+        toast.success("Supplier deleted successfully!", {
+          description: "The supplier has been removed.",
+        });
+      },
+      onError: (error) => {
+        toast.error("Failed to delete supplier!", {
+          description:
+            error?.response?.data?.error ||
+            error?.message ||
+            "Please try again.",
+        });
+      },
+    });
+    setConfirmOpen(false);
+    setSelectedId(null);
+  };
 
   return (
     <AppLayout>
       <div className="space-y-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Danh sách nhà cung cấp</CardTitle>
+            <CardTitle>Supplier List</CardTitle>
             <Button
               onClick={() => navigate("/suppliers/create")}
               className="flex items-center gap-2"
             >
-              <PlusCircle className="w-4 h-4" /> Thêm mới
+              <PlusCircle className="w-4 h-4" /> Add New
             </Button>
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <p>Đang tải dữ liệu...</p>
+              <p>Loading data...</p>
             ) : suppliers.length === 0 ? (
-              <p className="text-gray-500 text-sm">Chưa có nhà cung cấp nào.</p>
+              <p className="text-gray-500 text-sm">No suppliers found.</p>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID</TableHead>
-                    <TableHead>Tên</TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Địa chỉ</TableHead>
-                    <TableHead className="text-right">Hành động</TableHead>
+                    <TableHead>Address</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -65,7 +101,7 @@ export default function SupplierListPage() {
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => deleteSupplier(s.id)}
+                          onClick={() => handleDelete(s.id)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -78,6 +114,25 @@ export default function SupplierListPage() {
           </CardContent>
         </Card>
       </div>
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Delete</DialogTitle>
+          </DialogHeader>
+          <p>
+            Are you sure you want to delete this supplier? This action cannot be
+            undone.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }

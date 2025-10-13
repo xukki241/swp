@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { toast } from "sonner"; // Add toast import
 
 export default function SupplierEditPage() {
   const { id } = useParams();
@@ -81,15 +82,13 @@ export default function SupplierEditPage() {
     e.preventDefault();
 
     try {
-      // Chuẩn hóa dữ liệu thuốc trước khi gửi
       const variants = meds.map((m) => ({
-        id: m.id || null, // giữ id nếu có để backend biết là update
+        id: m.id || null,
         medicationVariantId: Number(m.medicationId),
         supplierSku: m.supplierSku || null,
         leadTimeDays: m.leadTimeDays ? Number(m.leadTimeDays) : null,
       }));
 
-      // Loại bỏ trùng lặp medicationVariantId
       const uniqueVariants = variants.filter(
         (v, i, arr) =>
           arr.findIndex(
@@ -103,24 +102,30 @@ export default function SupplierEditPage() {
         medicationVariants: uniqueVariants,
       });
 
+      toast.success("Supplier updated successfully!", {
+        description: "The supplier information has been saved.",
+      });
       navigate(`/suppliers/${id}`);
     } catch (error) {
-      console.error("Lỗi khi cập nhật nhà cung cấp:", error);
-      alert(
-        "Cập nhật thất bại. Kiểm tra console để biết chi tiết (có thể do thuốc đã tồn tại)."
-      );
+      toast.error("Failed to update supplier!", {
+        description:
+          error?.response?.data?.error ||
+          error?.message ||
+          "Please check your information and try again.",
+      });
+      console.error("Error updating supplier:", error);
     }
   };
   return (
     <AppLayout>
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle>Chỉnh Sửa Nhà Cung Cấp</CardTitle>
+          <CardTitle>Edit Supplier</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
-              placeholder="Tên"
+              placeholder="Supplier Name"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
@@ -130,13 +135,13 @@ export default function SupplierEditPage() {
               onChange={(e) => setForm({ ...form, email: e.target.value })}
             />
             <Input
-              placeholder="Địa chỉ"
+              placeholder="Address"
               value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
             />
 
             <div className="space-y-2">
-              <h3 className="font-semibold">Danh sách thuốc</h3>
+              <h3 className="font-semibold">Medications List</h3>
               {meds.map((m, i) => (
                 <div key={i} className="grid grid-cols-5 gap-2 items-center">
                   <Select
@@ -145,7 +150,7 @@ export default function SupplierEditPage() {
                   >
                     <SelectTrigger>
                       <SelectValue
-                        placeholder={m.medicationName || "Chọn thuốc"}
+                        placeholder={m.medicationName || "Select medication"}
                       />
                     </SelectTrigger>
                     <SelectContent>
@@ -158,7 +163,7 @@ export default function SupplierEditPage() {
                   </Select>
 
                   <Input
-                    placeholder="Biến thể"
+                    placeholder="Variant"
                     value={m.variantName}
                     onChange={(e) =>
                       handleChangeMed(i, "variantName", e.target.value)
@@ -172,7 +177,7 @@ export default function SupplierEditPage() {
                     }
                   />
                   <Input
-                    placeholder="Thời gian giao (ngày)"
+                    placeholder="Lead Time (days)"
                     type="number"
                     value={m.leadTimeDays}
                     onChange={(e) =>
@@ -184,17 +189,17 @@ export default function SupplierEditPage() {
                     variant="destructive"
                     onClick={() => handleRemoveMed(i)}
                   >
-                    Xóa
+                    Delete
                   </Button>
                 </div>
               ))}
               <Button type="button" variant="outline" onClick={handleAddMed}>
-                + Thêm thuốc
+                + Add medication
               </Button>
             </div>
 
             <Button type="submit" className="w-full">
-              Lưu thay đổi
+              Save changes
             </Button>
           </form>
         </CardContent>
