@@ -5,6 +5,7 @@ import app from "./app.js";
 import config from "./config/environment.js";
 import { closeConnection, testConnection } from "./db/connection.js";
 import logger from "./utils/logger.js";
+import { initializeScheduler } from "./utils/scheduler.js";
 
 const PORT = config.port;
 
@@ -22,6 +23,9 @@ async function startServer() {
   }
 
   await testConnection();
+
+  // Initialize scheduled report jobs
+  initializeScheduler();
 
   logger.info("Application started successfully");
 }

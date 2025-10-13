@@ -210,3 +210,63 @@ export const getMedicationInventory = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Get suppliers for a medication
+ * @route GET /api/medications/:id/suppliers
+ */
+export const getMedicationSuppliers = async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id);
+    const suppliers = await medicationService.getMedicationSuppliers(id);
+
+    res.status(200).json({
+      success: true,
+      count: suppliers.length,
+      data: suppliers,
+    });
+  } catch (error) {
+    logger.error("Error in getMedicationSuppliers controller:", error);
+    next(error);
+  }
+};
+
+/**
+ * Get purchase orders for a medication
+ * @route GET /api/medications/:id/purchases
+ */
+export const getMedicationPurchases = async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id);
+    const purchases = await medicationService.getMedicationPurchases(id);
+
+    res.status(200).json({
+      success: true,
+      count: purchases.length,
+      data: purchases,
+    });
+  } catch (error) {
+    logger.error("Error in getMedicationPurchases controller:", error);
+    next(error);
+  }
+};
+
+/**
+ * Get sales orders for a medication
+ * @route GET /api/medications/:id/sales
+ */
+export const getMedicationSales = async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id);
+    const sales = await medicationService.getMedicationSales(id);
+
+    res.status(200).json({
+      success: true,
+      count: sales.length,
+      data: sales,
+    });
+  } catch (error) {
+    logger.error("Error in getMedicationSales controller:", error);
+    next(error);
+  }
+};

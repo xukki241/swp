@@ -1,7 +1,16 @@
 import { eq, ilike, or, and } from "drizzle-orm";
 
 import { db } from "../db/index.js";
-import { medications, medicationVariants } from "../db/schema/index.js";
+import {
+  medications,
+  medicationVariants,
+  supplierMedicationVariants,
+  suppliers,
+  purchaseOrders,
+  purchaseOrderItems,
+  salesOrders,
+  salesOrderItems,
+} from "../db/schema/index.js";
 
 /**
  * Get all medications with optional search and filters
@@ -190,5 +199,126 @@ export const deleteMedication = async (id) => {
     return result[0] || null;
   } catch (error) {
     throw new Error(`Failed to delete medication: ${error.message}`);
+  }
+};
+
+/**
+ * Get all suppliers for a medication
+ * @param {number} medicationId - Medication ID
+ * @returns {Promise<Array>} List of suppliers
+ */
+export const getMedicationSuppliers = async (medicationId) => {
+  try {
+    const result = await db
+      .selectDistinct({
+        id: suppliers.id,
+        name: suppliers.name,
+        contactName: suppliers.contactName,
+        email: suppliers.email,
+        phone: suppliers.phone,
+        address: suppliers.address,
+        status: suppliers.status,
+      })
+      .from(suppliers)
+      .innerJoin(
+        supplierMedicationVariants,
+        eq(suppliers.id, supplierMedicationVariants.supplierId)
+      )
+      .innerJoin(
+        medicationVariants,
+        eq(
+          supplierMedicationVariants.medicationVariantId,
+          medicationVariants.id
+        )
+      )
+      .where(eq(medicationVariants.medicationId, medicationId));
+
+    return result;
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch suppliers for medication: ${error.message}`
+    );
+  }
+};
+
+/**
+ * Get all purchase orders containing a medication
+ * @param {number} medicationId - Medication ID
+ * @returns {Promise<Array>} List of purchase orders
+ */
+export const getMedicationPurchases = async (medicationId) => {
+  try {
+    const result = await db
+      .selectDistinct({
+        id: purchaseOrders.id,
+        supplierId: purchaseOrders.supplierId,
+        orderDate: purchaseOrders.orderDate,
+        expectedDate: purchaseOrders.expectedDate,
+        status: purchaseOrders.status,
+        totalAmount: purchaseOrders.totalAmount,
+        supplierName: suppliers.name,
+      })
+      .from(purchaseOrders)
+      .innerJoin(
+        purchaseOrderItems,
+        eq(purchaseOrders.id, purchaseOrderItems.purchaseOrderId)
+      )
+      .innerJoin(
+        supplierMedicationVariants,
+        eq(
+          purchaseOrderItems.supplierMedicationVariantId,
+          supplierMedicationVariants.id
+        )
+      )
+      .innerJoin(
+        medicationVariants,
+        eq(
+          supplierMedicationVariants.medicationVariantId,
+          medicationVariants.id
+        )
+      )
+      .leftJoin(suppliers, eq(purchaseOrders.supplierId, suppliers.id))
+      .where(eq(medicationVariants.medicationId, medicationId));
+
+    return result;
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch purchase orders for medication: ${error.message}`
+    );
+  }
+};
+
+/**
+ * Get all sales orders containing a medication
+ * @param {number} medicationId - Medication ID
+ * @returns {Promise<Array>} List of sales orders
+ */
+export const getMedicationSales = async (medicationId) => {
+  try {
+    const result = await db
+      .selectDistinct({
+        id: salesOrders.id,
+        customerId: salesOrders.customerId,
+        orderDate: salesOrders.orderDate,
+        totalAmount: salesOrders.totalAmount,
+        status: salesOrders.status,
+        paymentMethod: salesOrders.paymentMethod,
+      })
+      .from(salesOrders)
+      .innerJoin(
+        salesOrderItems,
+        eq(salesOrders.id, salesOrderItems.salesOrderId)
+      )
+      .innerJoin(
+        medicationVariants,
+        eq(salesOrderItems.medicationVariantId, medicationVariants.id)
+      )
+      .where(eq(medicationVariants.medicationId, medicationId));
+
+    return result;
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch sales orders for medication: ${error.message}`
+    );
   }
 };
