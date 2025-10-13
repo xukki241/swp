@@ -1,30 +1,25 @@
-import {
-  pgTable,
-  bigint,
-  varchar,
-  integer,
-  text,
-  uniqueIndex,
-} from "drizzle-orm/pg-core";
+import { pgTable, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common.js";
+import {
+  identityPrimaryKey,
+  foreignKey,
+  code,
+  name,
+  description,
+  int,
+} from "./common.js";
 import { warehouseRacks } from "./warehouseRacks.js";
 
 export const warehouseBins = pgTable(
   "warehouse_bins",
   {
     id: identityPrimaryKey(),
-    rackId: bigint("rack_id", { mode: "number" })
-      .notNull()
-      .references(() => warehouseRacks.id, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
-    code: varchar("code", { length: 50 }).notNull(),
-    name: varchar("name", { length: 100 }).notNull(),
-    level: integer("level").notNull(),
-    number: integer("number").notNull(),
-    description: text("description"),
+    rackId: foreignKey("rack_id", warehouseRacks.id).notNull(),
+    code: code(),
+    name: name(),
+    level: int("level").notNull(),
+    number: int("number").notNull(),
+    description: description(),
   },
   (table) => [
     uniqueIndex("warehouse_bins_rack_id_code_unique").on(

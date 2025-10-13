@@ -1,5 +1,5 @@
+import { inventoryService } from "../services/inventoryService.js";
 import * as medicationVariantService from "../services/medicationVariantService.js";
-import { convertBigIntIds } from "../utils/bigint.js";
 import logger from "../utils/logger.js";
 /**
  * Get all medication variants
@@ -226,6 +226,26 @@ export const deleteMedicationVariant = async (req, res, next) => {
     });
   } catch (error) {
     logger.error("Error in deleteMedicationVariant controller:", error);
+    next(error);
+  }
+};
+
+/**
+ * Get inventory for a medication variant
+ * @route GET /api/medication-variants/:id/inventory
+ */
+export const getMedicationVariantInventory = async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id);
+    const items = await inventoryService.getByMedicationVariantId(id);
+
+    res.status(200).json({
+      success: true,
+      count: items.length,
+      data: items,
+    });
+  } catch (error) {
+    logger.error("Error in getMedicationVariantInventory controller:", error);
     next(error);
   }
 };

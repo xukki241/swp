@@ -3,7 +3,7 @@ import express from "express";
 import * as registrationController from "../controllers/registrationController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
-const router = express.Router();
+export const registrationRouter = express.Router();
 
 // All registration routes require authentication and owner role
 
@@ -13,7 +13,7 @@ const router = express.Router();
  * @access  Private (Owner)
  * @query   status - Filter by status (pending, approved, rejected)
  */
-router.get(
+registrationRouter.get(
   "/",
   authenticate,
   authorize("owner"),
@@ -25,7 +25,7 @@ router.get(
  * @desc    Get registration by ID (owner only)
  * @access  Private (Owner)
  */
-router.get(
+registrationRouter.get(
   "/:id",
   authenticate,
   authorize("owner"),
@@ -38,7 +38,7 @@ router.get(
  * @access  Private (Owner)
  * @body    { password, role? }
  */
-router.post(
+registrationRouter.post(
   "/:id/approve",
   authenticate,
   authorize("owner"),
@@ -50,7 +50,7 @@ router.post(
  * @desc    Reject registration request (owner only)
  * @access  Private (Owner)
  */
-router.post(
+registrationRouter.post(
   "/:id/reject",
   authenticate,
   authorize("owner"),
@@ -62,11 +62,11 @@ router.post(
  * @desc    Delete registration request (owner only)
  * @access  Private (Owner)
  */
-router.delete(
+registrationRouter.delete(
   "/:id",
   authenticate,
   authorize("owner"),
   registrationController.deleteRegistration
 );
 
-export default router;
+export default registrationRouter;

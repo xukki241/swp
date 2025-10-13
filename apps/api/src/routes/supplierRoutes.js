@@ -1,88 +1,92 @@
+import {
+  createSuppliersRequestSchema,
+  listSuppliersQuerySchema,
+  updateSupplierRequestSchema,
+  uuidSchema,
+} from "@pharmaflow/dto";
+import {
+  validateBody,
+  validateParams,
+  validateQuery,
+} from "@pharmaflow/dto/middleware";
 import express from "express";
+import { z } from "zod";
 
 import { supplierController } from "../controllers/supplierController.js";
-import { supplierMedicationVariantController } from "../controllers/supplierMedicationVariantController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
-const router = express.Router();
+import { supplierMedicationVariantRouter } from "./supplierMedicationVariantRoutes.js";
 
-/* -------------------- SUPPLIERS -------------------- */
+export const supplierRouter = express.Router();
 
-// Require authentication for all
-router.use(authenticate);
+// Mount nested medication routes (before authentication to handle params properly)
+supplierRouter.use("/:supplierId/medications", supplierMedicationVariantRouter);
 
-// Get all suppliers (Owner + Staff)
-router.get("/", supplierController.getAll);
+// All routes require authentication
+supplierRouter.use(authenticate);
 
-// Get supplier by ID
-router.get("/:id", supplierController.getById);
+// Param validation schema for routes with :id
+const idParamSchema = z.object({
+  id: uuidSchema,
+});
 
-// Create new supplier (Owner only)
-router.post("/", authorize("owner"), supplierController.create);
-
-// Update supplier (Owner only)
-router.put("/:id", authorize("owner"), supplierController.update);
-
-// Delete supplier (Owner only)
-router.delete("/:id", authorize("owner"), supplierController.delete);
-
-/* -------------------- SUPPLIER MEDICATION VARIANTS (Nested) -------------------- */
 /**
- * @route   GET /api/suppliers/:supplierId/medications
- * @desc    Get all medications provided by this supplier
+ * @route   GET /api/suppliers
+ * @desc    Get all suppliers
+ * @access  Private (Authenticated)
  */
-router.get(
-  "/:supplierId/medications",
-  (req, res, next) => {
-    req.query.supplierId = req.params.supplierId;
-    next();
-  },
-  supplierMedicationVariantController.getAll
+supplierRouter.get(
+  "/",
+  validateQuery(listSuppliersQuerySchema),
+  supplierController.getAll
 );
 
 /**
- * @route   POST /api/suppliers/:supplierId/medications
- * @desc    Bulk add medications that this supplier provides
+ * @route   GET /api/suppliers/:id
+ * @desc    Get supplier by ID
+ * @access  Private (Authenticated)
  */
-router.post(
-  "/:supplierId/medications",
+supplierRouter.get(
+  "/:id",
+  validateParams(idParamSchema),
+  supplierController.getById
+);
+
+/**
+ * @route   POST /api/suppliers
+ * @desc    Create suppliers (batch)
+ * @access  Private (Owner only)
+ */
+supplierRouter.post(
+  "/",
   authorize("owner"),
-  (req, res, next) => {
-    req.body = Array.isArray(req.body) ? req.body : [req.body];
-    req.body.forEach((item) => {
-      item.supplierId = req.params.supplierId;
-    });
-    next();
-  },
-  supplierMedicationVariantController.bulkCreate
+  validateBody(createSuppliersRequestSchema),
+  supplierController.create
 );
 
 /**
- * @route   PATCH /api/suppliers/:supplierId/medications/:id
- * @desc    Update supplier medication info (SKU, lead time)
+ * @route   PATCH /api/suppliers/:id
+ * @desc    Update supplier by ID
+ * @access  Private (Owner only)
  */
-router.patch(
-  "/:supplierId/medications/:id",
+supplierRouter.patch(
+  "/:id",
   authorize("owner"),
-  (req, res, next) => {
-    req.params.variantId = req.params.id;
-    next();
-  },
-  supplierMedicationVariantController.update
+  validateParams(idParamSchema),
+  validateBody(updateSupplierRequestSchema),
+  supplierController.update
 );
 
 /**
- * @route   DELETE /api/suppliers/:supplierId/medications/:id
- * @desc    Remove medication link from supplier
+ * @route   DELETE /api/suppliers/:id
+ * @desc    Delete supplier by ID
+ * @access  Private (Owner only)
  */
-router.delete(
-  "/:supplierId/medications/:id",
+supplierRouter.delete(
+  "/:id",
   authorize("owner"),
-  (req, res, next) => {
-    req.params.variantId = req.params.id;
-    next();
-  },
-  supplierMedicationVariantController.delete
+  validateParams(idParamSchema),
+  supplierController.delete
 );
 
-export default router;
+export default supplierRouter;

@@ -1,13 +1,13 @@
-import { pgTable, varchar, text, boolean } from "drizzle-orm/pg-core";
+import { pgTable, varchar, boolean } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common.js";
+import { identityPrimaryKey, name, description } from "./common.js";
 import { medicationStatus } from "./enums.js";
 
 export const medications = pgTable("medications", {
   id: identityPrimaryKey(),
-  name: varchar("name", { length: 100 }).notNull(),
+  name: name(),
   brand: varchar("brand", { length: 100 }),
-  description: text("description"),
+  description: description(),
   isPrescriptionRequired: boolean("is_prescription_required")
     .notNull()
     .default(false),

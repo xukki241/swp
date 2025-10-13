@@ -1,107 +1,98 @@
+import {
+  createPurchaseOrdersRequestSchema,
+  listPurchaseOrdersQuerySchema,
+  updatePurchaseOrderRequestSchema,
+  uuidSchema,
+} from "@pharmaflow/dto";
+import {
+  validateBody,
+  validateParams,
+  validateQuery,
+} from "@pharmaflow/dto/middleware";
 import express from "express";
+import { z } from "zod";
 
 import { purchaseOrderController } from "../controllers/purchaseOrderController.js";
-import { purchaseOrderItemController } from "../controllers/purchaseOrderItemController.js";
-import { purchaseOrderReceiptController } from "../controllers/purchaseOrderReceiptController.js";
-import { purchaseOrderReceiptItemController } from "../controllers/purchaseOrderReceiptItemController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
-const router = express.Router();
+import {
+  nestedReceiptRouter,
+  standaloneReceiptRouter,
+} from "./purchaseOrderReceiptRoutes.js";
+
+export const purchaseOrderRouter = express.Router();
+
+// Mount nested receipt routes (before authentication to handle params properly)
+purchaseOrderRouter.use("/:purchaseOrderId/receipts", nestedReceiptRouter);
+
+// Mount standalone receipt routes (for accessing receipts without purchaseOrderId)
+purchaseOrderRouter.use("/receipts", standaloneReceiptRouter);
 
 // All routes require authentication
-router.use(authenticate);
+purchaseOrderRouter.use(authenticate);
 
-//
-// ========= PURCHASE ORDER =========
-//
-router.get("/", purchaseOrderController.getAll);
-router.get("/:id", purchaseOrderController.getById);
-router.post("/", authorize("owner"), purchaseOrderController.create);
-router.put("/:id", authorize("owner"), purchaseOrderController.update);
-router.delete("/:id", authorize("owner"), purchaseOrderController.delete);
+// Param validation schema for routes with :id
+const idParamSchema = z.object({
+  id: uuidSchema,
+});
 
-//
-// ========= PURCHASE ORDER ITEMS (nested) =========
-// /api/purchase-orders/:purchaseOrderId/items
-//
-router.get(
-  "/:purchaseOrderId/items",
-  purchaseOrderItemController.getAllByPurchaseOrder
-);
-router.get(
-  "/:purchaseOrderId/items/:itemId",
-  purchaseOrderItemController.getById
-);
-router.post(
-  "/:purchaseOrderId/items",
-  authorize("owner"),
-  purchaseOrderItemController.create
-);
-router.put(
-  "/:purchaseOrderId/items/:itemId",
-  authorize("owner"),
-  purchaseOrderItemController.update
-);
-router.delete(
-  "/:purchaseOrderId/items/:itemId",
-  authorize("owner"),
-  purchaseOrderItemController.delete
+/**
+ * @route   GET /api/purchases
+ * @desc    Get all purchase orders
+ * @access  Private (Authenticated)
+ */
+purchaseOrderRouter.get(
+  "/",
+  validateQuery(listPurchaseOrdersQuerySchema),
+  purchaseOrderController.getAll
 );
 
-//
-// ========= PURCHASE ORDER RECEIPTS (nested) =========
-// /api/purchase-orders/:purchaseOrderId/receipts
-//
-router.get(
-  "/:purchaseOrderId/receipts",
-  purchaseOrderReceiptController.getAllByPurchaseOrder
-);
-router.get(
-  "/:purchaseOrderId/receipts/:receiptId",
-  purchaseOrderReceiptController.getById
-);
-router.post(
-  "/:purchaseOrderId/receipts",
-  authorize("owner"),
-  purchaseOrderReceiptController.create
-);
-router.put(
-  "/:purchaseOrderId/receipts/:receiptId",
-  authorize("owner"),
-  purchaseOrderReceiptController.update
-);
-router.delete(
-  "/:purchaseOrderId/receipts/:receiptId",
-  authorize("owner"),
-  purchaseOrderReceiptController.delete
+/**
+ * @route   GET /api/purchases/:id
+ * @desc    Get purchase order by ID
+ * @access  Private (Authenticated)
+ */
+purchaseOrderRouter.get(
+  "/:id",
+  validateParams(idParamSchema),
+  purchaseOrderController.getById
 );
 
-//
-// ========= RECEIPT ITEMS (nested under receipts) =========
-// /api/purchase-orders/:purchaseOrderId/receipts/:receiptId/items
-//
-router.get(
-  "/:purchaseOrderId/receipts/:receiptId/items",
-  purchaseOrderReceiptItemController.getAllByReceipt
-);
-router.get(
-  "/:purchaseOrderId/receipts/:receiptId/items/:itemId",
-  purchaseOrderReceiptItemController.getById
-);
-router.post(
-  "/:purchaseOrderId/receipts/:receiptId/items",
+/**
+ * @route   POST /api/purchases
+ * @desc    Create purchase orders (batch)
+ * @access  Private (Owner only)
+ */
+purchaseOrderRouter.post(
+  "/",
   authorize("owner"),
-  purchaseOrderReceiptItemController.create
-);
-router.put(
-  "/:purchaseOrderId/receipts/:receiptId/items/:itemId",
-  authorize("owner"),
-  purchaseOrderReceiptItemController.update
-);
-router.delete(
-  "/:purchaseOrderId/receipts/:receiptId/items/:itemId",
-  authorize("owner"),
-  purchaseOrderReceiptItemController.delete
+  validateBody(createPurchaseOrdersRequestSchema),
+  purchaseOrderController.create
 );
 
-export default router;
+/**
+ * @route   PATCH /api/purchases/:id
+ * @desc    Update purchase order by ID
+ * @access  Private (Owner only)
+ */
+purchaseOrderRouter.patch(
+  "/:id",
+  authorize("owner"),
+  validateParams(idParamSchema),
+  validateBody(updatePurchaseOrderRequestSchema),
+  purchaseOrderController.update
+);
+
+/**
+ * @route   DELETE /api/purchases/:id
+ * @desc    Delete purchase order by ID
+ * @access  Private (Owner only)
+ */
+purchaseOrderRouter.delete(
+  "/:id",
+  authorize("owner"),
+  validateParams(idParamSchema),
+  purchaseOrderController.delete
+);
+
+export default purchaseOrderRouter;

@@ -1,12 +1,6 @@
-import {
-  pgTable,
-  bigint,
-  varchar,
-  integer,
-  uniqueIndex,
-} from "drizzle-orm/pg-core";
+import { pgTable, varchar, integer, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey } from "./common.js";
+import { identityPrimaryKey, foreignKey } from "./common.js";
 import { medicationVariants } from "./medicationVariants.js";
 import { suppliers } from "./suppliers.js";
 
@@ -14,18 +8,11 @@ export const supplierMedicationVariants = pgTable(
   "supplier_medication_variants",
   {
     id: identityPrimaryKey(),
-    supplierId: bigint("supplier_id", { mode: "number" })
-      .notNull()
-      .references(() => suppliers.id, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
-    medicationVariantId: bigint("medication_variant_id", { mode: "number" })
-      .notNull()
-      .references(() => medicationVariants.id, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
+    supplierId: foreignKey("supplier_id", suppliers.id).notNull(),
+    medicationVariantId: foreignKey(
+      "medication_variant_id",
+      medicationVariants.id
+    ).notNull(),
     supplierSku: varchar("supplier_sku", { length: 50 }),
     leadTimeDays: integer("lead_time_days"),
   },

@@ -1,23 +1,92 @@
+import {
+  createReceiptRequestSchema,
+  listReceiptsQuerySchema,
+  uuidSchema,
+} from "@pharmaflow/dto";
+import {
+  validateBody,
+  validateParams,
+  validateQuery,
+} from "@pharmaflow/dto/middleware";
 import express from "express";
+import { z } from "zod";
 
 import { purchaseOrderReceiptController } from "../controllers/purchaseOrderReceiptController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
-const router = express.Router();
+
+// Nested router for /api/purchases/:purchaseOrderId/receipts
+export const nestedReceiptRouter = express.Router({ mergeParams: true });
+
+// Standalone router for /api/purchases/receipts
+export const standaloneReceiptRouter = express.Router();
 
 // All routes require authentication
-router.use(authenticate);
+nestedReceiptRouter.use(authenticate);
+standaloneReceiptRouter.use(authenticate);
 
-// GET routes - accessible by both Owner and Staff
-router.get("/", purchaseOrderReceiptController.getAll);
-router.get("/:id", purchaseOrderReceiptController.getById);
+// Param validation schemas
+const idParamSchema = z.object({
+  id: uuidSchema,
+});
 
-// CUD routes - only accessible by Owner
-router.post("/", authorize("owner"), purchaseOrderReceiptController.create);
-router.put("/:id", authorize("owner"), purchaseOrderReceiptController.update);
-router.delete(
-  "/:id",
-  authorize("owner"),
-  purchaseOrderReceiptController.delete
+const purchaseOrderIdParamSchema = z.object({
+  purchaseOrderId: uuidSchema,
+});
+
+const purchaseOrderIdAndIdParamSchema = z.object({
+  purchaseOrderId: uuidSchema,
+  id: uuidSchema,
+});
+
+// ========== Nested Routes (under /api/purchases/:purchaseOrderId/receipts) ==========
+
+/**
+ * @route   GET /api/purchases/:purchaseOrderId/receipts
+ * @desc    Get all receipts for a purchase order
+ * @access  Private (Authenticated)
+ */
+nestedReceiptRouter.get(
+  "/",
+  validateParams(purchaseOrderIdParamSchema),
+  validateQuery(listReceiptsQuerySchema),
+  purchaseOrderReceiptController.getAllByPurchaseOrder
 );
 
-export default router;
+/**
+ * @route   GET /api/purchases/:purchaseOrderId/receipts/:id
+ * @desc    Get receipt by ID with items
+ * @access  Private (Authenticated)
+ */
+nestedReceiptRouter.get(
+  "/:id",
+  validateParams(purchaseOrderIdAndIdParamSchema),
+  purchaseOrderReceiptController.getById
+);
+
+/**
+ * @route   POST /api/purchases/:purchaseOrderId/receipts
+ * @desc    Create a receipt for a purchase order
+ * @access  Private (Owner only)
+ */
+nestedReceiptRouter.post(
+  "/",
+  authorize("owner"),
+  validateParams(purchaseOrderIdParamSchema),
+  validateBody(createReceiptRequestSchema),
+  purchaseOrderReceiptController.create
+);
+
+// ========== Standalone Routes (under /api/purchases/receipts) ==========
+
+/**
+ * @route   GET /api/purchases/receipts/:id
+ * @desc    Get receipt by ID (without requiring purchaseOrderId)
+ * @access  Private (Authenticated)
+ */
+standaloneReceiptRouter.get(
+  "/:id",
+  validateParams(idParamSchema),
+  purchaseOrderReceiptController.getById
+);
+
+export default nestedReceiptRouter;
