@@ -20,7 +20,12 @@ export default function SupplierCreatePage() {
   const { data: allMedicationsData } = useMedications();
   const allMedications = allMedicationsData?.data || [];
 
-  const [form, setForm] = useState({ name: "", email: "", address: "" });
+  const [form, setForm] = useState({
+    name: "",
+    contactName: "",
+    email: "",
+    address: "",
+  });
   const [meds, setMeds] = useState([
     {
       medicationId: "",
@@ -68,7 +73,10 @@ export default function SupplierCreatePage() {
           leadTimeDays: m.leadTimeDays ? Number(m.leadTimeDays) : null,
         }));
 
-      await createSupplier({ ...form, medicationVariants: variants });
+      const payload = { ...form, medicationVariants: variants };
+      console.log("Payload gửi lên:", payload); // Thêm dòng này
+
+      await createSupplier.mutateAsync(payload);
       navigate("/suppliers");
     } catch (error) {
       console.error("Lỗi khi tạo nhà cung cấp:", error);
@@ -90,9 +98,21 @@ export default function SupplierCreatePage() {
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
             <Input
+              placeholder="Người liên hệ"
+              value={form.contactName}
+              onChange={(e) =>
+                setForm({ ...form, contactName: e.target.value })
+              }
+            />
+            <Input
               placeholder="Email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+            <Input
+              placeholder="Số điện thoại"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />
             <Input
               placeholder="Địa chỉ"
