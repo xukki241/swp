@@ -146,7 +146,7 @@ export const supplierService = {
       const { medicationVariants: variants, ...supplierInfo } = supplierData;
 
       return await db.transaction(async (tx) => {
-        // Cập nhật thông tin nhà cung cấp
+        // ✅ 1. Cập nhật thông tin nhà cung cấp
         const [supplier] = await tx
           .update(suppliers)
           .set(supplierInfo)
@@ -157,29 +157,65 @@ export const supplierService = {
           return null;
         }
 
-        // Nếu các biến thể thuốc được cung cấp, hãy thay thế tất cả các biến thể hiện có
-        if (variants && Array.isArray(variants)) {
-          // Xóa các biến thể hiện có
-          await tx
-            .delete(supplierMedicationVariants)
+        // ✅ 2. Nếu có danh sách thuốc kèm theo, thực hiện logic UPSERT
+        if (Array.isArray(variants)) {
+          // Lấy danh sách thuốc hiện có của nhà cung cấp này
+          const existingVariants = await tx
+            .select()
+            .from(supplierMedicationVariants)
             .where(eq(supplierMedicationVariants.supplierId, id));
 
-          // Chèn các biến thể mới nếu có
-          if (variants.length > 0) {
-            const variantsToInsert = variants.map((variant) => ({
-              supplierId: id,
-              medicationVariantId: variant.medicationVariantId,
-              supplierSku: variant.supplierSku,
-              leadTimeDays: variant.leadTimeDays,
-            }));
+          const incomingMedicationVariantIds = new Set(
+            variants.map((v) => v.medicationVariantId)
+          );
 
-            await tx
-              .insert(supplierMedicationVariants)
-              .values(variantsToInsert);
+          // === PHẦN LOGIC ĐƯỢC THAY ĐỔI ===
+          // Vòng lặp qua danh sách thuốc gửi lên từ frontend
+          for (const variant of variants) {
+            // Tìm xem thuốc này đã tồn tại trong DB cho nhà cung cấp này chưa
+            const existing = existingVariants.find(
+              (ev) => ev.medicationVariantId === variant.medicationVariantId
+            );
+
+            if (existing) {
+              // Nếu ĐÃ TỒN TẠI -> Cập nhật thông tin (SKU, thời gian giao hàng)
+              await tx
+                .update(supplierMedicationVariants)
+                .set({
+                  supplierSku: variant.supplierSku,
+                  leadTimeDays: variant.leadTimeDays,
+                })
+                .where(eq(supplierMedicationVariants.id, existing.id));
+            } else {
+              // Nếu CHƯA TỒN TẠI -> Thêm mới bản ghi liên kết
+              await tx.insert(supplierMedicationVariants).values({
+                supplierId: id,
+                medicationVariantId: variant.medicationVariantId,
+                supplierSku: variant.supplierSku,
+                leadTimeDays: variant.leadTimeDays,
+              });
+            }
+          }
+          // === KẾT THÚC PHẦN THAY ĐỔI ===
+
+          // 🔻 Xóa những variant không còn trong danh sách mới
+          for (const old of existingVariants) {
+            if (!incomingMedicationVariantIds.has(old.medicationVariantId)) {
+              // Giữ lại logic xóa cũ của bạn vì nó đã xử lý trường hợp thuốc đang được sử dụng
+              try {
+                await tx
+                  .delete(supplierMedicationVariants)
+                  .where(eq(supplierMedicationVariants.id, old.id));
+              } catch (e) {
+                console.warn(
+                  `⚠️ Variant ${old.id} đang được sử dụng và không thể xóa. Lỗi: ${e.message}`
+                );
+              }
+            }
           }
         }
 
-        // Trả lại nhà cung cấp đã cập nhật với các biến thể thuốc
+        // ✅ 3. Trả lại supplier đã cập nhật (giữ nguyên)
         const [updatedSupplier] = await tx
           .select()
           .from(suppliers)

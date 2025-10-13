@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 
 export default function SupplierDetailPage() {
   const { id } = useParams();
@@ -25,13 +25,21 @@ export default function SupplierDetailPage() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <Button
-          variant="outline"
-          className="flex items-center gap-2"
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft className="w-4 h-4" /> Quay lại
-        </Button>
+        <div className="flex justify-between items-center">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft className="w-4 h-4" /> Quay lại
+          </Button>
+          <Button
+            className="flex items-center gap-2"
+            onClick={() => navigate(`/suppliers/${id}/edit`)}
+          >
+            <Pencil className="w-4 h-4" /> Chỉnh sửa
+          </Button>
+        </div>
 
         <Card>
           <CardHeader>
@@ -58,14 +66,11 @@ export default function SupplierDetailPage() {
             {isLoadingMedications ? (
               <p>Đang tải danh sách thuốc...</p>
             ) : medications.length === 0 ? (
-              <p className="text-gray-500 text-sm">
-                Nhà cung cấp này chưa có thuốc nào.
-              </p>
+              <p className="text-gray-500 text-sm">Chưa có thuốc nào.</p>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>ID</TableHead>
                     <TableHead>Tên thuốc</TableHead>
                     <TableHead>Biến thể</TableHead>
                     <TableHead>SKU</TableHead>
@@ -73,13 +78,12 @@ export default function SupplierDetailPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {medications.map((med) => (
-                    <TableRow key={med.id}>
-                      <TableCell>{med.id}</TableCell>
-                      <TableCell>{med.medicationName}</TableCell>
-                      <TableCell>{med.variantName}</TableCell>
-                      <TableCell>{med.supplierSku}</TableCell>
-                      <TableCell>{med.leadTimeDays}</TableCell>
+                  {medications.map((m) => (
+                    <TableRow key={m.id}>
+                      <TableCell>{m.medicationName}</TableCell>
+                      <TableCell>{m.variantName}</TableCell>
+                      <TableCell>{m.supplierSku}</TableCell>
+                      <TableCell>{m.leadTimeDays}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

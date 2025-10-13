@@ -22,7 +22,7 @@ export const createSupplier = async (supplierData) => {
   return response.data;
 };
 
-// Update supplier
+// Update supplier (including medication variants)
 export const updateSupplier = async ({ id, ...supplierData }) => {
   const response = await instance.put(`/suppliers/${id}`, supplierData);
   return response.data;
@@ -33,13 +33,11 @@ export const deleteSupplier = async (id) => {
   const response = await instance.delete(`/suppliers/${id}`);
   return response.data;
 };
-// Lấy danh sách thuốc mà supplier cung cấp
 export const getSupplierMedications = async (supplierId) => {
   const response = await instance.get(`/suppliers/${supplierId}/medications`);
   return response.data;
 };
 
-// Cập nhật (thêm/xóa) danh sách thuốc mà supplier cung cấp
 export const updateSupplierMedications = async (supplierId, medications) => {
   const response = await instance.post(
     `/suppliers/${supplierId}/medications`,
