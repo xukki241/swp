@@ -712,9 +712,20 @@
                       }
                     },
                     "url": {
-                      "raw": "{{baseUrl}}/api/medications/1/variants",
+                      "raw": "{{baseUrl}}/api/medications/:medicationId/variants",
                       "host": ["{{baseUrl}}"],
-                      "path": ["api", "medications", "1", "variants"]
+                      "path": [
+                        "api",
+                        "medications",
+                        ":medicationId",
+                        "variants"
+                      ],
+                      "variable": [
+                        {
+                          "key": "medicationId",
+                          "value": "00000000-0000-0000-0000-000000000000"
+                        }
+                      ]
                     },
                     "description": "Tạo một hoặc nhiều biến thể mới (ví dụ: hộp, vỉ, viên) cho một loại thuốc đã có."
                   },
@@ -736,9 +747,20 @@
                     "method": "GET",
                     "header": [],
                     "url": {
-                      "raw": "{{baseUrl}}/api/medications/1/variants",
+                      "raw": "{{baseUrl}}/api/medications/:medicationId/variants",
                       "host": ["{{baseUrl}}"],
-                      "path": ["api", "medications", "1", "variants"]
+                      "path": [
+                        "api",
+                        "medications",
+                        ":medicationId",
+                        "variants"
+                      ],
+                      "variable": [
+                        {
+                          "key": "medicationId",
+                          "value": "00000000-0000-0000-0000-000000000000"
+                        }
+                      ]
                     },
                     "description": "Lấy danh sách tất cả các biến thể của một loại thuốc cụ thể."
                   },
@@ -760,9 +782,25 @@
                     "method": "GET",
                     "header": [],
                     "url": {
-                      "raw": "{{baseUrl}}/api/medications/1/variants/1",
+                      "raw": "{{baseUrl}}/api/medications/:medicationId/variants/:id",
                       "host": ["{{baseUrl}}"],
-                      "path": ["api", "medications", "1", "variants", "1"]
+                      "path": [
+                        "api",
+                        "medications",
+                        ":medicationId",
+                        "variants",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "medicationId",
+                          "value": "00000000-0000-0000-0000-000000000000"
+                        },
+                        {
+                          "key": "id",
+                          "value": "00000000-0000-0000-0000-000000000000"
+                        }
+                      ]
                     },
                     "description": "Lấy thông tin chi tiết của một biến thể thuốc cụ thể."
                   },
@@ -784,14 +822,25 @@
                     "method": "GET",
                     "header": [],
                     "url": {
-                      "raw": "{{baseUrl}}/api/medications/variants/1/inventory",
+                      "raw": "{{baseUrl}}/api/medications/:medicationId/variants/:id/inventory",
                       "host": ["{{baseUrl}}"],
                       "path": [
                         "api",
                         "medications",
+                        ":medicationId",
                         "variants",
-                        "1",
+                        ":id",
                         "inventory"
+                      ],
+                      "variable": [
+                        {
+                          "key": "medicationId",
+                          "value": "00000000-0000-0000-0000-000000000000"
+                        },
+                        {
+                          "key": "id",
+                          "value": "00000000-0000-0000-0000-000000000000"
+                        }
                       ]
                     },
                     "description": "Lấy danh sách tất cả các lô hàng tồn kho của một biến thể thuốc cụ thể, bao gồm thông tin về vị trí, số lô, và ngày hết hạn."
@@ -835,11 +884,60 @@
                       "variable": [
                         {
                           "key": "medicationId",
-                          "value": "1"
+                          "value": "00000000-0000-0000-0000-000000000000"
                         },
                         {
                           "key": "id",
-                          "value": "1"
+                          "value": "00000000-0000-0000-0000-000000000000"
+                        }
+                      ]
+                    },
+                    "description": "Lấy danh sách tất cả các lô hàng tồn kho của một biến thể thuốc cụ thể, bao gồm thông tin về vị trí, số lô, và ngày hết hạn."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Cập nhật biến thể thuốc",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{accessToken}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PATCH",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n    \"sellPrice\": 16000.00,\n    \"isForSale\": true\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/api/medications/:medicationId/variants/:id",
+                      "host": ["{{baseUrl}}"],
+                      "path": [
+                        "api",
+                        "medications",
+                        ":medicationId",
+                        "variants",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "medicationId",
+                          "value": "00000000-0000-0000-0000-000000000000"
+                        },
+                        {
+                          "key": "id",
+                          "value": "00000000-0000-0000-0000-000000000000"
                         }
                       ]
                     },
@@ -863,9 +961,25 @@
                     "method": "DELETE",
                     "header": [],
                     "url": {
-                      "raw": "{{baseUrl}}/api/medications/1/variants/1",
+                      "raw": "{{baseUrl}}/api/medications/:medicationId/variants/:id",
                       "host": ["{{baseUrl}}"],
-                      "path": ["api", "medications", "1", "variants", "1"]
+                      "path": [
+                        "api",
+                        "medications",
+                        ":medicationId",
+                        "variants",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "medicationId",
+                          "value": "00000000-0000-0000-0000-000000000000"
+                        },
+                        {
+                          "key": "id",
+                          "value": "00000000-0000-0000-0000-000000000000"
+                        }
+                      ]
                     },
                     "description": "Xóa một biến thể thuốc."
                   },
@@ -891,7 +1005,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "[{\n    \"name\": \"Paracetamol 500mg\",\n    \"brand\": \"Traphaco\",\n    \"description\": \"Thuốc giảm đau, hạ sốt\",\n    \"is_prescription_required\": false,\n    \"is_controlled_substance\": false,\n    \"status\": \"active\"\n}]",
+                  "raw": "[{\n    \"name\": \"Paracetamol 500mg\",\n    \"brand\": \"Traphaco\",\n    \"description\": \"Thuốc giảm đau, hạ sốt\",\n    \"isPrescriptionRequired\": false,\n    \"isControlledSubstance\": false,\n    \"status\": \"active\"\n}]",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -986,7 +1100,7 @@
                   "variable": [
                     {
                       "key": "id",
-                      "value": "1"
+                      "value": "00000000-0000-0000-0000-000000000000"
                     }
                   ]
                 },
@@ -1010,9 +1124,15 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/medications/1",
+                  "raw": "{{baseUrl}}/api/medications/:id",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "medications", "1"]
+                  "path": ["api", "medications", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Xóa một loại thuốc (có thể là xóa mềm bằng cách cập nhật status)."
               },
@@ -1034,9 +1154,15 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/medications/1/suppliers",
+                  "raw": "{{baseUrl}}/api/medications/:medicationId/suppliers",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "medications", "1", "suppliers"]
+                  "path": ["api", "medications", ":medicationId", "suppliers"],
+                  "variable": [
+                    {
+                      "key": "medicationId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Lấy danh sách các nhà cung cấp cho một loại thuốc cụ thể (dựa trên các biến thể của nó)."
               },
@@ -1058,9 +1184,15 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/medications/1/purchases",
+                  "raw": "{{baseUrl}}/api/medications/:medicationId/purchases",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "medications", "1", "purchases"]
+                  "path": ["api", "medications", ":medicationId", "purchases"],
+                  "variable": [
+                    {
+                      "key": "medicationId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Lấy danh sách tất cả các đơn nhập hàng (Purchases) có chứa một loại thuốc cụ thể (thông qua các biến thể của nó)."
               },
@@ -1082,9 +1214,15 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/medications/1/sales",
+                  "raw": "{{baseUrl}}/api/medications/:medicationId/sales",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "medications", "1", "sales"]
+                  "path": ["api", "medications", ":medicationId", "sales"],
+                  "variable": [
+                    {
+                      "key": "medicationId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Lấy danh sách tất cả các đơn bán hàng (Sales Orders) có chứa một loại thuốc cụ thể."
               },
@@ -1106,9 +1244,15 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/medications/1/inventory",
+                  "raw": "{{baseUrl}}/api/medications/:medicationId/inventory",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "medications", "1", "inventory"]
+                  "path": ["api", "medications", ":medicationId", "inventory"],
+                  "variable": [
+                    {
+                      "key": "medicationId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Lấy danh sách tất cả các lô hàng tồn kho của một loại thuốc cụ thể (tổng hợp từ tất cả các biến thể của nó)."
               },
@@ -1232,9 +1376,15 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/zones/1",
+                  "raw": "{{baseUrl}}/api/warehouse/zones/:id",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "zones", "1"]
+                  "path": ["api", "warehouse", "zones", "1"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Lấy thông tin chi tiết của một khu vực bằng ID."
               },
@@ -1265,9 +1415,15 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/zones/1",
+                  "raw": "{{baseUrl}}/api/warehouse/zones/:id",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "zones", "1"]
+                  "path": ["api", "warehouse", "zones", "1"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Cập nhật thông tin của một khu vực."
               },
@@ -1289,9 +1445,15 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/zones/1",
+                  "raw": "{{baseUrl}}/api/warehouse/zones/:id",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "zones", "1"]
+                  "path": ["api", "warehouse", "zones", "1"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Xóa một khu vực."
               },
@@ -1327,9 +1489,15 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/zones/1/racks",
+                  "raw": "{{baseUrl}}/api/warehouse/zones/:id/racks",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "zones", "1", "racks"]
+                  "path": ["api", "warehouse", "zones", "1", "racks"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Tạo một hoặc nhiều kệ mới trong một khu vực bằng cách cung cấp danh sách thông tin kệ."
               },
@@ -1360,9 +1528,15 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/zones/1/racks/batch",
+                  "raw": "{{baseUrl}}/api/warehouse/zones/:id/racks/batch",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "zones", "1", "racks", "batch"]
+                  "path": ["api", "warehouse", "zones", "1", "racks", "batch"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Tạo hàng loạt kệ trong một khu vực bằng cách cung cấp số lượng để tạo tự động."
               },
@@ -1384,9 +1558,15 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/zones/1/racks",
+                  "raw": "{{baseUrl}}/api/warehouse/zones/:id/racks",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "zones", "1", "racks"]
+                  "path": ["api", "warehouse", "zones", "1", "racks"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Lấy danh sách tất cả các kệ trong một khu vực cụ thể."
               },
@@ -1408,9 +1588,15 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/racks/1",
+                  "raw": "{{baseUrl}}/api/warehouse/racks/:id",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "racks", "1"]
+                  "path": ["api", "warehouse", "racks", "1"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Lấy thông tin chi tiết của một kệ bằng ID."
               },
@@ -1441,9 +1627,15 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/racks/1",
+                  "raw": "{{baseUrl}}/api/warehouse/racks/:id",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "racks", "1"]
+                  "path": ["api", "warehouse", "racks", "1"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Cập nhật thông tin của một kệ."
               },
@@ -1465,9 +1657,15 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/racks/1",
+                  "raw": "{{baseUrl}}/api/warehouse/racks/:id",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "racks", "1"]
+                  "path": ["api", "warehouse", "racks", "1"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Xóa một kệ."
               },
@@ -1503,9 +1701,15 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/racks/1/bins",
+                  "raw": "{{baseUrl}}/api/warehouse/racks/:id/bins",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "racks", "1", "bins"]
+                  "path": ["api", "warehouse", "racks", ":id", "bins"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Tạo một hoặc nhiều ô chứa mới trong một kệ bằng cách cung cấp danh sách thông tin ô chứa."
               },
@@ -1536,9 +1740,15 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/racks/1/bins/batch",
+                  "raw": "{{baseUrl}}/api/warehouse/racks/:id/bins/batch",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "racks", "1", "bins", "batch"]
+                  "path": ["api", "warehouse", "racks", ":id", "bins", "batch"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Tạo hàng loạt ô chứa trong một kệ. Chế độ 'grid': cung cấp 'levels' và 'binsPerLevel'. Chế độ 'list': cung cấp mảng 'binsPerLevelList' (ví dụ: [2, 3, 4] tạo 3 ngăn với 2, 3, và 4 ô)."
               },
@@ -1560,9 +1770,15 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/racks/1/bins",
+                  "raw": "{{baseUrl}}/api/warehouse/racks/:id/bins",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "racks", "1", "bins"]
+                  "path": ["api", "warehouse", "racks", ":id", "bins"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Lấy danh sách tất cả các ô chứa trong một kệ cụ thể."
               },
@@ -1584,9 +1800,15 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/bins/1",
+                  "raw": "{{baseUrl}}/api/warehouse/bins/:id",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "bins", "1"]
+                  "path": ["api", "warehouse", "bins", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Lấy thông tin chi tiết của một ô chứa bằng ID."
               },
@@ -1608,9 +1830,15 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/bins/1/inventory",
+                  "raw": "{{baseUrl}}/api/warehouse/bins/:id/inventory",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "bins", "1", "inventory"]
+                  "path": ["api", "warehouse", "bins", ":id", "inventory"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Lấy danh sách tất cả các mặt hàng tồn kho đang được lưu trữ trong một ô chứa cụ thể."
               },
@@ -1641,9 +1869,15 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/bins/1",
+                  "raw": "{{baseUrl}}/api/warehouse/bins/:id",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "bins", "1"]
+                  "path": ["api", "warehouse", "bins", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Cập nhật thông tin của một ô chứa."
               },
@@ -1665,9 +1899,15 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/warehouse/bins/1",
+                  "raw": "{{baseUrl}}/api/warehouse/bins/:id",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "warehouse", "bins", "1"]
+                  "path": ["api", "warehouse", "bins", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Xóa một ô chứa."
               },
@@ -1711,9 +1951,20 @@
                       }
                     },
                     "url": {
-                      "raw": "{{baseUrl}}/api/purchases/1/receipts",
+                      "raw": "{{baseUrl}}/api/purchases/:purchaseOrderId/receipts",
                       "host": ["{{baseUrl}}"],
-                      "path": ["api", "purchases", "1", "receipts"]
+                      "path": [
+                        "api",
+                        "purchases",
+                        ":purchaseOrderId",
+                        "receipts"
+                      ],
+                      "variable": [
+                        {
+                          "key": "purchaseOrderId",
+                          "value": "00000000-0000-0000-0000-000000000000"
+                        }
+                      ]
                     },
                     "description": "Tạo một phiếu nhận hàng mới cho một đơn nhập hàng. Hành động này sẽ TỰ ĐỘNG tạo ra các bản ghi tồn kho (inventory) tương ứng với từng mặt hàng được nhận. Nếu tất cả các mặt hàng đã được nhận đủ, trạng thái của đơn nhập hàng (PO) sẽ được cập nhật thành 'completed'."
                   },
@@ -1746,7 +1997,7 @@
                       "variable": [
                         {
                           "key": "purchaseOrderId",
-                          "value": "1"
+                          "value": "00000000-0000-0000-0000-000000000000"
                         }
                       ]
                     },
@@ -1782,11 +2033,11 @@
                       "variable": [
                         {
                           "key": "purchaseOrderId",
-                          "value": "1"
+                          "value": "00000000-0000-0000-0000-000000000000"
                         },
                         {
                           "key": "id",
-                          "value": "1"
+                          "value": "00000000-0000-0000-0000-000000000000"
                         }
                       ]
                     },
@@ -1816,7 +2067,7 @@
                       "variable": [
                         {
                           "key": "id",
-                          "value": "1"
+                          "value": "00000000-0000-0000-0000-000000000000"
                         }
                       ]
                     },
@@ -1899,9 +2150,15 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/purchases/1",
+                  "raw": "{{baseUrl}}/api/purchases/:purchaseOrderId",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "purchases", "1"]
+                  "path": ["api", "purchases", ":purchaseOrderId"],
+                  "variable": [
+                    {
+                      "key": "purchaseOrderId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Lấy thông tin chi tiết của một đơn nhập hàng bằng ID, bao gồm danh sách các sản phẩm."
               },
@@ -1938,7 +2195,7 @@
                   "variable": [
                     {
                       "key": "id",
-                      "value": "1"
+                      "value": "00000000-0000-0000-0000-000000000000"
                     }
                   ]
                 },
@@ -1962,9 +2219,15 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/purchases/1",
+                  "raw": "{{baseUrl}}/api/purchases/:purchaseOrderId",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "purchases", "1"]
+                  "path": ["api", "purchases", ":purchaseOrderId"],
+                  "variable": [
+                    {
+                      "key": "purchaseOrderId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Xóa một đơn nhập hàng (chỉ nên thực hiện khi đơn hàng ở trạng thái 'pending')."
               },
@@ -2000,7 +2263,7 @@
               "query": [
                 {
                   "key": "medication_variant_id",
-                  "value": "1",
+                  "value": "00000000-0000-0000-0000-000000000000",
                   "disabled": true
                 },
                 {
@@ -2030,9 +2293,15 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/inventory/1",
+              "raw": "{{baseUrl}}/api/inventory/:inventoryId",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "inventory", "1"]
+              "path": ["api", "inventory", ":inventoryId"],
+              "variable": [
+                {
+                  "key": "inventoryId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
             },
             "description": "Lấy thông tin chi tiết của một bản ghi tồn kho cụ thể (một lô hàng tại một vị trí nhất định)."
           },
@@ -2063,9 +2332,15 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/inventory/1/adjust",
+              "raw": "{{baseUrl}}/api/inventory/:inventoryId/adjust",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "inventory", "1", "adjust"]
+              "path": ["api", "inventory", ":inventoryId", "adjust"],
+              "variable": [
+                {
+                  "key": "inventoryId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
             },
             "description": "Điều chỉnh số lượng của một bản ghi tồn kho. Dùng trong các trường hợp kiểm kê, hàng hỏng, ..."
           },
@@ -2098,7 +2373,17 @@
             "url": {
               "raw": "{{baseUrl}}/api/inventory/move",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "inventory", "move"]
+              "path": ["api", "inventory", "move"],
+              "query": [
+                {
+                  "key": "fromInventoryId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                },
+                {
+                  "key": "toBinId",
+                  "value": "10"
+                }
+              ]
             },
             "description": "Di chuyển một số lượng hàng hóa từ một lô/vị trí này sang một ô chứa khác."
           },
@@ -2186,9 +2471,15 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/sales/1",
+                  "raw": "{{baseUrl}}/api/sales/:salesOrderId",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "sales", "1"]
+                  "path": ["api", "sales", ":salesOrderId"],
+                  "variable": [
+                    {
+                      "key": "salesOrderId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Lấy thông tin chi tiết của một đơn bán hàng bằng ID."
               },
@@ -2219,9 +2510,15 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/sales/1",
+                  "raw": "{{baseUrl}}/api/sales/:salesOrderId",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "sales", "1"]
+                  "path": ["api", "sales", ":salesOrderId"],
+                  "variable": [
+                    {
+                      "key": "salesOrderId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Cập nhật trạng thái của một đơn bán hàng (ví dụ: từ 'pending' sang 'completed' hoặc 'cancelled')."
               },
@@ -2243,9 +2540,15 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/sales/1",
+                  "raw": "{{baseUrl}}/api/sales/:salesOrderId",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "sales", "1"]
+                  "path": ["api", "sales", ":salesOrderId"],
+                  "variable": [
+                    {
+                      "key": "salesOrderId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Hủy một đơn bán hàng. Thao tác này sẽ giải phóng số lượng hàng đã tạm giữ (reserved)."
               },
@@ -2332,9 +2635,15 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/customers/1",
+              "raw": "{{baseUrl}}/api/customers/:customerId",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "customers", "1"]
+              "path": ["api", "customers", ":customerId"],
+              "variable": [
+                {
+                  "key": "customerId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
             },
             "description": "Lấy thông tin chi tiết của một khách hàng bằng ID."
           },
@@ -2365,9 +2674,15 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/customers/1",
+              "raw": "{{baseUrl}}/api/customers/:customerId",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "customers", "1"]
+              "path": ["api", "customers", ":customerId"],
+              "variable": [
+                {
+                  "key": "customerId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
             },
             "description": "Cập nhật thông tin của một khách hàng."
           },
@@ -2389,9 +2704,15 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/customers/1",
+              "raw": "{{baseUrl}}/api/customers/:customerId",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "customers", "1"]
+              "path": ["api", "customers", ":customerId"],
+              "variable": [
+                {
+                  "key": "customerId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
             },
             "description": "Xóa một khách hàng."
           },
@@ -2431,9 +2752,15 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/suppliers/1/medications",
+                  "raw": "{{baseUrl}}/api/suppliers/:supplierId/medications",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "suppliers", "1", "medications"]
+                  "path": ["api", "suppliers", ":supplierId", "medications"],
+                  "variable": [
+                    {
+                      "key": "supplierId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Thêm một hoặc nhiều biến thể thuốc mà nhà cung cấp này có thể cung cấp."
               },
@@ -2455,9 +2782,15 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/suppliers/1/medications",
+                  "raw": "{{baseUrl}}/api/suppliers/:supplierId/medications",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "suppliers", "1", "medications"]
+                  "path": ["api", "suppliers", ":supplierId", "medications"],
+                  "variable": [
+                    {
+                      "key": "supplierId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Lấy danh sách các biến thể thuốc được cung cấp bởi nhà cung cấp này."
               },
@@ -2488,7 +2821,7 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/suppliers/1/medications/1",
+                  "raw": "{{baseUrl}}/api/suppliers/:supplierId/medications/:medicationId",
                   "host": ["{{baseUrl}}"],
                   "path": ["api", "suppliers", "1", "medications", "1"]
                 },
@@ -2512,9 +2845,25 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/suppliers/1/medications/1",
+                  "raw": "{{baseUrl}}/api/suppliers/:supplierId/medications/:medicationId",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "suppliers", "1", "medications", "1"]
+                  "path": [
+                    "api",
+                    "suppliers",
+                    ":supplierId",
+                    "medications",
+                    ":medicationId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "supplierId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    },
+                    {
+                      "key": "medicationId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Xóa liên kết giữa một biến thể thuốc và nhà cung cấp."
               },
@@ -2596,9 +2945,15 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/suppliers/1",
+              "raw": "{{baseUrl}}/api/suppliers/:supplierId",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "suppliers", "1"]
+              "path": ["api", "suppliers", ":supplierId"],
+              "variable": [
+                {
+                  "key": "supplierId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
             },
             "description": "Lấy thông tin chi tiết của một nhà cung cấp bằng ID."
           },
@@ -2629,9 +2984,15 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/suppliers/1",
+              "raw": "{{baseUrl}}/api/suppliers/:supplierId",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "suppliers", "1"]
+              "path": ["api", "suppliers", ":supplierId"],
+              "variable": [
+                {
+                  "key": "supplierId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
             },
             "description": "Cập nhật thông tin của một nhà cung cấp."
           },
@@ -2653,9 +3014,15 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/suppliers/1",
+              "raw": "{{baseUrl}}/api/suppliers/:supplierId",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "suppliers", "1"]
+              "path": ["api", "suppliers", ":supplierId"],
+              "variable": [
+                {
+                  "key": "supplierId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
             },
             "description": "Xóa một nhà cung cấp (có thể là xóa mềm bằng cách cập nhật status)."
           },
@@ -2688,7 +3055,13 @@
                 "url": {
                   "raw": "{{baseUrl}}/api/users/registrations",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "users", "registrations"]
+                  "path": ["api", "users", "registrations"],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "pending"
+                    }
+                  ]
                 },
                 "description": "Lấy danh sách các yêu cầu đăng ký đang chờ xử lý. Yêu cầu quyền admin."
               },
@@ -2719,9 +3092,21 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/users/registrations/1/approve",
+                  "raw": "{{baseUrl}}/api/users/registrations/:registrationId/approve",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "users", "registrations", "1", "approve"]
+                  "path": [
+                    "api",
+                    "users",
+                    "registrations",
+                    ":registrationId",
+                    "approve"
+                  ],
+                  "variable": [
+                    {
+                      "key": "registrationId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Phê duyệt một yêu cầu đăng ký, tạo tài khoản người dùng mới và gán mật khẩu, vai trò. Yêu cầu quyền admin."
               },
@@ -2743,9 +3128,21 @@
                 "method": "POST",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/users/registrations/1/reject",
+                  "raw": "{{baseUrl}}/api/users/registrations/:registrationId/reject",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "users", "registrations", "1", "reject"]
+                  "path": [
+                    "api",
+                    "users",
+                    "registrations",
+                    ":registrationId",
+                    "reject"
+                  ],
+                  "variable": [
+                    {
+                      "key": "registrationId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Từ chối một yêu cầu đăng ký. Yêu cầu quyền admin."
               },
@@ -2831,9 +3228,15 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/users/1",
+              "raw": "{{baseUrl}}/api/users/:userId",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "users", "1"]
+              "path": ["api", "users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
             },
             "description": "Lấy thông tin chi tiết của một người dùng cụ thể bằng ID."
           },
@@ -2869,9 +3272,15 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/users/1",
+              "raw": "{{baseUrl}}/api/users/:userId",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "users", "1"]
+              "path": ["api", "users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
             },
             "description": "Cập nhật thông tin cho một người dùng. Admin có thể cập nhật cho bất kỳ ai, người dùng thường chỉ có thể tự cập nhật thông tin của mình."
           },
@@ -2893,9 +3302,15 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/users/1",
+              "raw": "{{baseUrl}}/api/users/:userId",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "users", "1"]
+              "path": ["api", "users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
             },
             "description": "Xóa một người dùng (có thể là xóa mềm, chuyển status thành 'inactive'). Yêu cầu quyền admin."
           },
@@ -2980,9 +3395,15 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/reports/1",
+              "raw": "{{baseUrl}}/api/reports/:reportId",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "reports", "1"]
+              "path": ["api", "reports", ":reportId"],
+              "variable": [
+                {
+                  "key": "reportId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
             },
             "description": "Lấy thông tin chi tiết và dữ liệu của một báo cáo cụ thể."
           },
@@ -3004,9 +3425,15 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/reports/1",
+              "raw": "{{baseUrl}}/api/reports/:reportId",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "reports", "1"]
+              "path": ["api", "reports", ":reportId"],
+              "variable": [
+                {
+                  "key": "reportId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
             },
             "description": "Xóa một báo cáo đã tạo."
           },
@@ -3123,9 +3550,15 @@
                 "method": "PATCH",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/notifications/1/read",
+                  "raw": "{{baseUrl}}/api/notifications/:notificationId/read",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "notifications", "1", "read"]
+                  "path": ["api", "notifications", ":notificationId", "read"],
+                  "variable": [
+                    {
+                      "key": "notificationId",
+                      "value": "00000000-0000-0000-0000-000000000000"
+                    }
+                  ]
                 },
                 "description": "Đánh dấu một thông báo cụ thể là đã đọc."
               },
