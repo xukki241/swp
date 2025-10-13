@@ -1,76 +1,147 @@
+import {
+  createMedicationsRequestSchema,
+  listMedicationsQuerySchema,
+  updateMedicationRequestSchema,
+  uuidSchema,
+} from "@pharmaflow/dto";
+import {
+  validateBody,
+  validateParams,
+  validateQuery,
+} from "@pharmaflow/dto/middleware";
 import express from "express";
+import { z } from "zod";
 
 import * as medicationController from "../controllers/medicationController.js";
+import * as medicationVariantController from "../controllers/medicationVariantController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
+
+import { medicationVariantRouter } from "./medicationVariantRoutes.js";
 
 export const medicationRouter = express.Router();
 
+// Mount variant routes before authentication
+medicationRouter.use("/:medicationId/variants", medicationVariantRouter);
+
+medicationRouter.use(authenticate);
+
+// Param validation schema for routes with :id
+const idParamSchema = z.object({
+  id: uuidSchema,
+});
+
 /**
  * @route   GET /api/medications
- * @desc    Get all medications with optional search and filters
- * @access  Private (Owner, Staff)
- * @query   search - Search term for name or brand
- * @query   status - Filter by status (active, inactive, discontinued)
+ * @desc    Get all medications
+ * @access  Private (Authenticated)
  */
-medicationRouter.get("/", authenticate, medicationController.getAllMedications);
+medicationRouter.get(
+  "/",
+  validateQuery(listMedicationsQuerySchema),
+  medicationController.getAllMedications
+);
 
 /**
  * @route   GET /api/medications/:id
  * @desc    Get medication by ID
- * @access  Private (Owner, Staff)
+ * @access  Private (Authenticated)
  */
 medicationRouter.get(
   "/:id",
-  authenticate,
+  validateParams(idParamSchema),
   medicationController.getMedicationById
 );
 
 /**
  * @route   GET /api/medications/:id/inventory
  * @desc    Get inventory for a medication
- * @access  Private (Owner, Staff)
+ * @access  Private (Authenticated)
  */
 medicationRouter.get(
   "/:id/inventory",
-  authenticate,
+  validateParams(idParamSchema),
   medicationController.getMedicationInventory
 );
 
 /**
+ * @route   GET /api/medications/:id/suppliers
+ * @desc    Get suppliers for a medication
+ * @access  Private (Authenticated)
+ */
+medicationRouter.get(
+  "/:id/suppliers",
+  validateParams(idParamSchema),
+  medicationController.getMedicationSuppliers
+);
+
+/**
+ * @route   GET /api/medications/:id/purchases
+ * @desc    Get purchase orders containing a medication
+ * @access  Private (Authenticated)
+ */
+medicationRouter.get(
+  "/:id/purchases",
+  validateParams(idParamSchema),
+  medicationController.getMedicationPurchases
+);
+
+/**
+ * @route   GET /api/medications/:id/sales
+ * @desc    Get sales orders containing a medication
+ * @access  Private (Authenticated)
+ */
+medicationRouter.get(
+  "/:id/sales",
+  validateParams(idParamSchema),
+  medicationController.getMedicationSales
+);
+
+/**
+ * @route   GET /api/medications/variants/:id/inventory
+ * @desc    Get inventory for a medication variant
+ * @access  Private (Authenticated)
+ * @note    This route must be placed before POST /api/medications to avoid conflicts
+ */
+medicationRouter.get(
+  "/variants/:id/inventory",
+  validateParams(idParamSchema),
+  medicationVariantController.getMedicationVariantInventory
+);
+
+/**
  * @route   POST /api/medications
- * @desc    Create a new medication (owner only)
- * @access  Private (Owner)
- * @body    { name, brand?, description?, isPrescriptionRequired?, isControlledSubstance?, status? }
+ * @desc    Create a new medication (batch)
+ * @access  Private (Owner only)
  */
 medicationRouter.post(
   "/",
-  authenticate,
   authorize("owner"),
+  validateBody(createMedicationsRequestSchema),
   medicationController.createMedication
 );
 
 /**
- * @route   PUT /api/medications/:id
- * @desc    Update medication by ID (owner only)
- * @access  Private (Owner)
- * @body    { name?, brand?, description?, isPrescriptionRequired?, isControlledSubstance?, status? }
+ * @route   PATCH /api/medications/:id
+ * @desc    Update medication by ID
+ * @access  Private (Owner only)
  */
-medicationRouter.put(
+medicationRouter.patch(
   "/:id",
-  authenticate,
   authorize("owner"),
+  validateParams(idParamSchema),
+  validateBody(updateMedicationRequestSchema),
   medicationController.updateMedication
 );
 
 /**
  * @route   DELETE /api/medications/:id
- * @desc    Delete medication by ID (owner only)
- * @access  Private (Owner)
+ * @desc    Delete medication by ID
+ * @access  Private (Owner only)
  */
 medicationRouter.delete(
   "/:id",
-  authenticate,
   authorize("owner"),
+  validateParams(idParamSchema),
   medicationController.deleteMedication
 );
 
