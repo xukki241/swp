@@ -56,4 +56,11 @@ export const reportTypeEnum = z.enum([
   "sales",
   "purchase",
   "custom",
+  "sales_summary",
+  "inventory_on_hand",
+  "expiry_dates",
+  "low_stock",
+  "daily_sales",
+  "weekly_sales",
+  "monthly_sales",
 ]);

@@ -1,6 +1,17 @@
 import { purchaseOrderReceiptItemService } from "../services/purchaseOrderReceiptItemService.js";
 
 export const purchaseOrderReceiptItemController = {
+  async getAllByReceipt(req, res) {
+    try {
+      const purchaseOrderReceiptId = Number.parseInt(req.params.receiptId);
+      const items = await purchaseOrderReceiptItemService.getAll({
+        purchaseOrderReceiptId,
+      });
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
   // Create a new purchase order receipt item
   async create(req, res) {
     try {

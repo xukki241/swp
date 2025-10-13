@@ -823,9 +823,25 @@
                       }
                     },
                     "url": {
-                      "raw": "{{baseUrl}}/api/medications/1/variants/1",
+                      "raw": "{{baseUrl}}/api/medications/:medicationId/variants/:id",
                       "host": ["{{baseUrl}}"],
-                      "path": ["api", "medications", "1", "variants", "1"]
+                      "path": [
+                        "api",
+                        "medications",
+                        ":medicationId",
+                        "variants",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "medicationId",
+                          "value": "1"
+                        },
+                        {
+                          "key": "id",
+                          "value": "1"
+                        }
+                      ]
                     },
                     "description": "Cập nhật thông tin của một biến thể thuốc cụ thể."
                   },
@@ -964,9 +980,15 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/medications/1",
+                  "raw": "{{baseUrl}}/api/medications/:id",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "medications", "1"]
+                  "path": ["api", "medications", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1"
+                    }
+                  ]
                 },
                 "description": "Cập nhật thông tin của một loại thuốc bằng ID."
               },
@@ -1713,16 +1735,27 @@
                     "method": "GET",
                     "header": [],
                     "url": {
-                      "raw": "{{baseUrl}}/api/purchases/1/receipts",
+                      "raw": "{{baseUrl}}/api/purchases/:purchaseOrderId/receipts",
                       "host": ["{{baseUrl}}"],
-                      "path": ["api", "purchases", "1", "receipts"]
+                      "path": [
+                        "api",
+                        "purchases",
+                        ":purchaseOrderId",
+                        "receipts"
+                      ],
+                      "variable": [
+                        {
+                          "key": "purchaseOrderId",
+                          "value": "1"
+                        }
+                      ]
                     },
                     "description": "Lấy danh sách tất cả các phiếu nhận hàng của một đơn nhập hàng cụ thể."
                   },
                   "response": []
                 },
                 {
-                  "name": "Lấy chi tiết Phiếu nhận hàng",
+                  "name": "Lấy chi tiết Phiếu nhận hàng (By PO)",
                   "request": {
                     "auth": {
                       "type": "bearer",
@@ -1737,11 +1770,57 @@
                     "method": "GET",
                     "header": [],
                     "url": {
-                      "raw": "{{baseUrl}}/api/receipts/1",
+                      "raw": "{{baseUrl}}/api/purchases/:purchaseOrderId/receipts/:id",
                       "host": ["{{baseUrl}}"],
-                      "path": ["api", "receipts", "1"]
+                      "path": [
+                        "api",
+                        "purchases",
+                        ":purchaseOrderId",
+                        "receipts",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "purchaseOrderId",
+                          "value": "1"
+                        },
+                        {
+                          "key": "id",
+                          "value": "1"
+                        }
+                      ]
                     },
-                    "description": "Lấy thông tin chi tiết của một phiếu nhận hàng cụ thể bằng ID."
+                    "description": "Lấy thông tin chi tiết của một phiếu nhận hàng cụ thể bằng ID (trong context của purchase order)."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Lấy chi tiết Phiếu nhận hàng (Standalone)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{accessToken}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/purchases/receipts/:id",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["api", "purchases", "receipts", ":id"],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "1"
+                        }
+                      ]
+                    },
+                    "description": "Lấy thông tin chi tiết của một phiếu nhận hàng cụ thể bằng ID (không cần purchase order ID)."
                   },
                   "response": []
                 }
@@ -1853,9 +1932,15 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/purchases/1",
+                  "raw": "{{baseUrl}}/api/purchases/:id",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "purchases", "1"]
+                  "path": ["api", "purchases", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1"
+                    }
+                  ]
                 },
                 "description": "Cập nhật thông tin của một đơn nhập hàng (ví dụ: thay đổi trạng thái). Không dùng để thay đổi danh sách sản phẩm."
               },

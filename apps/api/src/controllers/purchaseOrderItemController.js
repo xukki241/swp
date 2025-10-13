@@ -1,6 +1,17 @@
 import { purchaseOrderItemService } from "../services/purchaseOrderItemService.js";
 
 export const purchaseOrderItemController = {
+  // 🔹 Get all items by specific purchase order
+  async getAllByPurchaseOrder(req, res) {
+    try {
+      const purchaseOrderId = Number.parseInt(req.params.purchaseOrderId);
+      const items = await purchaseOrderItemService.getAll({ purchaseOrderId });
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
   // Create a new purchase order item
   async create(req, res) {
     try {
@@ -42,6 +53,7 @@ export const purchaseOrderItemController = {
       res.status(500).json({ error: error.message });
     }
   },
+
   // Update purchase order item
   async update(req, res) {
     try {

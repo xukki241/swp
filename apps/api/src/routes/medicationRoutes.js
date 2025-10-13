@@ -30,6 +30,8 @@ const idParamSchema = z.object({
   id: uuidSchema,
 });
 
+/* -------------------- MEDICATION -------------------- */
+
 /**
  * @route   GET /api/medications
  * @desc    Get all medications
