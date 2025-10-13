@@ -5,6 +5,8 @@ import {
   getSupplierById,
   createSupplier,
   updateSupplier,
+  getSupplierMedications,
+  updateSupplierMedications,
   deleteSupplier,
 } from "@/services/supplierService";
 
@@ -73,6 +75,27 @@ export const useDeleteSupplier = () => {
     onSuccess: (data, supplierId) => {
       queryClient.invalidateQueries({ queryKey: ["suppliers"] });
       queryClient.removeQueries({ queryKey: ["suppliers", supplierId] });
+    },
+  });
+};
+
+export const useSupplierMedications = (supplierId) => {
+  return useQuery({
+    queryKey: ["supplierMedications", supplierId],
+    queryFn: () => getSupplierMedications(supplierId),
+    enabled: !!supplierId,
+  });
+};
+
+export const useUpdateSupplierMedications = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ supplierId, medications }) =>
+      updateSupplierMedications(supplierId, medications),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["supplierMedications", variables.supplierId],
+      });
     },
   });
 };

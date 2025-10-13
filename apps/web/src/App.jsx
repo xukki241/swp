@@ -8,7 +8,8 @@ import NotFoundPage from "@/pages/NotFoundPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import UserListPage from "@/pages/UserListPage";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
-import SupplierListPage from "./pages/Supplier";
+import SupplierListPage from "./pages/SupplierListPage";
+import SupplierDetailPage from "./pages/SupplierDetailPage";
 
 function App() {
   return (
@@ -88,6 +89,15 @@ function App() {
           element={
             <ProtectedRoute>
               <SupplierListPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/suppliers/:id"
+          element={
+            <ProtectedRoute>
+              <SupplierDetailPage />
             </ProtectedRoute>
           }
         />

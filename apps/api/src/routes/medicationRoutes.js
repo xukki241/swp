@@ -13,46 +13,6 @@ const router = express.Router();
  * @desc    Get all medications
  */
 router.get("/", authenticate, medicationController.getAllMedications);
-
-/**
- * @route   GET /api/medications/:id
- * @desc    Get medication by ID
- */
-router.get("/:id", authenticate, medicationController.getMedicationById);
-
-/**
- * @route   POST /api/medications
- * @desc    Create a new medication
- */
-router.post(
-  "/",
-  authenticate,
-  authorize("owner"),
-  medicationController.createMedication
-);
-
-/**
- * @route   PUT /api/medications/:id
- * @desc    Update medication by ID
- */
-router.put(
-  "/:id",
-  authenticate,
-  authorize("owner"),
-  medicationController.updateMedication
-);
-
-/**
- * @route   DELETE /api/medications/:id
- * @desc    Delete medication by ID
- */
-router.delete(
-  "/:id",
-  authenticate,
-  authorize("owner"),
-  medicationController.deleteMedication
-);
-
 /* -------------------- VARIANTS (nested) -------------------- */
 
 /**
@@ -127,6 +87,46 @@ router.delete(
     next();
   },
   medicationVariantController.deleteMedicationVariant
+);
+/* -------------------- MEDICATION ID -------------------- */
+
+/**
+ * @route   GET /api/medications/:id
+ * @desc    Get medication by ID
+ */
+router.get("/:id", authenticate, medicationController.getMedicationById);
+
+/**
+ * @route   POST /api/medications
+ * @desc    Create a new medication
+ */
+router.post(
+  "/",
+  authenticate,
+  authorize("owner"),
+  medicationController.createMedication
+);
+
+/**
+ * @route   PUT /api/medications/:id
+ * @desc    Update medication by ID
+ */
+router.put(
+  "/:id",
+  authenticate,
+  authorize("owner"),
+  medicationController.updateMedication
+);
+
+/**
+ * @route   DELETE /api/medications/:id
+ * @desc    Delete medication by ID
+ */
+router.delete(
+  "/:id",
+  authenticate,
+  authorize("owner"),
+  medicationController.deleteMedication
 );
 
 export default router;
