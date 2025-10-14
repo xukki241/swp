@@ -46,13 +46,15 @@ import {
 } from "@/hooks/useUsers";
 
 export default function UserListPage() {
+  // Separate pending search input from actual search query
+  const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [roleFilter, setRoleFilter] = useState("all");
   const [selectedUser, setSelectedUser] = useState(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
 
-  // Fetch staff with filters
+  // Fetch staff with filters - only searches when user clicks search button
   const filters = {};
   if (searchQuery) filters.search = searchQuery;
   if (statusFilter !== "all") filters.status = statusFilter;
@@ -271,18 +273,44 @@ export default function UserListPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="mb-6 flex flex-col gap-4 md:flex-row">
+            <form
+              onSubmit={function (e) {
+                e.preventDefault();
+                setSearchQuery(searchInput);
+              }}
+              className="mb-6 flex flex-col gap-4 md:flex-row"
+            >
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search by name, email, or phone..."
-                  value={searchQuery}
+                  value={searchInput}
                   onChange={function (e) {
-                    setSearchQuery(e.target.value);
+                    setSearchInput(e.target.value);
                   }}
                   className="pl-10 h-11 rounded-lg"
                 />
               </div>
+              <Button
+                type="submit"
+                className="h-11 bg-primary/90 hover:bg-primary"
+              >
+                <Search className="h-4 w-4" />
+                Search
+              </Button>
+              {searchQuery && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11"
+                  onClick={function () {
+                    setSearchInput("");
+                    setSearchQuery("");
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full md:w-[180px] h-11">
                   <SelectValue placeholder="Filter by status" />
@@ -304,7 +332,7 @@ export default function UserListPage() {
                   <SelectItem value="staff">Staff</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </form>
 
             <div className="rounded-lg border">
               <Table>
