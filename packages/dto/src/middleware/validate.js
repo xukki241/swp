@@ -54,7 +54,8 @@ export function validateBody(schema) {
 export function validateQuery(schema) {
   return (req, res, next) => {
     try {
-      req.query = schema.parse(req.query);
+      // Just validate without reassigning - req.query is read-only in some cases
+      schema.parse(req.query);
       next();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -73,7 +74,8 @@ export function validateQuery(schema) {
 export function validateParams(schema) {
   return (req, res, next) => {
     try {
-      req.params = schema.parse(req.params);
+      // Just validate without reassigning - req.params is read-only in some cases
+      schema.parse(req.params);
       next();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -100,11 +102,13 @@ export function validate(schemas) {
       }
 
       if (schemas.query) {
-        req.query = schemas.query.parse(req.query);
+        // Just validate without reassigning - req.query is read-only
+        schemas.query.parse(req.query);
       }
 
       if (schemas.params) {
-        req.params = schemas.params.parse(req.params);
+        // Just validate without reassigning - req.params is read-only
+        schemas.params.parse(req.params);
       }
 
       next();
@@ -157,7 +161,10 @@ export function safeValidate(schema, target = "body") {
       return res.status(400).json(formatZodError(result.error));
     }
 
-    req[target] = result.data;
+    // Only assign if target is body (writable), not query or params
+    if (target === "body") {
+      req[target] = result.data;
+    }
     next();
   };
 }
