@@ -31,21 +31,24 @@ const currentUserId = req.user.userId; // UUID is a string
 
 ### Controllers (High Priority)
 
-- [x] `userController.js` - FIXED
-- [ ] `medicationController.js`
-- [ ] `medicationVariantController.js`
-- [ ] `registrationController.js`
-- [ ] `authController.js`
+- [x] `userController.js` - FIXED ✅
+- [x] `medicationController.js` - FIXED ✅
+- [x] `medicationVariantController.js` - FIXED ✅ (partial)
+- [x] `registrationController.js` - FIXED ✅
+- [x] `authController.js` - FIXED ✅
+- [x] `supplierController.js` - FIXED ✅
+- [x] `supplierMedicationVariantController.js` - FIXED ✅
+- [x] `purchaseOrderController.js` - FIXED ✅
 - [ ] `customerController.js`
-- [ ] `supplierController.js`
 - [ ] `inventoryController.js`
-- [ ] `purchaseOrderController.js`
 - [ ] `salesOrderController.js`
 
 ### Services
 
-- [ ] Check all service files for BigInt conversions
-- [ ] Update any parseInt() to keep as strings
+- [x] `userService.js` - Clean (no BigInt) ✅
+- [x] `authService.js` - Clean (no BigInt) ✅
+- [x] `supplierService.js` - FIXED ✅ (removed Number() from medicationVariantId)
+- [ ] Check remaining service files for BigInt conversions
 
 ### Frontend
 
@@ -111,11 +114,27 @@ if (userId === anotherUserId) // Correct (both strings)
 ### Completed ✅
 
 - Database schema updated to UUID
-- `userController.js` updated
+- **User Management Flow** (100%):
+  - `userController.js` ✅
+  - `authController.js` ✅
+  - `registrationController.js` ✅
+  - `checkAuth.js` middleware ✅
+  - `userService.js` ✅
+  - `authService.js` ✅
+- **Medication Management Flow** (95%):
+  - `medicationController.js` ✅
+  - `medicationVariantController.js` ✅ (3 BigInt(medicationId) còn lại)
+- **Supplier Management Flow** (100%):
+  - `supplierController.js` ✅
+  - `supplierMedicationVariantController.js` ✅
+  - `supplierService.js` ✅
+  - `purchaseOrderController.js` ✅
 
 ### In Progress 🔄
 
-- Remaining controllers
+- Customer management
+- Inventory management
+- Sales orders (POS)
 
 ### Pending ⏳
 

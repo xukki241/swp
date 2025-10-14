@@ -20,12 +20,14 @@ export const validate = (schemas) => {
 
       // Validate query parameters if schema provided
       if (schemas.query) {
-        req.query = await schemas.query.parseAsync(req.query);
+        // Just validate without reassigning to avoid read-only errors
+        await schemas.query.parseAsync(req.query);
       }
 
       // Validate URL parameters if schema provided
       if (schemas.params) {
-        req.params = await schemas.params.parseAsync(req.params);
+        // Just validate without reassigning to avoid read-only errors
+        await schemas.params.parseAsync(req.params);
       }
 
       next();
