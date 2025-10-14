@@ -7,6 +7,7 @@ import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import UserListPage from "@/pages/UserListPage";
+import UserProfilePage from "@/pages/UserProfilePage";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import SupplierListPage from "./pages/supplier/SupplierListPage";
 import SupplierDetailPage from "./pages/supplier/SupplierDetailPage";
@@ -49,6 +50,14 @@ function App() {
           element={
             <ProtectedRoute>
               <RegistrationRequestsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user-profile"
+          element={
+            <ProtectedRoute>
+              <UserProfilePage />
             </ProtectedRoute>
           }
         />
