@@ -50,9 +50,7 @@ export const supplierController = {
 
   async getById(req, res) {
     try {
-      const supplier = await supplierService.getById(
-        Number.parseInt(req.params.id)
-      );
+      const supplier = await supplierService.getById(req.params.id); // UUID is a string
       if (!supplier) {
         return res.status(404).json({ error: "Supplier not found" });
       }
@@ -65,7 +63,7 @@ export const supplierController = {
   async update(req, res) {
     try {
       const supplier = await supplierService.update(
-        Number.parseInt(req.params.id),
+        req.params.id, // UUID is a string
         req.body
       );
       if (!supplier) {
@@ -80,9 +78,7 @@ export const supplierController = {
   // Delete supplier
   async delete(req, res) {
     try {
-      const supplier = await supplierService.delete(
-        Number.parseInt(req.params.id)
-      );
+      const supplier = await supplierService.delete(req.params.id); // UUID is a string
       if (!supplier) {
         return res.status(404).json({ error: "Supplier not found" });
       }

@@ -26,10 +26,8 @@ export const supplierMedicationVariantController = {
         req.params.supplierId || req.query.supplierId || undefined;
 
       const filters = {
-        supplierId: supplierIdParam ? Number(supplierIdParam) : undefined,
-        medicationVariantId: req.query.medicationVariantId
-          ? Number(req.query.medicationVariantId)
-          : undefined,
+        supplierId: supplierIdParam || undefined, // UUID is a string
+        medicationVariantId: req.query.medicationVariantId || undefined, // UUID is a string
         limit: Number(req.query.limit) || 100,
         offset: Number(req.query.offset) || 0,
       };
@@ -44,9 +42,7 @@ export const supplierMedicationVariantController = {
   // Get supplier medication variant by ID
   async getById(req, res) {
     try {
-      const smv = await supplierMedicationVariantService.getById(
-        Number.parseInt(req.params.id)
-      );
+      const smv = await supplierMedicationVariantService.getById(req.params.id); // UUID is a string
       if (!smv) {
         return res
           .status(404)
@@ -61,7 +57,7 @@ export const supplierMedicationVariantController = {
   async update(req, res) {
     try {
       const smv = await supplierMedicationVariantService.update(
-        Number.parseInt(req.params.id),
+        req.params.id, // UUID is a string
         req.body
       );
       if (!smv) {
@@ -78,9 +74,7 @@ export const supplierMedicationVariantController = {
   // Delete supplier medication variant
   async delete(req, res) {
     try {
-      const smv = await supplierMedicationVariantService.delete(
-        Number.parseInt(req.params.id)
-      );
+      const smv = await supplierMedicationVariantService.delete(req.params.id); // UUID is a string
       if (!smv) {
         return res
           .status(404)

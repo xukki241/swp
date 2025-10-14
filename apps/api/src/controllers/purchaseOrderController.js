@@ -15,9 +15,7 @@ export const purchaseOrderController = {
   async getAll(req, res) {
     try {
       const filters = {
-        supplierId: req.query.supplierId
-          ? Number.parseInt(req.query.supplierId)
-          : undefined,
+        supplierId: req.query.supplierId || undefined, // UUID is a string
         status: req.query.status,
         startDate: req.query.startDate,
         endDate: req.query.endDate,
@@ -34,9 +32,7 @@ export const purchaseOrderController = {
   // Get purchase order by ID
   async getById(req, res) {
     try {
-      const po = await purchaseOrderService.getById(
-        Number.parseInt(req.params.id)
-      );
+      const po = await purchaseOrderService.getById(req.params.id); // UUID is a string
       if (!po) {
         return res.status(404).json({ error: "Purchase order not found" });
       }
@@ -49,7 +45,7 @@ export const purchaseOrderController = {
   async update(req, res) {
     try {
       const po = await purchaseOrderService.update(
-        Number.parseInt(req.params.id),
+        req.params.id, // UUID is a string
         req.body
       );
       if (!po) {
@@ -64,9 +60,7 @@ export const purchaseOrderController = {
   // Delete purchase order
   async delete(req, res) {
     try {
-      const po = await purchaseOrderService.delete(
-        Number.parseInt(req.params.id)
-      );
+      const po = await purchaseOrderService.delete(req.params.id); // UUID is a string
       if (!po) {
         return res.status(404).json({ error: "Purchase order not found" });
       }

@@ -22,7 +22,7 @@ export const supplierService = {
         if (variants && Array.isArray(variants) && variants.length > 0) {
           const variantsToInsert = variants.map((variant) => ({
             supplierId: supplier.id,
-            medicationVariantId: Number(variant.medicationVariantId),
+            medicationVariantId: variant.medicationVariantId, // UUID is a string
             supplierSku: variant.supplierSku,
             leadTimeDays: Number(variant.leadTimeDays),
           }));
