@@ -15,14 +15,19 @@ export const supplierMedicationVariantSchema = z.object({
 });
 
 // POST /api/suppliers/:supplierId/medications (batch)
-export const createSupplierMedicationSchema = z.object({
-  medication_variant_id: uuidSchema,
-  supplier_sku: z.string().max(50).optional(),
-  lead_time_days: nonNegativeIntSchema.optional(),
+export const createSupplierMedicationVariantSchema = z.object({
+  // Frontend gửi `medicationVariantId` là number
+  medicationVariantId: z.number().int().positive(),
+
+  // Frontend gửi `supplierSku` là string | null
+  supplierSku: z.string().nullable().optional(),
+
+  // Frontend gửi `leadTimeDays` là number | null
+  leadTimeDays: z.number().int().positive().nullable().optional(),
 });
 
 export const createSupplierMedicationsRequestSchema = z.array(
-  createSupplierMedicationSchema
+  createSupplierMedicationVariantSchema
 );
 export const createSupplierMedicationsResponseSchema = z.array(
   supplierMedicationVariantSchema
@@ -44,7 +49,7 @@ export const listSupplierMedicationsResponseSchema = z.object({
 
 // PATCH /api/suppliers/:supplierId/medications/:id
 export const updateSupplierMedicationRequestSchema =
-  createSupplierMedicationSchema.partial();
+  createSupplierMedicationVariantSchema.partial();
 export const updateSupplierMedicationResponseSchema =
   supplierMedicationVariantSchema;
 

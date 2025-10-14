@@ -27,7 +27,10 @@ supplierRouter.use(authenticate);
 
 // Param validation schema for routes with :id
 const idParamSchema = z.object({
-  id: uuidSchema,
+  id: z.coerce
+    .number()
+    .int()
+    .positive({ message: "ID phải là một số nguyên dương." }),
 });
 
 /**

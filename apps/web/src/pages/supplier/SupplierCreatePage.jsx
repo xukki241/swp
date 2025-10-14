@@ -77,7 +77,8 @@ export default function SupplierCreatePage() {
 
       const payload = { ...form, medicationVariants: variants };
 
-      await createSupplier.mutateAsync(payload);
+      // ✅ SỬA LỖI: Gói payload vào trong một mảng
+      await createSupplier.mutateAsync([payload]);
 
       toast.success("Supplier created successfully!", {
         description: "The supplier has been added.",

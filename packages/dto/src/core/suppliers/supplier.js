@@ -8,6 +8,7 @@ import {
   paginationSchema,
 } from "../common/index.js";
 import { supplierStatusEnum } from "../common/index.js";
+import { createSupplierMedicationVariantSchema } from "./medication.js";
 
 // Supplier schema
 export const supplierSchema = z.object({
@@ -19,7 +20,6 @@ export const supplierSchema = z.object({
   address: addressSchema,
   status: supplierStatusEnum,
 });
-
 // POST /api/suppliers (batch)
 export const createSupplierSchema = z.object({
   name: nameSchema,
@@ -28,6 +28,9 @@ export const createSupplierSchema = z.object({
   phone: phoneSchema,
   address: addressSchema,
   status: supplierStatusEnum.default("active"),
+
+  // Cho phép có một mảng các medication variant, khớp với schema mới ở trên
+  medicationVariants: z.array(createSupplierMedicationVariantSchema).optional(),
 });
 
 export const createSuppliersRequestSchema = z.array(createSupplierSchema);
