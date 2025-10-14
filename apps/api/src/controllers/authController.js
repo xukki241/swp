@@ -169,7 +169,7 @@ export const changePassword = async (req, res, next) => {
     }
 
     const result = await authService.changePassword(
-      BigInt(userId),
+      userId, // UUID is a string
       oldPassword,
       newPassword
     );

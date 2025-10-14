@@ -28,7 +28,7 @@ export const getAllRegistrations = async (req, res, next) => {
  */
 export const getRegistrationById = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
 
     const registration = await registrationService.getRegistrationById(id);
 
@@ -55,7 +55,7 @@ export const getRegistrationById = async (req, res, next) => {
  */
 export const approveRegistration = async (req, res, _next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
     const { role } = req.body;
 
     // Validate role
@@ -88,7 +88,7 @@ export const approveRegistration = async (req, res, _next) => {
  */
 export const rejectRegistration = async (req, res, _next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
 
     const result = await registrationService.rejectRegistration(id);
 
@@ -108,7 +108,7 @@ export const rejectRegistration = async (req, res, _next) => {
  */
 export const deleteRegistration = async (req, res, _next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
 
     const result = await registrationService.deleteRegistration(id);
 

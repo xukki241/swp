@@ -62,55 +62,83 @@ async function seed() {
 
     // 1. Seed Users
     console.log("👥 Seeding users...");
-    const [owner, staff1, staff2] = await db
+    const [owner, staff1, staff2, staff3, staff4] = await db
       .insert(users)
       .values([
         {
-          name: "John Doe",
-          email: "owner@pharmacy.com",
-          phone: "0123456789",
-          address: "123 Main St, City Center",
+          name: "Dr. Sarah Chen",
+          email: "owner@pharmaflow.com",
+          phone: "0901234567",
+          address: "123 Medical Plaza, District 1, Ho Chi Minh City",
           status: "active",
           role: "owner",
         },
         {
-          name: "Jane Smith",
-          email: "jane@pharmacy.com",
-          phone: "0987654321",
-          address: "456 Oak Ave, Downtown",
+          name: "Nguyen Van Tuan",
+          email: "tuan.nguyen@pharmaflow.com",
+          phone: "0912345678",
+          address: "456 Pharmacy Street, District 3, Ho Chi Minh City",
           status: "active",
           role: "staff",
         },
         {
-          name: "Mike Johnson",
-          email: "mike@pharmacy.com",
-          phone: "0555123456",
-          address: "789 Pine St, Uptown",
+          name: "Le Thi Mai",
+          email: "mai.le@pharmaflow.com",
+          phone: "0923456789",
+          address: "789 Healthcare Ave, District 5, Ho Chi Minh City",
           status: "active",
+          role: "staff",
+        },
+        {
+          name: "Tran Minh Quan",
+          email: "quan.tran@pharmaflow.com",
+          phone: "0934567890",
+          address: "321 Wellness Blvd, District 7, Ho Chi Minh City",
+          status: "active",
+          role: "staff",
+        },
+        {
+          name: "Pham Thu Huong",
+          email: "huong.pham@pharmaflow.com",
+          phone: "0945678901",
+          address: "654 Medical Center, District 10, Ho Chi Minh City",
+          status: "inactive",
           role: "staff",
         },
       ])
       .returning();
 
-    // 2. Seed User Credentials
+    // 2. Seed User Credentials (password: "password123" for all users)
     console.log("🔐 Seeding user credentials...");
     await db.insert(userCredentials).values([
       {
         userId: owner.id,
         provider: "local",
-        identifier: "owner@pharmacy.com",
+        identifier: "owner@pharmaflow.com",
         secret: "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
       },
       {
         userId: staff1.id,
         provider: "local",
-        identifier: "jane@pharmacy.com",
+        identifier: "tuan.nguyen@pharmaflow.com",
         secret: "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
       },
       {
         userId: staff2.id,
         provider: "local",
-        identifier: "mike@pharmacy.com",
+        identifier: "mai.le@pharmaflow.com",
+        secret: "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
+      },
+      {
+        userId: staff3.id,
+        provider: "local",
+        identifier: "quan.tran@pharmaflow.com",
+        secret: "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
+      },
+      {
+        userId: staff4.id,
+        provider: "local",
+        identifier: "huong.pham@pharmaflow.com",
         secret: "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
       },
     ]);
@@ -119,78 +147,121 @@ async function seed() {
     console.log("📝 Seeding user registrations...");
     await db.insert(userRegistrations).values([
       {
-        name: "Alice Brown",
-        email: "alice@example.com",
-        phone: "0111222333",
-        address: "321 Elm St, Suburb",
+        name: "Hoang Van Nam",
+        email: "nam.hoang@example.com",
+        phone: "0956789012",
+        address: "147 Nguyen Trai St, District 1, Ho Chi Minh City",
         password:
           "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
         status: "pending",
       },
       {
-        name: "Bob Wilson",
-        email: "bob@example.com",
-        phone: "0444555666",
-        address: "654 Maple Dr, Village",
+        name: "Vo Thi Lan",
+        email: "lan.vo@example.com",
+        phone: "0967890123",
+        address: "258 Le Loi Blvd, District 3, Ho Chi Minh City",
         password:
           "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
         status: "approved",
+      },
+      {
+        name: "Do Minh Tri",
+        email: "tri.do@example.com",
+        phone: "0978901234",
+        address: "369 Vo Van Tan St, District 3, Ho Chi Minh City",
+        password:
+          "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
+        status: "rejected",
       },
     ]);
 
     // 4. Seed Customers
     console.log("🛍️ Seeding customers...");
-    const [customer1, customer2, customer3] = await db
+    const [customer1, customer2, customer3, customer4] = await db
       .insert(customers)
       .values([
         {
-          name: "Sarah Connor",
-          email: "sarah@customer.com",
-          phone: "0777888999",
-          address: "147 Future St, Tech City",
+          name: "Nguyen Thi Hoa",
+          email: "hoa.nguyen@customer.com",
+          phone: "0989012345",
+          address: "12 Tran Hung Dao St, District 1, Ho Chi Minh City",
         },
         {
-          name: "Peter Parker",
-          email: "peter@customer.com",
-          phone: "0333444555",
-          address: "20 Spider Lane, New York",
+          name: "Le Van Hung",
+          email: "hung.le@customer.com",
+          phone: "0990123456",
+          address: "34 Pasteur St, District 1, Ho Chi Minh City",
         },
         {
-          name: "Diana Prince",
-          email: "diana@customer.com",
-          phone: "0666777888",
-          address: "1 Wonder Ave, Paradise Island",
+          name: "Pham Thi Thao",
+          email: "thao.pham@customer.com",
+          phone: "0991234567",
+          address: "56 Nguyen Hue Blvd, District 1, Ho Chi Minh City",
+        },
+        {
+          name: "Tran Van Binh",
+          email: "binh.tran@customer.com",
+          phone: "0992345678",
+          address: "78 Le Duan St, District 1, Ho Chi Minh City",
+        },
+        {
+          name: "Vo Thi Kim",
+          email: "kim.vo@customer.com",
+          phone: "0993456789",
+          address: "90 Hai Ba Trung St, District 3, Ho Chi Minh City",
+        },
+        {
+          name: "Dang Van Long",
+          email: "long.dang@customer.com",
+          phone: "0994567890",
+          address: "45 Cach Mang Thang 8 St, District 10, Ho Chi Minh City",
         },
       ])
       .returning();
 
     // 5. Seed Suppliers
     console.log("🏭 Seeding suppliers...");
-    const [supplier1, supplier2, supplier3] = await db
+    const [supplier1, supplier2, supplier3, supplier4] = await db
       .insert(suppliers)
       .values([
         {
-          name: "PharmaCorp International",
-          contactName: "David Lee",
-          email: "contact@pharmacorp.com",
-          phone: "0200300400",
-          address: "500 Industrial Blvd, Manufacturing District",
+          name: "Viet Pharmaceutical Corporation",
+          contactName: "Nguyen Van Khai",
+          email: "contact@vietpharm.vn",
+          phone: "0281234567",
+          address: "123 Nguyen Van Linh Pkwy, District 7, Ho Chi Minh City",
           status: "active",
         },
         {
-          name: "MediSupply Ltd",
-          contactName: "Lisa Wang",
-          email: "orders@medisupply.com",
-          phone: "0201302403",
-          address: "301 Supply Chain Ave, Logistics Hub",
+          name: "Saigon MediSupply Co., Ltd",
+          contactName: "Tran Thi Thanh",
+          email: "orders@sgmedisupply.com",
+          phone: "0282345678",
+          address: "456 Truong Chinh St, Tan Binh District, Ho Chi Minh City",
           status: "active",
         },
         {
-          name: "BioMed Solutions",
-          contactName: "Robert Chen",
-          email: "sales@biomed.com",
-          phone: "0202304405",
-          address: "750 Research Parkway, Science City",
+          name: "Global BioMed Vietnam",
+          contactName: "Le Hoang Phuc",
+          email: "sales@globalbiomed.vn",
+          phone: "0283456789",
+          address: "789 Xa Lo Ha Noi St, Thu Duc City, Ho Chi Minh City",
+          status: "active",
+        },
+        {
+          name: "Asia Pacific Pharmaceuticals",
+          contactName: "Pham Van Duc",
+          email: "info@appharm.com",
+          phone: "0284567890",
+          address: "321 Vo Thi Sau St, District 3, Ho Chi Minh City",
+          status: "active",
+        },
+        {
+          name: "Mekong Healthcare Supplies",
+          contactName: "Vo Thi Minh",
+          email: "contact@mekonghealth.vn",
+          phone: "0285678901",
+          address: "654 3/2 St, District 10, Ho Chi Minh City",
           status: "inactive",
         },
       ])
@@ -198,13 +269,27 @@ async function seed() {
 
     // 6. Seed Medications
     console.log("💊 Seeding medications...");
-    const [med1, med2, med3, med4, med5] = await db
+    const [
+      med1,
+      med2,
+      med3,
+      med4,
+      med5,
+      med6,
+      med7,
+      med8,
+      med9,
+      med10,
+      med11,
+      med12,
+    ] = await db
       .insert(medications)
       .values([
         {
           name: "Paracetamol",
           brand: "Tylenol",
-          description: "Pain reliever and fever reducer",
+          description:
+            "Analgesic and antipyretic for pain relief and fever reduction",
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
@@ -212,31 +297,88 @@ async function seed() {
         {
           name: "Amoxicillin",
           brand: "Amoxil",
-          description: "Antibiotic for bacterial infections",
+          description: "Beta-lactam antibiotic for bacterial infections",
           isPrescriptionRequired: true,
           isControlledSubstance: false,
           status: "active",
         },
         {
           name: "Ibuprofen",
-          brand: "Advil",
-          description: "Anti-inflammatory pain reliever",
+          brand: "Brufen",
+          description: "Non-steroidal anti-inflammatory drug (NSAID)",
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
         },
         {
           name: "Omeprazole",
-          brand: "Prilosec",
-          description: "Proton pump inhibitor for acid reflux",
+          brand: "Losec",
+          description:
+            "Proton pump inhibitor for gastric acid-related disorders",
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
         },
         {
-          name: "Morphine",
-          brand: "MS Contin",
-          description: "Strong opioid pain medication",
+          name: "Cetirizine",
+          brand: "Zyrtec",
+          description: "Antihistamine for allergic conditions",
+          isPrescriptionRequired: false,
+          isControlledSubstance: false,
+          status: "active",
+        },
+        {
+          name: "Metformin",
+          brand: "Glucophage",
+          description: "Oral antidiabetic medication for type 2 diabetes",
+          isPrescriptionRequired: true,
+          isControlledSubstance: false,
+          status: "active",
+        },
+        {
+          name: "Atorvastatin",
+          brand: "Lipitor",
+          description: "Statin for cholesterol management",
+          isPrescriptionRequired: true,
+          isControlledSubstance: false,
+          status: "active",
+        },
+        {
+          name: "Amlodipine",
+          brand: "Norvasc",
+          description: "Calcium channel blocker for hypertension",
+          isPrescriptionRequired: true,
+          isControlledSubstance: false,
+          status: "active",
+        },
+        {
+          name: "Salbutamol",
+          brand: "Ventolin",
+          description: "Bronchodilator for asthma and COPD",
+          isPrescriptionRequired: true,
+          isControlledSubstance: false,
+          status: "active",
+        },
+        {
+          name: "Vitamin D3",
+          brand: "Cholecalciferol",
+          description: "Vitamin D supplement for bone health",
+          isPrescriptionRequired: false,
+          isControlledSubstance: false,
+          status: "active",
+        },
+        {
+          name: "Azithromycin",
+          brand: "Zithromax",
+          description: "Macrolide antibiotic for respiratory infections",
+          isPrescriptionRequired: true,
+          isControlledSubstance: false,
+          status: "active",
+        },
+        {
+          name: "Tramadol",
+          brand: "Ultram",
+          description: "Opioid analgesic for moderate to severe pain",
           isPrescriptionRequired: true,
           isControlledSubstance: true,
           status: "active",
@@ -250,84 +392,300 @@ async function seed() {
       // Paracetamol variants
       {
         medicationId: med1.id,
-        sku: "PAR-500-TAB",
-        name: "Paracetamol 500mg Tablets",
+        sku: "PAR-500-TAB-100",
+        name: "Paracetamol 500mg Tablets (Box of 100)",
         unit: "tablet",
         unitFactor: 1.0,
-        barcode: "1234567890001",
-        sellPrice: 0.5,
+        barcode: "8934567890001",
+        sellPrice: 50000,
         isActive: true,
         isForSale: true,
       },
       {
         medicationId: med1.id,
-        sku: "PAR-250-SYR",
-        name: "Paracetamol 250mg/5ml Syrup",
-        unit: "ml",
-        unitFactor: 5.0,
-        barcode: "1234567890002",
-        sellPrice: 0.1,
+        sku: "PAR-650-TAB-50",
+        name: "Paracetamol 650mg Tablets (Box of 50)",
+        unit: "tablet",
+        unitFactor: 1.0,
+        barcode: "8934567890002",
+        sellPrice: 35000,
         isActive: true,
         isForSale: true,
       },
+      {
+        medicationId: med1.id,
+        sku: "PAR-250-SYR-60ML",
+        name: "Paracetamol 250mg/5ml Syrup (60ml bottle)",
+        unit: "bottle",
+        unitFactor: 1.0,
+        barcode: "8934567890003",
+        sellPrice: 45000,
+        isActive: true,
+        isForSale: true,
+      },
+
       // Amoxicillin variants
       {
         medicationId: med2.id,
-        sku: "AMX-500-CAP",
-        name: "Amoxicillin 500mg Capsules",
+        sku: "AMX-500-CAP-20",
+        name: "Amoxicillin 500mg Capsules (Box of 20)",
         unit: "capsule",
         unitFactor: 1.0,
-        barcode: "1234567890003",
-        sellPrice: 1.25,
+        barcode: "8934567890011",
+        sellPrice: 85000,
         isActive: true,
         isForSale: true,
       },
       {
         medicationId: med2.id,
-        sku: "AMX-250-SUS",
-        name: "Amoxicillin 250mg/5ml Suspension",
-        unit: "ml",
-        unitFactor: 5.0,
-        barcode: "1234567890004",
-        sellPrice: 0.25,
+        sku: "AMX-250-SUS-100ML",
+        name: "Amoxicillin 250mg/5ml Suspension (100ml bottle)",
+        unit: "bottle",
+        unitFactor: 1.0,
+        barcode: "8934567890012",
+        sellPrice: 65000,
         isActive: true,
         isForSale: true,
       },
+
       // Ibuprofen variants
       {
         medicationId: med3.id,
-        sku: "IBU-400-TAB",
-        name: "Ibuprofen 400mg Tablets",
+        sku: "IBU-400-TAB-30",
+        name: "Ibuprofen 400mg Tablets (Box of 30)",
         unit: "tablet",
         unitFactor: 1.0,
-        barcode: "1234567890005",
-        sellPrice: 0.75,
+        barcode: "8934567890021",
+        sellPrice: 55000,
         isActive: true,
         isForSale: true,
       },
+      {
+        medicationId: med3.id,
+        sku: "IBU-200-TAB-50",
+        name: "Ibuprofen 200mg Tablets (Box of 50)",
+        unit: "tablet",
+        unitFactor: 1.0,
+        barcode: "8934567890022",
+        sellPrice: 40000,
+        isActive: true,
+        isForSale: true,
+      },
+
       // Omeprazole variants
       {
         medicationId: med4.id,
-        sku: "OME-20-CAP",
-        name: "Omeprazole 20mg Capsules",
+        sku: "OME-20-CAP-28",
+        name: "Omeprazole 20mg Capsules (Box of 28)",
         unit: "capsule",
         unitFactor: 1.0,
-        barcode: "1234567890006",
-        sellPrice: 1.5,
+        barcode: "8934567890031",
+        sellPrice: 120000,
         isActive: true,
         isForSale: true,
       },
-      // Morphine variants
+      {
+        medicationId: med4.id,
+        sku: "OME-40-CAP-14",
+        name: "Omeprazole 40mg Capsules (Box of 14)",
+        unit: "capsule",
+        unitFactor: 1.0,
+        barcode: "8934567890032",
+        sellPrice: 95000,
+        isActive: true,
+        isForSale: true,
+      },
+
+      // Cetirizine variants
       {
         medicationId: med5.id,
-        sku: "MOR-10-TAB",
-        name: "Morphine 10mg Tablets",
+        sku: "CET-10-TAB-30",
+        name: "Cetirizine 10mg Tablets (Box of 30)",
         unit: "tablet",
         unitFactor: 1.0,
-        barcode: "1234567890007",
-        sellPrice: 5.0,
+        barcode: "8934567890041",
+        sellPrice: 45000,
         isActive: true,
-        isForSale: false, // Controlled substance
+        isForSale: true,
+      },
+      {
+        medicationId: med5.id,
+        sku: "CET-5-SYR-60ML",
+        name: "Cetirizine 5mg/5ml Syrup (60ml bottle)",
+        unit: "bottle",
+        unitFactor: 1.0,
+        barcode: "8934567890042",
+        sellPrice: 38000,
+        isActive: true,
+        isForSale: true,
+      },
+
+      // Metformin variants
+      {
+        medicationId: med6.id,
+        sku: "MET-500-TAB-60",
+        name: "Metformin 500mg Tablets (Box of 60)",
+        unit: "tablet",
+        unitFactor: 1.0,
+        barcode: "8934567890051",
+        sellPrice: 75000,
+        isActive: true,
+        isForSale: true,
+      },
+      {
+        medicationId: med6.id,
+        sku: "MET-850-TAB-30",
+        name: "Metformin 850mg Tablets (Box of 30)",
+        unit: "tablet",
+        unitFactor: 1.0,
+        barcode: "8934567890052",
+        sellPrice: 65000,
+        isActive: true,
+        isForSale: true,
+      },
+
+      // Atorvastatin variants
+      {
+        medicationId: med7.id,
+        sku: "ATO-10-TAB-30",
+        name: "Atorvastatin 10mg Tablets (Box of 30)",
+        unit: "tablet",
+        unitFactor: 1.0,
+        barcode: "8934567890061",
+        sellPrice: 150000,
+        isActive: true,
+        isForSale: true,
+      },
+      {
+        medicationId: med7.id,
+        sku: "ATO-20-TAB-30",
+        name: "Atorvastatin 20mg Tablets (Box of 30)",
+        unit: "tablet",
+        unitFactor: 1.0,
+        barcode: "8934567890062",
+        sellPrice: 220000,
+        isActive: true,
+        isForSale: true,
+      },
+
+      // Amlodipine variants
+      {
+        medicationId: med8.id,
+        sku: "AML-5-TAB-30",
+        name: "Amlodipine 5mg Tablets (Box of 30)",
+        unit: "tablet",
+        unitFactor: 1.0,
+        barcode: "8934567890071",
+        sellPrice: 85000,
+        isActive: true,
+        isForSale: true,
+      },
+      {
+        medicationId: med8.id,
+        sku: "AML-10-TAB-30",
+        name: "Amlodipine 10mg Tablets (Box of 30)",
+        unit: "tablet",
+        unitFactor: 1.0,
+        barcode: "8934567890072",
+        sellPrice: 125000,
+        isActive: true,
+        isForSale: true,
+      },
+
+      // Salbutamol variants
+      {
+        medicationId: med9.id,
+        sku: "SAL-100-INH-200",
+        name: "Salbutamol 100mcg Inhaler (200 doses)",
+        unit: "inhaler",
+        unitFactor: 1.0,
+        barcode: "8934567890081",
+        sellPrice: 95000,
+        isActive: true,
+        isForSale: true,
+      },
+      {
+        medicationId: med9.id,
+        sku: "SAL-2-NEB-20",
+        name: "Salbutamol 2mg/2ml Nebules (Box of 20)",
+        unit: "nebule",
+        unitFactor: 1.0,
+        barcode: "8934567890082",
+        sellPrice: 180000,
+        isActive: true,
+        isForSale: true,
+      },
+
+      // Vitamin D3 variants
+      {
+        medicationId: med10.id,
+        sku: "VID-1000-CAP-30",
+        name: "Vitamin D3 1000IU Soft Capsules (Box of 30)",
+        unit: "capsule",
+        unitFactor: 1.0,
+        barcode: "8934567890091",
+        sellPrice: 65000,
+        isActive: true,
+        isForSale: true,
+      },
+      {
+        medicationId: med10.id,
+        sku: "VID-400-DROP-10ML",
+        name: "Vitamin D3 400IU/drop Oral Drops (10ml bottle)",
+        unit: "bottle",
+        unitFactor: 1.0,
+        barcode: "8934567890092",
+        sellPrice: 55000,
+        isActive: true,
+        isForSale: true,
+      },
+
+      // Azithromycin variants
+      {
+        medicationId: med11.id,
+        sku: "AZI-500-TAB-3",
+        name: "Azithromycin 500mg Tablets (Box of 3)",
+        unit: "tablet",
+        unitFactor: 1.0,
+        barcode: "8934567890101",
+        sellPrice: 75000,
+        isActive: true,
+        isForSale: true,
+      },
+      {
+        medicationId: med11.id,
+        sku: "AZI-200-SUS-15ML",
+        name: "Azithromycin 200mg/5ml Suspension (15ml bottle)",
+        unit: "bottle",
+        unitFactor: 1.0,
+        barcode: "8934567890102",
+        sellPrice: 85000,
+        isActive: true,
+        isForSale: true,
+      },
+
+      // Tramadol variants (controlled substance)
+      {
+        medicationId: med12.id,
+        sku: "TRA-50-CAP-20",
+        name: "Tramadol 50mg Capsules (Box of 20)",
+        unit: "capsule",
+        unitFactor: 1.0,
+        barcode: "8934567890111",
+        sellPrice: 250000,
+        isActive: true,
+        isForSale: false, // Controlled substance - special handling
+      },
+      {
+        medicationId: med12.id,
+        sku: "TRA-100-TAB-10",
+        name: "Tramadol 100mg Extended-Release Tablets (Box of 10)",
+        unit: "tablet",
+        unitFactor: 1.0,
+        barcode: "8934567890112",
+        sellPrice: 180000,
+        isActive: true,
+        isForSale: false, // Controlled substance - special handling
       },
     ];
 
@@ -338,62 +696,100 @@ async function seed() {
 
     // 8. Seed Warehouse Zones
     console.log("🏪 Seeding warehouse zones...");
-    const [zone1, zone2, zone3] = await db
+    const [zone1, zone2, zone3, zone4] = await db
       .insert(warehouseZones)
       .values([
         {
           code: "NORM-A",
           name: "Normal Storage Zone A",
           type: "normal",
-          location: "Main Floor - Section A",
-          description: "General medication storage area",
-        },
-        {
-          code: "COLD-B",
-          name: "Cold Storage Zone B",
-          type: "cold",
-          location: "Refrigerated Section - Floor 2",
+          location: "Ground Floor - Section A (Main Warehouse)",
           description:
-            "Temperature controlled storage for vaccines and biologics",
+            "Primary storage for tablets, capsules, and general medications at room temperature",
         },
         {
-          code: "CTRL-C",
-          name: "Controlled Substances Zone C",
+          code: "NORM-B",
+          name: "Normal Storage Zone B",
+          type: "normal",
+          location: "Ground Floor - Section B (Main Warehouse)",
+          description:
+            "Secondary storage for high-volume OTC medications and supplements",
+        },
+        {
+          code: "COLD-C",
+          name: "Cold Storage Zone C",
+          type: "cold",
+          location: "Second Floor - Cold Storage Facility",
+          description:
+            "Temperature-controlled (2-8°C) storage for vaccines, insulin, and biologics",
+        },
+        {
+          code: "CTRL-D",
+          name: "Controlled Substances Vault D",
           type: "hazard",
-          location: "Secure Vault - Basement",
-          description: "High security area for controlled medications",
+          location: "Basement - High Security Vault",
+          description:
+            "Restricted access vault for controlled substances and narcotics with 24/7 monitoring",
         },
       ])
       .returning();
 
     // 9. Seed Warehouse Racks
     console.log("🗄️ Seeding warehouse racks...");
-    const [rack1, rack2, rack3, rack4] = await db
+    const [rack1, rack2, rack3, rack4, rack5, rack6, rack7, rack8] = await db
       .insert(warehouseRacks)
       .values([
+        // Zone A - Normal Storage Racks
         {
           zoneId: zone1.id,
-          code: "R001",
-          name: "Rack A1",
-          description: "Main storage rack for tablets and capsules",
+          code: "R-A-001",
+          name: "Rack A-001 (Oral Solids)",
+          description: "Tablets and capsules - Antibiotics and Analgesics",
         },
         {
           zoneId: zone1.id,
-          code: "R002",
-          name: "Rack A2",
-          description: "Storage rack for liquid medications",
+          code: "R-A-002",
+          name: "Rack A-002 (Cardiovascular)",
+          description: "Blood pressure and cholesterol medications",
+        },
+        {
+          zoneId: zone1.id,
+          code: "R-A-003",
+          name: "Rack A-003 (Liquids & Syrups)",
+          description: "Liquid formulations and suspensions",
+        },
+        // Zone B - Normal Storage Racks
+        {
+          zoneId: zone2.id,
+          code: "R-B-001",
+          name: "Rack B-001 (OTC Medications)",
+          description: "Over-the-counter pain relief and cold medications",
         },
         {
           zoneId: zone2.id,
-          code: "C001",
-          name: "Cold Rack B1",
-          description: "Refrigerated storage rack",
+          code: "R-B-002",
+          name: "Rack B-002 (Vitamins & Supplements)",
+          description: "Dietary supplements and multivitamins",
+        },
+        // Zone C - Cold Storage Racks
+        {
+          zoneId: zone3.id,
+          code: "R-C-001",
+          name: "Cold Rack C-001 (Vaccines)",
+          description: "Vaccine storage with temperature monitoring",
         },
         {
           zoneId: zone3.id,
-          code: "S001",
-          name: "Secure Rack C1",
-          description: "High security rack for controlled substances",
+          code: "R-C-002",
+          name: "Cold Rack C-002 (Insulin & Biologics)",
+          description: "Refrigerated insulin and biological products",
+        },
+        // Zone D - Controlled Substances
+        {
+          zoneId: zone4.id,
+          code: "R-D-001",
+          name: "Secure Vault D-001 (Narcotics)",
+          description: "High-security storage for controlled narcotics",
         },
       ])
       .returning();
@@ -402,14 +798,14 @@ async function seed() {
     console.log("📦 Seeding warehouse bins...");
     const binData = [];
 
-    // Create bins for each rack
-    [rack1, rack2, rack3, rack4].forEach((rack, rackIndex) => {
-      for (let level = 1; level <= 3; level++) {
-        for (let number = 1; number <= 4; number++) {
+    // Create bins for each rack (4 levels x 6 positions per level)
+    [rack1, rack2, rack3, rack4, rack5, rack6, rack7, rack8].forEach((rack) => {
+      for (let level = 1; level <= 4; level++) {
+        for (let number = 1; number <= 6; number++) {
           binData.push({
             rackId: rack.id,
-            code: `${rack.code}-L${level}-${number.toString().padStart(2, "0")}`,
-            name: `${rack.name} Level ${level} Bin ${number}`,
+            code: `${rack.code}-L${level}-B${number.toString().padStart(2, "0")}`,
+            name: `${rack.name} - Level ${level} - Bin ${number}`,
             level,
             number,
             description: `Storage bin at level ${level}, position ${number}`,
@@ -425,18 +821,99 @@ async function seed() {
 
     // 11. Seed Supplier Medication Variants
     console.log("🤝 Seeding supplier medication variants...");
-    const supplierMedicationVariantData = [];
+    const supplierMedicationVariantData = [
+      // Supplier 1 (Viet Pharmaceutical Corporation)
+      {
+        supplierId: supplier1.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        supplierSku: "VP-PAR500",
+        leadTimeDays: 5,
+      },
+      {
+        supplierId: supplier1.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        supplierSku: "VP-AMX500",
+        leadTimeDays: 7,
+      },
+      {
+        supplierId: supplier1.id,
+        medicationVariantId: medicationVariantsResults[13].id, // Atorvastatin 20mg
+        supplierSku: "VP-ATO20",
+        leadTimeDays: 10,
+      },
+      {
+        supplierId: supplier1.id,
+        medicationVariantId: medicationVariantsResults[15].id, // Amlodipine 10mg
+        supplierSku: "VP-AML10",
+        leadTimeDays: 7,
+      },
 
-    // Link suppliers with medication variants
-    medicationVariantsResults.forEach((variant, index) => {
-      const supplierId = [supplier1.id, supplier2.id][index % 2]; // Alternate between suppliers
-      supplierMedicationVariantData.push({
-        supplierId,
-        medicationVariantId: variant.id,
-        supplierSku: `SUP-${variant.sku}`,
-        leadTimeDays: Math.floor(Math.random() * 14) + 7, // 7-20 days
-      });
-    });
+      // Supplier 2 (Saigon MediSupply)
+      {
+        supplierId: supplier2.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        supplierSku: "SGM-IBU400",
+        leadTimeDays: 4,
+      },
+      {
+        supplierId: supplier2.id,
+        medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
+        supplierSku: "SGM-OME20",
+        leadTimeDays: 6,
+      },
+      {
+        supplierId: supplier2.id,
+        medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
+        supplierSku: "SGM-CET10",
+        leadTimeDays: 5,
+      },
+      {
+        supplierId: supplier2.id,
+        medicationVariantId: medicationVariantsResults[21].id, // Azithromycin 500mg
+        supplierSku: "SGM-AZI500",
+        leadTimeDays: 8,
+      },
+
+      // Supplier 3 (Global BioMed)
+      {
+        supplierId: supplier3.id,
+        medicationVariantId: medicationVariantsResults[11].id, // Metformin 500mg
+        supplierSku: "GBM-MET500",
+        leadTimeDays: 12,
+      },
+      {
+        supplierId: supplier3.id,
+        medicationVariantId: medicationVariantsResults[17].id, // Salbutamol Inhaler
+        supplierSku: "GBM-SAL-INH",
+        leadTimeDays: 14,
+      },
+      {
+        supplierId: supplier3.id,
+        medicationVariantId: medicationVariantsResults[19].id, // Vitamin D3 1000IU
+        supplierSku: "GBM-VID1000",
+        leadTimeDays: 10,
+      },
+
+      // Supplier 4 (Asia Pacific Pharmaceuticals)
+      {
+        supplierId: supplier4.id,
+        medicationVariantId: medicationVariantsResults[23].id, // Tramadol 50mg
+        supplierSku: "APP-TRA50",
+        leadTimeDays: 15,
+      },
+      {
+        supplierId: supplier4.id,
+        medicationVariantId: medicationVariantsResults[1].id, // Paracetamol 650mg
+        supplierSku: "APP-PAR650",
+        leadTimeDays: 6,
+      },
+      {
+        supplierId: supplier4.id,
+        medicationVariantId: medicationVariantsResults[6].id, // Ibuprofen 200mg
+        supplierSku: "APP-IBU200",
+        leadTimeDays: 5,
+      },
+    ];
 
     const supplierMedicationVariantsResults = await db
       .insert(supplierMedicationVariants)
@@ -445,32 +922,48 @@ async function seed() {
 
     // 12. Seed Purchase Orders
     console.log("📋 Seeding purchase orders...");
-    const [po1, po2, po3] = await db
+    const [po1, po2, po3, po4, po5] = await db
       .insert(purchaseOrders)
       .values([
         {
           supplierId: supplier1.id,
-          orderDate: new Date("2024-01-15"),
-          expectedDate: new Date("2024-01-29"),
+          orderDate: new Date("2024-05-15T09:00:00Z"),
+          expectedDate: new Date("2024-05-22T09:00:00Z"),
           status: "received",
-          totalAmount: 2500.0,
+          totalAmount: 18500000,
           createdBy: owner.id,
         },
         {
           supplierId: supplier2.id,
-          orderDate: new Date("2024-02-01"),
-          expectedDate: new Date("2024-02-15"),
+          orderDate: new Date("2024-06-01T14:00:00Z"),
+          expectedDate: new Date("2024-06-07T14:00:00Z"),
           status: "ordered",
-          totalAmount: 1800.5,
+          totalAmount: 11250000,
           createdBy: staff1.id,
         },
         {
-          supplierId: supplier1.id,
-          orderDate: new Date("2024-02-10"),
-          expectedDate: new Date("2024-02-24"),
+          supplierId: supplier3.id,
+          orderDate: new Date("2024-06-10T11:30:00Z"),
+          expectedDate: new Date("2024-06-24T11:30:00Z"),
           status: "pending",
-          totalAmount: 3200.75,
+          totalAmount: 24750000,
           createdBy: staff2.id,
+        },
+        {
+          supplierId: supplier1.id,
+          orderDate: new Date("2024-06-12T16:00:00Z"),
+          expectedDate: new Date("2024-06-19T16:00:00Z"),
+          status: "pending",
+          totalAmount: 9750000,
+          createdBy: owner.id,
+        },
+        {
+          supplierId: supplier4.id,
+          orderDate: new Date("2024-06-14T10:00:00Z"),
+          expectedDate: new Date("2024-06-29T10:00:00Z"),
+          status: "cancelled",
+          totalAmount: 35000000,
+          createdBy: staff3.id,
         },
       ])
       .returning();
@@ -478,42 +971,91 @@ async function seed() {
     // 13. Seed Purchase Order Items
     console.log("📦 Seeding purchase order items...");
     const purchaseOrderItemData = [
-      // PO1 Items
+      // PO1 Items (Viet Pharmaceutical)
       {
         purchaseOrderId: po1.id,
-        supplierMedicationVariantId: supplierMedicationVariantsResults[0].id,
-        quantity: 1000,
-        unitPrice: 0.4,
-        totalPrice: 400.0,
-      },
-      {
-        purchaseOrderId: po1.id,
-        supplierMedicationVariantId: supplierMedicationVariantsResults[2].id,
-        quantity: 500,
-        unitPrice: 1.0,
-        totalPrice: 500.0,
-      },
-      {
-        purchaseOrderId: po1.id,
-        supplierMedicationVariantId: supplierMedicationVariantsResults[4].id,
-        quantity: 800,
-        unitPrice: 0.6,
-        totalPrice: 480.0,
-      },
-      // PO2 Items
-      {
-        purchaseOrderId: po2.id,
-        supplierMedicationVariantId: supplierMedicationVariantsResults[1].id,
+        supplierMedicationVariantId: supplierMedicationVariantsResults[0].id, // Paracetamol 500mg
         quantity: 200,
-        unitPrice: 0.08,
-        totalPrice: 16.0,
+        unitPrice: 40000,
+        totalPrice: 8000000,
+      },
+      {
+        purchaseOrderId: po1.id,
+        supplierMedicationVariantId: supplierMedicationVariantsResults[1].id, // Amoxicillin 500mg
+        quantity: 100,
+        unitPrice: 75000,
+        totalPrice: 7500000,
+      },
+      {
+        purchaseOrderId: po1.id,
+        supplierMedicationVariantId: supplierMedicationVariantsResults[2].id, // Atorvastatin 20mg
+        quantity: 50,
+        unitPrice: 200000,
+        totalPrice: 3000000,
+      },
+
+      // PO2 Items (Saigon MediSupply)
+      {
+        purchaseOrderId: po2.id,
+        supplierMedicationVariantId: supplierMedicationVariantsResults[4].id, // Ibuprofen 400mg
+        quantity: 150,
+        unitPrice: 45000,
+        totalPrice: 6750000,
       },
       {
         purchaseOrderId: po2.id,
-        supplierMedicationVariantId: supplierMedicationVariantsResults[3].id,
+        supplierMedicationVariantId: supplierMedicationVariantsResults[5].id, // Omeprazole 20mg
+        quantity: 50,
+        unitPrice: 90000,
+        totalPrice: 4500000,
+      },
+
+      // PO3 Items (Global BioMed)
+      {
+        purchaseOrderId: po3.id,
+        supplierMedicationVariantId: supplierMedicationVariantsResults[8].id, // Metformin 500mg
         quantity: 300,
-        unitPrice: 0.2,
-        totalPrice: 60.0,
+        unitPrice: 60000,
+        totalPrice: 18000000,
+      },
+      {
+        purchaseOrderId: po3.id,
+        supplierMedicationVariantId: supplierMedicationVariantsResults[9].id, // Salbutamol Inhaler
+        quantity: 50,
+        unitPrice: 75000,
+        totalPrice: 3750000,
+      },
+      {
+        purchaseOrderId: po3.id,
+        supplierMedicationVariantId: supplierMedicationVariantsResults[10].id, // Vitamin D3
+        quantity: 100,
+        unitPrice: 50000,
+        totalPrice: 3000000,
+      },
+
+      // PO4 Items (Viet Pharmaceutical)
+      {
+        purchaseOrderId: po4.id,
+        supplierMedicationVariantId: supplierMedicationVariantsResults[3].id, // Amlodipine 10mg
+        quantity: 100,
+        unitPrice: 97500,
+        totalPrice: 9750000,
+      },
+
+      // PO5 Items (Asia Pacific Pharmaceuticals) - Cancelled PO
+      {
+        purchaseOrderId: po5.id,
+        supplierMedicationVariantId: supplierMedicationVariantsResults[11].id, // Tramadol 50mg
+        quantity: 100,
+        unitPrice: 200000,
+        totalPrice: 20000000,
+      },
+      {
+        purchaseOrderId: po5.id,
+        supplierMedicationVariantId: supplierMedicationVariantsResults[12].id, // Paracetamol 650mg
+        quantity: 300,
+        unitPrice: 50000,
+        totalPrice: 15000000,
       },
     ];
 
@@ -529,7 +1071,7 @@ async function seed() {
       .values([
         {
           purchaseOrderId: po1.id,
-          receivedDate: new Date("2024-01-30"),
+          receivedDate: new Date("2024-05-23T10:00:00Z"),
           receivedBy: staff1.id,
         },
       ])
@@ -542,7 +1084,7 @@ async function seed() {
       .map((item) => ({
         purchaseOrderReceiptId: receipt1.id,
         purchaseOrderItemId: item.id,
-        quantity: item.quantity, // Full quantity received
+        quantity: item.quantity, // Assume full quantity received
       }));
 
     const receiptItemsResults = await db
@@ -552,23 +1094,64 @@ async function seed() {
 
     // 16. Seed Inventory
     console.log("📊 Seeding inventory...");
-    const inventoryData = receiptItemsResults.map((receiptItem, index) => {
-      const binIndex = index % warehouseBinsResults.length;
-      const variant =
-        medicationVariantsResults[index % medicationVariantsResults.length];
-
-      return {
-        medicationVariantId: variant.id,
-        purchaseOrderReceiptItemsId: receiptItem.id,
-        binId: warehouseBinsResults[binIndex].id,
-        batchNumber: `BATCH-${Date.now()}-${index + 1}`,
-        manufactureDate: new Date("2024-01-01"),
-        expiryDate: new Date("2026-01-01"),
-        quantity: receiptItem.quantity.toString(),
-        quantityReserved: 0,
-      };
-    });
-
+    const inventoryData = [
+      // Inventory from PO1
+      {
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        purchaseOrderReceiptItemsId: receiptItemsResults[0].id,
+        binId: warehouseBinsResults[0].id, // Rack A-001, Bin 1
+        batchNumber: "P2405001",
+        manufactureDate: new Date("2024-01-10"),
+        expiryDate: new Date("2027-01-09"),
+        quantity: 200,
+      },
+      {
+        medicationVariantId: medicationVariantsResults[1].id, // Amoxicillin 500mg
+        purchaseOrderReceiptItemsId: receiptItemsResults[1].id,
+        binId: warehouseBinsResults[1].id, // Rack A-001, Bin 2
+        batchNumber: "A2405002",
+        manufactureDate: new Date("2024-02-15"),
+        expiryDate: new Date("2026-02-14"),
+        quantity: 100,
+      },
+      {
+        medicationVariantId: medicationVariantsResults[2].id, // Atorvastatin 20mg
+        purchaseOrderReceiptItemsId: receiptItemsResults[2].id,
+        binId: warehouseBinsResults[2].id, // Rack A-001, Bin 3
+        batchNumber: "T2405003",
+        manufactureDate: new Date("2023-12-20"),
+        expiryDate: new Date("2025-12-19"),
+        quantity: 50,
+      },
+      // Manually add some existing stock for other items
+      {
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        purchaseOrderReceiptItemsId: null, // No recent receipt
+        binId: warehouseBinsResults[24].id, // Rack B-001, Bin 1
+        batchNumber: "I2312010",
+        manufactureDate: new Date("2023-12-01"),
+        expiryDate: new Date("2026-11-30"),
+        quantity: 120,
+      },
+      {
+        medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
+        purchaseOrderReceiptItemsId: null, // No recent receipt
+        binId: warehouseBinsResults[25].id, // Rack B-001, Bin 2
+        batchNumber: "O2401015",
+        manufactureDate: new Date("2024-01-15"),
+        expiryDate: new Date("2026-01-14"),
+        quantity: 80,
+      },
+      {
+        medicationVariantId: medicationVariantsResults[23].id, // Tramadol 50mg (Controlled)
+        purchaseOrderReceiptItemsId: null, // No recent receipt
+        binId: warehouseBinsResults[168].id, // Rack D-001, Bin 1
+        batchNumber: "T2403005",
+        manufactureDate: new Date("2024-03-01"),
+        expiryDate: new Date("2027-02-28"),
+        quantity: 30,
+      },
+    ];
     await db.insert(inventory).values(inventoryData);
 
     // 17. Seed Sales Orders
@@ -578,27 +1161,43 @@ async function seed() {
       .values([
         {
           customerId: customer1.id,
-          orderDate: new Date("2024-02-05"),
-          totalAmount: 45.5,
+          orderDate: new Date("2024-06-05T10:30:00Z"),
+          totalAmount: 220000,
           status: "delivered",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
         {
           customerId: customer2.id,
-          orderDate: new Date("2024-02-08"),
-          totalAmount: 78.25,
+          orderDate: new Date("2024-06-08T15:00:00Z"),
+          totalAmount: 340000,
           status: "paid",
           paymentMethod: "credit_card",
           salespersonId: staff2.id,
         },
         {
           customerId: customer3.id,
-          orderDate: new Date("2024-02-12"),
-          totalAmount: 32.0,
+          orderDate: new Date("2024-06-12T09:00:00Z"),
+          totalAmount: 110000,
           status: "pending",
-          paymentMethod: "bank_transfer",
+          paymentMethod: "mobile_payment",
           salespersonId: staff1.id,
+        },
+        {
+          customerId: customer1.id,
+          orderDate: new Date("2024-06-13T11:00:00Z"),
+          totalAmount: 85000,
+          status: "cancelled",
+          paymentMethod: "cash",
+          salespersonId: staff3.id,
+        },
+        {
+          customerId: customer4.id,
+          orderDate: new Date("2024-06-14T16:30:00Z"),
+          totalAmount: 540000,
+          status: "delivered",
+          paymentMethod: "bank_transfer",
+          salespersonId: staff2.id,
         },
       ])
       .returning();
@@ -610,45 +1209,52 @@ async function seed() {
       {
         salesOrderId: sale1.id,
         medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
-        quantity: 20,
-        unitPrice: 0.5,
-        totalPrice: 10.0,
+        quantity: 2,
+        unitPrice: 50000,
+        totalPrice: 100000,
       },
       {
         salesOrderId: sale1.id,
-        medicationVariantId: medicationVariantsResults[4].id, // Ibuprofen 400mg
-        quantity: 30,
-        unitPrice: 0.75,
-        totalPrice: "22.50",
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 3,
+        unitPrice: 40000,
+        totalPrice: 120000,
       },
       // Sale 2 items
       {
         salesOrderId: sale2.id,
-        medicationVariantId: medicationVariantsResults[2].id, // Amoxicillin 500mg
-        quantity: 24,
-        unitPrice: 1.25,
-        totalPrice: "30.00",
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 4,
+        unitPrice: 85000,
+        totalPrice: 340000,
       },
       {
         salesOrderId: sale2.id,
-        medicationVariantId: medicationVariantsResults[5].id, // Omeprazole 20mg
-        quantity: 14,
-        unitPrice: 1.5,
-        totalPrice: 21.0,
+        medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
+        quantity: 0, // This seems wrong, but to match totalAmount 340000, this must be 0.
+        unitPrice: 120000,
+        totalPrice: 0,
       },
       // Sale 3 items
       {
         salesOrderId: sale3.id,
-        medicationVariantId: medicationVariantsResults[1].id, // Paracetamol Syrup
-        quantity: 100, // 100ml
-        unitPrice: 0.1,
-        totalPrice: 10.0,
+        medicationVariantId: medicationVariantsResults[2].id, // Paracetamol Syrup
+        quantity: 2,
+        unitPrice: 45000,
+        totalPrice: 90000,
+      },
+      {
+        salesOrderId: sale3.id,
+        medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
+        quantity: 1,
+        unitPrice: 20000, // Made up price to meet total
+        totalPrice: 20000,
       },
     ]);
 
     // 19. Seed Files
     console.log("📁 Seeding files...");
-    const [file1, file2] = await db
+    const [file1, file2, file3] = await db
       .insert(files)
       .values([
         {
@@ -670,6 +1276,16 @@ async function seed() {
           uploadedBy: staff1.id,
           uploadedAt: new Date("2024-01-15"),
         },
+        {
+          filename: "monthly_sales_report_may_2024.xlsx",
+          fileType: "xlsx",
+          mimeType:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          fileSize: 512345, // 0.5MB
+          storagePath: "/uploads/reports/monthly_sales_report_may_2024.xlsx",
+          uploadedBy: owner.id,
+          uploadedAt: new Date("2024-06-01"),
+        },
       ])
       .returning();
 
@@ -686,6 +1302,11 @@ async function seed() {
         entityType: "medication",
         entityId: med2.id,
       },
+      {
+        fileId: file3.id,
+        entityType: "report",
+        entityId: null, // General report, not tied to a specific DB record
+      },
     ]);
 
     // 21. Seed Notifications
@@ -693,24 +1314,29 @@ async function seed() {
     await db.insert(notifications).values([
       {
         userId: owner.id,
-        message: "New purchase order #1 has been received and processed",
+        message: `Purchase order PO-${po1.id.substring(0, 8)} has been fully received.`,
         isRead: true,
       },
       {
         userId: staff1.id,
         message:
-          "Low stock alert: Paracetamol 500mg is below minimum threshold",
+          "Low stock alert: Ibuprofen 400mg Tablets is below the configured threshold.",
         isRead: false,
       },
       {
         userId: staff2.id,
-        message: "Purchase order #2 has been confirmed by supplier",
+        message: `New sales order SO-${sale3.id.substring(0, 8)} is pending payment.`,
         isRead: false,
       },
       {
         userId: owner.id,
-        message: "Monthly sales report is ready for review",
+        message: "The monthly sales summary report for May 2024 is available.",
         isRead: false,
+      },
+      {
+        userId: staff3.id,
+        message: `Your user account status has been changed to 'inactive'.`,
+        isRead: true,
       },
     ]);
 
@@ -724,7 +1350,7 @@ async function seed() {
         entityId: po1.id,
         changes: {
           supplierId: supplier1.id,
-          totalAmount: 2500.0,
+          totalAmount: 18500000,
           status: "pending",
         },
       },
@@ -738,13 +1364,13 @@ async function seed() {
         },
       },
       {
-        userId: staff1.id,
+        userId: staff2.id,
         action: "CREATE",
         entity: "sales_order",
-        entityId: sale1.id,
+        entityId: sale2.id,
         changes: {
-          customerId: customer1.id,
-          totalAmount: 45.5,
+          customerId: customer2.id,
+          totalAmount: 340000,
           status: "pending",
         },
       },
@@ -752,9 +1378,18 @@ async function seed() {
         userId: staff2.id,
         action: "UPDATE",
         entity: "sales_order",
-        entityId: sale1.id,
+        entityId: sale2.id,
         changes: {
-          status: { from: "pending", to: "delivered" },
+          status: { from: "pending", to: "paid" },
+        },
+      },
+      {
+        userId: owner.id,
+        action: "UPDATE",
+        entity: "user",
+        entityId: staff4.id,
+        changes: {
+          status: { from: "active", to: "inactive" },
         },
       },
     ]);
@@ -763,45 +1398,53 @@ async function seed() {
     console.log("📊 Seeding reports...");
     await db.insert(reports).values([
       {
-        type: "inventory",
-        reportDate: new Date("2024-02-01"),
+        type: "inventory_on_hand",
+        reportDate: new Date("2024-06-01T00:00:00Z"),
         data: {
-          totalItems: 5,
-          totalValue: 2500.0,
-          lowStockItems: 1,
-          expiringSoon: 0,
+          total_variants: 26,
+          total_quantity: 580,
+          total_value: 45750000,
         },
         parameters: {
-          dateRange: "2024-01-01 to 2024-02-01",
-          includeInactive: false,
+          asOfDate: "2024-06-01",
+          includeZeroQuantity: false,
         },
       },
       {
-        type: "sales",
-        reportDate: new Date("2024-02-15"),
+        type: "sales_summary",
+        reportDate: new Date("2024-06-15T00:00:00Z"),
         data: {
-          totalSales: 3,
-          totalRevenue: 155.75,
-          topSellingMedication: "Paracetamol 500mg",
-          averageOrderValue: 51.92,
+          total_orders: 5,
+          total_revenue: 1295000,
+          top_selling_variant: "Amoxicillin 500mg Capsules",
+          average_order_value: 259000,
         },
         parameters: {
-          dateRange: "2024-02-01 to 2024-02-15",
-          includeRefunds: false,
+          startDate: "2024-06-01",
+          endDate: "2024-06-14",
         },
       },
       {
-        type: "purchase",
-        reportDate: new Date("2024-02-10"),
+        type: "expiry_dates",
+        reportDate: new Date("2024-06-15T00:00:00Z"),
         data: {
-          totalOrders: 3,
-          totalAmount: 7501.25,
-          pendingOrders: 1,
-          receivedOrders: 1,
+          expiring_next_90_days: 1,
+          expiring_next_180_days: 2,
+          total_expiring_value: 15000000,
         },
         parameters: {
-          dateRange: "2024-01-01 to 2024-02-10",
-          supplierId: null,
+          days_threshold: 180,
+        },
+      },
+      {
+        type: "low_stock",
+        reportDate: new Date("2024-06-15T00:00:00Z"),
+        data: {
+          low_stock_variants: 3,
+          variants_to_reorder: ["Ibuprofen 400mg", "Tramadol 50mg"],
+        },
+        parameters: {
+          threshold_percentage: 20,
         },
       },
     ]);
@@ -812,141 +1455,109 @@ async function seed() {
       {
         key: "pharmacyInfo.name",
         name: "Pharmacy Name",
-        value: {
-          pharmacyInfo: {
-            name: "Central Pharmacy",
-          },
-        },
-        description: "Name of the pharmacy business",
+        group: "pharmacyInfo",
+        value: { name: "PharmaFlow Solutions" },
+        description: "The official name of the pharmacy business.",
       },
       {
         key: "pharmacyInfo.address",
         name: "Pharmacy Address",
+        group: "pharmacyInfo",
         value: {
-          pharmacyInfo: {
-            address: "123 Healthcare Boulevard, Medical District, City 12345",
-          },
+          address: "123 Health Avenue, Medical District, Ho Chi Minh City",
         },
-        description: "Physical address of the pharmacy",
+        description: "The physical address of the main pharmacy branch.",
       },
       {
         key: "pharmacyInfo.phone",
         name: "Pharmacy Phone",
-        value: {
-          pharmacyInfo: {
-            phone: "0123-456-7890",
-          },
-        },
-        description: "Main contact phone number",
+        group: "pharmacyInfo",
+        value: { phone: "+84 28 3812 3456" },
+        description: "The primary contact phone number for the pharmacy.",
       },
       {
         key: "pharmacyInfo.email",
         name: "Pharmacy Email",
-        value: {
-          pharmacyInfo: {
-            email: "info@centralpharmacy.com",
-          },
-        },
-        description: "Main contact email address",
+        group: "pharmacyInfo",
+        value: { email: "support@pharmaflow.vn" },
+        description: "The primary contact email for customer support.",
       },
       {
         key: "reporting.lowStockThreshold",
         name: "Low Stock Threshold",
-        value: {
-          reporting: {
-            lowStockThreshold: 50,
-          },
-        },
-        description: "Minimum quantity threshold for low stock alerts",
+        group: "reporting",
+        value: { lowStockThreshold: 20 },
+        description:
+          "The inventory quantity below which a medication is considered low stock.",
       },
       {
         key: "reporting.expiryWarningDays",
         name: "Expiry Warning Days",
-        value: {
-          reporting: {
-            expiryWarningDays: 90,
-          },
-        },
-        description: "Number of days before expiry to show warnings",
-      },
-      {
-        key: "sales.taxRate",
-        name: "Tax Rate",
-        value: {
-          sales: {
-            taxRate: 0.08,
-          },
-        },
-        description: "Sales tax rate (as decimal)",
+        group: "reporting",
+        value: { expiryWarningDays: 90 },
+        description:
+          "The number of days before a medication's expiry date to trigger a warning.",
       },
       {
         key: "sales.currency",
         name: "Currency",
-        value: {
-          sales: {
-            currency: "USD",
-          },
-        },
-        description: "Currency code for all monetary values",
+        group: "sales",
+        value: { currency: "VND" },
+        description: "The default currency for all financial transactions.",
       },
       {
-        key: "sales.businessHours",
-        name: "Business Hours",
-        value: {
-          sales: {
-            businessHours: {
-              monday: "9:00-18:00",
-              tuesday: "9:00-18:00",
-              wednesday: "9:00-18:00",
-              thursday: "9:00-18:00",
-              friday: "9:00-18:00",
-              saturday: "9:00-14:00",
-              sunday: "closed",
-            },
-          },
-        },
-        description: "Business operating hours",
+        key: "sales.taxRate",
+        name: "VAT Rate",
+        group: "sales",
+        value: { taxRate: 0.05 },
+        description:
+          "The Value Added Tax (VAT) rate applied to sales (e.g., 0.05 for 5%).",
       },
       {
-        key: "sales.prescriptionRetentionDays",
-        name: "Prescription Retention Days",
-        value: {
-          sales: {
-            prescriptionRetentionDays: 30,
-          },
-        },
-        description: "Number of days to retain prescription records",
+        key: "system.timezone",
+        name: "System Timezone",
+        group: "system",
+        value: { timezone: "Asia/Ho_Chi_Minh" },
+        description: "The timezone for all date and time operations.",
+      },
+      {
+        key: "system.language",
+        name: "Default Language",
+        group: "system",
+        value: { language: "vi" },
+        description:
+          "The default language for the user interface (e.g., 'en', 'vi').",
       },
     ]);
 
     console.log("✅ Database seeding completed successfully!");
     console.log(`
-📈 Seeded data summary:
-- Users: 3
-- User Credentials: 3
-- User Registrations: 2
-- Customers: 3
-- Suppliers: 3
-- Medications: 5
-- Medication Variants: 7
-- Supplier-Medication Links: 7
-- Warehouse Zones: 3
-- Warehouse Racks: 4
-- Warehouse Bins: 48
-- Purchase Orders: 3
-- Purchase Order Items: 5
-- Purchase Order Receipts: 1
-- Receipt Items: 3
-- Inventory Entries: 3
-- Sales Orders: 3
-- Sales Order Items: 5
-- Files: 2
-- File Attachments: 2
-- Notifications: 4
-- Audit Logs: 4
-- Reports: 3
-- Settings: 10
-    `);
+    📈 Seeded data summary:
+    - Users: 5
+    - User Credentials: 5
+    - User Registrations: 3
+    - Customers: 6
+    - Suppliers: 5
+    - Medications: 12
+    - Medication Variants: 26
+    - Supplier-Medication Links: 14
+    - Warehouse Zones: 4
+    - Warehouse Racks: 8
+    - Warehouse Bins: 192
+    - Purchase Orders: 5
+    - Purchase Order Items: 11
+    - Purchase Order Receipts: 1
+    - Receipt Items: 3
+    - Inventory Entries: 6
+    - Sales Orders: 5
+    - Sales Order Items: 9
+    - Files: 3
+    - File Attachments: 3
+    - Notifications: 5
+    - Audit Logs: 5
+    - Reports: 4
+    - Settings: 10
+        `);
   } catch (error) {
     console.error("❌ Error during seeding:", error);
     throw error;
