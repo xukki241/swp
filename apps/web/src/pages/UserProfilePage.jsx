@@ -1,6 +1,7 @@
 "use client";
 
-import { useCurrentUser } from "@/hooks/useAuth";
+import { useCurrentUser, useChangePassword } from "@/hooks/useAuth";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
@@ -18,61 +19,93 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { AppLayout } from "@/components/layouts/app-layout";
-import { Mail, Phone, User, KeyRound, PenBox } from "lucide-react";
-import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
+import { AppLayout } from "@/components/layouts/app-layout";
+import { toast } from "sonner";
+import { Mail, Phone, User, KeyRound } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Loading } from "@/components/ui/loading";
+
 export default function UserProfile() {
   const { data: currentUser, isLoading, isError } = useCurrentUser();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [formData, setFormData] = useState(
-    {
-      name: "",
-      email: "",
-      phone: "",
-      status: "",
-    },
-    [currentUser]
-  );
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const changePasswordMutation = useChangePassword();
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
-  useEffect(() => {
-    if (currentUser?.user) {
-      setFormData({
-        name: currentUser.user.name || "",
-        email: currentUser.user.email || "",
-        phone: currentUser.user.phone || "",
-        status: currentUser.user.status || "",
+  const handlePasswordInputChange = (field, value) => {
+    setPasswordData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
+
+    if (!passwordData.oldPassword.trim()) {
+      toast.error("Validation Error", {
+        description: "Old password is required",
       });
+      return;
     }
-  }, [currentUser]);
 
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+    if (!passwordData.newPassword.trim()) {
+      toast.error("Validation Error", {
+        description: "New password is required",
+      });
+      return;
+    }
 
-  const handleSaveChanges = () => {
-    console.log("save change");
-    setIsDialogOpen(false);
-  };
+    if (passwordData.newPassword.length < 8) {
+      toast.error("Validation Error", {
+        description: "New password must be at least 8 characters long",
+      });
+      return;
+    }
 
-  const handleResetPassword = () => {
-    console.log(
-      "[v0] Reset password clicked for user:",
-      currentUser?.user?.email
-    );
-    // TODO: Implement actual password reset logic
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error("Validation Error", {
+        description: "New password and confirm password do not match",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const data = await changePasswordMutation.mutateAsync({
+        oldPassword: passwordData.oldPassword,
+        newPassword: passwordData.newPassword,
+      });
+
+      toast.success("Password Reset", {
+        description:
+          data?.message || "Your password has been reset successfully.",
+      });
+
+      setIsResetPasswordOpen(false);
+      setPasswordData({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (error) {
+      console.log(error);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to reset password. Please try again.";
+      toast.error("Change Failed", { description: errorMessage });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isLoading) {
@@ -135,6 +168,20 @@ export default function UserProfile() {
 
   return (
     <AppLayout>
+      {/* Overlay when submitting */}
+      {isSubmitting && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 flex flex-col items-center gap-4 shadow-xl">
+            <Loading className="h-8 w-8" />
+            <p className="text-sm font-medium text-gray-700">
+              {isResetPasswordOpen
+                ? "Resetting password..."
+                : "Updating profile..."}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-4xl mx-auto p-4 md:p-6 lg:p-8">
         <Card className="rounded-2xl border-border shadow-lg">
           <CardHeader className="pb-4">
@@ -181,6 +228,7 @@ export default function UserProfile() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-border">
+              {/* Email Section */}
               {user.email && (
                 <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
                   <Mail className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
@@ -195,6 +243,7 @@ export default function UserProfile() {
                 </div>
               )}
 
+              {/* Phone Section */}
               {user.phone && (
                 <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
                   <Phone className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
@@ -208,106 +257,123 @@ export default function UserProfile() {
               )}
             </div>
 
+            {/* Reset Password Section */}
             <div className="pt-4 border-t border-border flex flex-col sm:flex-row gap-3">
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <Dialog
+                open={isResetPasswordOpen}
+                onOpenChange={setIsResetPasswordOpen}
+              >
                 <DialogTrigger asChild>
                   <Button
-                    variant="default"
-                    className="w-full sm:w-auto gap-2 cursor-pointer"
+                    onClick={() => setIsResetPasswordOpen(true)}
+                    variant="outline"
+                    className="w-full sm:w-auto gap-2 bg-transparent"
                   >
-                    <PenBox className="h-4 w-4" />
-                    Update Profile
+                    <KeyRound className="h-4 w-4" />
+                    Change Password
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px] p-8">
-                  <DialogHeader>
-                    <DialogTitle>Edit Profile</DialogTitle>
-                    <DialogDescription>
-                      Update your profile information. Click save when you're
-                      done.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="name">Name</Label>
-                      <Input
-                        id="name"
-                        placeholder="Enter your name"
-                        value={formData.name}
-                        onChange={(e) =>
-                          handleInputChange("name", e.target.value)
-                        }
-                      />
+
+                <DialogContent className="sm:max-w-[500px]">
+                  <form onSubmit={handlePasswordReset}>
+                    <DialogHeader className="mb-4">
+                      <DialogTitle>Change Password</DialogTitle>
+                      <DialogDescription>
+                        Enter your current password and choose a new password.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-2 mb-2">
+                        <Label className="mb-1" htmlFor="oldPassword">
+                          Old Password
+                        </Label>
+                        <Input
+                          id="oldPassword"
+                          type="password"
+                          placeholder="Enter your current password"
+                          value={passwordData.oldPassword}
+                          onChange={(e) =>
+                            handlePasswordInputChange(
+                              "oldPassword",
+                              e.target.value
+                            )
+                          }
+                          disabled={changePasswordMutation.isPending}
+                          required
+                          minLength={8}
+                        />
+                      </div>
+                      <div className="grid gap-2 mb-2">
+                        <Label className="mb-1" htmlFor="newPassword">
+                          New Password
+                        </Label>
+                        <Input
+                          id="newPassword"
+                          type="password"
+                          placeholder="Enter your new password"
+                          value={passwordData.newPassword}
+                          onChange={(e) =>
+                            handlePasswordInputChange(
+                              "newPassword",
+                              e.target.value
+                            )
+                          }
+                          disabled={changePasswordMutation.isPending}
+                          required
+                          minLength={8}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Must be at least 8 characters long
+                        </p>
+                      </div>
+                      <div className="grid gap-2 mb-2">
+                        <Label className="mb-1" htmlFor="confirmPassword">
+                          Confirm New Password
+                        </Label>
+                        <Input
+                          id="confirmPassword"
+                          type="password"
+                          placeholder="Confirm your new password"
+                          value={passwordData.confirmPassword}
+                          onChange={(e) =>
+                            handlePasswordInputChange(
+                              "confirmPassword",
+                              e.target.value
+                            )
+                          }
+                          disabled={changePasswordMutation.isPending}
+                          required
+                        />
+                      </div>
                     </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={formData.email}
-                        onChange={(e) =>
-                          handleInputChange("email", e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="phone">Phone</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="Enter your phone number"
-                        value={formData.phone}
-                        onChange={(e) =>
-                          handleInputChange("phone", e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="status">Status</Label>
-                      <Select
-                        value={formData.status}
-                        onValueChange={(value) =>
-                          handleInputChange("status", value)
-                        }
+                    <DialogFooter>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setIsResetPasswordOpen(false);
+                          setPasswordData({
+                            oldPassword: "",
+                            newPassword: "",
+                            confirmPassword: "",
+                          });
+                        }}
+                        disabled={changePasswordMutation.isPending}
                       >
-                        <SelectTrigger id="status" className="w-full">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="active">Active</SelectItem>
-                          <SelectItem value="inactive">Inactive</SelectItem>
-                          <SelectItem value="pending">Pending</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      className="cursor-pointer"
-                      variant="outline"
-                      onClick={() => setIsDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      className="cursor-pointer"
-                      onClick={handleSaveChanges}
-                    >
-                      Save Changes
-                    </Button>
-                  </DialogFooter>
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={changePasswordMutation.isPending}
+                      >
+                        {changePasswordMutation.isPending
+                          ? "Changing..."
+                          : "Reset Password"}
+                      </Button>
+                    </DialogFooter>
+                  </form>
                 </DialogContent>
               </Dialog>
-
-              <Button
-                onClick={handleResetPassword}
-                variant="outline"
-                className="w-full sm:w-auto gap-2 bg-transparent cursor-pointer"
-              >
-                <KeyRound className="h-4 w-4" />
-                Reset Password
-              </Button>
             </div>
           </CardContent>
         </Card>
