@@ -10,7 +10,7 @@ export const getAllMedicationVariants = async (req, res, next) => {
     const { search, medicationId, isActive } = req.query;
     const variants = await medicationVariantService.getAllMedicationVariants({
       search,
-      medicationId: medicationId ? BigInt(medicationId) : undefined,
+      medicationId: medicationId || undefined, // UUID is already a string
       isActive: isActive !== undefined ? isActive === "true" : undefined,
     });
 
@@ -31,7 +31,7 @@ export const getAllMedicationVariants = async (req, res, next) => {
  */
 export const getMedicationVariantById = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
     const variant = await medicationVariantService.getMedicationVariantById(id);
 
     if (!variant) {
@@ -120,7 +120,7 @@ export const createMedicationVariant = async (req, res, next) => {
  */
 export const updateMedicationVariant = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
     const {
       medicationId,
       sku,
@@ -208,7 +208,7 @@ export const updateMedicationVariant = async (req, res, next) => {
  */
 export const deleteMedicationVariant = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
 
     const variant = await medicationVariantService.deleteMedicationVariant(id);
 

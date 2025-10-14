@@ -31,7 +31,7 @@ export const getAllMedications = async (req, res, next) => {
  */
 export const getMedicationById = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
     const medication = await medicationService.getMedicationById(id);
 
     if (!medication) {
@@ -104,7 +104,7 @@ export const createMedication = async (req, res, next) => {
  */
 export const updateMedication = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
     const {
       name,
       brand,
@@ -169,7 +169,7 @@ export const updateMedication = async (req, res, next) => {
  */
 export const deleteMedication = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
 
     const medication = await medicationService.deleteMedication(id);
 
