@@ -8,6 +8,7 @@ import {
   logoutUser,
   requestPasswordReset,
   verifyResetOTP,
+  changePassword,
 } from "@/services/authService";
 
 /**
@@ -122,6 +123,18 @@ export const useVerifyResetOTP = () => {
     },
     onError: (error) => {
       console.error("Verify OTP failed:", error);
+    },
+  });
+};
+
+/**
+ * Hook for changing password
+ */
+export const useChangePassword = () => {
+  return useMutation({
+    mutationFn: changePassword,
+    onError: (error) => {
+      console.error("Change password failed:", error);
     },
   });
 };
