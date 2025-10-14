@@ -13,20 +13,17 @@ import logger from "../utils/logger.js";
 export const validate = (schemas) => {
   return async (req, res, next) => {
     try {
-      // ✅ Validate request body if schema provided
+      // Validate request body if schema provided
       if (schemas.body) {
         req.body = await schemas.body.parseAsync(req.body);
       }
 
-      // ✅ Validate query parameters if schema provided
+      // Validate query parameters if schema provided
       if (schemas.query) {
-        // Instead of modifying req.query, you can create a new property
-        // or reassign it if your Express version allows.
-        // For broader compatibility, let's use a new property.
-        req.validatedQuery = await schemas.query.parseAsync(req.query);
+        req.query = await schemas.query.parseAsync(req.query);
       }
 
-      // ✅ Validate URL parameters if schema provided
+      // Validate URL parameters if schema provided
       if (schemas.params) {
         req.params = await schemas.params.parseAsync(req.params);
       }

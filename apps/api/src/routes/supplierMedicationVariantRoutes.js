@@ -25,15 +25,12 @@ supplierMedicationVariantRouter.use(authenticate);
 
 // Param validation schemas
 const supplierIdParamSchema = z.object({
-  supplierId: z.coerce.number().int().positive(),
+  supplierId: uuidSchema,
 });
 
 const supplierIdAndIdParamSchema = z.object({
-  supplierId: z.coerce.number().int().positive(),
-  id: z.coerce
-    .number()
-    .int()
-    .positive({ message: "ID phải là một số nguyên dương." }),
+  supplierId: uuidSchema,
+  id: uuidSchema,
 });
 
 /**
