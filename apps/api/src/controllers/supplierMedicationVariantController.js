@@ -1,6 +1,14 @@
 import { supplierMedicationVariantService } from "../services/supplierMedicationVariantService.js";
 
 export const supplierMedicationVariantController = {
+  async bulkCreate(req, res) {
+    try {
+      const smvs = await supplierMedicationVariantService.bulkCreate(req.body);
+      res.status(201).json(smvs);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
   // Create a new supplier medication variant
   async create(req, res) {
     try {
@@ -14,23 +22,25 @@ export const supplierMedicationVariantController = {
   // Get all supplier medication variants
   async getAll(req, res) {
     try {
+      const supplierIdParam =
+        req.params.supplierId || req.query.supplierId || undefined;
+
       const filters = {
-        supplierId: req.query.supplierId
-          ? Number.parseInt(req.query.supplierId)
-          : undefined,
+        supplierId: supplierIdParam ? Number(supplierIdParam) : undefined,
         medicationVariantId: req.query.medicationVariantId
-          ? Number.parseInt(req.query.medicationVariantId)
+          ? Number(req.query.medicationVariantId)
           : undefined,
-        limit: Number.parseInt(req.query.limit) || 100,
-        offset: Number.parseInt(req.query.offset) || 0,
+        limit: Number(req.query.limit) || 100,
+        offset: Number(req.query.offset) || 0,
       };
+
       const smvs = await supplierMedicationVariantService.getAll(filters);
       res.json(smvs);
     } catch (error) {
+      console.error("❌ Error in getAll:", error);
       res.status(500).json({ error: error.message });
     }
   },
-
   // Get supplier medication variant by ID
   async getById(req, res) {
     try {

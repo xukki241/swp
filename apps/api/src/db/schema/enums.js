@@ -32,6 +32,13 @@ export const reportType = pgEnum("report_type", [
   "sales",
   "purchase",
   "custom",
+  "sales_summary",
+  "inventory_on_hand",
+  "expiry_dates",
+  "low_stock",
+  "daily_sales",
+  "weekly_sales",
+  "monthly_sales",
 ]);
 
 export const supplierStatus = pgEnum("supplier_status", [

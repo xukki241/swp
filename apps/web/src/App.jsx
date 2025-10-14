@@ -9,6 +9,10 @@ import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import UserListPage from "@/pages/UserListPage";
 import UserProfilePage from "@/pages/UserProfilePage";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
+import SupplierListPage from "./pages/supplier/SupplierListPage";
+import SupplierDetailPage from "./pages/supplier/SupplierDetailPage";
+import SupplierCreatePage from "./pages/supplier/SupplierCreatePage";
+import SupplierEditPage from "./pages/supplier/SupplierEditPage";
 
 function App() {
   return (
@@ -91,7 +95,38 @@ function App() {
             </PublicRoute>
           }
         />
-
+        <Route
+          path="/suppliers"
+          element={
+            <ProtectedRoute>
+              <SupplierListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/suppliers/create"
+          element={
+            <ProtectedRoute>
+              <SupplierCreatePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/suppliers/:id"
+          element={
+            <ProtectedRoute>
+              <SupplierDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/suppliers/:id/edit"
+          element={
+            <ProtectedRoute>
+              <SupplierEditPage />
+            </ProtectedRoute>
+          }
+        />
         {/* 404 page - accessible to everyone */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
