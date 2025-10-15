@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { MedicationRow } from "@/components/MedicationRow";
+import { Label } from "@/components/ui/label";
 
 export default function SupplierCreatePage() {
   const navigate = useNavigate();
@@ -33,14 +34,7 @@ export default function SupplierCreatePage() {
     status: "active",
   });
 
-  const [meds, setMeds] = useState([
-    {
-      medicationId: "",
-      medicationVariantId: "",
-      supplierSku: "",
-      leadTimeDays: "",
-    },
-  ]);
+  const [meds, setMeds] = useState([]);
 
   const handleAddMed = () =>
     setMeds([
@@ -64,6 +58,26 @@ export default function SupplierCreatePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const errors = {};
+    if (!form.name.trim()) errors.name = "Supplier name is required.";
+    if (!form.email.trim()) {
+      errors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+      errors.email = "Email address is invalid.";
+    }
+    if (!form.phone.trim()) errors.phone = "Phone number is required.";
+    if (!form.address.trim()) errors.address = "Address is required.";
+
+    if (Object.keys(errors).length > 0) {
+      console.error("Validation Errors:", errors);
+      const errorMessages = Object.values(errors).join("\n");
+      toast.error("Validation Failed", {
+        description: <pre className="text-sm">{errorMessages}</pre>,
+      });
+      return;
+    }
+
     try {
       const variants = meds
         .filter((m) => m.medicationVariantId && m.supplierSku)
@@ -74,7 +88,7 @@ export default function SupplierCreatePage() {
         }));
 
       const payload = { ...form, medicationVariants: variants };
-      await createSupplier.mutateAsync([payload]);
+      await createSupplier.mutateAsync(payload);
 
       toast.success("Supplier created successfully!");
       navigate("/suppliers");
@@ -98,36 +112,57 @@ export default function SupplierCreatePage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              placeholder="Supplier Name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-            <Input
-              placeholder="Contact Name"
-              value={form.contactName}
-              onChange={(e) =>
-                setForm({ ...form, contactName: e.target.value })
-              }
-            />
-            <Input
-              placeholder="Email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
-            <Input
-              placeholder="Phone Number"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            />
-            <Input
-              placeholder="Address"
-              value={form.address}
-              onChange={(e) => setForm({ ...form, address: e.target.value })}
-            />
-
+            {/* -- THAY ĐỔI: THÊM CÁC LABEL VÀ INPUT ID -- */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Status</label>
+              <Label htmlFor="supplierName">Supplier Name *</Label>
+              <Input
+                id="supplierName"
+                placeholder="e.g., Global Pharma Inc."
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="contactName">Contact Name</Label>
+              <Input
+                id="contactName"
+                placeholder="e.g., John Doe"
+                value={form.contactName}
+                onChange={(e) =>
+                  setForm({ ...form, contactName: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email *</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="e.g., contact@globalpharma.com"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number *</Label>
+              <Input
+                id="phone"
+                placeholder="e.g., +1 234 567 890"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="address">Address *</Label>
+              <Input
+                id="address"
+                placeholder="e.g., 123 Health St, Medicine City"
+                value={form.address}
+                onChange={(e) => setForm({ ...form, address: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Status</Label>
               <Select
                 value={form.status}
                 onValueChange={(value) => setForm({ ...form, status: value })}
