@@ -1,0 +1,86 @@
+WarehouseRack:
+  type: object
+  required:
+    - id
+    - zoneId
+    - code
+    - name
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    zoneId:
+      $ref: "../common/schemas.yaml#/UUID"
+    code:
+      $ref: "../common/schemas.yaml#/Code"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    description:
+      $ref: "../common/schemas.yaml#/Description"
+
+CreateWarehouseRack:
+  type: object
+  required:
+    - code
+    - name
+  properties:
+    code:
+      $ref: "../common/schemas.yaml#/Code"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    description:
+      $ref: "../common/schemas.yaml#/Description"
+
+CreateWarehouseRacksRequest:
+  type: array
+  items:
+    $ref: "#/CreateWarehouseRack"
+  description: Array of warehouse racks to create
+
+CreateWarehouseRacksResponse:
+  type: array
+  items:
+    $ref: "#/WarehouseRack"
+  description: Array of created warehouse racks
+
+BatchCreateWarehouseRacks:
+  type: object
+  required:
+    - quantity
+  properties:
+    quantity:
+      $ref: "../common/schemas.yaml#/PositiveInteger"
+    codePrefix:
+      type: string
+      maxLength: 50
+      default: "RACK"
+      description: Prefix for auto-generated rack codes
+      example: "RACK"
+    namePrefix:
+      type: string
+      maxLength: 100
+      default: "Rack"
+      description: Prefix for auto-generated rack names
+      example: "Rack"
+
+UpdateWarehouseRack:
+  type: object
+  properties:
+    code:
+      $ref: "../common/schemas.yaml#/Code"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    description:
+      $ref: "../common/schemas.yaml#/Description"
+
+WarehouseRackListResponse:
+  type: object
+  required:
+    - data
+    - pagination
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/WarehouseRack"
+    pagination:
+      $ref: "../common/schemas.yaml#/Pagination"

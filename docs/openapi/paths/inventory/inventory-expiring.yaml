@@ -1,0 +1,33 @@
+/inventory/expiring:
+  get:
+    tags:
+      - Inventory
+    summary: Get expiring inventory
+    description: Get list of inventory entries that are expiring soon
+    operationId: getExpiringInventory
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/PageParam"
+      - $ref: "../../components/common/parameters.yaml#/LimitParam"
+      - $ref: "../../components/common/parameters.yaml#/SortByParam"
+      - $ref: "../../components/common/parameters.yaml#/SortOrderParam"
+      - name: daysUntilExpiry
+        in: query
+        description: Number of days until expiry (default 30)
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 30
+    responses:
+      "200":
+        description: Expiring inventory retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/inventory/inventory-schemas.yaml#/InventoryListResponse"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

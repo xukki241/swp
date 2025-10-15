@@ -1,0 +1,97 @@
+UserRole:
+  type: string
+  enum:
+    - owner
+    - staff
+  description: User role in the system
+
+UserStatus:
+  type: string
+  enum:
+    - active
+    - inactive
+    - suspended
+  description: User account status
+
+UserRegistrationStatus:
+  type: string
+  enum:
+    - pending
+    - approved
+    - rejected
+  description: User registration request status
+
+ResetMethod:
+  type: string
+  enum:
+    - email
+    - sms
+  description: Password reset method
+
+WarehouseZoneType:
+  type: string
+  enum:
+    - normal
+    - cold
+    - hazard
+    - quarantine
+  description: Warehouse zone type
+
+MedicationStatus:
+  type: string
+  enum:
+    - active
+    - inactive
+    - discontinued
+  description: Medication status
+
+SupplierStatus:
+  type: string
+  enum:
+    - active
+    - inactive
+    - blacklisted
+  description: Supplier status
+
+PurchaseOrderStatus:
+  type: string
+  enum:
+    - pending
+    - ordered
+    - received
+    - cancelled
+  description: Purchase order status
+
+SalesOrderStatus:
+  type: string
+  enum:
+    - pending
+    - paid
+    - delivered
+    - cancelled
+  description: Sales order status
+
+SalesOrderPaymentMethod:
+  type: string
+  enum:
+    - cash
+    - bank_transfer
+    - credit_card
+    - mobile_payment
+  description: Payment method for sales order
+
+ReportType:
+  type: string
+  enum:
+    - inventory
+    - sales
+    - purchase
+    - custom
+    - sales_summary
+    - inventory_on_hand
+    - expiry_dates
+    - low_stock
+    - daily_sales
+    - weekly_sales
+    - monthly_sales
+  description: Report type

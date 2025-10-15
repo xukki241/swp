@@ -1,0 +1,89 @@
+/customers/{customerId}:
+  get:
+    tags:
+      - Customers
+    summary: Get customer by ID
+    description: Retrieve a specific customer by their ID
+    operationId: getCustomerById
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/CustomerIdParam"
+    responses:
+      "200":
+        description: Customer retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/customers/customer-schemas.yaml#/Customer"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  patch:
+    tags:
+      - Customers
+    summary: Update customer
+    description: Update customer information
+    operationId: updateCustomer
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/CustomerIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/customers/customer-schemas.yaml#/UpdateCustomer"
+          example:
+            name: "John Doe Jr."
+            email: "john.doe.jr@example.com"
+            phone: "0123456789"
+            address: "789 New Street, City, Country"
+    responses:
+      "200":
+        description: Customer updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/customers/customer-schemas.yaml#/Customer"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "409":
+        $ref: "../../components/common/responses.yaml#/ConflictError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  delete:
+    tags:
+      - Customers
+    summary: Delete customer
+    description: Delete a customer (Owner only)
+    operationId: deleteCustomer
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/CustomerIdParam"
+    responses:
+      "200":
+        description: Customer deleted successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/common/schemas.yaml#/Response"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

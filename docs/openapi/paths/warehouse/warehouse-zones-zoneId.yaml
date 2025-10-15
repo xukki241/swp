@@ -1,0 +1,86 @@
+/warehouse/zones/{zoneId}:
+  get:
+    tags:
+      - Warehouse
+    summary: Get warehouse zone by ID
+    description: Retrieve a specific warehouse zone
+    operationId: getWarehouseZone
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/ZoneIdParam"
+    responses:
+      "200":
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/warehouse/zone-schemas.yaml#/WarehouseZone"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  patch:
+    tags:
+      - Warehouse
+    summary: Update warehouse zone
+    description: Update a specific warehouse zone
+    operationId: updateWarehouseZone
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/ZoneIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/warehouse/zone-schemas.yaml#/UpdateWarehouseZone"
+    responses:
+      "200":
+        description: Warehouse zone updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/warehouse/zone-schemas.yaml#/WarehouseZone"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  delete:
+    tags:
+      - Warehouse
+    summary: Delete warehouse zone
+    description: Delete a specific warehouse zone
+    operationId: deleteWarehouseZone
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/ZoneIdParam"
+    responses:
+      "200":
+        description: Warehouse zone deleted successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/common/schemas.yaml#/Response"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

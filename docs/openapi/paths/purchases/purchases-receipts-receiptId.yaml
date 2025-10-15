@@ -1,0 +1,46 @@
+/purchases/receipts/{receiptId}:
+  get:
+    tags:
+      - Purchases
+    summary: Get receipt by ID
+    description: Retrieve a specific purchase order receipt with its items
+    operationId: getReceiptById
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/ReceiptIdParam"
+    responses:
+      "200":
+        description: Receipt retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/purchases/receipt-schemas.yaml#/PurchaseOrderReceiptWithItems"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  delete:
+    tags:
+      - Purchases
+    summary: Delete receipt
+    description: Delete a purchase order receipt
+    operationId: deleteReceipt
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/ReceiptIdParam"
+    responses:
+      "200":
+        description: Receipt deleted successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/common/schemas.yaml#/Response"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

@@ -38,7 +38,11 @@ salesOrderRouter.patch(
   salesOrderController.update
 );
 
-// DELETE /api/sales/:id - Cancel sales order
-salesOrderRouter.delete("/:id", salesOrderController.delete);
+// DELETE /api/sales/:id - Cancel sales order (Owner only)
+salesOrderRouter.delete(
+  "/:id",
+  authorize("owner"),
+  salesOrderController.delete
+);
 
 export default salesOrderRouter;

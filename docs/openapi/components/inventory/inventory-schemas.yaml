@@ -1,0 +1,171 @@
+Inventory:
+  type: object
+  required:
+    - id
+    - medicationVariantId
+    - purchaseOrderReceiptItemsId
+    - binId
+    - batchNumber
+    - quantity
+    - quantityReserved
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    medicationVariantId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the medication variant
+    purchaseOrderReceiptItemsId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the purchase order receipt item
+    binId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the warehouse bin where inventory is stored
+    batchNumber:
+      type: string
+      maxLength: 100
+      description: Batch number for tracking
+      example: "BATCH-2025-001"
+    manufactureDate:
+      allOf:
+        - $ref: "../common/schemas.yaml#/Date"
+        - nullable: true
+          description: Date when the medication was manufactured
+    expiryDate:
+      allOf:
+        - $ref: "../common/schemas.yaml#/Date"
+        - nullable: true
+          description: Expiry date of the medication
+    quantity:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Total quantity in inventory
+    quantityReserved:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Quantity reserved for orders
+
+UpdateInventory:
+  type: object
+  properties:
+    medicationVariantId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the medication variant
+    purchaseOrderReceiptItemsId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the purchase order receipt item
+    binId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the warehouse bin where inventory is stored
+    batchNumber:
+      type: string
+      maxLength: 100
+      description: Batch number for tracking
+    manufactureDate:
+      allOf:
+        - $ref: "../common/schemas.yaml#/Date"
+        - nullable: true
+          description: Date when the medication was manufactured
+    expiryDate:
+      allOf:
+        - $ref: "../common/schemas.yaml#/Date"
+        - nullable: true
+          description: Expiry date of the medication
+    quantity:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Total quantity in inventory
+    quantityReserved:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Quantity reserved for orders
+
+AdjustInventoryRequest:
+  type: object
+  required:
+    - newQuantity
+    - reason
+  properties:
+    newQuantity:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: New quantity to set for the inventory
+    reason:
+      type: string
+      minLength: 1
+      description: Reason for inventory adjustment
+      example: "Damaged goods removed from inventory"
+
+MoveInventoryRequest:
+  type: object
+  required:
+    - fromInventoryId
+    - toBinId
+    - quantity
+    - reason
+  properties:
+    fromInventoryId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the inventory to move from
+    toBinId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the bin to move inventory to
+    quantity:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Quantity to move
+    reason:
+      type: string
+      minLength: 1
+      description: Reason for moving inventory
+      example: "Reorganization of warehouse storage"
+
+MoveInventoryResponse:
+  type: object
+  required:
+    - message
+  properties:
+    message:
+      type: string
+      description: Success message
+      example: "Inventory moved successfully"
+
+InventoryListResponse:
+  type: object
+  required:
+    - data
+    - pagination
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/Inventory"
+    pagination:
+      $ref: "../common/schemas.yaml#/Pagination"
+
+InventorySummary:
+  type: object
+  required:
+    - medicationVariantId
+    - totalQuantity
+    - totalReserved
+    - availableQuantity
+  properties:
+    medicationVariantId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the medication variant
+    totalQuantity:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Total quantity across all bins
+    totalReserved:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Total reserved quantity
+    availableQuantity:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Available quantity (total - reserved)
+
+InventorySummaryListResponse:
+  type: object
+  required:
+    - data
+    - pagination
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/InventorySummary"
+    pagination:
+      $ref: "../common/schemas.yaml#/Pagination"

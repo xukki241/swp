@@ -1,0 +1,122 @@
+SalesOrder:
+  type: object
+  required:
+    - id
+    - customerId
+    - orderDate
+    - totalAmount
+    - status
+    - paymentMethod
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    customerId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the customer who placed the order
+    orderDate:
+      $ref: "../common/schemas.yaml#/DateTime"
+      description: Date and time when the order was placed
+    totalAmount:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Total amount of the order
+    status:
+      $ref: "../common/enums.yaml#/SalesOrderStatus"
+    paymentMethod:
+      $ref: "../common/enums.yaml#/SalesOrderPaymentMethod"
+    salespersonId:
+      allOf:
+        - $ref: "../common/schemas.yaml#/UUID"
+        - nullable: true
+          description: ID of the salesperson who processed the order
+
+SalesOrderItem:
+  type: object
+  required:
+    - id
+    - salesOrderId
+    - medicationVariantId
+    - quantity
+    - unitPrice
+    - totalPrice
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    salesOrderId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the sales order
+    medicationVariantId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the medication variant
+    quantity:
+      $ref: "../common/schemas.yaml#/PositiveInteger"
+      description: Quantity ordered
+    unitPrice:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Unit price at time of order
+    totalPrice:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Total price for this line item
+
+SalesOrderWithItems:
+  allOf:
+    - $ref: "#/SalesOrder"
+    - type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/SalesOrderItem"
+          description: Order line items
+
+CreateSalesOrderItem:
+  type: object
+  required:
+    - medication_variant_id
+    - quantity
+  properties:
+    medication_variant_id:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the medication variant to order
+    quantity:
+      $ref: "../common/schemas.yaml#/PositiveInteger"
+      description: Quantity to order
+
+CreateSalesOrderRequest:
+  type: object
+  required:
+    - customer_id
+    - items
+  properties:
+    customer_id:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the customer placing the order
+    payment_method:
+      allOf:
+        - $ref: "../common/enums.yaml#/SalesOrderPaymentMethod"
+        - default: cash
+    items:
+      type: array
+      minItems: 1
+      items:
+        $ref: "#/CreateSalesOrderItem"
+      description: Order line items (at least one required)
+
+UpdateSalesOrderRequest:
+  type: object
+  properties:
+    status:
+      $ref: "../common/enums.yaml#/SalesOrderStatus"
+      description: Update order status
+
+SalesOrderListResponse:
+  type: object
+  required:
+    - data
+    - pagination
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/SalesOrder"
+    pagination:
+      $ref: "../common/schemas.yaml#/Pagination"

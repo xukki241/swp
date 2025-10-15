@@ -1,0 +1,86 @@
+/warehouse/racks/{rackId}:
+  get:
+    tags:
+      - Warehouse
+    summary: Get warehouse rack by ID
+    description: Retrieve a specific warehouse rack
+    operationId: getWarehouseRack
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/RackIdParam"
+    responses:
+      "200":
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/warehouse/rack-schemas.yaml#/WarehouseRack"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  patch:
+    tags:
+      - Warehouse
+    summary: Update warehouse rack
+    description: Update a specific warehouse rack
+    operationId: updateWarehouseRack
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/RackIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/warehouse/rack-schemas.yaml#/UpdateWarehouseRack"
+    responses:
+      "200":
+        description: Warehouse rack updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/warehouse/rack-schemas.yaml#/WarehouseRack"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  delete:
+    tags:
+      - Warehouse
+    summary: Delete warehouse rack
+    description: Delete a specific warehouse rack
+    operationId: deleteWarehouseRack
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/RackIdParam"
+    responses:
+      "200":
+        description: Warehouse rack deleted successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/common/schemas.yaml#/Response"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
