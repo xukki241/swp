@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { AppLayout } from "@/components/layouts/app-layout";
@@ -6,6 +8,13 @@ import { useMedications, useMedicationsVariants } from "@/hooks/useMedications";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { MedicationRow } from "@/components/MedicationRow";
 
@@ -29,11 +38,27 @@ export default function SupplierEditPage() {
     email: "",
     phone: "",
     address: "",
+    status: "active",
   });
 
   const [meds, setMeds] = useState([]);
 
   useEffect(() => {
+    if (supplier) {
+      // Always populate basic supplier info regardless of medications
+      setForm({
+        name: supplier.name || "",
+        contactName: supplier.contactName || supplier.contact_name || "",
+        email: supplier.email || "",
+        phone: supplier.phone || "",
+        address: supplier.address || "",
+        status: supplier.status || "active",
+      });
+    }
+  }, [supplier]);
+
+  useEffect(() => {
+    // Only populate medications if they exist and we have the necessary data
     if (
       supplier &&
       Array.isArray(supplier.medicationVariants) &&
@@ -41,14 +66,6 @@ export default function SupplierEditPage() {
       allMedications.length > 0 &&
       allMedVariants.length > 0
     ) {
-      setForm({
-        name: supplier.name || "",
-        contactName: supplier.contactName || supplier.contact_name || "",
-        email: supplier.email || "",
-        phone: supplier.phone || "",
-        address: supplier.address || "",
-      });
-
       const mappedMeds = supplier.medicationVariants.map((v, idx) => {
         const variantId =
           v.medicationVariantId ||
@@ -118,7 +135,9 @@ export default function SupplierEditPage() {
         .map((m) => ({
           medication_variant_id: m.medicationVariantId,
           supplier_sku: m.supplierSku || null,
-          lead_time_days: m.leadTimeDays ? parseInt(m.leadTimeDays, 10) : null,
+          lead_time_days: m.leadTimeDays
+            ? Number.parseInt(m.leadTimeDays, 10)
+            : null,
         }));
 
       const updateData = {
@@ -127,6 +146,7 @@ export default function SupplierEditPage() {
         email: form.email.trim(),
         phone: form.phone.trim(),
         address: form.address.trim(),
+        status: form.status,
         medicationVariants: variants,
       };
 
@@ -186,6 +206,23 @@ export default function SupplierEditPage() {
               value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
             />
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Status</label>
+              <Select
+                value={form.status}
+                onValueChange={(value) => setForm({ ...form, status: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="blacklisted">Blacklisted</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             <div className="space-y-2">
               <h3 className="font-semibold">Medications List</h3>

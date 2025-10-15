@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { AppLayout } from "@/components/layouts/app-layout";
@@ -6,6 +8,13 @@ import { useMedications } from "@/hooks/useMedications";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { MedicationRow } from "@/components/MedicationRow";
 
@@ -21,6 +30,7 @@ export default function SupplierCreatePage() {
     email: "",
     phone: "",
     address: "",
+    status: "active",
   });
 
   const [meds, setMeds] = useState([
@@ -115,6 +125,23 @@ export default function SupplierCreatePage() {
               value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
             />
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Status</label>
+              <Select
+                value={form.status}
+                onValueChange={(value) => setForm({ ...form, status: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="blacklisted">Blacklisted</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             <div className="space-y-2">
               <h3 className="font-semibold">Medications List</h3>

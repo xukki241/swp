@@ -1,3 +1,5 @@
+"use client";
+
 import { useMedicationVariants } from "@/hooks/useMedications";
 import {
   Select,
@@ -46,7 +48,14 @@ export function MedicationRow({
         });
       }
     }
-  }, [availableVariants, rowData.medicationVariantId]);
+  }, [
+    rowData.medicationVariantId,
+    rowData.variantName,
+    availableVariants,
+    rowData,
+    onChange,
+    index,
+  ]);
 
   const handleMedicationChange = (medId) => {
     const selectedMed = allMedications.find((m) => m.id === medId);
@@ -74,76 +83,108 @@ export function MedicationRow({
     onChange(index, { ...rowData, [field]: value });
   };
 
+  // Medication and Variant get more space, other fields are smaller
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-2 items-center">
-      <Select
-        value={selectedMedId || undefined}
-        onValueChange={handleMedicationChange}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select medication" />
-        </SelectTrigger>
-        <SelectContent>
-          {allMedications.map((med) => (
-            <SelectItem key={med.id} value={med.id}>
-              {med.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="flex flex-col gap-3 p-4 border rounded-lg bg-card">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-muted-foreground">
+            Medication
+          </label>
+          <Select
+            value={selectedMedId || undefined}
+            onValueChange={handleMedicationChange}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select medication" />
+            </SelectTrigger>
+            <SelectContent>
+              {allMedications.map((med) => (
+                <SelectItem key={med.id} value={med.id}>
+                  {med.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      <Select
-        key={selectedMedId || `med-row-${index}`}
-        value={rowData.medicationVariantId || undefined}
-        onValueChange={handleVariantChange}
-        disabled={!selectedMedId || isLoadingVariants}
-      >
-        <SelectTrigger>
-          <SelectValue
-            placeholder={isLoadingVariants ? "Loading..." : "Select variant"}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-muted-foreground">
+            Variant
+          </label>
+          <Select
+            key={selectedMedId || `med-row-${index}`}
+            value={rowData.medicationVariantId || undefined}
+            onValueChange={handleVariantChange}
+            disabled={!selectedMedId || isLoadingVariants}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue
+                placeholder={
+                  isLoadingVariants ? "Loading..." : "Select variant"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent className="max-w-[400px]">
+              {isLoadingVariants && (
+                <div className="p-2 text-sm text-center text-muted-foreground">
+                  Loading variants...
+                </div>
+              )}
+              {!isLoadingVariants &&
+                availableVariants.length === 0 &&
+                selectedMedId && (
+                  <div className="p-2 text-sm text-center text-muted-foreground">
+                    No variants found
+                  </div>
+                )}
+              {availableVariants.map((variant) => (
+                <SelectItem
+                  key={variant.id}
+                  value={variant.id}
+                  className="whitespace-normal"
+                >
+                  {variant.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-muted-foreground">
+            Supplier SKU
+          </label>
+          <Input
+            placeholder="Enter SKU"
+            value={rowData.supplierSku || ""}
+            onChange={(e) => handleFieldChange("supplierSku", e.target.value)}
           />
-        </SelectTrigger>
-        <SelectContent>
-          {isLoadingVariants && (
-            <div className="p-2 text-sm text-center text-muted-foreground">
-              Loading variants...
-            </div>
-          )}
-          {!isLoadingVariants &&
-            availableVariants.length === 0 &&
-            selectedMedId && (
-              <div className="p-2 text-sm text-center text-muted-foreground">
-                No variants found
-              </div>
-            )}
-          {availableVariants.map((variant) => (
-            <SelectItem key={variant.id} value={variant.id}>
-              {variant.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        </div>
 
-      <Input
-        placeholder="Supplier SKU"
-        value={rowData.supplierSku || ""}
-        onChange={(e) => handleFieldChange("supplierSku", e.target.value)}
-      />
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-muted-foreground">
+            Lead Time (days)
+          </label>
+          <Input
+            placeholder="Days"
+            type="number"
+            value={rowData.leadTimeDays || ""}
+            onChange={(e) => handleFieldChange("leadTimeDays", e.target.value)}
+          />
+        </div>
 
-      <Input
-        placeholder="Lead Time (days)"
-        type="number"
-        value={rowData.leadTimeDays || ""}
-        onChange={(e) => handleFieldChange("leadTimeDays", e.target.value)}
-      />
-
-      <Button
-        type="button"
-        variant="destructive"
-        onClick={() => onRemove(index)}
-      >
-        Delete
-      </Button>
+        <Button
+          type="button"
+          variant="destructive"
+          onClick={() => onRemove(index)}
+          className="w-full md:w-auto"
+        >
+          Remove
+        </Button>
+      </div>
     </div>
   );
 }
