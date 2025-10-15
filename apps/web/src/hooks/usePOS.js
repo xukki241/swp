@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
+
 import { salesService } from "@/services/salesService";
 
 export function usePOS() {
@@ -50,7 +51,9 @@ export function usePOS() {
 
   // Update item quantity
   const updateQuantity = useCallback((medicationVariantId, quantity) => {
-    if (quantity < 1) return;
+    if (quantity < 1) {
+      return;
+    }
 
     setCart((prev) =>
       prev.map((item) =>

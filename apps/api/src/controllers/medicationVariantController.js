@@ -7,10 +7,12 @@ import logger from "../utils/logger.js";
  */
 export const getAllMedicationVariants = async (req, res, next) => {
   try {
-    const { search, medicationId, isActive } = req.query;
+    const { search, isActive } = req.query;
+    const { medicationId } = req.params;
+
     const variants = await medicationVariantService.getAllMedicationVariants({
       search,
-      medicationId: medicationId || undefined, // UUID is already a string
+      medicationId: medicationId || undefined,
       isActive: isActive !== undefined ? isActive === "true" : undefined,
     });
 
@@ -24,7 +26,6 @@ export const getAllMedicationVariants = async (req, res, next) => {
     next(error);
   }
 };
-
 /**
  * Get medication variant by ID
  * @route GET /api/medication-variants/:id
