@@ -126,47 +126,81 @@ export default function SupplierEditPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const errors = {};
-    if (!form.name.trim()) errors.name = "Supplier name is required.";
+    // --- LOGIC VALIDATION (GIỐNG HỆT TRANG CREATE) ---
+    const validationErrors = [];
+    if (!form.name.trim()) {
+      validationErrors.push("Supplier Name is required.");
+    }
     if (!form.email.trim()) {
-      errors.email = "Email is required.";
+      validationErrors.push("Email is required.");
     } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      errors.email = "Email address is invalid.";
+      validationErrors.push("Email format is invalid.");
     }
-    if (!form.phone.trim()) errors.phone = "Phone number is required.";
-    if (!form.address.trim()) errors.address = "Address is required.";
+    if (!form.phone.trim()) {
+      validationErrors.push("Phone Number is required.");
+    }
+    if (!form.address.trim()) {
+      validationErrors.push("Address is required.");
+    }
 
-    if (Object.keys(errors).length > 0) {
-      console.error("Validation Errors:", errors);
-      const errorMessages = Object.values(errors).join("\n");
+    meds.forEach((med, index) => {
+      if (med.medicationId || med.supplierSku.trim()) {
+        if (!med.medicationVariantId) {
+          validationErrors.push(
+            `Medication #${index + 1}: Medication Variant must be selected.`
+          );
+        }
+        if (!med.supplierSku.trim()) {
+          validationErrors.push(
+            `Medication #${index + 1}: Supplier SKU is required.`
+          );
+        }
+      }
+    });
+
+    if (validationErrors.length > 0) {
       toast.error("Validation Failed", {
-        description: <pre className="text-sm">{errorMessages}</pre>,
+        description: (
+          <pre className="text-sm text-left whitespace-pre-wrap">
+            {validationErrors.join("\n")}
+          </pre>
+        ),
       });
-      return;
+      return; // Dừng việc submit
     }
+    // --- KẾT THÚC VALIDATION ---
 
     try {
       const variants = meds
-        .filter((m) => m.medicationVariantId && m.supplierSku)
+        .filter((m) => m.medicationVariantId && m.supplierSku.trim())
         .map((m) => ({
           medication_variant_id: m.medicationVariantId,
-          supplier_sku: m.supplierSku || null,
+          supplier_sku: m.supplierSku.trim(),
           lead_time_days: m.leadTimeDays
             ? Number.parseInt(m.leadTimeDays, 10)
             : null,
         }));
 
-      const updateData = { ...form, medicationVariants: variants };
+      const payload = {
+        name: form.name.trim(),
+        contactName: form.contactName?.trim() || null,
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        address: form.address.trim(),
+        status: form.status,
+        medicationVariants: variants,
+      };
 
-      await updateSupplier.mutateAsync({ id, ...updateData });
-
+      await updateSupplier.mutateAsync({ id, ...payload });
       toast.success("Supplier updated successfully!");
       navigate(`/suppliers`);
     } catch (error) {
-      console.error("Update error:", error);
-      toast.error("Failed to update supplier", {
+      console.error("Submission error:", error);
+      toast.error("Failed to save supplier", {
         description:
-          error?.response?.data?.error || "An unexpected error occurred.",
+          error?.response?.data?.error ||
+          error.message ||
+          "An unexpected error occurred.",
       });
     }
   };

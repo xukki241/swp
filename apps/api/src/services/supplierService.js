@@ -1,4 +1,4 @@
-import { eq, ilike, or, and } from "drizzle-orm";
+import { eq, ilike, or, and, ne } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import { medications } from "../db/schema/medications.js";
@@ -7,50 +7,118 @@ import { supplierMedicationVariants } from "../db/schema/supplierMedicationVaria
 import { suppliers } from "../db/schema/suppliers.js";
 
 export const supplierService = {
-  async create(suppliersData) {
-    try {
-      return await db.transaction(async (tx) => {
-        const createdSuppliers = [];
+  async create(suppliersArray) {
+    if (!Array.isArray(suppliersArray)) {
+      throw new Error("Payload must be an array of suppliers.");
+    }
 
-        for (const supplierData of suppliersData) {
-          const { medicationVariants: variants, ...supplierInfo } =
-            supplierData;
+    const results = [];
+    for (const supplierData of suppliersArray) {
+      const validationErrors = [];
+      const {
+        name,
+        email,
+        contactName,
+        phone,
+        address,
+        status,
+        medicationVariants,
+      } = supplierData;
 
-          const [supplier] = await tx
-            .insert(suppliers)
-            .values(supplierInfo)
-            .returning();
-
-          let supplierVariants = [];
-
-          if (variants && Array.isArray(variants) && variants.length > 0) {
-            const variantsToInsert = variants.map((variant) => ({
-              supplierId: supplier.id,
-              medicationVariantId: variant.medication_variant_id,
-              supplierSku: variant.supplier_sku,
-              leadTimeDays: variant.lead_time_days
-                ? Number(variant.lead_time_days)
-                : null,
-            }));
-
-            supplierVariants = await tx
-              .insert(supplierMedicationVariants)
-              .values(variantsToInsert)
-              .returning();
+      // Validate only if field is provided
+      if (name !== undefined && !name.trim()) {
+        validationErrors.push("Supplier name cannot be empty.");
+      }
+      if (email !== undefined) {
+        if (!email.trim()) {
+          validationErrors.push("Email is required.");
+        } else if (!/\S+@\S+\.\S+/.test(email)) {
+          validationErrors.push("Email format is invalid.");
+        }
+      }
+      if (phone !== undefined && !phone.trim()) {
+        validationErrors.push("Phone number is required.");
+      }
+      if (address !== undefined && !address.trim()) {
+        validationErrors.push("Address is required.");
+      }
+      if (medicationVariants && Array.isArray(medicationVariants)) {
+        for (const [vIndex, variant] of medicationVariants.entries()) {
+          if (
+            variant.medication_variant_id !== undefined &&
+            !variant.medication_variant_id
+          ) {
+            validationErrors.push(
+              `Medication #${vIndex + 1}: Medication Variant must be selected.`
+            );
           }
+          if (
+            variant.supplier_sku !== undefined &&
+            !variant.supplier_sku.trim()
+          ) {
+            validationErrors.push(
+              `Medication #${vIndex + 1}: Supplier SKU is required.`
+            );
+          }
+        }
+      }
 
-          createdSuppliers.push({
-            ...supplier,
-            medicationVariants: supplierVariants,
+      if (validationErrors.length > 0) {
+        throw new Error(validationErrors.join("\n"));
+      }
+
+      try {
+        // Check duplicate email
+        if (email) {
+          const existingSupplier = await db.query.suppliers.findFirst({
+            where: eq(suppliers.email, email.trim()),
           });
+          if (existingSupplier) {
+            throw new Error("Supplier with this email already exists.");
+          }
+        }
+        if (phone) {
+          const existingSupplier = await db.query.suppliers.findFirst({
+            where: eq(suppliers.phone, phone.trim()),
+          });
+          if (existingSupplier) {
+            throw new Error("Supplier with this phone number already exists.");
+          }
+        }
+        // Create supplier
+        const [newSupplier] = await db
+          .insert(suppliers)
+          .values({
+            name: name?.trim() ?? "",
+            contactName: contactName?.trim() ?? "",
+            email: email?.trim() ?? "",
+            phone: phone?.trim() ?? "",
+            address: address?.trim() ?? "",
+            status: status || "active",
+          })
+          .returning();
+
+        // Create medication variants if any
+        if (
+          medicationVariants &&
+          Array.isArray(medicationVariants) &&
+          medicationVariants.length > 0
+        ) {
+          const variantsToInsert = medicationVariants.map((variant) => ({
+            supplierId: newSupplier.id,
+            medicationVariantId: variant.medication_variant_id,
+            supplierSku: variant.supplier_sku?.trim(),
+            leadTimeDays: variant.lead_time_days ?? null,
+          }));
+          await db.insert(supplierMedicationVariants).values(variantsToInsert);
         }
 
-        return createdSuppliers;
-      });
-    } catch (error) {
-      console.error("Error creating suppliers:", error.message);
-      throw new Error(`Failed to create suppliers: ${error.message}`);
+        results.push(newSupplier);
+      } catch (error) {
+        throw new Error(error.message || "Failed to create supplier");
+      }
     }
+    return results;
   },
 
   async getAll(filters = {}) {
@@ -132,115 +200,114 @@ export const supplierService = {
   },
 
   async update(id, supplierData) {
-    try {
-      const { medicationVariants: variants, ...supplierInfo } = supplierData;
+    const validationErrors = [];
+    const { name, email, phone, address, status, medicationVariants } =
+      supplierData;
 
-      return await db.transaction(async (tx) => {
-        const [supplier] = await tx
-          .update(suppliers)
-          .set(supplierInfo)
-          .where(eq(suppliers.id, id))
-          .returning();
-
-        if (!supplier) {
-          return null;
-        }
-
-        if (Array.isArray(variants)) {
-          const existingVariants = await tx
-            .select()
-            .from(supplierMedicationVariants)
-            .where(eq(supplierMedicationVariants.supplierId, id));
-          const incomingMedicationVariantIds = new Set(
-            variants.map(
-              (v) => v.medicationVariantId || v.medication_variant_id
-            )
+    // Validate chỉ khi trường được truyền lên
+    if (name !== undefined && !name.trim()) {
+      validationErrors.push("Supplier name cannot be empty.");
+    }
+    if (email !== undefined) {
+      if (!email.trim()) {
+        validationErrors.push("Email is required.");
+      } else if (!/\S+@\S+\.\S+/.test(email)) {
+        validationErrors.push("Email format is invalid.");
+      }
+    }
+    if (phone !== undefined && !phone.trim()) {
+      validationErrors.push("Phone number is required.");
+    }
+    if (address !== undefined && !address.trim()) {
+      validationErrors.push("Address is required.");
+    }
+    if (medicationVariants && Array.isArray(medicationVariants)) {
+      for (const [vIndex, variant] of medicationVariants.entries()) {
+        if (
+          variant.medication_variant_id !== undefined &&
+          !variant.medication_variant_id
+        ) {
+          validationErrors.push(
+            `Medication #${vIndex + 1}: Medication Variant must be selected.`
           );
-
-          for (const variant of variants) {
-            const variantId =
-              variant.medicationVariantId || variant.medication_variant_id;
-            const sku = variant.supplierSku || variant.supplier_sku;
-            const leadTime = variant.leadTimeDays || variant.lead_time_days;
-
-            if (!variantId) {
-              console.warn("⚠️ Skipping variant without ID:", variant);
-              continue;
-            }
-
-            const existing = existingVariants.find(
-              (ev) => ev.medicationVariantId === variantId
-            );
-
-            if (existing) {
-              await tx
-                .update(supplierMedicationVariants)
-                .set({
-                  supplierSku: sku,
-                  leadTimeDays: leadTime,
-                })
-                .where(eq(supplierMedicationVariants.id, existing.id));
-            } else {
-              await tx.insert(supplierMedicationVariants).values({
-                supplierId: id,
-                medicationVariantId: variantId,
-                supplierSku: sku,
-                leadTimeDays: leadTime,
-              });
-            }
-          }
-
-          for (const old of existingVariants) {
-            if (!incomingMedicationVariantIds.has(old.medicationVariantId)) {
-              try {
-                await tx
-                  .delete(supplierMedicationVariants)
-                  .where(eq(supplierMedicationVariants.id, old.id));
-              } catch (e) {
-                console.warn(
-                  `⚠️ Variant ${old.id} is in use and cannot be deleted. Error: ${e.message}`
-                );
-              }
-            }
-          }
         }
+        if (
+          variant.supplier_sku !== undefined &&
+          !variant.supplier_sku.trim()
+        ) {
+          validationErrors.push(
+            `Medication #${vIndex + 1}: Supplier SKU is required.`
+          );
+        }
+      }
+    }
 
-        const [updatedSupplier] = await tx
-          .select()
-          .from(suppliers)
-          .where(eq(suppliers.id, id));
+    if (validationErrors.length > 0) {
+      throw new Error(validationErrors.join("\n"));
+    }
 
-        const updatedVariants = await tx
-          .select({
-            id: supplierMedicationVariants.id,
-            medicationVariantId: supplierMedicationVariants.medicationVariantId,
-            supplierSku: supplierMedicationVariants.supplierSku,
-            leadTimeDays: supplierMedicationVariants.leadTimeDays,
-            medicationName: medications.name,
-            variantName: medicationVariants.name,
-          })
-          .from(supplierMedicationVariants)
-          .leftJoin(
-            medicationVariants,
-            eq(
-              supplierMedicationVariants.medicationVariantId,
-              medicationVariants.id
-            )
-          )
-          .leftJoin(
-            medications,
-            eq(medicationVariants.medicationId, medications.id)
-          )
-          .where(eq(supplierMedicationVariants.supplierId, id));
-
-        return {
-          ...updatedSupplier,
-          medicationVariants: updatedVariants,
-        };
+    try {
+      // Kiểm tra supplier tồn tại
+      const existingSupplier = await db.query.suppliers.findFirst({
+        where: eq(suppliers.id, id),
       });
+      if (!existingSupplier) {
+        throw new Error("Supplier not found.");
+      }
+
+      // Kiểm tra email trùng lặp (nếu email thay đổi)
+      if (email && email.trim() !== existingSupplier.email) {
+        const emailExists = await db.query.suppliers.findFirst({
+          where: eq(suppliers.email, email.trim()),
+        });
+        if (emailExists) {
+          throw new Error("Supplier with this email already exists.");
+        }
+      }
+      if (phone && phone.trim() !== existingSupplier.phone) {
+        const phoneExists = await db.query.suppliers.findFirst({
+          where: and(
+            eq(suppliers.phone, phone.trim()),
+            ne(suppliers.id, id) // Đảm bảo không so sánh với chính nó
+          ),
+        });
+        if (phoneExists) {
+          throw new Error("Supplier with this phone number already exists.");
+        }
+      }
+
+      // Update supplier
+      const [updatedSupplier] = await db
+        .update(suppliers)
+        .set({
+          name: name?.trim(),
+          email: email?.trim(),
+          phone: phone?.trim(),
+          address: address?.trim(),
+          status: status || existingSupplier.status,
+        })
+        .where(eq(suppliers.id, id))
+        .returning();
+
+      // Update medication variants: xóa hết cũ, thêm mới
+      if (medicationVariants && Array.isArray(medicationVariants)) {
+        await db
+          .delete(supplierMedicationVariants)
+          .where(eq(supplierMedicationVariants.supplierId, id));
+        if (medicationVariants.length > 0) {
+          const variantsToInsert = medicationVariants.map((variant) => ({
+            supplierId: id,
+            medicationVariantId: variant.medication_variant_id,
+            supplierSku: variant.supplier_sku?.trim(),
+            leadTimeDays: variant.lead_time_days ?? null,
+          }));
+          await db.insert(supplierMedicationVariants).values(variantsToInsert);
+        }
+      }
+
+      return updatedSupplier;
     } catch (error) {
-      console.error(`Error updating supplier with ID ${id}:`, error);
-      throw error;
+      throw new Error(error.message || "Failed to update supplier");
     }
   },
 
