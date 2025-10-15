@@ -46,7 +46,6 @@ export default function SupplierEditPage() {
 
   useEffect(() => {
     if (supplier) {
-      // Always populate basic supplier info regardless of medications
       setForm({
         name: supplier.name || "",
         contactName: supplier.contactName || supplier.contact_name || "",
@@ -59,7 +58,6 @@ export default function SupplierEditPage() {
   }, [supplier]);
 
   useEffect(() => {
-    // Only populate medications if they exist and we have the necessary data
     if (
       supplier &&
       Array.isArray(supplier.medicationVariants) &&
@@ -125,8 +123,6 @@ export default function SupplierEditPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // --- LOGIC VALIDATION (GIỐNG HỆT TRANG CREATE) ---
     const validationErrors = [];
     if (!form.name.trim()) {
       validationErrors.push("Supplier Name is required.");
@@ -166,9 +162,8 @@ export default function SupplierEditPage() {
           </pre>
         ),
       });
-      return; // Dừng việc submit
+      return;
     }
-    // --- KẾT THÚC VALIDATION ---
 
     try {
       const variants = meds

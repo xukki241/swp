@@ -58,8 +58,6 @@ export default function SupplierCreatePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // --- VALIDATION LOGIC ---
     const validationErrors = [];
     if (!form.name.trim()) {
       validationErrors.push("Supplier Name is required.");
@@ -77,7 +75,6 @@ export default function SupplierCreatePage() {
     }
 
     meds.forEach((med, index) => {
-      // Chỉ validate những dòng đã được người dùng tương tác (chọn thuốc hoặc nhập SKU)
       if (med.medicationId || med.supplierSku.trim()) {
         if (!med.medicationVariantId) {
           validationErrors.push(
@@ -100,13 +97,11 @@ export default function SupplierCreatePage() {
           </pre>
         ),
       });
-      return; // Dừng việc submit
+      return;
     }
-    // --- END VALIDATION ---
 
     try {
       const variants = meds
-        // Lọc ra những dòng thực sự có dữ liệu để gửi đi
         .filter((m) => m.medicationVariantId && m.supplierSku.trim())
         .map((m) => ({
           medication_variant_id: m.medicationVariantId,
