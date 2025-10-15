@@ -1,0 +1,80 @@
+/users/{userId}:
+  get:
+    tags:
+      - Users
+    summary: Get user by ID
+    description: Retrieve a specific user by their ID
+    operationId: getUserById
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/UserIdParam"
+    responses:
+      "200":
+        description: User retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/users/schemas.yaml#/User"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  patch:
+    tags:
+      - Users
+    summary: Update user
+    description: Update user information (owner only)
+    operationId: updateUser
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/UserIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/users/schemas.yaml#/UpdateUser"
+    responses:
+      "200":
+        description: User updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/users/schemas.yaml#/User"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  delete:
+    tags:
+      - Users
+    summary: Delete user
+    description: Delete a user account (owner only)
+    operationId: deleteUser
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/UserIdParam"
+    responses:
+      "200":
+        description: User deleted successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/common/schemas.yaml#/Response"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

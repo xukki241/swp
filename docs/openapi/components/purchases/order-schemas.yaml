@@ -1,0 +1,142 @@
+PurchaseOrder:
+  type: object
+  required:
+    - id
+    - supplierId
+    - orderDate
+    - status
+    - totalAmount
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    supplierId:
+      $ref: "../common/schemas.yaml#/UUID"
+    orderDate:
+      $ref: "../common/schemas.yaml#/DateTime"
+    expectedDate:
+      allOf:
+        - $ref: "../common/schemas.yaml#/DateTime"
+        - nullable: true
+    status:
+      $ref: "../common/enums.yaml#/PurchaseOrderStatus"
+    totalAmount:
+      type: number
+      format: float
+      minimum: 0
+      description: Total amount of the purchase order
+      example: 1500000.00
+    createdBy:
+      allOf:
+        - $ref: "../common/schemas.yaml#/UUID"
+        - nullable: true
+
+PurchaseOrderItem:
+  type: object
+  required:
+    - id
+    - purchaseOrderId
+    - supplierMedicationVariantId
+    - quantity
+    - unitPrice
+    - totalPrice
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    purchaseOrderId:
+      $ref: "../common/schemas.yaml#/UUID"
+    supplierMedicationVariantId:
+      type: string
+      format: uuid
+      description: Supplier medication variant ID
+    quantity:
+      $ref: "../common/schemas.yaml#/PositiveInteger"
+    unitPrice:
+      type: number
+      format: float
+      minimum: 0
+      description: Unit price
+      example: 50000.00
+    totalPrice:
+      type: number
+      format: float
+      minimum: 0
+      description: Total price (quantity * unitPrice)
+      example: 500000.00
+
+PurchaseOrderWithItems:
+  allOf:
+    - $ref: "#/PurchaseOrder"
+    - type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/PurchaseOrderItem"
+
+CreatePurchaseOrderItem:
+  type: object
+  required:
+    - supplierMedicationVariantId
+    - quantity
+    - unitPrice
+  properties:
+    supplierMedicationVariantId:
+      type: string
+      format: uuid
+      description: Supplier medication variant ID
+    quantity:
+      $ref: "../common/schemas.yaml#/PositiveInteger"
+    unitPrice:
+      type: number
+      format: float
+      minimum: 0
+      description: Unit price
+      example: 50000.00
+
+CreatePurchaseOrder:
+  type: object
+  required:
+    - supplierId
+    - items
+  properties:
+    supplierId:
+      type: string
+      format: uuid
+      description: Supplier ID
+    items:
+      type: array
+      minItems: 1
+      items:
+        $ref: "#/CreatePurchaseOrderItem"
+      description: Array of items in the purchase order
+
+CreatePurchaseOrdersRequest:
+  type: array
+  items:
+    $ref: "#/CreatePurchaseOrder"
+  description: Array of purchase orders to create
+
+CreatePurchaseOrdersResponse:
+  type: array
+  items:
+    $ref: "#/PurchaseOrder"
+  description: Array of created purchase orders
+
+UpdatePurchaseOrder:
+  type: object
+  properties:
+    status:
+      $ref: "../common/enums.yaml#/PurchaseOrderStatus"
+
+PurchaseOrderListResponse:
+  type: object
+  required:
+    - data
+    - pagination
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/PurchaseOrder"
+    pagination:
+      $ref: "../common/schemas.yaml#/Pagination"

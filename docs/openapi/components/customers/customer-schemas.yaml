@@ -1,0 +1,73 @@
+Customer:
+  type: object
+  required:
+    - id
+    - name
+    - email
+    - phone
+    - address
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    email:
+      $ref: "../common/schemas.yaml#/Email"
+    phone:
+      $ref: "../common/schemas.yaml#/Phone"
+    address:
+      $ref: "../common/schemas.yaml#/Address"
+
+CreateCustomer:
+  type: object
+  required:
+    - name
+    - email
+    - phone
+    - address
+  properties:
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    email:
+      $ref: "../common/schemas.yaml#/Email"
+    phone:
+      $ref: "../common/schemas.yaml#/Phone"
+    address:
+      $ref: "../common/schemas.yaml#/Address"
+
+CreateCustomersRequest:
+  type: array
+  items:
+    $ref: "#/CreateCustomer"
+  description: Array of customers to create
+
+CreateCustomersResponse:
+  type: array
+  items:
+    $ref: "#/Customer"
+  description: Array of created customers
+
+UpdateCustomer:
+  type: object
+  properties:
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    email:
+      $ref: "../common/schemas.yaml#/Email"
+    phone:
+      $ref: "../common/schemas.yaml#/Phone"
+    address:
+      $ref: "../common/schemas.yaml#/Address"
+
+CustomerListResponse:
+  type: object
+  required:
+    - data
+    - pagination
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/Customer"
+    pagination:
+      $ref: "../common/schemas.yaml#/Pagination"

@@ -1,0 +1,140 @@
+Report:
+  type: object
+  required:
+    - id
+    - type
+    - reportDate
+    - data
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    type:
+      $ref: "../common/enums.yaml#/ReportType"
+    reportDate:
+      $ref: "../common/schemas.yaml#/DateTime"
+      description: Date and time when the report was generated
+    data:
+      type: object
+      description: Report data in JSON format
+      additionalProperties: true
+    parameters:
+      type: object
+      nullable: true
+      description: Parameters used to generate the report
+      additionalProperties: true
+
+CreateReportRequest:
+  type: object
+  required:
+    - type
+  properties:
+    type:
+      $ref: "../common/enums.yaml#/ReportType"
+    parameters:
+      type: object
+      description: Optional parameters for report generation
+      properties:
+        startDate:
+          $ref: "../common/schemas.yaml#/DateTime"
+          description: Start date for report period
+        endDate:
+          $ref: "../common/schemas.yaml#/DateTime"
+          description: End date for report period
+
+ReportListResponse:
+  type: object
+  required:
+    - data
+    - pagination
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/Report"
+    pagination:
+      $ref: "../common/schemas.yaml#/Pagination"
+
+DailySalesReport:
+  type: object
+  description: Daily sales summary report
+  properties:
+    date:
+      type: string
+      format: date
+      description: Report date
+    totalSales:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Total sales amount for the day
+    orderCount:
+      $ref: "../common/schemas.yaml#/NonNegativeInteger"
+      description: Number of orders
+    topProducts:
+      type: array
+      description: Top selling products
+      items:
+        type: object
+        properties:
+          medicationName:
+            type: string
+          quantitySold:
+            type: integer
+          revenue:
+            type: number
+
+WeeklySalesReport:
+  type: object
+  description: Weekly sales summary report
+  properties:
+    weekStartDate:
+      type: string
+      format: date
+      description: Start date of the week
+    weekEndDate:
+      type: string
+      format: date
+      description: End date of the week
+    totalSales:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Total sales amount for the week
+    orderCount:
+      $ref: "../common/schemas.yaml#/NonNegativeInteger"
+      description: Number of orders
+    dailyBreakdown:
+      type: array
+      description: Daily breakdown of sales
+      items:
+        type: object
+        properties:
+          date:
+            type: string
+            format: date
+          sales:
+            type: number
+          orders:
+            type: integer
+
+MonthlySalesReport:
+  type: object
+  description: Monthly sales summary report
+  properties:
+    month:
+      type: string
+      description: Month and year (e.g., "2025-10")
+    totalSales:
+      $ref: "../common/schemas.yaml#/PositiveDecimal"
+      description: Total sales amount for the month
+    orderCount:
+      $ref: "../common/schemas.yaml#/NonNegativeInteger"
+      description: Number of orders
+    weeklyBreakdown:
+      type: array
+      description: Weekly breakdown of sales
+      items:
+        type: object
+        properties:
+          week:
+            type: string
+          sales:
+            type: number
+          orders:
+            type: integer

@@ -1,0 +1,30 @@
+/warehouse/zones/batch:
+  post:
+    tags:
+      - Warehouse
+    summary: Batch create warehouse zones
+    description: Create multiple warehouse zones with auto-generated codes and names
+    operationId: batchCreateWarehouseZones
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/warehouse/zone-schemas.yaml#/BatchCreateWarehouseZones"
+    responses:
+      "201":
+        description: Warehouse zones created successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/warehouse/zone-schemas.yaml#/CreateWarehouseZonesResponse"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

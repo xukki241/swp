@@ -1,0 +1,89 @@
+/purchases/orders:
+  get:
+    tags:
+      - Purchases
+    summary: List all purchase orders
+    description: Get paginated list of purchase orders with optional filtering
+    operationId: listPurchaseOrders
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/PageParam"
+      - $ref: "../../components/common/parameters.yaml#/LimitParam"
+      - $ref: "../../components/common/parameters.yaml#/SortByParam"
+      - $ref: "../../components/common/parameters.yaml#/SortOrderParam"
+      - name: supplierId
+        in: query
+        description: Filter by supplier ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        description: Filter by purchase order status
+        required: false
+        schema:
+          $ref: "../../components/common/enums.yaml#/PurchaseOrderStatus"
+      - name: createdBy
+        in: query
+        description: Filter by creator user ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: orderDateFrom
+        in: query
+        description: Filter by order date from
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: orderDateTo
+        in: query
+        description: Filter by order date to
+        required: false
+        schema:
+          type: string
+          format: date-time
+    responses:
+      "200":
+        description: Purchase orders retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/purchases/order-schemas.yaml#/PurchaseOrderListResponse"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  post:
+    tags:
+      - Purchases
+    summary: Create purchase orders (batch)
+    description: Create one or more purchase orders with items
+    operationId: createPurchaseOrders
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/purchases/order-schemas.yaml#/CreatePurchaseOrdersRequest"
+    responses:
+      "201":
+        description: Purchase orders created successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/purchases/order-schemas.yaml#/CreatePurchaseOrdersResponse"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

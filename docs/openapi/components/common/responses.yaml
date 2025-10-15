@@ -1,0 +1,78 @@
+BadRequestError:
+  description: Bad request - Invalid input parameters
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas.yaml#/Error"
+      example:
+        message: "Validation failed"
+        statusCode: 400
+        details:
+          field: "email"
+          issue: "Invalid email format"
+
+UnauthorizedError:
+  description: Unauthorized - Authentication required
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas.yaml#/Error"
+      example:
+        message: "Authentication required"
+        statusCode: 401
+
+ForbiddenError:
+  description: Forbidden - Insufficient permissions
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas.yaml#/Error"
+      example:
+        message: "Insufficient permissions"
+        statusCode: 403
+
+NotFoundError:
+  description: Not found - Resource does not exist
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas.yaml#/Error"
+      example:
+        message: "Resource not found"
+        statusCode: 404
+
+ConflictError:
+  description: Conflict - Resource already exists
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas.yaml#/Error"
+      example:
+        message: "Resource already exists"
+        statusCode: 409
+
+InternalServerError:
+  description: Internal server error
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas.yaml#/Error"
+      example:
+        message: "Internal server error"
+        statusCode: 500
+
+# Aliases without "Error" suffix for consistency
+BadRequest:
+  $ref: "#/BadRequestError"
+
+Unauthorized:
+  $ref: "#/UnauthorizedError"
+
+Forbidden:
+  $ref: "#/ForbiddenError"
+
+NotFound:
+  $ref: "#/NotFoundError"
+
+Conflict:
+  $ref: "#/ConflictError"

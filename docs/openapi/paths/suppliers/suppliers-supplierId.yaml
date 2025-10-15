@@ -1,0 +1,90 @@
+/suppliers/{supplierId}:
+  get:
+    tags:
+      - Suppliers
+    summary: Get supplier by ID
+    description: Retrieve a specific supplier by their ID
+    operationId: getSupplierById
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/SupplierIdParam"
+    responses:
+      "200":
+        description: Supplier retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/suppliers/supplier-schemas.yaml#/Supplier"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  patch:
+    tags:
+      - Suppliers
+    summary: Update supplier
+    description: Update supplier information (Owner only)
+    operationId: updateSupplier
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/SupplierIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/suppliers/supplier-schemas.yaml#/UpdateSupplier"
+          example:
+            name: "ABC Pharmaceuticals Ltd."
+            contactName: "John Doe Jr."
+            status: "active"
+    responses:
+      "200":
+        description: Supplier updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/suppliers/supplier-schemas.yaml#/Supplier"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "409":
+        $ref: "../../components/common/responses.yaml#/ConflictError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  delete:
+    tags:
+      - Suppliers
+    summary: Delete supplier
+    description: Delete a supplier (Owner only)
+    operationId: deleteSupplier
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/SupplierIdParam"
+    responses:
+      "200":
+        description: Supplier deleted successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/common/schemas.yaml#/Response"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

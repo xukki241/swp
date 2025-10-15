@@ -1,0 +1,27 @@
+/auth/login:
+  post:
+    tags:
+      - Auth
+    summary: Login user
+    description: Authenticate user and receive JWT tokens
+    operationId: login
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/auth/schemas.yaml#/LoginRequest"
+    responses:
+      "200":
+        description: Login successful
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/auth/schemas.yaml#/LoginResponse"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

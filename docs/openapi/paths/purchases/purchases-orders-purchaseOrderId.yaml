@@ -1,0 +1,78 @@
+/purchases/orders/{purchaseOrderId}:
+  get:
+    tags:
+      - Purchases
+    summary: Get purchase order by ID
+    description: Retrieve a specific purchase order with its items
+    operationId: getPurchaseOrderById
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/PurchaseOrderIdParam"
+    responses:
+      "200":
+        description: Purchase order retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/purchases/order-schemas.yaml#/PurchaseOrderWithItems"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  patch:
+    tags:
+      - Purchases
+    summary: Update purchase order
+    description: Update purchase order status
+    operationId: updatePurchaseOrder
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/PurchaseOrderIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/purchases/order-schemas.yaml#/UpdatePurchaseOrder"
+    responses:
+      "200":
+        description: Purchase order updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/purchases/order-schemas.yaml#/PurchaseOrder"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  delete:
+    tags:
+      - Purchases
+    summary: Delete purchase order
+    description: Delete a purchase order
+    operationId: deletePurchaseOrder
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/PurchaseOrderIdParam"
+    responses:
+      "200":
+        description: Purchase order deleted successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/common/schemas.yaml#/Response"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

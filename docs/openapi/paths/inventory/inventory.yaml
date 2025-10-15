@@ -1,0 +1,59 @@
+/inventory:
+  get:
+    tags:
+      - Inventory
+    summary: List all inventory
+    description: Get paginated list of inventory entries with optional filtering
+    operationId: listInventory
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/PageParam"
+      - $ref: "../../components/common/parameters.yaml#/LimitParam"
+      - $ref: "../../components/common/parameters.yaml#/SortByParam"
+      - $ref: "../../components/common/parameters.yaml#/SortOrderParam"
+      - name: medication_variant_id
+        in: query
+        description: Filter by medication variant ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: bin_id
+        in: query
+        description: Filter by warehouse bin ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: batchNumber
+        in: query
+        description: Filter by batch number
+        required: false
+        schema:
+          type: string
+      - name: expiryDateFrom
+        in: query
+        description: Filter by expiry date from (YYYY-MM-DD)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: expiryDateTo
+        in: query
+        description: Filter by expiry date to (YYYY-MM-DD)
+        required: false
+        schema:
+          type: string
+          format: date
+    responses:
+      "200":
+        description: Inventory entries retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/inventory/inventory-schemas.yaml#/InventoryListResponse"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

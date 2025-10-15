@@ -1,0 +1,171 @@
+RegisterRequest:
+  type: object
+  required:
+    - name
+    - email
+    - phone
+    - address
+  properties:
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    email:
+      type: string
+      format: email
+      maxLength: 255
+      description: Email address (required for registration)
+      example: "newuser@example.com"
+    phone:
+      type: string
+      pattern: '^\d{10}$'
+      description: Phone number (10 digits, required for registration)
+      example: "0987654321"
+    address:
+      type: string
+      description: Address (required for registration)
+      example: "456 New Street, City, Country"
+
+RegisterResponse:
+  type: object
+  required:
+    - message
+  properties:
+    message:
+      type: string
+      description: Registration result message
+      example: "Registration request submitted successfully"
+
+LoginRequest:
+  type: object
+  required:
+    - email
+    - password
+  properties:
+    email:
+      type: string
+      format: email
+      description: User email address
+      example: "user@example.com"
+    password:
+      type: string
+      minLength: 1
+      description: User password
+      example: "password123"
+
+LoginResponse:
+  type: object
+  required:
+    - accessToken
+    - refreshToken
+  properties:
+    accessToken:
+      type: string
+      description: JWT access token
+      example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    refreshToken:
+      type: string
+      description: JWT refresh token
+      example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+ForgotPasswordRequest:
+  type: object
+  required:
+    - email
+  properties:
+    email:
+      type: string
+      format: email
+      description: Email address for password reset
+      example: "user@example.com"
+
+ForgotPasswordResponse:
+  type: object
+  required:
+    - message
+  properties:
+    message:
+      type: string
+      description: Password reset request confirmation
+      example: "Password reset instructions sent to your email"
+
+ResetPasswordRequest:
+  type: object
+  required:
+    - token
+    - newPassword
+  properties:
+    token:
+      type: string
+      minLength: 6
+      maxLength: 6
+      description: 6-digit OTP token
+      example: "123456"
+    newPassword:
+      type: string
+      minLength: 8
+      maxLength: 255
+      description: New password
+      example: "newSecurePassword123"
+
+ResetPasswordResponse:
+  type: object
+  required:
+    - message
+  properties:
+    message:
+      type: string
+      description: Password reset confirmation
+      example: "Password reset successfully"
+
+ChangePasswordRequest:
+  type: object
+  required:
+    - oldPassword
+    - newPassword
+  properties:
+    oldPassword:
+      type: string
+      minLength: 1
+      description: Current password
+      example: "oldPassword123"
+    newPassword:
+      type: string
+      minLength: 8
+      maxLength: 255
+      description: New password
+      example: "newSecurePassword123"
+
+ChangePasswordResponse:
+  type: object
+  required:
+    - message
+  properties:
+    message:
+      type: string
+      description: Password change confirmation
+      example: "Password changed successfully"
+
+MeResponse:
+  type: object
+  required:
+    - id
+    - name
+    - email
+    - phone
+    - address
+    - status
+    - role
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    email:
+      $ref: "../common/schemas.yaml#/Email"
+    phone:
+      $ref: "../common/schemas.yaml#/Phone"
+    address:
+      $ref: "../common/schemas.yaml#/Address"
+    status:
+      $ref: "../common/enums.yaml#/UserStatus"
+    role:
+      $ref: "../common/enums.yaml#/UserRole"

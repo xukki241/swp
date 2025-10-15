@@ -1,0 +1,60 @@
+/purchases/orders/{purchaseOrderId}/receipts:
+  get:
+    tags:
+      - Purchases
+    summary: List purchase order receipts
+    description: Get paginated list of receipts for a specific purchase order
+    operationId: listPurchaseOrderReceipts
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/PurchaseOrderIdParam"
+      - $ref: "../../components/common/parameters.yaml#/PageParam"
+      - $ref: "../../components/common/parameters.yaml#/LimitParam"
+      - $ref: "../../components/common/parameters.yaml#/SortByParam"
+      - $ref: "../../components/common/parameters.yaml#/SortOrderParam"
+    responses:
+      "200":
+        description: Purchase order receipts retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/purchases/receipt-schemas.yaml#/ReceiptListResponse"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  post:
+    tags:
+      - Purchases
+    summary: Create purchase order receipt
+    description: Create a receipt for received items from a purchase order
+    operationId: createPurchaseOrderReceipt
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/PurchaseOrderIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/purchases/receipt-schemas.yaml#/CreateReceipt"
+    responses:
+      "201":
+        description: Purchase order receipt created successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/purchases/receipt-schemas.yaml#/PurchaseOrderReceipt"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

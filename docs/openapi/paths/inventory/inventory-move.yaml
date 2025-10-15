@@ -1,0 +1,37 @@
+/inventory/move:
+  post:
+    tags:
+      - Inventory
+    summary: Move inventory between bins
+    description: Move inventory from one bin to another (Owner only)
+    operationId: moveInventory
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/inventory/inventory-schemas.yaml#/MoveInventoryRequest"
+          example:
+            fromInventoryId: "550e8400-e29b-41d4-a716-446655440000"
+            toBinId: "660e8400-e29b-41d4-a716-446655440001"
+            quantity: 50
+            reason: "Reorganization of warehouse storage"
+    responses:
+      "200":
+        description: Inventory moved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/inventory/inventory-schemas.yaml#/MoveInventoryResponse"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
