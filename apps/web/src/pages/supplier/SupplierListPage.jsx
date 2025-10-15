@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react"; // <-- THAY ĐỔI: Thêm useMemo
 import { useNavigate } from "react-router";
 import { useSuppliers, useDeleteSupplier } from "@/hooks/useSuppliers";
 import { AppLayout } from "@/components/layouts/app-layout";
@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardHeader,
@@ -22,12 +23,20 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   PlusCircle,
   Edit,
   Trash2,
   CheckCircle,
   XCircle,
   Ban,
+  Search,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -40,10 +49,41 @@ import {
 
 export default function SupplierListPage() {
   const navigate = useNavigate();
-  const { data: suppliers = [], isLoading } = useSuppliers();
-  const { mutate: deleteSupplier } = useDeleteSupplier();
+
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+
+  const { data: allSuppliers = [], isLoading } = useSuppliers();
+  const { mutate: deleteSupplier } = useDeleteSupplier();
+
+  const filteredSuppliers = useMemo(() => {
+    let suppliers = [...allSuppliers];
+
+    if (statusFilter !== "all") {
+      suppliers = suppliers.filter((s) => s.status === statusFilter);
+    }
+
+    if (searchQuery) {
+      const lowercasedQuery = searchQuery.toLowerCase();
+      suppliers = suppliers.filter((s) => {
+        const nameMatch = (s.name || "")
+          .toLowerCase()
+          .includes(lowercasedQuery);
+        const emailMatch = (s.email || "")
+          .toLowerCase()
+          .includes(lowercasedQuery);
+        const phoneMatch = (s.phone || "")
+          .toLowerCase()
+          .includes(lowercasedQuery);
+        return nameMatch || emailMatch || phoneMatch;
+      });
+    }
+
+    return suppliers;
+  }, [allSuppliers, searchQuery, statusFilter]);
 
   const handleDelete = (id) => {
     setSelectedId(id);
@@ -85,10 +125,8 @@ export default function SupplierListPage() {
         icon: Ban,
       },
     };
-
     const config = variants[status] || variants.inactive;
     const Icon = config.icon;
-
     return (
       <Badge variant="secondary" className={config.className}>
         <Icon className="h-3 w-3 mr-1" />
@@ -138,7 +176,7 @@ export default function SupplierListPage() {
             <div>
               <CardTitle>Supplier List</CardTitle>
               <CardDescription>
-                View and manage all supplier information
+                View, search, and manage all supplier information
               </CardDescription>
             </div>
             <Button
@@ -149,29 +187,85 @@ export default function SupplierListPage() {
             </Button>
           </CardHeader>
           <CardContent>
-            {suppliers.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground font-medium">
-                  No suppliers found
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Get started by adding your first supplier
-                </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setSearchQuery(searchInput);
+              }}
+              className="mb-6 flex flex-col gap-4 md:flex-row"
+            >
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name, email, or phone..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="pl-10 h-11 rounded-lg"
+                />
               </div>
-            ) : (
-              <div className="rounded-lg border">
-                <Table>
-                  <TableHeader>
+              <Button
+                type="submit"
+                className="h-11 bg-primary/90 hover:bg-primary"
+              >
+                <Search className="h-4 w-4 mr-2" />
+                Search
+              </Button>
+              {searchQuery && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 bg-transparent"
+                  onClick={() => {
+                    setSearchInput("");
+                    setSearchQuery("");
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full md:w-[180px] h-11">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="blacklisted">Blacklisted</SelectItem>
+                </SelectContent>
+              </Select>
+            </form>
+
+            <div className="rounded-lg border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredSuppliers.length === 0 ? (
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Phone</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableCell colSpan={5} className="text-center py-12">
+                        <div className="flex flex-col items-center gap-2">
+                          <Search className="h-10 w-10 text-muted-foreground/50" />
+                          <p className="text-muted-foreground font-medium">
+                            No suppliers found
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {searchQuery || statusFilter !== "all"
+                              ? "Try adjusting your filters"
+                              : "Get started by adding your first supplier"}
+                          </p>
+                        </div>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {suppliers.map((s) => (
+                  ) : (
+                    filteredSuppliers.map((s) => (
                       <TableRow key={s.id}>
                         <TableCell className="font-medium">{s.name}</TableCell>
                         <TableCell>{s.email || "N/A"}</TableCell>
@@ -182,8 +276,10 @@ export default function SupplierListPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => navigate(`/suppliers/${s.id}`)}
-                              title="View Details"
+                              onClick={() =>
+                                navigate(`/suppliers/${s.id}/edit/`)
+                              }
+                              title="Edit Details"
                             >
                               <Edit className="w-4 h-4" />
                             </Button>
@@ -198,11 +294,11 @@ export default function SupplierListPage() {
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </div>
