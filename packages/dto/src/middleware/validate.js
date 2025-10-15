@@ -8,7 +8,7 @@ import { ZodError } from "zod";
 function formatZodError(error) {
   const formattedErrors = {};
 
-  error.errors.forEach((err) => {
+  error.issues.forEach((err) => {
     const path = err.path.join(".");
     if (!formattedErrors[path]) {
       formattedErrors[path] = [];
@@ -19,7 +19,7 @@ function formatZodError(error) {
   return {
     error: "Validation failed",
     details: formattedErrors,
-    issues: error.errors.map((err) => ({
+    issues: error.issues.map((err) => ({
       path: err.path,
       message: err.message,
       code: err.code,

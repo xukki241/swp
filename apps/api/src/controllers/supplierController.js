@@ -4,31 +4,15 @@ export const supplierController = {
   // Create a new supplier with medication variants
   async create(req, res) {
     try {
-      // Validate required fields
-      const { name, contactName, email, phone, address, medicationVariants } =
-        req.body;
+      const suppliers = await supplierService.create(req.body);
 
-      if (!name || !contactName || !email || !phone || !address) {
-        return res.status(400).json({
-          error: "Missing required fields: name, contactName, email, phone",
-        });
-      }
-
-      // Validate medication variants if provided
-      if (medicationVariants && Array.isArray(medicationVariants)) {
-        for (const variant of medicationVariants) {
-          if (!variant.medicationVariantId) {
-            return res.status(400).json({
-              error: "Each medication variant must have medicationVariantId",
-            });
-          }
-        }
-      }
-
-      const supplier = await supplierService.create(req.body);
-      res.status(201).json(supplier);
+      res.status(201).json(suppliers);
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      console.error("Error creating supplier:", error);
+      res.status(400).json({
+        error: "Could not create supplier.",
+        details: error.message,
+      });
     }
   },
 
