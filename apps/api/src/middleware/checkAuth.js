@@ -28,7 +28,7 @@ export const authenticate = async (req, res, next) => {
     const decoded = jwt.verify(token, config.jwtSecret || "your-secret-key");
 
     // Get user from database
-    const user = await getUserById(BigInt(decoded.userId));
+    const user = await getUserById(decoded.userId); // UUID is already a string
 
     if (!user) {
       return res.status(401).json({
@@ -47,7 +47,7 @@ export const authenticate = async (req, res, next) => {
 
     // Attach user info to request
     req.user = {
-      userId: user.id.toString(),
+      userId: user.id, // UUID is already a string
       email: user.email,
       role: user.role,
       name: user.name,
@@ -118,11 +118,11 @@ export const optionalAuth = async (req, res, next) => {
       const token = authHeader.substring(7);
       const decoded = jwt.verify(token, config.jwtSecret || "your-secret-key");
 
-      const user = await getUserById(BigInt(decoded.userId));
+      const user = await getUserById(decoded.userId); // UUID is already a string
 
       if (user && user.status === "active") {
         req.user = {
-          userId: user.id.toString(),
+          userId: user.id, // UUID is already a string
           email: user.email,
           role: user.role,
           name: user.name,

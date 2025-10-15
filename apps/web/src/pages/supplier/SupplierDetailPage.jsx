@@ -1,3 +1,5 @@
+"use client";
+
 import { useParams, useNavigate } from "react-router";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { useSupplier, useSupplierMedications } from "@/hooks/useSuppliers";
@@ -9,9 +11,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Pencil } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Pencil, CheckCircle, XCircle, Ban } from "lucide-react";
 
 export default function SupplierDetailPage() {
   const { id } = useParams();
@@ -20,74 +29,191 @@ export default function SupplierDetailPage() {
   const { data: medications = [], isLoading: isLoadingMedications } =
     useSupplierMedications(id);
 
-  if (isLoading) return <p>Đang tải thông tin...</p>;
+  function getStatusBadge(status) {
+    const variants = {
+      active: {
+        className: "bg-green-100 text-green-700 hover:bg-green-100",
+        icon: CheckCircle,
+      },
+      inactive: {
+        className: "bg-gray-100 text-gray-700 hover:bg-gray-100",
+        icon: XCircle,
+      },
+      blacklisted: {
+        className: "bg-red-100 text-red-700 hover:bg-red-100",
+        icon: Ban,
+      },
+    };
+
+    const config = variants[status] || variants.inactive;
+    const Icon = config.icon;
+
+    return (
+      <Badge variant="secondary" className={config.className}>
+        <Icon className="h-3 w-3 mr-1" />
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </Badge>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Supplier Details
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Loading supplier information...
+            </p>
+          </div>
+          <Card className="shadow-md rounded-xl border-0">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <Button
-            variant="outline"
-            className="flex items-center gap-2"
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeft className="w-4 h-4" /> Quay lại
-          </Button>
-          <Button
-            className="flex items-center gap-2"
-            onClick={() => navigate(`/suppliers/${id}/edit`)}
-          >
-            <Pencil className="w-4 h-4" /> Chỉnh sửa
-          </Button>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Supplier Details
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              View and manage supplier information
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2 bg-transparent"
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeft className="w-4 h-4" /> Back
+            </Button>
+            <Button
+              className="flex items-center gap-2"
+              onClick={() => navigate(`/suppliers/${id}/edit`)}
+            >
+              <Pencil className="w-4 h-4" /> Edit
+            </Button>
+          </div>
         </div>
 
-        <Card>
+        <Card className="shadow-md rounded-xl border-0">
           <CardHeader>
-            <CardTitle>Thông tin nhà cung cấp</CardTitle>
+            <CardTitle>Supplier Information</CardTitle>
+            <CardDescription>
+              Basic details and contact information
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <p>
-              <strong>Tên:</strong> {supplier?.name}
-            </p>
-            <p>
-              <strong>Email:</strong> {supplier?.email}
-            </p>
-            <p>
-              <strong>Địa chỉ:</strong> {supplier?.address}
-            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Name
+                </p>
+                <p className="text-base font-semibold mt-1">
+                  {supplier?.name || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Contact Name
+                </p>
+                <p className="text-base font-semibold mt-1">
+                  {supplier?.contactName || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Email
+                </p>
+                <p className="text-base font-semibold mt-1">
+                  {supplier?.email || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Phone
+                </p>
+                <p className="text-base font-semibold mt-1">
+                  {supplier?.phone || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Address
+                </p>
+                <p className="text-base font-semibold mt-1">
+                  {supplier?.address || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Status
+                </p>
+                <div className="mt-1">{getStatusBadge(supplier?.status)}</div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-md rounded-xl border-0">
           <CardHeader>
-            <CardTitle>Danh sách thuốc cung cấp</CardTitle>
+            <CardTitle>Supplied Medications</CardTitle>
+            <CardDescription>
+              List of medications provided by this supplier
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {isLoadingMedications ? (
-              <p>Đang tải danh sách thuốc...</p>
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
             ) : medications.length === 0 ? (
-              <p className="text-gray-500 text-sm">Chưa có thuốc nào.</p>
+              <div className="text-center py-12">
+                <p className="text-muted-foreground font-medium">
+                  No medications found
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  This supplier has no medications assigned yet
+                </p>
+              </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tên thuốc</TableHead>
-                    <TableHead>Biến thể</TableHead>
-                    <TableHead>SKU</TableHead>
-                    <TableHead>Thời gian giao (ngày)</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {medications.map((m) => (
-                    <TableRow key={m.id}>
-                      <TableCell>{m.medicationName}</TableCell>
-                      <TableCell>{m.variantName}</TableCell>
-                      <TableCell>{m.supplierSku}</TableCell>
-                      <TableCell>{m.leadTimeDays}</TableCell>
+              <div className="rounded-lg border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Medication Name</TableHead>
+                      <TableHead>Variant</TableHead>
+                      <TableHead>Supplier SKU</TableHead>
+                      <TableHead>Lead Time (days)</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {medications.map((m) => (
+                      <TableRow key={m.id}>
+                        <TableCell className="font-medium">
+                          {m.medicationName || "N/A"}
+                        </TableCell>
+                        <TableCell>{m.variantName || "N/A"}</TableCell>
+                        <TableCell>{m.supplierSku || "N/A"}</TableCell>
+                        <TableCell>{m.leadTimeDays || "N/A"}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>
