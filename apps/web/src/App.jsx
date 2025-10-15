@@ -10,6 +10,7 @@ import UserListPage from "@/pages/UserListPage";
 import POSPage from "@/pages/POSPage";
 import PolicyPage from "@/pages/PolicyPage"; // Added PolicyPage import
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
+import StockOverviewPage from "./pages/inventory/StockOverviewPage";
 
 function App() {
   return (
@@ -98,6 +99,14 @@ function App() {
             <PublicRoute>
               <PolicyPage />
             </PublicRoute>
+          }
+        />
+        <Route
+          path="/inventory/stock"
+          element={
+            <ProtectedRoute>
+              <StockOverviewPage />
+            </ProtectedRoute>
           }
         />
 
