@@ -1,13 +1,13 @@
 import { z } from "zod";
 
 // UUID validation
-export const uuidSchema = z.string().uuid();
+export const uuidSchema = z.uuid();
 
 // Common string fields
 export const nameSchema = z.string().min(1).max(100);
 export const codeSchema = z.string().min(1).max(50);
 export const descriptionSchema = z.string().nullable().optional();
-export const emailSchema = z.string().email().max(255).nullable().optional();
+export const emailSchema = z.email().max(255).nullable().optional();
 export const phoneSchema = z
   .string()
   .regex(/^\d{10}$/, "Phone must be exactly 10 digits")
@@ -27,7 +27,7 @@ export const dateSchema = z.union([
   z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   z.date(),
 ]);
-export const timestampSchema = z.union([z.string().datetime(), z.date()]);
+export const timestampSchema = z.union([z.dateTime(), z.date()]);
 
 // Boolean
 export const booleanSchema = z.boolean();
