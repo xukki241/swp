@@ -11,39 +11,99 @@ import { users } from "../db/schema/users.js";
 
 export const purchaseOrderService = {
   // Create a new purchase order with items
-  async create(data) {
+  async create(data, userId) {
     return await db.transaction(async (tx) => {
-      const { items, ...poData } = data;
+      const createdOrders = [];
 
-      // Create purchase order
-      const [po] = await tx
-        .insert(purchaseOrders)
-        .values({
-          ...poData,
-          orderDate: poData.orderDate ? new Date(poData.orderDate) : new Date(),
-          expectedDate: poData.expectedDate
-            ? new Date(poData.expectedDate)
-            : null,
-        })
-        .returning();
+      for (const order of data) {
+        const { supplier_id, expected_date, items } = order;
 
-      // Create items if provided
-      let createdItems = [];
-      if (items && Array.isArray(items) && items.length > 0) {
-        const itemsToCreate = items.map((item) => ({
-          ...item,
-          purchaseOrderId: po.id,
-        }));
-        createdItems = await tx
-          .insert(purchaseOrderItems)
-          .values(itemsToCreate)
+        // basic validation
+        if (!supplier_id) {
+          throw new Error("supplier_id is required for each purchase order");
+        }
+        if (!Array.isArray(items) || items.length === 0) {
+          throw new Error("items must be a non-empty array");
+        }
+
+        // ✅ Tính tổng tiền, đảm bảo numbers
+        const totalAmount = items.reduce((sum, item) => {
+          const q = Number(item.quantity);
+          const p = Number(item.unit_price);
+          if (Number.isNaN(q) || Number.isNaN(p)) {
+            throw new Error(
+              "item.quantity and item.unit_price must be numbers"
+            );
+          }
+          return sum + q * p;
+        }, 0);
+
+        // ✅ Parse expected_date an toàn
+        const parseExpectedDate = (val) => {
+          if (val === undefined || val === null) {
+            return null;
+          }
+          if (typeof val === "string") {
+            const s = val.trim();
+            if (s === "") {
+              return null;
+            }
+            const d = new Date(s);
+            return isNaN(d.getTime()) ? null : d;
+          }
+          if (val instanceof Date) {
+            return isNaN(val.getTime()) ? null : val;
+          }
+          // other types - ignore
+          return null;
+        };
+
+        const parsedExpectedDate = parseExpectedDate(expected_date);
+
+        // --- Debug logging (xem trước khi insert) ---
+        console.log("Creating PO =>", {
+          supplier_id,
+          expected_date_raw: expected_date,
+          expected_date_parsed: parsedExpectedDate,
+          orderDate: new Date().toISOString(),
+          status: "pending",
+          totalAmount,
+          createdBy: userId,
+          itemsCount: items.length,
+        });
+        // ------------------------------------------------
+
+        // ✅ Tạo purchase order
+        const [po] = await tx
+          .insert(purchaseOrders)
+          .values({
+            supplierId: supplier_id,
+            orderDate: new Date(),
+            expectedDate: parsedExpectedDate,
+            status: "pending",
+            totalAmount: totalAmount,
+            createdBy: userId,
+          })
           .returning();
+
+        // ✅ Tạo items
+        const createdItems = await tx
+          .insert(purchaseOrderItems)
+          .values(
+            items.map((item) => ({
+              purchaseOrderId: po.id,
+              supplierMedicationVariantId: item.supplier_medication_variant_id,
+              quantity: Number(item.quantity),
+              unitPrice: Number(item.unit_price),
+              totalPrice: Number(item.quantity) * Number(item.unit_price),
+            }))
+          )
+          .returning();
+
+        createdOrders.push({ ...po, items: createdItems });
       }
 
-      return {
-        ...po,
-        items: createdItems,
-      };
+      return createdOrders;
     });
   },
 
