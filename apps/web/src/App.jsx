@@ -8,13 +8,14 @@ import NotFoundPage from "@/pages/NotFoundPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import UserListPage from "@/pages/UserListPage";
 import POSPage from "@/pages/POSPage";
-import PolicyPage from "@/pages/PolicyPage"; // Added PolicyPage import
+import PolicyPage from "@/pages/PolicyPage";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import SupplierListPage from "./pages/supplier/SupplierListPage";
 import SupplierCreatePage from "./pages/supplier/SupplierCreatePage";
 import SupplierDetailPage from "./pages/supplier/SupplierDetailPage";
 import SupplierEditPage from "./pages/supplier/SupplierEditPage";
 import PurchaseOrderListPage from "./pages/purchaseOrder/PurchaseOrderListPage";
+import PurchaseOrderCreatePage from "./pages/purchaseOrder/PurchaseOrderCreatePage";
 
 function App() {
   return (
@@ -103,6 +104,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/purchase-orders/create"
+          element={
+            <ProtectedRoute>
+              <PurchaseOrderCreatePage />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Public routes - redirect to dashboard if already logged in */}
         <Route
           path="/login"
