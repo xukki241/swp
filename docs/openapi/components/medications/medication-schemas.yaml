@@ -1,0 +1,105 @@
+Medication:
+  type: object
+  required:
+    - id
+    - name
+    - isPrescriptionRequired
+    - isControlledSubstance
+    - status
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    brand:
+      type: string
+      maxLength: 100
+      nullable: true
+      description: Brand name of the medication
+      example: "Pfizer"
+    description:
+      $ref: "../common/schemas.yaml#/Description"
+    isPrescriptionRequired:
+      type: boolean
+      description: Whether a prescription is required
+      example: true
+    isControlledSubstance:
+      type: boolean
+      description: Whether this is a controlled substance
+      example: false
+    status:
+      $ref: "../common/enums.yaml#/MedicationStatus"
+
+CreateMedication:
+  type: object
+  required:
+    - name
+  properties:
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    brand:
+      type: string
+      maxLength: 100
+      description: Brand name of the medication
+      example: "Pfizer"
+    description:
+      $ref: "../common/schemas.yaml#/Description"
+    isPrescriptionRequired:
+      type: boolean
+      default: false
+      description: Whether a prescription is required
+      example: true
+    isControlledSubstance:
+      type: boolean
+      default: false
+      description: Whether this is a controlled substance
+      example: false
+    status:
+      allOf:
+        - $ref: "../common/enums.yaml#/MedicationStatus"
+        - default: active
+
+CreateMedicationsRequest:
+  type: array
+  items:
+    $ref: "#/CreateMedication"
+  description: Array of medications to create
+
+CreateMedicationsResponse:
+  type: array
+  items:
+    $ref: "#/Medication"
+  description: Array of created medications
+
+UpdateMedication:
+  type: object
+  properties:
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    brand:
+      type: string
+      maxLength: 100
+      description: Brand name of the medication
+    description:
+      $ref: "../common/schemas.yaml#/Description"
+    isPrescriptionRequired:
+      type: boolean
+      description: Whether a prescription is required
+    isControlledSubstance:
+      type: boolean
+      description: Whether this is a controlled substance
+    status:
+      $ref: "../common/enums.yaml#/MedicationStatus"
+
+MedicationListResponse:
+  type: object
+  required:
+    - data
+    - pagination
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/Medication"
+    pagination:
+      $ref: "../common/schemas.yaml#/Pagination"

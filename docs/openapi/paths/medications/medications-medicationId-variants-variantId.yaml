@@ -1,0 +1,81 @@
+/medications/{medicationId}/variants/{variantId}:
+  get:
+    tags:
+      - Medications
+    summary: Get medication variant by ID
+    description: Retrieve a specific medication variant
+    operationId: getMedicationVariantById
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/MedicationIdParam"
+      - $ref: "../../components/common/parameters.yaml#/VariantIdParam"
+    responses:
+      "200":
+        description: Medication variant retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/medications/variant-schemas.yaml#/MedicationVariant"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  patch:
+    tags:
+      - Medications
+    summary: Update medication variant
+    description: Update a medication variant's information
+    operationId: updateMedicationVariant
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/MedicationIdParam"
+      - $ref: "../../components/common/parameters.yaml#/VariantIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/medications/variant-schemas.yaml#/UpdateMedicationVariant"
+    responses:
+      "200":
+        description: Medication variant updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/medications/variant-schemas.yaml#/MedicationVariant"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  delete:
+    tags:
+      - Medications
+    summary: Delete medication variant
+    description: Delete a medication variant
+    operationId: deleteMedicationVariant
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/MedicationIdParam"
+      - $ref: "../../components/common/parameters.yaml#/VariantIdParam"
+    responses:
+      "200":
+        description: Medication variant deleted successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/common/schemas.yaml#/Response"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

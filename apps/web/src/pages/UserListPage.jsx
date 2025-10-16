@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import {
-  useStaff,
+  useUsers,
   useUpdateUser,
   useActivateUser,
   useDeactivateUser,
@@ -60,7 +60,7 @@ export default function UserListPage() {
   if (statusFilter !== "all") filters.status = statusFilter;
   if (roleFilter !== "all") filters.role = roleFilter;
 
-  const { data: apiResponse, isLoading, error } = useStaff(filters);
+  const { data: apiResponse, isLoading, error } = useUsers(filters);
   const updateMutation = useUpdateUser();
   const activateMutation = useActivateUser();
   const deactivateMutation = useDeactivateUser();

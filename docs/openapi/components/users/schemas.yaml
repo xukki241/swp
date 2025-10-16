@@ -1,0 +1,96 @@
+User:
+  type: object
+  required:
+    - id
+    - name
+    - email
+    - phone
+    - address
+    - status
+    - role
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    email:
+      $ref: "../common/schemas.yaml#/Email"
+    phone:
+      $ref: "../common/schemas.yaml#/Phone"
+    address:
+      $ref: "../common/schemas.yaml#/Address"
+    status:
+      $ref: "../common/enums.yaml#/UserStatus"
+    role:
+      $ref: "../common/enums.yaml#/UserRole"
+
+CreateUser:
+  type: object
+  required:
+    - name
+    - email
+    - phone
+    - password
+  properties:
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    email:
+      type: string
+      format: email
+      maxLength: 255
+      description: Email address (required)
+      example: "staff@example.com"
+    phone:
+      type: string
+      pattern: '^\d{10}$'
+      description: Phone number (10 digits, required)
+      example: "0123456789"
+    address:
+      $ref: "../common/schemas.yaml#/Address"
+    password:
+      type: string
+      minLength: 8
+      maxLength: 255
+      description: User password
+      example: "securePassword123"
+    role:
+      allOf:
+        - $ref: "../common/enums.yaml#/UserRole"
+        - default: staff
+
+CreateUsersRequest:
+  type: array
+  items:
+    $ref: "#/CreateUser"
+  description: Array of users to create
+
+CreateUsersResponse:
+  type: array
+  items:
+    $ref: "#/User"
+  description: Array of created users
+
+UpdateUser:
+  type: object
+  properties:
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    address:
+      $ref: "../common/schemas.yaml#/Address"
+    status:
+      $ref: "../common/enums.yaml#/UserStatus"
+    role:
+      $ref: "../common/enums.yaml#/UserRole"
+
+UserListResponse:
+  type: object
+  required:
+    - data
+    - pagination
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/User"
+    pagination:
+      $ref: "../common/schemas.yaml#/Pagination"

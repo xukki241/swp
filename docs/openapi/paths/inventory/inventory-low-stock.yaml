@@ -1,0 +1,34 @@
+/inventory/low-stock:
+  get:
+    tags:
+      - Inventory
+    summary: Get low stock inventory
+    description: Get list of inventory entries with low stock levels
+    operationId: getLowStockInventory
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/PageParam"
+      - $ref: "../../components/common/parameters.yaml#/LimitParam"
+      - $ref: "../../components/common/parameters.yaml#/SortByParam"
+      - $ref: "../../components/common/parameters.yaml#/SortOrderParam"
+      - name: threshold
+        in: query
+        description: Low stock threshold quantity (default 10)
+        required: false
+        schema:
+          type: number
+          format: float
+          minimum: 0
+          default: 10
+    responses:
+      "200":
+        description: Low stock inventory retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/inventory/inventory-schemas.yaml#/InventoryListResponse"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

@@ -7,12 +7,9 @@ import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import UserListPage from "@/pages/UserListPage";
-import UserProfilePage from "@/pages/UserProfilePage";
+import POSPage from "@/pages/POSPage";
+import PolicyPage from "@/pages/PolicyPage"; // Added PolicyPage import
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
-import SupplierListPage from "./pages/supplier/SupplierListPage";
-import SupplierDetailPage from "./pages/supplier/SupplierDetailPage";
-import SupplierCreatePage from "./pages/supplier/SupplierCreatePage";
-import SupplierEditPage from "./pages/supplier/SupplierEditPage";
 
 function App() {
   return (
@@ -38,6 +35,14 @@ function App() {
           }
         />
         <Route
+          path="/pos"
+          element={
+            <ProtectedRoute>
+              <POSPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/users/list"
           element={
             <ProtectedRoute>
@@ -50,14 +55,6 @@ function App() {
           element={
             <ProtectedRoute>
               <RegistrationRequestsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/user-profile"
-          element={
-            <ProtectedRoute>
-              <UserProfilePage />
             </ProtectedRoute>
           }
         />
@@ -96,37 +93,14 @@ function App() {
           }
         />
         <Route
-          path="/suppliers"
+          path="/policy"
           element={
-            <ProtectedRoute>
-              <SupplierListPage />
-            </ProtectedRoute>
+            <PublicRoute>
+              <PolicyPage />
+            </PublicRoute>
           }
         />
-        <Route
-          path="/suppliers/create"
-          element={
-            <ProtectedRoute>
-              <SupplierCreatePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/suppliers/:id"
-          element={
-            <ProtectedRoute>
-              <SupplierDetailPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/suppliers/:id/edit"
-          element={
-            <ProtectedRoute>
-              <SupplierEditPage />
-            </ProtectedRoute>
-          }
-        />
+
         {/* 404 page - accessible to everyone */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

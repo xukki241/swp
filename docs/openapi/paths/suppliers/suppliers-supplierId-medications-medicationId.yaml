@@ -1,0 +1,108 @@
+/suppliers/{supplierId}/medications/{medicationId}:
+  get:
+    tags:
+      - Suppliers
+    summary: Get supplier medication by ID
+    description: Retrieve a specific medication variant from a supplier's catalog
+    operationId: getSupplierMedicationById
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/SupplierIdParam"
+      - name: medicationId
+        in: path
+        description: Supplier Medication Variant ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Supplier medication retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/suppliers/supplier-schemas.yaml#/SupplierMedicationVariant"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  patch:
+    tags:
+      - Suppliers
+    summary: Update supplier medication
+    description: Update medication variant information in supplier's catalog (Owner only)
+    operationId: updateSupplierMedication
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/SupplierIdParam"
+      - name: medicationId
+        in: path
+        description: Supplier Medication Variant ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/suppliers/supplier-schemas.yaml#/UpdateSupplierMedication"
+          example:
+            supplier_sku: "SUP-MED-001-V2"
+            lead_time_days: 10
+    responses:
+      "200":
+        description: Supplier medication updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/suppliers/supplier-schemas.yaml#/SupplierMedicationVariant"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  delete:
+    tags:
+      - Suppliers
+    summary: Remove medication from supplier
+    description: Remove a medication variant from supplier's catalog (Owner only)
+    operationId: removeSupplierMedication
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/SupplierIdParam"
+      - name: medicationId
+        in: path
+        description: Supplier Medication Variant ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Medication removed from supplier successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/common/schemas.yaml#/Response"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

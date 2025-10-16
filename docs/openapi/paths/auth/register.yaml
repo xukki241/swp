@@ -1,0 +1,28 @@
+/auth/register:
+  post:
+    tags:
+      - Auth
+    summary: Register new user
+    description: |
+      Register a new user account. Creates a registration request that needs approval.
+    operationId: register
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/auth/schemas.yaml#/RegisterRequest"
+    responses:
+      "201":
+        description: Registration request created successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/auth/schemas.yaml#/RegisterResponse"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "409":
+        $ref: "../../components/common/responses.yaml#/ConflictError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

@@ -1,0 +1,37 @@
+/reports/weekly:
+  get:
+    tags:
+      - Reports
+    summary: Generate weekly sales report
+    description: Generate a sales report for the current or specified week
+    operationId: generateWeeklySalesReport
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: startDate
+        in: query
+        description: Start date of the week (defaults to current week if not specified)
+        required: false
+        schema:
+          type: string
+          format: date
+          example: "2025-10-13"
+      - name: endDate
+        in: query
+        description: End date of the week
+        required: false
+        schema:
+          type: string
+          format: date
+          example: "2025-10-19"
+    responses:
+      "200":
+        description: Weekly sales report generated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/reports/report-schemas.yaml#/WeeklySalesReport"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

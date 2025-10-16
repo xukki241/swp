@@ -1,0 +1,172 @@
+openapi: 3.0.3
+info:
+  title: PharmaFlow API
+  description: |
+    PharmaFlow API provides comprehensive pharmacy management capabilities including
+    inventory management, sales tracking, supplier management, user authentication,
+    and reporting features.
+  version: 1.0.0
+  contact:
+    name: PharmaFlow API Support
+    email: support@pharmaflow.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+  - url: https://api.pharmaflow.com/api
+    description: Production server
+
+tags:
+  - name: Auth
+    description: Authentication and authorization endpoints
+  - name: System
+    description: System health, status, and configuration endpoints
+  - name: Customers
+    description: Customer management operations
+  - name: Inventory
+    description: Inventory tracking and management
+  - name: Medications
+    description: Medication catalog and information management
+  - name: Purchases
+    description: Purchase order and supplier transaction management
+  - name: Reports
+    description: Business intelligence and reporting endpoints
+  - name: Sales
+    description: Sales transactions and order processing
+  - name: Suppliers
+    description: Supplier information and relationship management
+  - name: Users
+    description: User account and profile management
+  - name: Warehouse
+    description: Warehouse operations and stock management
+
+paths:
+  # Authentication endpoints
+  /auth/register:
+    $ref: "./paths/auth/register.yaml#/~1auth~1register"
+  /auth/login:
+    $ref: "./paths/auth/login.yaml#/~1auth~1login"
+  /auth/forgot-password:
+    $ref: "./paths/auth/forgot-password.yaml#/~1auth~1forgot-password"
+  /auth/reset-password:
+    $ref: "./paths/auth/reset-password.yaml#/~1auth~1reset-password"
+  /auth/change-password:
+    $ref: "./paths/auth/change-password.yaml#/~1auth~1change-password"
+  /auth/me:
+    $ref: "./paths/auth/me.yaml#/~1auth~1me"
+
+  # System endpoints
+  /health:
+    $ref: "./paths/system/health.yaml#/~1health"
+
+  # User endpoints
+  /users:
+    $ref: "./paths/users/users.yaml#/~1users"
+  /users/{userId}:
+    $ref: "./paths/users/users-userId.yaml#/~1users~1{userId}"
+
+  # Medication endpoints
+  /medications:
+    $ref: "./paths/medications/medications.yaml#/~1medications"
+  /medications/{medicationId}:
+    $ref: "./paths/medications/medications-medicationId.yaml#/~1medications~1{medicationId}"
+  /medications/{medicationId}/variants:
+    $ref: "./paths/medications/medications-medicationId-variants.yaml#/~1medications~1{medicationId}~1variants"
+  /medications/{medicationId}/variants/{variantId}:
+    $ref: "./paths/medications/medications-medicationId-variants-variantId.yaml#/~1medications~1{medicationId}~1variants~1{variantId}"
+
+  # Purchase endpoints
+  /purchases/orders:
+    $ref: "./paths/purchases/purchases-orders.yaml#/~1purchases~1orders"
+  /purchases/orders/{purchaseOrderId}:
+    $ref: "./paths/purchases/purchases-orders-purchaseOrderId.yaml#/~1purchases~1orders~1{purchaseOrderId}"
+  /purchases/orders/{purchaseOrderId}/receipts:
+    $ref: "./paths/purchases/purchases-orders-purchaseOrderId-receipts.yaml#/~1purchases~1orders~1{purchaseOrderId}~1receipts"
+  /purchases/receipts:
+    $ref: "./paths/purchases/purchases-receipts.yaml#/~1purchases~1receipts"
+  /purchases/receipts/{receiptId}:
+    $ref: "./paths/purchases/purchases-receipts-receiptId.yaml#/~1purchases~1receipts~1{receiptId}"
+
+  # Customer endpoints
+  /customers:
+    $ref: "./paths/customers/customers.yaml#/~1customers"
+  /customers/{customerId}:
+    $ref: "./paths/customers/customers-customerId.yaml#/~1customers~1{customerId}"
+
+  # Inventory endpoints
+  /inventory:
+    $ref: "./paths/inventory/inventory.yaml#/~1inventory"
+  /inventory/summary/by-variant:
+    $ref: "./paths/inventory/inventory-summary-by-variant.yaml#/~1inventory~1summary~1by-variant"
+  /inventory/expiring:
+    $ref: "./paths/inventory/inventory-expiring.yaml#/~1inventory~1expiring"
+  /inventory/low-stock:
+    $ref: "./paths/inventory/inventory-low-stock.yaml#/~1inventory~1low-stock"
+  /inventory/move:
+    $ref: "./paths/inventory/inventory-move.yaml#/~1inventory~1move"
+  /inventory/{inventoryId}:
+    $ref: "./paths/inventory/inventory-inventoryId.yaml#/~1inventory~1{inventoryId}"
+  /inventory/{inventoryId}/adjust:
+    $ref: "./paths/inventory/inventory-inventoryId-adjust.yaml#/~1inventory~1{inventoryId}~1adjust"
+
+  # Report endpoints
+  /reports:
+    $ref: "./paths/reports/reports.yaml#/~1reports"
+  /reports/daily:
+    $ref: "./paths/reports/reports-daily.yaml#/~1reports~1daily"
+  /reports/weekly:
+    $ref: "./paths/reports/reports-weekly.yaml#/~1reports~1weekly"
+  /reports/monthly:
+    $ref: "./paths/reports/reports-monthly.yaml#/~1reports~1monthly"
+  /reports/{reportId}:
+    $ref: "./paths/reports/reports-reportId.yaml#/~1reports~1{reportId}"
+
+  # Sales endpoints
+  /sales:
+    $ref: "./paths/sales/sales.yaml#/~1sales"
+  /sales/{salesOrderId}:
+    $ref: "./paths/sales/sales-salesOrderId.yaml#/~1sales~1{salesOrderId}"
+
+  # Supplier endpoints
+  /suppliers:
+    $ref: "./paths/suppliers/suppliers.yaml#/~1suppliers"
+  /suppliers/{supplierId}:
+    $ref: "./paths/suppliers/suppliers-supplierId.yaml#/~1suppliers~1{supplierId}"
+  /suppliers/{supplierId}/medications:
+    $ref: "./paths/suppliers/suppliers-supplierId-medications.yaml#/~1suppliers~1{supplierId}~1medications"
+  /suppliers/{supplierId}/medications/{medicationId}:
+    $ref: "./paths/suppliers/suppliers-supplierId-medications-medicationId.yaml#/~1suppliers~1{supplierId}~1medications~1{medicationId}"
+
+  # Warehouse endpoints
+  /warehouse/zones:
+    $ref: "./paths/warehouse/warehouse-zones.yaml#/~1warehouse~1zones"
+  /warehouse/zones/batch:
+    $ref: "./paths/warehouse/warehouse-zones-batch.yaml#/~1warehouse~1zones~1batch"
+  /warehouse/zones/{zoneId}:
+    $ref: "./paths/warehouse/warehouse-zones-zoneId.yaml#/~1warehouse~1zones~1{zoneId}"
+  /warehouse/zones/{zoneId}/racks:
+    $ref: "./paths/warehouse/warehouse-zones-zoneId-racks.yaml#/~1warehouse~1zones~1{zoneId}~1racks"
+  /warehouse/zones/{zoneId}/racks/batch:
+    $ref: "./paths/warehouse/warehouse-zones-zoneId-racks-batch.yaml#/~1warehouse~1zones~1{zoneId}~1racks~1batch"
+  /warehouse/racks/{rackId}:
+    $ref: "./paths/warehouse/warehouse-racks-rackId.yaml#/~1warehouse~1racks~1{rackId}"
+  /warehouse/racks/{rackId}/bins:
+    $ref: "./paths/warehouse/warehouse-racks-rackId-bins.yaml#/~1warehouse~1racks~1{rackId}~1bins"
+  /warehouse/racks/{rackId}/bins/batch:
+    $ref: "./paths/warehouse/warehouse-racks-rackId-bins-batch.yaml#/~1warehouse~1racks~1{rackId}~1bins~1batch"
+  /warehouse/bins/{binId}:
+    $ref: "./paths/warehouse/warehouse-bins-binId.yaml#/~1warehouse~1bins~1{binId}"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT authentication token
+
+security:
+  - bearerAuth: []

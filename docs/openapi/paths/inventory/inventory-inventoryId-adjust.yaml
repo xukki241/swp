@@ -1,0 +1,43 @@
+/inventory/{inventoryId}/adjust:
+  patch:
+    tags:
+      - Inventory
+    summary: Adjust inventory quantity
+    description: Adjust the quantity of an inventory entry (Owner only)
+    operationId: adjustInventory
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: inventoryId
+        in: path
+        description: Inventory ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/inventory/inventory-schemas.yaml#/AdjustInventoryRequest"
+          example:
+            newQuantity: 100
+            reason: "Damaged goods removed from inventory"
+    responses:
+      "200":
+        description: Inventory adjusted successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/inventory/inventory-schemas.yaml#/Inventory"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

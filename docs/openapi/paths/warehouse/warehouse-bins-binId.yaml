@@ -1,0 +1,86 @@
+/warehouse/bins/{binId}:
+  get:
+    tags:
+      - Warehouse
+    summary: Get warehouse bin by ID
+    description: Retrieve a specific warehouse bin
+    operationId: getWarehouseBin
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/BinIdParam"
+    responses:
+      "200":
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/warehouse/bin-schemas.yaml#/WarehouseBin"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  patch:
+    tags:
+      - Warehouse
+    summary: Update warehouse bin
+    description: Update a specific warehouse bin
+    operationId: updateWarehouseBin
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/BinIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/warehouse/bin-schemas.yaml#/UpdateWarehouseBin"
+    responses:
+      "200":
+        description: Warehouse bin updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/warehouse/bin-schemas.yaml#/WarehouseBin"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  delete:
+    tags:
+      - Warehouse
+    summary: Delete warehouse bin
+    description: Delete a specific warehouse bin
+    operationId: deleteWarehouseBin
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/BinIdParam"
+    responses:
+      "200":
+        description: Warehouse bin deleted successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/common/schemas.yaml#/Response"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

@@ -1091,11 +1091,10 @@ async function seed() {
       .insert(purchaseOrderReceiptItems)
       .values(receiptItemData)
       .returning();
-
     // 16. Seed Inventory
     console.log("📊 Seeding inventory...");
     const inventoryData = [
-      // Inventory from PO1
+      // Inventory from PO1 (có thật trong receipt)
       {
         medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
         purchaseOrderReceiptItemsId: receiptItemsResults[0].id,
@@ -1123,10 +1122,11 @@ async function seed() {
         expiryDate: new Date("2025-12-19"),
         quantity: 50,
       },
-      // Manually add some existing stock for other items
+
+      // ✅ Sửa lại 3 dòng bị lỗi (giờ có receiptItemsResults thay vì null)
       {
         medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
-        purchaseOrderReceiptItemsId: null, // No recent receipt
+        purchaseOrderReceiptItemsId: receiptItemsResults[0].id,
         binId: warehouseBinsResults[24].id, // Rack B-001, Bin 1
         batchNumber: "I2312010",
         manufactureDate: new Date("2023-12-01"),
@@ -1135,7 +1135,7 @@ async function seed() {
       },
       {
         medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
-        purchaseOrderReceiptItemsId: null, // No recent receipt
+        purchaseOrderReceiptItemsId: receiptItemsResults[1].id,
         binId: warehouseBinsResults[25].id, // Rack B-001, Bin 2
         batchNumber: "O2401015",
         manufactureDate: new Date("2024-01-15"),
@@ -1144,7 +1144,7 @@ async function seed() {
       },
       {
         medicationVariantId: medicationVariantsResults[23].id, // Tramadol 50mg (Controlled)
-        purchaseOrderReceiptItemsId: null, // No recent receipt
+        purchaseOrderReceiptItemsId: receiptItemsResults[2].id,
         binId: warehouseBinsResults[168].id, // Rack D-001, Bin 1
         batchNumber: "T2403005",
         manufactureDate: new Date("2024-03-01"),
@@ -1152,6 +1152,7 @@ async function seed() {
         quantity: 30,
       },
     ];
+
     await db.insert(inventory).values(inventoryData);
 
     // 17. Seed Sales Orders
@@ -1291,24 +1292,27 @@ async function seed() {
 
     // 20. Seed File Attachments
     console.log("🔗 Seeding file attachments...");
+
+    // 🔧 Fix: entityId là integer và NOT NULL → gán tạm giá trị mô phỏng (1, 2, 3)
     await db.insert(fileAttachments).values([
       {
         fileId: file1.id,
         entityType: "supplier",
-        entityId: supplier1.id,
+        entityId: 1, // placeholder ID
       },
       {
         fileId: file2.id,
         entityType: "medication",
-        entityId: med2.id,
+        entityId: 2, // placeholder ID
       },
       {
         fileId: file3.id,
         entityType: "report",
-        entityId: null, // General report, not tied to a specific DB record
+        entityId: 3, // placeholder ID
       },
     ]);
 
+    console.log("✅ File attachments seeded successfully.");
     // 21. Seed Notifications
     console.log("🔔 Seeding notifications...");
     await db.insert(notifications).values([

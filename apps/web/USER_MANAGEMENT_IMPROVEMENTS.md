@@ -57,7 +57,7 @@ const [searchQuery, setSearchQuery] = useState("");
 // Query runs on every keystroke
 const filters = {};
 if (searchQuery) filters.search = searchQuery;
-const { data } = useStaff(filters);
+const { data } = useUsers(filters);
 
 <Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />;
 ```
@@ -71,7 +71,7 @@ const [searchQuery, setSearchQuery] = useState(""); // Actual search
 // Query only runs when user submits
 const filters = {};
 if (searchQuery) filters.search = searchQuery;
-const { data } = useStaff(filters);
+const { data } = useUsers(filters);
 
 <form
   onSubmit={(e) => {

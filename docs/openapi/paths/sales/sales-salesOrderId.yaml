@@ -1,0 +1,102 @@
+/sales/{salesOrderId}:
+  get:
+    tags:
+      - Sales
+    summary: Get sales order by ID
+    description: Retrieve a specific sales order by its ID with order items
+    operationId: getSalesOrderById
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: salesOrderId
+        in: path
+        description: Sales Order ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Sales order retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/sales/sales-order-schemas.yaml#/SalesOrderWithItems"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  patch:
+    tags:
+      - Sales
+    summary: Update sales order status
+    description: Update the status of a sales order
+    operationId: updateSalesOrder
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: salesOrderId
+        in: path
+        description: Sales Order ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/sales/sales-order-schemas.yaml#/UpdateSalesOrderRequest"
+          example:
+            status: "paid"
+    responses:
+      "200":
+        description: Sales order updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/sales/sales-order-schemas.yaml#/SalesOrder"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  delete:
+    tags:
+      - Sales
+    summary: Cancel sales order
+    description: Cancel a sales order (Owner only)
+    operationId: cancelSalesOrder
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: salesOrderId
+        in: path
+        description: Sales Order ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Sales order cancelled successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/common/schemas.yaml#/Response"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

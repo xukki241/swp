@@ -1,0 +1,104 @@
+WarehouseZone:
+  type: object
+  required:
+    - id
+    - code
+    - name
+    - type
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    code:
+      $ref: "../common/schemas.yaml#/Code"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    type:
+      $ref: "../common/enums.yaml#/WarehouseZoneType"
+    location:
+      type: string
+      nullable: true
+      description: Physical location of the zone
+      example: "Building A, Floor 2"
+    description:
+      $ref: "../common/schemas.yaml#/Description"
+
+CreateWarehouseZone:
+  type: object
+  required:
+    - code
+    - name
+  properties:
+    code:
+      $ref: "../common/schemas.yaml#/Code"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    type:
+      allOf:
+        - $ref: "../common/enums.yaml#/WarehouseZoneType"
+        - default: normal
+    location:
+      type: string
+      description: Physical location of the zone
+      example: "Building A, Floor 2"
+    description:
+      $ref: "../common/schemas.yaml#/Description"
+
+CreateWarehouseZonesRequest:
+  type: array
+  items:
+    $ref: "#/CreateWarehouseZone"
+  description: Array of warehouse zones to create
+
+CreateWarehouseZonesResponse:
+  type: array
+  items:
+    $ref: "#/WarehouseZone"
+  description: Array of created warehouse zones
+
+BatchCreateWarehouseZones:
+  type: object
+  required:
+    - quantity
+  properties:
+    quantity:
+      $ref: "../common/schemas.yaml#/PositiveInteger"
+    codePrefix:
+      type: string
+      maxLength: 50
+      default: "ZONE"
+      description: Prefix for auto-generated zone codes
+      example: "ZONE"
+    namePrefix:
+      type: string
+      maxLength: 100
+      default: "Zone"
+      description: Prefix for auto-generated zone names
+      example: "Zone"
+
+UpdateWarehouseZone:
+  type: object
+  properties:
+    code:
+      $ref: "../common/schemas.yaml#/Code"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    type:
+      $ref: "../common/enums.yaml#/WarehouseZoneType"
+    location:
+      type: string
+      description: Physical location of the zone
+    description:
+      $ref: "../common/schemas.yaml#/Description"
+
+WarehouseZoneListResponse:
+  type: object
+  required:
+    - data
+    - pagination
+  properties:
+    data:
+      type: array
+      items:
+        $ref: "#/WarehouseZone"
+    pagination:
+      $ref: "../common/schemas.yaml#/Pagination"
