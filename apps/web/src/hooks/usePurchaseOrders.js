@@ -1,9 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
 import {
   getAllPurchaseOrders,
   getPurchaseOrderById,
   deletePurchaseOrder,
   updatePurchaseOrderStatus,
+  createPurchaseOrder,
 } from "@/services/purchaseOrderService";
 
 /**
@@ -59,3 +61,13 @@ export const useUpdatePurchaseOrderStatus = () => {
     },
   });
 };
+export function useCreatePurchaseOrder() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload) => createPurchaseOrder(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["purchaseOrders"]);
+    },
+  });
+}

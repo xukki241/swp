@@ -14,6 +14,7 @@ import SupplierListPage from "./pages/supplier/SupplierListPage";
 import SupplierCreatePage from "./pages/supplier/SupplierCreatePage";
 import SupplierDetailPage from "./pages/supplier/SupplierDetailPage";
 import SupplierEditPage from "./pages/supplier/SupplierEditPage";
+import PurchaseOrderListPage from "./pages/purchaseOrder/PurchaseOrderListPage";
 
 function App() {
   return (
@@ -94,7 +95,14 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/procurement/purchase-orders"
+          element={
+            <ProtectedRoute>
+              <PurchaseOrderListPage />
+            </ProtectedRoute>
+          }
+        />
         {/* Public routes - redirect to dashboard if already logged in */}
         <Route
           path="/login"
