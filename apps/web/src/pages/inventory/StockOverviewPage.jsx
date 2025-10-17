@@ -22,9 +22,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
-import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
 
 // Mock data - replace with actual API call
 const medicines = [
@@ -279,9 +279,9 @@ export default function StockOverviewPage() {
               {filteredMedicines.map((medicine) => (
                 <Card
                   key={medicine.id}
-                  className="border shadow-sm hover:shadow-md transition-shadow mb-3"
+                  className="border shadow-sm hover:shadow-md transition-shadow mb-3 overflow-hidden"
                 >
-                  <CardContent className="flex justify-between items-center">
+                  <CardContent className="flex justify-between items-center flex-wrap gap-3">
                     <div className="flex items-center gap-4">
                       <img
                         src={MedicinePlaceholder}
@@ -294,6 +294,9 @@ export default function StockOverviewPage() {
                         </h3>
                         <p className="text-sm text-muted-foreground mt-1">
                           Stock: {medicine.quantity} {medicine.unit}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Price: {medicine.price} VND
                         </p>
                       </div>
                     </div>
@@ -517,20 +520,6 @@ export default function StockOverviewPage() {
               </div>
             </div>
 
-            <div>
-              <Label className="mb-2" htmlFor="note">
-                Note
-              </Label>
-              <Textarea
-                type="text"
-                id="note"
-                name="note"
-                className="h-20"
-                value={stockFormData.note}
-                onChange={handleFormChange}
-              />
-            </div>
-
             <DialogFooter>
               <Button
                 variant="outline"
@@ -644,12 +633,6 @@ export default function StockOverviewPage() {
                   <Label className="text-muted-foreground">Batch Number</Label>
                   <p className="text-lg font-semibold">
                     {selectedMedicine.batchNumber}
-                  </p>
-                </div>
-                <div className="space-y-1 md:col-span-2">
-                  <Label className="text-muted-foreground">Note</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedMedicine.note || "No note"}
                   </p>
                 </div>
               </div>

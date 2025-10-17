@@ -49,6 +49,7 @@ export default function UserProfile() {
   const handlePasswordReset = async (e) => {
     e.preventDefault();
 
+    // validate reset password form
     if (!passwordData.oldPassword.trim()) {
       toast.error("Validation Error", {
         description: "Old password is required",

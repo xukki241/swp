@@ -8,7 +8,7 @@ import NotFoundPage from "@/pages/NotFoundPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import UserListPage from "@/pages/UserListPage";
 import POSPage from "@/pages/POSPage";
-import PolicyPage from "@/pages/PolicyPage"; // Added PolicyPage import
+import PolicyPage from "@/pages/PolicyPage";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import StockOverviewPage from "./pages/inventory/StockOverviewPage";
 
