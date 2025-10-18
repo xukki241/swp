@@ -29,8 +29,36 @@ export default function PurchaseOrderCreatePage() {
   const suppliers = suppliersData?.data || suppliersData || [];
   const meds = supplierDetail?.medicationVariants || [];
 
+  const [buyerInfo, setBuyerInfo] = useState({
+    contact: "PharmaFlow Procurement Team",
+    email: "procurement@pharmaflow.com",
+    address: "123 Medical Center, District 1, Ho Chi Minh City",
+    phone: "+84 28 1234 5678",
+  });
+
   const [selectedItems, setSelectedItems] = useState([]);
-  const [expectedDate, setExpectedDate] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const expectedDeliveryDate = useMemo(() => {
+    // Chỉ tính khi đã có items được chọn với medication và lead time
+    const itemsWithLeadTime = selectedItems
+      .map((item) => {
+        const med = meds.find((m) => m.id === item.supplierMedicationVariantId);
+        return med?.leadTimeDays || 0;
+      })
+      .filter((days) => days > 0);
+
+    if (itemsWithLeadTime.length === 0) return "";
+
+    const maxLeadTime = Math.max(...itemsWithLeadTime);
+
+    const today = new Date();
+    const deliveryDate = new Date(
+      today.getTime() + maxLeadTime * 24 * 60 * 60 * 1000
+    );
+
+    return deliveryDate.toISOString().split("T")[0];
+  }, [selectedItems, meds]);
 
   const totalAmount = useMemo(
     () =>
@@ -62,6 +90,13 @@ export default function PurchaseOrderCreatePage() {
     setSelectedItems(updated);
   };
 
+  const handleBuyerInfoChange = (field, value) => {
+    setBuyerInfo((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -91,11 +126,13 @@ export default function PurchaseOrderCreatePage() {
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
       const payload = [
         {
           supplier_id: supplierId,
-          expected_date: expectedDate,
+          expected_date: expectedDeliveryDate,
           items: selectedItems.map((i) => ({
             supplier_medication_variant_id: i.supplierMedicationVariantId,
             quantity: Number(i.quantity),
@@ -104,189 +141,290 @@ export default function PurchaseOrderCreatePage() {
         },
       ];
 
-      console.log("📦 Payload gửi đi:", payload);
+      console.log("📦 Payload sent:", payload);
 
-      await instance.post("/purchases", payload);
+      const response = await instance.post("/purchases", payload);
+      const createdOrder = response.data?.data?.[0] || response.data;
 
-      toast.success("✅ Purchase order created successfully!");
+      // Prepare email data
+      const emailData = {
+        supplierEmail: supplierDetail.email,
+        supplierName: supplierDetail.name,
+        supplierContact: supplierDetail.contactName,
+        buyerInfo: {
+          contact: buyerInfo.contact,
+          email: buyerInfo.email,
+          address: buyerInfo.address,
+          phone: buyerInfo.phone,
+        },
+        items: selectedItems.map((item) => {
+          const med = meds.find(
+            (m) => m.id === item.supplierMedicationVariantId
+          );
+          return {
+            medicationName: med?.medicationName || "Unknown",
+            variantName: med?.variantName || "-",
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+          };
+        }),
+        totalAmount,
+        expectedDeliveryDate: new Date(expectedDeliveryDate).toLocaleDateString(
+          "en-US",
+          {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }
+        ),
+        orderNumber: createdOrder?.id || `PO-${Date.now()}`,
+        orderDate: new Date().toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+      };
+
+      // Send email notification
+      try {
+        await instance.post("/send-purchase-order-email", emailData);
+        toast.success("✅ Purchase order created and email sent successfully!");
+      } catch (emailError) {
+        console.error("⚠️ Email sending failed:", emailError);
+        toast.warning("Purchase order created, but email notification failed.");
+      }
+
       navigate("/procurement/purchase-orders");
     } catch (error) {
       console.error("❌ Error creating PO:", error);
       const message =
         error?.response?.data?.error || "Failed to create purchase order.";
       toast.error("Error", { description: message });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <Card className="shadow-xl border-0 bg-gradient-to-br from-white to-gray-50">
-          <CardHeader className="border-b  text-black">
-            <div className="flex items-center gap-3 justify-center">
-              <Package className="w-8 h-8" />
-              <CardTitle className="text-3xl font-bold tracking-tight">
-                Create Purchase Order
-              </CardTitle>
+        <Card className="shadow-lg border border-gray-200">
+          <CardHeader className="border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <Package className="w-8 h-8 text-gray-700" />
+              <div>
+                <CardTitle className="text-3xl font-bold">
+                  Create Purchase Order
+                </CardTitle>
+                <p className="text-sm text-gray-600 mt-1">
+                  Fill in the details below to create a new purchase order
+                </p>
+              </div>
             </div>
-            <p className="text-center text-black mt-2 text-sm">
-              ABC Pharmaceutical Company - Thach Hoa, Hoa Lac, Hanoi | Phone:
-              0987 654 321
-            </p>
           </CardHeader>
 
           <CardContent className="p-6 md:p-8">
             <form onSubmit={handleSubmit} className="space-y-8">
-              {/* --- Supplier Info --- */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border-2 border-blue-100">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Building2 className="w-5 h-5 text-blue-600" />
-                    <h2 className="font-bold text-lg text-gray-800">
-                      Buyer Information
-                    </h2>
+              {/* --- Buyer Information --- */}
+              <div>
+                <h2 className="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                  <Building2 className="w-5 h-5" />
+                  Buyer Information
+                </h2>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="contact" className="text-sm font-medium">
+                      Contact Name
+                    </Label>
+                    <Input
+                      id="contact"
+                      value={buyerInfo.contact}
+                      onChange={(e) =>
+                        handleBuyerInfoChange("contact", e.target.value)
+                      }
+                      placeholder="Enter contact name"
+                      className="mt-1"
+                    />
                   </div>
-                  <div className="space-y-2 text-sm text-gray-700">
-                    <p>
-                      <span className="font-semibold text-gray-900">
-                        Company:
-                      </span>{" "}
-                      ABC Pharmaceutical Company
-                    </p>
-                    <p>
-                      <span className="font-semibold text-gray-900">
-                        Address:
-                      </span>{" "}
-                      Thach Hoa, Hoa Lac, Hanoi
-                    </p>
-                    <p>
-                      <span className="font-semibold text-gray-900">
-                        Phone:
-                      </span>{" "}
-                      0987 654 321
-                    </p>
+                  <div>
+                    <Label htmlFor="email" className="text-sm font-medium">
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={buyerInfo.email}
+                      onChange={(e) =>
+                        handleBuyerInfoChange("email", e.target.value)
+                      }
+                      placeholder="Enter email address"
+                      className="mt-1"
+                    />
                   </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-100">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Building2 className="w-5 h-5 text-green-600" />
-                    <h2 className="font-bold text-lg text-gray-800">
-                      Supplier Information
-                    </h2>
+                  <div>
+                    <Label htmlFor="address" className="text-sm font-medium">
+                      Address
+                    </Label>
+                    <Input
+                      id="address"
+                      value={buyerInfo.address}
+                      onChange={(e) =>
+                        handleBuyerInfoChange("address", e.target.value)
+                      }
+                      placeholder="Enter address"
+                      className="mt-1"
+                    />
                   </div>
-
-                  {loadingSuppliers ? (
-                    <div className="flex items-center gap-2 text-gray-500">
-                      <Loader2 className="animate-spin w-4 h-4" /> Loading
-                      suppliers...
-                    </div>
-                  ) : (
-                    <Select
-                      value={supplierId}
-                      onValueChange={(val) => {
-                        setSupplierId(val);
-                        setSelectedItems([]);
-                      }}
-                    >
-                      <SelectTrigger className="bg-white border-2 border-green-200 focus:border-green-400">
-                        <SelectValue placeholder="Select a supplier..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {suppliers.map((s) => (
-                          <SelectItem key={s.id} value={s.id}>
-                            {s.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-
-                  {supplierDetail && (
-                    <div className="mt-4 space-y-2 text-sm text-gray-700">
-                      <p>
-                        <span className="font-semibold text-gray-900">
-                          Contact:
-                        </span>{" "}
-                        {supplierDetail.contactName}
-                      </p>
-                      <p>
-                        <span className="font-semibold text-gray-900">
-                          Email:
-                        </span>{" "}
-                        {supplierDetail.email}
-                      </p>
-                      <p>
-                        <span className="font-semibold text-gray-900">
-                          Address:
-                        </span>{" "}
-                        {supplierDetail.address}
-                      </p>
-                      <p>
-                        <span className="font-semibold text-gray-900">
-                          Phone:
-                        </span>{" "}
-                        {supplierDetail.phone}
-                      </p>
-                    </div>
-                  )}
+                  <div>
+                    <Label htmlFor="phone" className="text-sm font-medium">
+                      Phone
+                    </Label>
+                    <Input
+                      id="phone"
+                      value={buyerInfo.phone}
+                      onChange={(e) =>
+                        handleBuyerInfoChange("phone", e.target.value)
+                      }
+                      placeholder="Enter phone number"
+                      className="mt-1"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Expected Date */}
-              <div className="flex flex-col md:flex-row gap-4 items-start md:items-center bg-amber-50 p-4 rounded-lg border border-amber-200">
-                <Label className="font-semibold text-gray-800 min-w-[200px]">
+              {/* --- Supplier Information --- */}
+              <div>
+                <h2 className="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                  <Building2 className="w-5 h-5" />
+                  Supplier Information
+                </h2>
+
+                {loadingSuppliers ? (
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <Loader2 className="animate-spin w-4 h-4" /> Loading
+                    suppliers...
+                  </div>
+                ) : (
+                  <Select
+                    value={supplierId}
+                    onValueChange={(val) => {
+                      setSupplierId(val);
+                      setSelectedItems([]);
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    <SelectTrigger className="w-full md:w-96">
+                      <SelectValue placeholder="Select a supplier..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {suppliers.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+
+                {supplierDetail && (
+                  <div className="mt-4 grid md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">
+                        Contact
+                      </p>
+                      <p className="text-gray-900">
+                        {supplierDetail.contactName}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Email</p>
+                      <p className="text-gray-900">{supplierDetail.email}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">
+                        Address
+                      </p>
+                      <p className="text-gray-900">{supplierDetail.address}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Phone</p>
+                      <p className="text-gray-900">{supplierDetail.phone}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* --- Expected Delivery Date (Auto-calculated) --- */}
+              <div>
+                <h2 className="font-bold text-lg text-gray-800 mb-4">
                   Expected Delivery Date
-                </Label>
-                <Input
-                  type="date"
-                  value={expectedDate}
-                  onChange={(e) => setExpectedDate(e.target.value)}
-                  className="max-w-sm bg-white border-amber-300 focus:border-amber-500"
-                />
+                </h2>
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <p className="text-sm text-gray-600 mb-2">
+                    {expectedDeliveryDate
+                      ? "Automatically calculated based on maximum lead time of selected items"
+                      : "Add medications to calculate expected delivery date"}
+                  </p>
+                  <p className="text-lg font-semibold text-gray-900">
+                    {expectedDeliveryDate
+                      ? new Date(expectedDeliveryDate).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )
+                      : "Not calculated yet"}
+                  </p>
+                </div>
               </div>
 
               {/* --- Medication Table --- */}
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h3 className="font-bold text-xl text-gray-800 flex items-center gap-2">
-                    <Package className="w-5 h-5 text-blue-600" />
+                  <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
+                    <Package className="w-5 h-5" />
                     Order Items
                   </h3>
                   <Button
                     type="button"
                     variant="outline"
                     onClick={handleAddItem}
-                    className="border-2 border-green-200 text-green-600 hover:bg-blue-50 font-semibold"
+                    className="border border-gray-300 bg-transparent"
+                    disabled={isSubmitting}
                   >
                     <Plus className="w-4 h-4 mr-1" />
                     Add Item
                   </Button>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border-2 border-gray-200 shadow-md">
+                <div className="overflow-x-auto rounded-lg border border-gray-200">
                   <table className="min-w-full text-sm">
-                    <thead className="bg-gradient-to-r from-gray-700 to-gray-800 text-white">
+                    <thead className="bg-gray-100 border-b border-gray-200">
                       <tr>
-                        <th className="p-3 text-left font-semibold w-[25%]">
+                        <th className="p-3 text-left font-semibold text-gray-700 w-[20%]">
                           Medication
                         </th>
-                        <th className="p-3 text-left font-semibold w-[15%]">
+                        <th className="p-3 text-left font-semibold text-gray-700 w-[12%]">
                           SKU Code
                         </th>
-                        <th className="p-3 text-left font-semibold w-[20%]">
+                        <th className="p-3 text-left font-semibold text-gray-700 w-[15%]">
                           Variant
                         </th>
-                        <th className="p-3 text-center font-semibold w-[10%]">
+                        <th className="p-3 text-center font-semibold text-gray-700 w-[10%]">
+                          Lead Days
+                        </th>
+                        <th className="p-3 text-center font-semibold text-gray-700 w-[10%]">
                           Quantity
                         </th>
-                        <th className="p-3 text-center font-semibold w-[15%]">
+                        <th className="p-3 text-center font-semibold text-gray-700 w-[15%]">
                           Unit Price
                         </th>
-                        <th className="p-3 text-center font-semibold w-[15%]">
+                        <th className="p-3 text-center font-semibold text-gray-700 w-[13%]">
                           Subtotal
                         </th>
-                        <th className="p-3 text-center font-semibold w-[5%]">
+                        <th className="p-3 text-center font-semibold text-gray-700 w-[5%]">
                           Action
                         </th>
                       </tr>
@@ -295,7 +433,7 @@ export default function PurchaseOrderCreatePage() {
                       {selectedItems.length === 0 ? (
                         <tr>
                           <td
-                            colSpan={7}
+                            colSpan={8}
                             className="text-center py-12 text-gray-400"
                           >
                             <Package className="w-12 h-12 mx-auto mb-2 opacity-30" />
@@ -313,7 +451,7 @@ export default function PurchaseOrderCreatePage() {
                           return (
                             <tr
                               key={index}
-                              className="border-t hover:bg-gray-50 transition-colors"
+                              className="border-t border-gray-200 hover:bg-gray-50 transition-colors"
                             >
                               <td className="p-3">
                                 <Select
@@ -325,8 +463,9 @@ export default function PurchaseOrderCreatePage() {
                                       val
                                     )
                                   }
+                                  disabled={isSubmitting}
                                 >
-                                  <SelectTrigger className="border-gray-300">
+                                  <SelectTrigger className="border border-gray-300">
                                     <SelectValue placeholder="Select medication..." />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -350,6 +489,9 @@ export default function PurchaseOrderCreatePage() {
                               <td className="p-3 text-gray-700">
                                 {med?.variantName || "-"}
                               </td>
+                              <td className="p-3 text-center text-gray-700 font-medium">
+                                {med?.leadTimeDays || "-"}
+                              </td>
                               <td className="p-3 text-center">
                                 <Input
                                   type="number"
@@ -363,6 +505,7 @@ export default function PurchaseOrderCreatePage() {
                                     )
                                   }
                                   className="w-20 text-center mx-auto"
+                                  disabled={isSubmitting}
                                 />
                               </td>
                               <td className="p-3 text-center">
@@ -378,9 +521,10 @@ export default function PurchaseOrderCreatePage() {
                                     )
                                   }
                                   className="w-28 text-center mx-auto"
+                                  disabled={isSubmitting}
                                 />
                               </td>
-                              <td className="p-3 text-center font-bold text-blue-600">
+                              <td className="p-3 text-center font-bold text-gray-900">
                                 {(
                                   item.quantity * item.unitPrice
                                 ).toLocaleString()}{" "}
@@ -392,6 +536,7 @@ export default function PurchaseOrderCreatePage() {
                                   size="sm"
                                   onClick={() => handleRemoveItem(index)}
                                   className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                                  disabled={isSubmitting}
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </Button>
@@ -407,22 +552,35 @@ export default function PurchaseOrderCreatePage() {
 
               {/* --- Total --- */}
               <div className="flex justify-end">
-                <div className="bg-green-400 text-white px-4 py-4 rounded-xl shadow-lg">
-                  <div className="text-sm font-medium opacity-90 mb-1">
-                    Total Amount
+                <div className="border border-gray-300 rounded-lg overflow-hidden min-w-[280px]">
+                  <div className="bg-gray-50 px-6 py-2 border-b border-gray-300">
+                    <span className="text-sm font-medium text-gray-700">
+                      Total Amount
+                    </span>
                   </div>
-                  <div className="text-2xl font-bold">
-                    {totalAmount.toLocaleString()} ₫
+                  <div className="bg-white px-6 py-3">
+                    <span className="text-xl font-bold text-gray-900">
+                      {totalAmount.toLocaleString()} ₫
+                    </span>
                   </div>
                 </div>
               </div>
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-6 text-lg shadow-lg hover:shadow-xl transition-all"
-                disabled={!supplierId || selectedItems.length === 0}
+                className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-6 text-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={
+                  !supplierId || selectedItems.length === 0 || isSubmitting
+                }
               >
-                Create Purchase Order
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Creating Purchase Order & Sending Email...</span>
+                  </div>
+                ) : (
+                  "Create Purchase Order"
+                )}
               </Button>
             </form>
           </CardContent>
