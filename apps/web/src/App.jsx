@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import DashboardPage from "@/pages/Dashboard";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
@@ -9,8 +10,8 @@ import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import UserListPage from "@/pages/UserListPage";
 import POSPage from "@/pages/POSPage";
 import PolicyPage from "@/pages/PolicyPage";
-import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
-import StockOverviewPage from "./pages/inventory/StockOverviewPage";
+import StockOverviewPage from "@/pages/inventory/StockOverviewPage";
+import WarehousePage from "@/pages/inventory/WarehousePage";
 
 function App() {
   return (
@@ -59,6 +60,22 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/inventory/stock"
+          element={
+            <ProtectedRoute>
+              <StockOverviewPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/inventory/warehouse"
+          element={
+            <ProtectedRoute>
+              <WarehousePage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Public routes - redirect to dashboard if already logged in */}
         <Route
@@ -99,14 +116,6 @@ function App() {
             <PublicRoute>
               <PolicyPage />
             </PublicRoute>
-          }
-        />
-        <Route
-          path="/inventory/stock"
-          element={
-            <ProtectedRoute>
-              <StockOverviewPage />
-            </ProtectedRoute>
           }
         />
 
