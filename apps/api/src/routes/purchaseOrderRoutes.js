@@ -22,14 +22,14 @@ import {
 
 export const purchaseOrderRouter = express.Router();
 
-// Mount nested receipt routes (before authentication to handle params properly)
-purchaseOrderRouter.use("/:purchaseOrderId/receipts", nestedReceiptRouter);
-
-// Mount standalone receipt routes (for accessing receipts without purchaseOrderId)
-purchaseOrderRouter.use("/receipts", standaloneReceiptRouter);
-
 // All routes require authentication
 purchaseOrderRouter.use(authenticate);
+
+// Mount standalone receipt routes FIRST (must be before /:id route)
+purchaseOrderRouter.use("/receipts", standaloneReceiptRouter);
+
+// Mount nested receipt routes (for /purchases/:purchaseOrderId/receipts)
+purchaseOrderRouter.use("/:purchaseOrderId/receipts", nestedReceiptRouter);
 
 // Param validation schema for routes with :id
 const idParamSchema = z.object({

@@ -46,9 +46,7 @@ export const purchaseOrderReceiptController = {
   // Get purchase order receipt by ID
   async getById(req, res) {
     try {
-      const receipt = await purchaseOrderReceiptService.getById(
-        Number.parseInt(req.params.id)
-      );
+      const receipt = await purchaseOrderReceiptService.getById(req.params.id);
       if (!receipt) {
         return res
           .status(404)
@@ -63,7 +61,7 @@ export const purchaseOrderReceiptController = {
   async update(req, res) {
     try {
       const receipt = await purchaseOrderReceiptService.update(
-        Number.parseInt(req.params.id),
+        req.params.id,
         req.body
       );
       if (!receipt) {
@@ -80,9 +78,7 @@ export const purchaseOrderReceiptController = {
   // Delete purchase order receipt
   async delete(req, res) {
     try {
-      const receipt = await purchaseOrderReceiptService.delete(
-        Number.parseInt(req.params.id)
-      );
+      const receipt = await purchaseOrderReceiptService.delete(req.params.id);
       if (!receipt) {
         return res
           .status(404)
