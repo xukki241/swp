@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import {
   usePurchaseOrders,
   useDeletePurchaseOrder,
+  useUpdatePurchaseOrderStatus,
 } from "@/hooks/usePurchaseOrders";
 import { AppLayout } from "@/components/layouts/app-layout";
 import {
@@ -25,7 +26,14 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, Eye, Trash2, PlusCircle, Calendar } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, Eye, Trash2, PlusCircle, Calendar, Edit } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -39,14 +47,26 @@ export default function PurchaseOrderListPage() {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [editStatusOpen, setEditStatusOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("");
 
   const { data: purchaseOrders = [], isLoading } = usePurchaseOrders();
   const { mutate: deletePurchaseOrder } = useDeletePurchaseOrder();
+  const { mutate: updateStatus, isPending: isUpdatingStatus } =
+    useUpdatePurchaseOrderStatus();
 
   const filteredOrders = useMemo(() => {
     let orders = [...purchaseOrders];
+
+    // Filter by status
+    if (statusFilter !== "all") {
+      orders = orders.filter((o) => o.status === statusFilter);
+    }
+
+    // Filter by search query
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       orders = orders.filter(
@@ -56,11 +76,17 @@ export default function PurchaseOrderListPage() {
       );
     }
     return orders;
-  }, [purchaseOrders, searchQuery]);
+  }, [purchaseOrders, searchQuery, statusFilter]);
 
   const handleDelete = (id) => {
     setSelectedId(id);
     setConfirmOpen(true);
+  };
+
+  const handleEditStatus = (order) => {
+    setSelectedId(order.id);
+    setSelectedStatus(order.status);
+    setEditStatusOpen(true);
   };
 
   const confirmDelete = () => {
@@ -75,6 +101,23 @@ export default function PurchaseOrderListPage() {
       },
     });
     setConfirmOpen(false);
+  };
+
+  const confirmUpdateStatus = () => {
+    updateStatus(
+      { id: selectedId, status: selectedStatus },
+      {
+        onSuccess: () => {
+          toast.success("Status updated successfully!");
+          setEditStatusOpen(false);
+        },
+        onError: (error) => {
+          toast.error("Failed to update status!", {
+            description: error?.response?.data?.error || error.message,
+          });
+        },
+      }
+    );
   };
 
   const getStatusBadge = (status) => {
@@ -138,7 +181,7 @@ export default function PurchaseOrderListPage() {
                 e.preventDefault();
                 setSearchQuery(searchInput);
               }}
-              className="mb-6 flex gap-3"
+              className="mb-6 flex flex-col gap-4 md:flex-row"
             >
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -146,12 +189,36 @@ export default function PurchaseOrderListPage() {
                   placeholder="Search by supplier or status..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 h-11"
                 />
               </div>
               <Button type="submit" className="h-11">
                 <Search className="h-4 w-4 mr-2" /> Search
               </Button>
+              {searchQuery && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11"
+                  onClick={() => {
+                    setSearchInput("");
+                    setSearchQuery("");
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full md:w-[180px] h-11">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="received">Received</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
             </form>
 
             <div className="rounded-lg border">
@@ -172,7 +239,17 @@ export default function PurchaseOrderListPage() {
                         colSpan={5}
                         className="text-center py-8 text-muted-foreground"
                       >
-                        No purchase orders found
+                        <div className="flex flex-col items-center gap-2">
+                          <Search className="h-10 w-10 text-muted-foreground/50" />
+                          <p className="font-medium">
+                            No purchase orders found
+                          </p>
+                          <p className="text-sm">
+                            {searchQuery || statusFilter !== "all"
+                              ? "Try adjusting your filters"
+                              : "Get started by creating your first order"}
+                          </p>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -197,13 +274,23 @@ export default function PurchaseOrderListPage() {
                               onClick={() =>
                                 navigate(`/purchase-orders/${o.id}`)
                               }
+                              title="View Details"
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
                             <Button
                               size="sm"
+                              variant="secondary"
+                              onClick={() => handleEditStatus(o)}
+                              title="Edit Status"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
                               variant="destructive"
                               onClick={() => handleDelete(o.id)}
+                              title="Delete"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
@@ -225,7 +312,8 @@ export default function PurchaseOrderListPage() {
             <DialogTitle>Confirm Delete</DialogTitle>
           </DialogHeader>
           <p className="text-muted-foreground">
-            Are you sure you want to delete this purchase order?
+            Are you sure you want to delete this purchase order? This action
+            cannot be undone.
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>
@@ -233,6 +321,52 @@ export default function PurchaseOrderListPage() {
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
               Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editStatusOpen} onOpenChange={setEditStatusOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update Order Status</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              Select a new status for this purchase order:
+            </p>
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="received">Received</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setEditStatusOpen(false)}
+              disabled={isUpdatingStatus}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmUpdateStatus}
+              disabled={isUpdatingStatus}
+              className="min-w-[100px]"
+            >
+              {isUpdatingStatus ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Updating...
+                </>
+              ) : (
+                "Update"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

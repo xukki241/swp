@@ -16,6 +16,7 @@ import SupplierDetailPage from "./pages/supplier/SupplierDetailPage";
 import SupplierEditPage from "./pages/supplier/SupplierEditPage";
 import PurchaseOrderListPage from "./pages/purchaseOrder/PurchaseOrderListPage";
 import PurchaseOrderCreatePage from "./pages/purchaseOrder/PurchaseOrderCreatePage";
+import PurchaseOrderDetailPage from "./pages/purchaseOrder/PurchaseOrderDetailPage";
 
 function App() {
   return (
@@ -109,6 +110,14 @@ function App() {
           element={
             <ProtectedRoute>
               <PurchaseOrderCreatePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/purchase-orders/:id"
+          element={
+            <ProtectedRoute>
+              <PurchaseOrderDetailPage />
             </ProtectedRoute>
           }
         />
