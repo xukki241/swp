@@ -4,12 +4,6 @@ import { instance } from "@/lib/axios";
  * User Management API Services
  */
 
-// Get all staff with optional filters
-export const getAllStaff = async (params = {}) => {
-  const response = await instance.get("/users/staff", { params });
-  return response.data;
-};
-
 // Get all users with optional search
 export const getAllUsers = async (params = {}) => {
   const response = await instance.get("/users", { params });

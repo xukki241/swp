@@ -1,0 +1,29 @@
+/reports/daily:
+  get:
+    tags:
+      - Reports
+    summary: Generate daily sales report
+    description: Generate a sales report for the current or specified day
+    operationId: generateDailySalesReport
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: date
+        in: query
+        description: Date for the report (defaults to today if not specified)
+        required: false
+        schema:
+          type: string
+          format: date
+          example: "2025-10-16"
+    responses:
+      "200":
+        description: Daily sales report generated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/reports/report-schemas.yaml#/DailySalesReport"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

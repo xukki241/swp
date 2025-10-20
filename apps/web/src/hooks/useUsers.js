@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
-  getAllStaff,
   getAllUsers,
   getUserById,
   createUser,
@@ -11,18 +10,6 @@ import {
   deactivateUser,
   suspendUser,
 } from "@/services/userService";
-
-/**
- * Hook to fetch all staff with filters
- * @param {Object} filters - { search, role, status }
- */
-export const useStaff = (filters = {}) => {
-  return useQuery({
-    queryKey: ["staff", filters],
-    queryFn: () => getAllStaff(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
-  });
-};
 
 /**
  * Hook to fetch all users

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
-  useStaff,
+  useUsers,
   useUpdateUser,
   useActivateUser,
   useDeactivateUser,

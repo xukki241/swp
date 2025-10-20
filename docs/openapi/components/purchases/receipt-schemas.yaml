@@ -1,0 +1,117 @@
+PurchaseOrderReceipt:
+  type: object
+  required:
+    - id
+    - purchaseOrderId
+    - receivedDate
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    purchaseOrderId:
+      $ref: "../common/schemas.yaml#/UUID"
+    receivedDate:
+      $ref: "../common/schemas.yaml#/DateTime"
+    receivedBy:
+      allOf:
+        - $ref: "../common/schemas.yaml#/UUID"
+        - nullable: true
+
+PurchaseOrderReceiptItem:
+  type: object
+  required:
+    - id
+    - purchaseOrderReceiptId
+    - purchaseOrderItemId
+    - quantity
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    purchaseOrderReceiptId:
+      $ref: "../common/schemas.yaml#/UUID"
+    purchaseOrderItemId:
+      $ref: "../common/schemas.yaml#/UUID"
+    quantity:
+      $ref: "../common/schemas.yaml#/PositiveInteger"
+
+PurchaseOrderReceiptWithItems:
+  allOf:
+    - $ref: "#/PurchaseOrderReceipt"
+    - type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/PurchaseOrderReceiptItem"
+
+CreateReceiptItem:
+  type: object
+  required:
+    - purchaseOrderItemId
+    - quantity
+    - binId
+    - batchNumber
+  properties:
+    purchaseOrderItemId:
+      type: string
+      format: uuid
+      description: Purchase order item ID
+    quantity:
+      $ref: "../common/schemas.yaml#/PositiveInteger"
+    binId:
+      type: string
+      format: uuid
+      description: Warehouse bin ID where items are stored
+    batchNumber:
+      type: string
+      minLength: 1
+      maxLength: 100
+      description: Batch/lot number
+      example: "BATCH-2025-001"
+    manufactureDate:
+      $ref: "../common/schemas.yaml#/Date"
+    expiryDate:
+      $ref: "../common/schemas.yaml#/Date"
+
+CreateReceipt:
+  type: object
+  required:
+    - items
+  properties:
+    items:
+      type: array
+      minItems: 1
+      items:
+        $ref: "#/CreateReceiptItem"
+      description: Array of items being received
+
+CreateReceiptResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Receipt created successfully"
+        data:
+          $ref: "#/PurchaseOrderReceipt"
+
+ReceiptResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Receipt retrieved successfully"
+        data:
+          $ref: "#/PurchaseOrderReceipt"
+
+ReceiptListResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Receipts retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/PurchaseOrderReceipt"

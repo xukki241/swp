@@ -16,10 +16,12 @@ export const warehouseRackService = {
       // Validate referenced zones exist
       const zoneIds = Array.from(new Set(rackData.map((r) => r.zoneId)));
       for (const zid of zoneIds) {
-        const [zone] = await db
-          .select()
-          .from(warehouseZones)
-          .where(eq(warehouseZones.id, zid));
+        const zone = await db.query.warehouseZones.findFirst({
+          where: eq(warehouseZones.id, zid),
+          columns: {
+            id: true,
+          },
+        });
 
         if (!zone) {
           throw new Error(`Zone with ID ${zid} not found`);
@@ -35,10 +37,12 @@ export const warehouseRackService = {
     }
 
     // Single create
-    const [zone] = await db
-      .select()
-      .from(warehouseZones)
-      .where(eq(warehouseZones.id, rackData.zoneId));
+    const zone = await db.query.warehouseZones.findFirst({
+      where: eq(warehouseZones.id, rackData.zoneId),
+      columns: {
+        id: true,
+      },
+    });
 
     if (!zone) {
       throw new Error(`Zone with ID ${rackData.zoneId} not found`);
@@ -52,28 +56,13 @@ export const warehouseRackService = {
   async getAll(filters = {}) {
     const { search, zoneId, limit = 100, offset = 0 } = filters;
 
-    let query = db
-      .select({
-        id: warehouseRacks.id,
-        zoneId: warehouseRacks.zoneId,
-        code: warehouseRacks.code,
-        name: warehouseRacks.name,
-        description: warehouseRacks.description,
-        zoneName: warehouseZones.name,
-        zoneCode: warehouseZones.code,
-        zoneType: warehouseZones.type,
-      })
-      .from(warehouseRacks)
-      .leftJoin(warehouseZones, eq(warehouseRacks.zoneId, warehouseZones.id));
-
     const conditions = [];
 
     if (search) {
       conditions.push(
         or(
           ilike(warehouseRacks.code, `%${search}%`),
-          ilike(warehouseRacks.name, `%${search}%`),
-          ilike(warehouseZones.name, `%${search}%`)
+          ilike(warehouseRacks.name, `%${search}%`)
         )
       );
     }
@@ -82,58 +71,39 @@ export const warehouseRackService = {
       conditions.push(eq(warehouseRacks.zoneId, zoneId));
     }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    const results = await db.query.warehouseRacks.findMany({
+      where: conditions.length > 0 ? and(...conditions) : undefined,
+      with: {
+        zone: true,
+        bins: true,
+      },
+      limit,
+      offset,
+    });
 
-    const results = await query.limit(limit).offset(offset);
     return results;
   },
 
   async getById(id) {
-    const [rack] = await db
-      .select({
-        id: warehouseRacks.id,
-        zoneId: warehouseRacks.zoneId,
-        code: warehouseRacks.code,
-        name: warehouseRacks.name,
-        description: warehouseRacks.description,
-        zoneName: warehouseZones.name,
-        zoneCode: warehouseZones.code,
-        zoneType: warehouseZones.type,
-      })
-      .from(warehouseRacks)
-      .leftJoin(warehouseZones, eq(warehouseRacks.zoneId, warehouseZones.id))
-      .where(eq(warehouseRacks.id, id));
+    const rack = await db.query.warehouseRacks.findFirst({
+      where: eq(warehouseRacks.id, id),
+      with: {
+        zone: true,
+        bins: true,
+      },
+    });
 
-    if (!rack) {
-      return null;
-    }
-
-    // Get all bins in this rack
-    const bins = await db
-      .select({
-        id: warehouseBins.id,
-        code: warehouseBins.code,
-        name: warehouseBins.name,
-        level: warehouseBins.level,
-        number: warehouseBins.number,
-        description: warehouseBins.description,
-      })
-      .from(warehouseBins)
-      .where(eq(warehouseBins.rackId, id));
-
-    return {
-      ...rack,
-      bins,
-    };
+    return rack;
   },
 
   async getByZoneId(zoneId) {
-    const racks = await db
-      .select()
-      .from(warehouseRacks)
-      .where(eq(warehouseRacks.zoneId, zoneId));
+    const racks = await db.query.warehouseRacks.findMany({
+      where: eq(warehouseRacks.zoneId, zoneId),
+      with: {
+        zone: true,
+        bins: true,
+      },
+    });
 
     return racks;
   },
@@ -141,10 +111,12 @@ export const warehouseRackService = {
   async update(id, rackData) {
     // If zoneId is being updated, verify the new zone exists
     if (rackData.zoneId) {
-      const [zone] = await db
-        .select()
-        .from(warehouseZones)
-        .where(eq(warehouseZones.id, rackData.zoneId));
+      const zone = await db.query.warehouseZones.findFirst({
+        where: eq(warehouseZones.id, rackData.zoneId),
+        columns: {
+          id: true,
+        },
+      });
 
       if (!zone) {
         throw new Error(`Zone with ID ${rackData.zoneId} not found`);
@@ -161,11 +133,13 @@ export const warehouseRackService = {
   },
 
   async delete(id) {
-    // Check if rack has bins
-    const bins = await db
-      .select()
-      .from(warehouseBins)
-      .where(eq(warehouseBins.rackId, id));
+    // Check if rack has bins using db.query API
+    const bins = await db.query.warehouseBins.findMany({
+      where: eq(warehouseBins.rackId, id),
+      columns: {
+        id: true,
+      },
+    });
 
     if (bins.length > 0) {
       throw new Error(

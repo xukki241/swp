@@ -25,3 +25,4 @@ export * from "./warehouseRacks.js";
 export * from "./warehouseZones.js";
 export * from "./enums.js";
 export * from "./common.js";
+export * from "./relations.js";

@@ -5,11 +5,12 @@ import {
   emailSchema,
   phoneSchema,
   addressSchema,
+  successResponseSchema,
 } from "../common/index.js";
 import { userRoleEnum, userStatusEnum } from "../common/index.js";
 
 // GET /api/auth/me
-export const meResponseSchema = z.object({
+const meDataSchema = z.object({
   id: uuidSchema,
   name: nameSchema,
   email: emailSchema,
@@ -18,3 +19,5 @@ export const meResponseSchema = z.object({
   status: userStatusEnum,
   role: userRoleEnum,
 });
+
+export const meResponseSchema = successResponseSchema(meDataSchema);

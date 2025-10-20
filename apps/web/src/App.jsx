@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import DashboardPage from "@/pages/Dashboard";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
@@ -7,13 +8,11 @@ import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import UserListPage from "@/pages/UserListPage";
-import UserProfilePage from "@/pages/UserProfilePage";
-import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
-import SupplierListPage from "./pages/supplier/SupplierListPage";
-import SupplierDetailPage from "./pages/supplier/SupplierDetailPage";
-import SupplierCreatePage from "./pages/supplier/SupplierCreatePage";
-import SupplierEditPage from "./pages/supplier/SupplierEditPage";
-import PolicyPage from "./pages/PolicyPage";
+import POSPage from "@/pages/POSPage";
+import PolicyPage from "@/pages/PolicyPage";
+import StockOverviewPage from "@/pages/inventory/StockOverviewPage";
+import WarehousePage from "@/pages/inventory/WarehousePage";
+import InventoryTrackingPage from "@/pages/inventory/InventoryTrackingPage";
 
 function App() {
   return (
@@ -39,6 +38,14 @@ function App() {
           }
         />
         <Route
+          path="/pos"
+          element={
+            <ProtectedRoute>
+              <POSPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/users/list"
           element={
             <ProtectedRoute>
@@ -55,76 +62,45 @@ function App() {
           }
         />
         <Route
-          path="/user-profile"
+          path="/inventory/stock"
           element={
             <ProtectedRoute>
-              <UserProfilePage />
+              <StockOverviewPage />
             </ProtectedRoute>
           }
         />
         <Route
-          path="/suppliers"
+          path="/inventory/warehouse"
           element={
             <ProtectedRoute>
-              <SupplierListPage />
+              <WarehousePage />
             </ProtectedRoute>
           }
         />
         <Route
-          path="/suppliers/create"
+          path="/inventory/tracking"
           element={
             <ProtectedRoute>
-              <SupplierCreatePage />
+              <InventoryTrackingPage />
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/suppliers/:id"
-          element={
-            <ProtectedRoute>
-              <SupplierDetailPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/suppliers/:id/edit"
-          element={
-            <ProtectedRoute>
-              <SupplierEditPage />
-            </ProtectedRoute>
-          }
-        />
+
         {/* Public routes - redirect to dashboard if already logged in */}
         <Route
-          path="/login"
+          path="/inventory/warehouse"
           element={
-            <PublicRoute>
-              <LoginPage />
-            </PublicRoute>
+            <ProtectedRoute>
+              <WarehousePage />
+            </ProtectedRoute>
           }
         />
         <Route
-          path="/register"
+          path="/inventory/tracking"
           element={
-            <PublicRoute>
-              <RegisterPage />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/forgot-password"
-          element={
-            <PublicRoute>
-              <ForgotPasswordPage />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/reset-password"
-          element={
-            <PublicRoute>
-              <ResetPasswordPage />
-            </PublicRoute>
+            <ProtectedRoute>
+              <InventoryTrackingPage />
+            </ProtectedRoute>
           }
         />
         <Route

@@ -24,7 +24,7 @@ export const createSupplier = async (supplierData) => {
 
 // Update supplier (including medication variants)
 export const updateSupplier = async ({ id, ...supplierData }) => {
-  const response = await instance.put(`/suppliers/${id}`, supplierData);
+  const response = await instance.patch(`/suppliers/${id}`, supplierData);
   return response.data;
 };
 

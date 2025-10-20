@@ -82,7 +82,7 @@ export const createMedication = async (req, res, next) => {
       isPrescriptionRequired: isPrescriptionRequired || false,
       isControlledSubstance: isControlledSubstance || false,
       status: status || "active",
-      variants: variants || [], // Array of variant objects
+      variants: variants || [],
     };
 
     const medication = await medicationService.createMedication(medicationData);

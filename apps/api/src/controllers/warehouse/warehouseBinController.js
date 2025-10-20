@@ -27,7 +27,7 @@ export const warehouseBinController = {
     }
 
     const bin = await warehouseBinService.create({
-      rackId: payload.rackId ? Number.parseInt(payload.rackId) : payload.rackId,
+      rackId: payload.rackId, // UUID, no parsing needed
       code: payload.code,
       name: payload.name,
       level: payload.level ? Number.parseInt(payload.level) : payload.level,
@@ -44,7 +44,7 @@ export const warehouseBinController = {
   // Create warehouse bins in batch with auto-generated codes
   createBatch: asyncHandler(async (req, res) => {
     const { mode, codePrefix = "BIN", namePrefix = "Bin" } = req.body;
-    const rackId = Number.parseInt(req.params.rackId);
+    const rackId = req.params.rackId; // UUID, no parsing needed
 
     const bins = [];
     let binCounter = 1;
@@ -92,8 +92,8 @@ export const warehouseBinController = {
   getAll: asyncHandler(async (req, res) => {
     const filters = {
       search: req.query.search,
-      rackId: req.query.rackId ? Number.parseInt(req.query.rackId) : undefined,
-      zoneId: req.query.zoneId ? Number.parseInt(req.query.zoneId) : undefined,
+      rackId: req.query.rackId || undefined, // UUID
+      zoneId: req.query.zoneId || undefined, // UUID
       level:
         req.query.level !== undefined
           ? Number.parseInt(req.query.level)
@@ -110,9 +110,7 @@ export const warehouseBinController = {
 
   // Get warehouse bin by ID
   getById: asyncHandler(async (req, res) => {
-    const bin = await warehouseBinService.getById(
-      Number.parseInt(req.params.id)
-    );
+    const bin = await warehouseBinService.getById(req.params.id); // UUID is a string
     if (!bin) {
       return res.status(404).json({
         success: false,
@@ -127,9 +125,7 @@ export const warehouseBinController = {
 
   // Get bins by rack ID
   getByRackId: asyncHandler(async (req, res) => {
-    const bins = await warehouseBinService.getByRackId(
-      Number.parseInt(req.params.rackId)
-    );
+    const bins = await warehouseBinService.getByRackId(req.params.rackId);
     res.json({
       success: true,
       data: bins,
@@ -147,11 +143,9 @@ export const warehouseBinController = {
     if (updateData.number !== undefined) {
       updateData.number = Number.parseInt(updateData.number);
     }
+    // rackId is UUID, no conversion needed
 
-    const bin = await warehouseBinService.update(
-      Number.parseInt(req.params.id),
-      updateData
-    );
+    const bin = await warehouseBinService.update(req.params.id, updateData);
     if (!bin) {
       return res.status(404).json({
         success: false,
@@ -183,9 +177,7 @@ export const warehouseBinController = {
 
   // Get inventory in a bin
   getInventory: asyncHandler(async (req, res) => {
-    const items = await inventoryService.getByBinId(
-      Number.parseInt(req.params.id)
-    );
+    const items = await inventoryService.getByBinId(req.params.id); // UUID is a string
     res.json({
       success: true,
       data: items,

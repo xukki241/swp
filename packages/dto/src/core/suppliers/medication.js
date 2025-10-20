@@ -4,7 +4,6 @@ import {
   nonNegativeIntSchema,
   paginationSchema,
 } from "../common/index.js";
-
 // Supplier medication variant schema
 export const supplierMedicationVariantSchema = z.object({
   id: uuidSchema,

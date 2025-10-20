@@ -1,0 +1,71 @@
+/suppliers/{supplierId}/medications:
+  get:
+    tags:
+      - Suppliers
+    summary: List supplier medications
+    description: Get paginated list of medication variants offered by a supplier
+    operationId: listSupplierMedications
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/SupplierIdParam"
+      - $ref: "../../components/common/parameters.yaml#/PageParam"
+      - $ref: "../../components/common/parameters.yaml#/LimitParam"
+      - $ref: "../../components/common/parameters.yaml#/SortByParam"
+      - $ref: "../../components/common/parameters.yaml#/SortOrderParam"
+    responses:
+      "200":
+        description: Supplier medications retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/suppliers/supplier-schemas.yaml#/SupplierMedicationListResponse"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  post:
+    tags:
+      - Suppliers
+    summary: Add medications to supplier
+    description: Add one or more medication variants to a supplier's catalog (Owner only)
+    operationId: addSupplierMedications
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/SupplierIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/suppliers/supplier-schemas.yaml#/CreateSupplierMedicationsRequest"
+          example:
+            - medication_variant_id: "550e8400-e29b-41d4-a716-446655440000"
+              supplier_sku: "SUP-MED-001"
+              lead_time_days: 7
+            - medication_variant_id: "660e8400-e29b-41d4-a716-446655440001"
+              supplier_sku: "SUP-MED-002"
+              lead_time_days: 14
+    responses:
+      "201":
+        description: Medications added to supplier successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/suppliers/supplier-schemas.yaml#/CreateSupplierMedicationsResponse"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "409":
+        $ref: "../../components/common/responses.yaml#/ConflictError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
