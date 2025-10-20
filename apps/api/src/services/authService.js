@@ -213,7 +213,7 @@ export const login = async (email, password) => {
         role: user.role,
       },
       config.jwtSecret || "your-secret-key",
-      { expiresIn: "24h" }
+      { expiresIn: "1d" }
     );
 
     return {

@@ -88,35 +88,19 @@ function App() {
 
         {/* Public routes - redirect to dashboard if already logged in */}
         <Route
-          path="/login"
+          path="/inventory/warehouse"
           element={
-            <PublicRoute>
-              <LoginPage />
-            </PublicRoute>
+            <ProtectedRoute>
+              <WarehousePage />
+            </ProtectedRoute>
           }
         />
         <Route
-          path="/register"
+          path="/inventory/tracking"
           element={
-            <PublicRoute>
-              <RegisterPage />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/forgot-password"
-          element={
-            <PublicRoute>
-              <ForgotPasswordPage />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/reset-password"
-          element={
-            <PublicRoute>
-              <ResetPasswordPage />
-            </PublicRoute>
+            <ProtectedRoute>
+              <InventoryTrackingPage />
+            </ProtectedRoute>
           }
         />
         <Route
