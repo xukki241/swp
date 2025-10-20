@@ -219,7 +219,6 @@ export default function PurchaseOrderReceiptListPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Receipt ID</TableHead>
                     <TableHead>Supplier</TableHead>
                     <TableHead>Received Date</TableHead>
                     <TableHead>Received By</TableHead>
@@ -231,7 +230,7 @@ export default function PurchaseOrderReceiptListPage() {
                   {filteredReceipts.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={6}
+                        colSpan={5}
                         className="text-center py-8 text-muted-foreground"
                       >
                         <div className="flex flex-col items-center gap-2">
@@ -248,16 +247,15 @@ export default function PurchaseOrderReceiptListPage() {
                   ) : (
                     filteredReceipts.map((r) => (
                       <TableRow key={r.id}>
-                        <TableCell className="font-mono text-sm">
-                          #{r.id}
-                        </TableCell>
                         <TableCell className="font-medium">
                           {r.supplierName || "N/A"}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Calendar className="w-4 h-4" />
-                            {new Date(r.receivedDate).toLocaleDateString()}
+                            {new Date(r.receivedDate).toLocaleDateString(
+                              "vi-VN"
+                            )}
                           </div>
                         </TableCell>
                         <TableCell>{r.receivedByName || "N/A"}</TableCell>

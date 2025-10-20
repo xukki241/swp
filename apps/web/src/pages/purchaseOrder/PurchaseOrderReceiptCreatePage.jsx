@@ -6,6 +6,7 @@ import {
   usePurchaseOrder,
   useCreatePurchaseOrderReceipt,
 } from "@/hooks/usePurchaseOrders";
+import { useCurrentUser } from "@/hooks/useAuth";
 import { AppLayout } from "@/components/layouts/app-layout";
 import {
   Card,
@@ -42,6 +43,7 @@ export default function PurchaseOrderReceiptCreatePage() {
   const navigate = useNavigate();
   const { data: order, isLoading } = usePurchaseOrder(purchaseOrderId);
   const { mutate: createReceipt, isPending } = useCreatePurchaseOrderReceipt();
+  const { data: currentUser } = useCurrentUser();
 
   const [receivedDate, setReceivedDate] = useState(
     new Date().toISOString().split("T")[0]
@@ -98,11 +100,12 @@ export default function PurchaseOrderReceiptCreatePage() {
 
     const payload = {
       receivedDate,
+      receivedBy: currentUser?.user?.id,
       items: items
         .filter((item) => item.quantity > 0)
         .map((item) => ({
           purchaseOrderItemId: item.purchaseOrderItemId,
-          quantity: item.quantity,
+          quantity: Number(item.quantity),
         })),
     };
 

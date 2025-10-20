@@ -266,6 +266,7 @@ export default function PurchaseOrderListPage() {
                     <TableHead>Supplier</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Order Date</TableHead>
+                    <TableHead>Expected Delivery</TableHead>
                     <TableHead>Total Amount</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -274,7 +275,7 @@ export default function PurchaseOrderListPage() {
                   {filteredOrders.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={5}
+                        colSpan={6}
                         className="text-center py-8 text-muted-foreground"
                       >
                         <div className="flex flex-col items-center gap-2">
@@ -298,8 +299,22 @@ export default function PurchaseOrderListPage() {
                         <TableCell>
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Calendar className="w-4 h-4" />
-                            {new Date(o.orderDate).toLocaleDateString()}
+                            {new Date(o.orderDate).toLocaleDateString("vi-VN")}
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          {o.expectedDate ? (
+                            <div className="flex items-center gap-2 text-sm text-blue-600">
+                              <Calendar className="w-4 h-4" />
+                              {new Date(o.expectedDate).toLocaleDateString(
+                                "vi-VN"
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">
+                              Not set
+                            </span>
+                          )}
                         </TableCell>
                         <TableCell>
                           {o.totalAmount?.toLocaleString()} ₫
