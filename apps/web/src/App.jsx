@@ -13,6 +13,7 @@ import SupplierListPage from "./pages/supplier/SupplierListPage";
 import SupplierDetailPage from "./pages/supplier/SupplierDetailPage";
 import SupplierCreatePage from "./pages/supplier/SupplierCreatePage";
 import SupplierEditPage from "./pages/supplier/SupplierEditPage";
+import PolicyPage from "./pages/PolicyPage";
 
 function App() {
   return (
@@ -61,7 +62,38 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/suppliers"
+          element={
+            <ProtectedRoute>
+              <SupplierListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/suppliers/create"
+          element={
+            <ProtectedRoute>
+              <SupplierCreatePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/suppliers/:id"
+          element={
+            <ProtectedRoute>
+              <SupplierDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/suppliers/:id/edit"
+          element={
+            <ProtectedRoute>
+              <SupplierEditPage />
+            </ProtectedRoute>
+          }
+        />
         {/* Public routes - redirect to dashboard if already logged in */}
         <Route
           path="/login"
@@ -96,37 +128,14 @@ function App() {
           }
         />
         <Route
-          path="/suppliers"
+          path="/policy"
           element={
-            <ProtectedRoute>
-              <SupplierListPage />
-            </ProtectedRoute>
+            <PublicRoute>
+              <PolicyPage />
+            </PublicRoute>
           }
         />
-        <Route
-          path="/suppliers/create"
-          element={
-            <ProtectedRoute>
-              <SupplierCreatePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/suppliers/:id"
-          element={
-            <ProtectedRoute>
-              <SupplierDetailPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/suppliers/:id/edit"
-          element={
-            <ProtectedRoute>
-              <SupplierEditPage />
-            </ProtectedRoute>
-          }
-        />
+
         {/* 404 page - accessible to everyone */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
