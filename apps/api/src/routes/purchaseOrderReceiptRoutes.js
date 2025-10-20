@@ -79,6 +79,17 @@ nestedReceiptRouter.post(
 // ========== Standalone Routes (under /api/purchases/receipts) ==========
 
 /**
+ * @route   GET /api/purchases/receipts
+ * @desc    Get all receipts (across all purchase orders)
+ * @access  Private (Authenticated)
+ */
+standaloneReceiptRouter.get(
+  "/",
+  validateQuery(listReceiptsQuerySchema),
+  purchaseOrderReceiptController.getAll
+);
+
+/**
  * @route   GET /api/purchases/receipts/:id
  * @desc    Get receipt by ID (without requiring purchaseOrderId)
  * @access  Private (Authenticated)

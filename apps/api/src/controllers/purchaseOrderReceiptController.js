@@ -3,7 +3,7 @@ import { purchaseOrderReceiptService } from "../services/purchaseOrderReceiptSer
 export const purchaseOrderReceiptController = {
   async getAllByPurchaseOrder(req, res) {
     try {
-      const purchaseOrderId = Number.parseInt(req.params.purchaseOrderId);
+      const purchaseOrderId = req.params.purchaseOrderId;
       const receipts = await purchaseOrderReceiptService.getAll({
         purchaseOrderId,
       });
@@ -15,7 +15,7 @@ export const purchaseOrderReceiptController = {
   // Create a new purchase order receipt
   async create(req, res) {
     try {
-      const purchaseOrderId = Number.parseInt(req.params.purchaseOrderId);
+      const purchaseOrderId = req.params.purchaseOrderId;
       const receipt = await purchaseOrderReceiptService.create({
         purchaseOrderId,
         ...req.body,
@@ -30,9 +30,7 @@ export const purchaseOrderReceiptController = {
   async getAll(req, res) {
     try {
       const filters = {
-        purchaseOrderId: req.query.purchaseOrderId
-          ? Number.parseInt(req.query.purchaseOrderId)
-          : undefined,
+        purchaseOrderId: req.query.purchaseOrderId || undefined,
         startDate: req.query.startDate,
         endDate: req.query.endDate,
         limit: Number.parseInt(req.query.limit) || 100,

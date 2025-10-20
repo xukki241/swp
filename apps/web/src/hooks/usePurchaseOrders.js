@@ -6,6 +6,11 @@ import {
   deletePurchaseOrder,
   updatePurchaseOrderStatus,
   createPurchaseOrder,
+  getAllPurchaseOrderReceipts,
+  getPurchaseOrderReceipts,
+  getPurchaseOrderReceiptById,
+  createPurchaseOrderReceipt,
+  deletePurchaseOrderReceipt,
 } from "@/services/purchaseOrderService";
 
 /**
@@ -71,3 +76,77 @@ export function useCreatePurchaseOrder() {
     },
   });
 }
+
+/**
+ * ============================================
+ * Purchase Order Receipts Hooks
+ * ============================================
+ */
+
+/**
+ * Hook lấy tất cả receipts (across all purchase orders)
+ */
+export const usePurchaseOrderReceipts = (filters = {}) => {
+  return useQuery({
+    queryKey: ["purchaseOrderReceipts", filters],
+    queryFn: () => getAllPurchaseOrderReceipts(filters),
+    staleTime: 2 * 60 * 1000,
+  });
+};
+
+/**
+ * Hook lấy receipts của 1 purchase order cụ thể
+ */
+export const usePurchaseOrderReceiptsByOrder = (
+  purchaseOrderId,
+  filters = {}
+) => {
+  return useQuery({
+    queryKey: ["purchaseOrderReceipts", purchaseOrderId, filters],
+    queryFn: () => getPurchaseOrderReceipts(purchaseOrderId, filters),
+    enabled: !!purchaseOrderId,
+    staleTime: 2 * 60 * 1000,
+  });
+};
+
+/**
+ * Hook lấy chi tiết 1 receipt
+ */
+export const usePurchaseOrderReceipt = (id) => {
+  return useQuery({
+    queryKey: ["purchaseOrderReceipts", id],
+    queryFn: () => getPurchaseOrderReceiptById(id),
+    enabled: !!id,
+    staleTime: 2 * 60 * 1000,
+  });
+};
+
+/**
+ * Hook tạo receipt mới
+ */
+export const useCreatePurchaseOrderReceipt = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ purchaseOrderId, payload }) =>
+      createPurchaseOrderReceipt(purchaseOrderId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["purchaseOrderReceipts"] });
+      queryClient.invalidateQueries({ queryKey: ["purchaseOrders"] });
+    },
+  });
+};
+
+/**
+ * Hook xóa receipt
+ */
+export const useDeletePurchaseOrderReceipt = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deletePurchaseOrderReceipt,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["purchaseOrderReceipts"] });
+    },
+  });
+};

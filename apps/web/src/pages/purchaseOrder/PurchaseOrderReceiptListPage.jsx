@@ -3,9 +3,8 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import {
-  usePurchaseOrders,
-  useDeletePurchaseOrder,
-  useUpdatePurchaseOrderStatus,
+  usePurchaseOrderReceipts,
+  useDeletePurchaseOrderReceipt,
 } from "@/hooks/usePurchaseOrders";
 import { AppLayout } from "@/components/layouts/app-layout";
 import {
@@ -27,13 +26,13 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Search, Eye, Trash2, PlusCircle, Calendar, Edit } from "lucide-react";
+  Search,
+  Eye,
+  Trash2,
+  PlusCircle,
+  Calendar,
+  Package,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -43,81 +42,48 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
-export default function PurchaseOrderListPage() {
+export default function PurchaseOrderReceiptListPage() {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [editStatusOpen, setEditStatusOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState("");
 
-  const { data: purchaseOrders = [], isLoading } = usePurchaseOrders();
-  const { mutate: deletePurchaseOrder } = useDeletePurchaseOrder();
-  const { mutate: updateStatus, isPending: isUpdatingStatus } =
-    useUpdatePurchaseOrderStatus();
+  const { data: receipts = [], isLoading } = usePurchaseOrderReceipts();
+  const { mutate: deleteReceipt } = useDeletePurchaseOrderReceipt();
 
-  const filteredOrders = useMemo(() => {
-    let orders = [...purchaseOrders];
+  const filteredReceipts = useMemo(() => {
+    let items = [...receipts];
 
-    // Filter by status
-    if (statusFilter !== "all") {
-      orders = orders.filter((o) => o.status === statusFilter);
-    }
-
-    // Filter by search query
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      orders = orders.filter(
-        (o) =>
-          (o.supplierName || "").toLowerCase().includes(q) ||
-          (o.status || "").toLowerCase().includes(q)
+      items = items.filter(
+        (r) =>
+          (r.supplierName || "").toLowerCase().includes(q) ||
+          (r.receivedByName || "").toLowerCase().includes(q) ||
+          (r.poStatus || "").toLowerCase().includes(q)
       );
     }
-    return orders;
-  }, [purchaseOrders, searchQuery, statusFilter]);
+    return items;
+  }, [receipts, searchQuery]);
 
   const handleDelete = (id) => {
     setSelectedId(id);
     setConfirmOpen(true);
   };
 
-  const handleEditStatus = (order) => {
-    setSelectedId(order.id);
-    setSelectedStatus(order.status);
-    setEditStatusOpen(true);
-  };
-
   const confirmDelete = () => {
-    deletePurchaseOrder(selectedId, {
+    deleteReceipt(selectedId, {
       onSuccess: () => {
-        toast.success("Purchase order deleted successfully!");
+        toast.success("Receipt deleted successfully!");
       },
       onError: (error) => {
-        toast.error("Failed to delete order!", {
+        toast.error("Failed to delete receipt!", {
           description: error?.response?.data?.error || error.message,
         });
       },
     });
     setConfirmOpen(false);
-  };
-
-  const confirmUpdateStatus = () => {
-    updateStatus(
-      { id: selectedId, status: selectedStatus },
-      {
-        onSuccess: () => {
-          toast.success("Status updated successfully!");
-          setEditStatusOpen(false);
-        },
-        onError: (error) => {
-          toast.error("Failed to update status!", {
-            description: error?.response?.data?.error || error.message,
-          });
-        },
-      }
-    );
   };
 
   const getStatusBadge = (status) => {
@@ -131,7 +97,7 @@ export default function PurchaseOrderListPage() {
         variant="secondary"
         className={colorMap[status] || "bg-gray-100 text-gray-700"}
       >
-        {status.toUpperCase()}
+        {status?.toUpperCase()}
       </Badge>
     );
   };
@@ -154,25 +120,26 @@ export default function PurchaseOrderListPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Purchase Orders
+              Purchase Order Receipts
             </h1>
             <p className="text-muted-foreground">
-              Manage all supplier purchase orders
+              View all received purchase orders
             </p>
           </div>
           <Button
-            onClick={() => navigate("/purchase-orders/create")}
+            onClick={() => navigate("/purchase-orders")}
+            variant="outline"
             className="flex items-center gap-2"
           >
-            <PlusCircle className="w-4 h-4" /> New Order
+            <Package className="w-4 h-4" /> View Orders
           </Button>
         </div>
 
         <Card className="shadow-md border-0">
           <CardHeader>
-            <CardTitle>Purchase Orders List</CardTitle>
+            <CardTitle>Receipt List</CardTitle>
             <CardDescription>
-              Search, view, or manage all purchase orders
+              Search and manage all purchase order receipts
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -186,7 +153,7 @@ export default function PurchaseOrderListPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder="Search by supplier or status..."
+                  placeholder="Search by supplier, received by, or status..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   className="pl-10 h-11"
@@ -208,72 +175,62 @@ export default function PurchaseOrderListPage() {
                   Clear
                 </Button>
               )}
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full md:w-[180px] h-11">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="ordered">Ordered</SelectItem>
-                  <SelectItem value="received">Received</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
             </form>
 
             <div className="rounded-lg border">
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Receipt ID</TableHead>
                     <TableHead>Supplier</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Order Date</TableHead>
-                    <TableHead>Total Amount</TableHead>
+                    <TableHead>Received Date</TableHead>
+                    <TableHead>Received By</TableHead>
+                    <TableHead>Order Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredOrders.length === 0 ? (
+                  {filteredReceipts.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={5}
+                        colSpan={6}
                         className="text-center py-8 text-muted-foreground"
                       >
                         <div className="flex flex-col items-center gap-2">
                           <Search className="h-10 w-10 text-muted-foreground/50" />
-                          <p className="font-medium">
-                            No purchase orders found
-                          </p>
+                          <p className="font-medium">No receipts found</p>
                           <p className="text-sm">
-                            {searchQuery || statusFilter !== "all"
-                              ? "Try adjusting your filters"
-                              : "Get started by creating your first order"}
+                            {searchQuery
+                              ? "Try adjusting your search"
+                              : "No receipts have been recorded yet"}
                           </p>
                         </div>
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredOrders.map((o) => (
-                      <TableRow key={o.id}>
-                        <TableCell>{o.supplierName || o.supplierId}</TableCell>
-                        <TableCell>{getStatusBadge(o.status)}</TableCell>
+                    filteredReceipts.map((r) => (
+                      <TableRow key={r.id}>
+                        <TableCell className="font-mono text-sm">
+                          #{r.id}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {r.supplierName || "N/A"}
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Calendar className="w-4 h-4" />
-                            {new Date(o.orderDate).toLocaleDateString()}
+                            {new Date(r.receivedDate).toLocaleDateString()}
                           </div>
                         </TableCell>
-                        <TableCell>
-                          {o.totalAmount?.toLocaleString()} ₫
-                        </TableCell>
+                        <TableCell>{r.receivedByName || "N/A"}</TableCell>
+                        <TableCell>{getStatusBadge(r.poStatus)}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={() =>
-                                navigate(`/purchase-orders/${o.id}`)
+                                navigate(`/procurement/receipts/${r.id}`)
                               }
                               title="View Details"
                             >
@@ -281,16 +238,8 @@ export default function PurchaseOrderListPage() {
                             </Button>
                             <Button
                               size="sm"
-                              variant="secondary"
-                              onClick={() => handleEditStatus(o)}
-                              title="Edit Status"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
                               variant="destructive"
-                              onClick={() => handleDelete(o.id)}
+                              onClick={() => handleDelete(r.id)}
                               title="Delete"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -313,8 +262,8 @@ export default function PurchaseOrderListPage() {
             <DialogTitle>Confirm Delete</DialogTitle>
           </DialogHeader>
           <p className="text-muted-foreground">
-            Are you sure you want to delete this purchase order? This action
-            cannot be undone.
+            Are you sure you want to delete this receipt? This action cannot be
+            undone.
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>
@@ -322,53 +271,6 @@ export default function PurchaseOrderListPage() {
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
               Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={editStatusOpen} onOpenChange={setEditStatusOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Update Order Status</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <p className="text-sm text-muted-foreground">
-              Select a new status for this purchase order:
-            </p>
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="ordered">Ordered</SelectItem>
-                <SelectItem value="received">Received</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setEditStatusOpen(false)}
-              disabled={isUpdatingStatus}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={confirmUpdateStatus}
-              disabled={isUpdatingStatus}
-              className="min-w-[100px]"
-            >
-              {isUpdatingStatus ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Updating...
-                </>
-              ) : (
-                "Update"
-              )}
             </Button>
           </DialogFooter>
         </DialogContent>

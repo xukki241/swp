@@ -4,7 +4,7 @@ export const purchaseOrderItemController = {
   // 🔹 Get all items by specific purchase order
   async getAllByPurchaseOrder(req, res) {
     try {
-      const purchaseOrderId = Number.parseInt(req.params.purchaseOrderId);
+      const purchaseOrderId = req.params.purchaseOrderId; // UUID string
       const items = await purchaseOrderItemService.getAll({ purchaseOrderId });
       res.json(items);
     } catch (error) {
@@ -26,9 +26,7 @@ export const purchaseOrderItemController = {
   async getAll(req, res) {
     try {
       const filters = {
-        purchaseOrderId: req.query.purchaseOrderId
-          ? Number.parseInt(req.query.purchaseOrderId)
-          : undefined,
+        purchaseOrderId: req.query.purchaseOrderId || undefined, // UUID string
         limit: Number.parseInt(req.query.limit) || 100,
         offset: Number.parseInt(req.query.offset) || 0,
       };
