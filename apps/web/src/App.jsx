@@ -19,6 +19,7 @@ import PurchaseOrderCreatePage from "./pages/purchaseOrder/PurchaseOrderCreatePa
 import PurchaseOrderDetailPage from "./pages/purchaseOrder/PurchaseOrderDetailPage";
 import PurchaseOrderReceiptListPage from "./pages/purchaseOrder/PurchaseOrderReceiptListPage";
 import PurchaseOrderReceiptDetailPage from "./pages/purchaseOrder/PurchaseOrderReceiptDetailPage";
+import PurchaseOrderReceiptCreatePage from "./pages/purchaseOrder/PurchaseOrderReceiptCreatePage";
 
 function App() {
   return (
@@ -136,6 +137,14 @@ function App() {
           element={
             <ProtectedRoute>
               <PurchaseOrderReceiptDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/purchase-orders/:purchaseOrderId/receipts/create"
+          element={
+            <ProtectedRoute>
+              <PurchaseOrderReceiptCreatePage />
             </ProtectedRoute>
           }
         />

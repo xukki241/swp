@@ -28,6 +28,7 @@ import {
   Building2,
   Package,
   DollarSign,
+  FileText,
 } from "lucide-react";
 
 export default function PurchaseOrderDetailPage() {
@@ -306,6 +307,15 @@ export default function PurchaseOrderDetailPage() {
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" /> Back to List
                 </Button>
+                {order.status === "ordered" && (
+                  <Button
+                    onClick={() =>
+                      navigate(`/purchase-orders/${order.id}/receipts/create`)
+                    }
+                  >
+                    <FileText className="w-4 h-4 mr-2" /> Create Receipt
+                  </Button>
+                )}
               </div>
             </div>
           </CardContent>

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardHeader,
@@ -26,12 +27,20 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Search,
   Eye,
   Trash2,
   PlusCircle,
   Calendar,
   Package,
+  ArrowUpDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -46,6 +55,7 @@ export default function PurchaseOrderReceiptListPage() {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState("desc"); // desc = newest first, asc = oldest first
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
@@ -55,6 +65,7 @@ export default function PurchaseOrderReceiptListPage() {
   const filteredReceipts = useMemo(() => {
     let items = [...receipts];
 
+    // Filter by search query
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       items = items.filter(
@@ -64,8 +75,16 @@ export default function PurchaseOrderReceiptListPage() {
           (r.poStatus || "").toLowerCase().includes(q)
       );
     }
+
+    // Sort by received date
+    items.sort((a, b) => {
+      const dateA = new Date(a.receivedDate);
+      const dateB = new Date(b.receivedDate);
+      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+    });
+
     return items;
-  }, [receipts, searchQuery]);
+  }, [receipts, searchQuery, sortOrder]);
 
   const handleDelete = (id) => {
     setSelectedId(id);
@@ -148,33 +167,52 @@ export default function PurchaseOrderReceiptListPage() {
                 e.preventDefault();
                 setSearchQuery(searchInput);
               }}
-              className="mb-6 flex flex-col gap-4 md:flex-row"
+              className="mb-6 space-y-4"
             >
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Search by supplier, received by, or status..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-10 h-11"
-                />
-              </div>
-              <Button type="submit" className="h-11">
-                <Search className="h-4 w-4 mr-2" /> Search
-              </Button>
-              {searchQuery && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-11"
-                  onClick={() => {
-                    setSearchInput("");
-                    setSearchQuery("");
-                  }}
-                >
-                  Clear
+              <div className="flex flex-col gap-4 md:flex-row">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    placeholder="Search by supplier, received by, or status..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    className="pl-10 h-11"
+                  />
+                </div>
+                <Button type="submit" className="h-11">
+                  <Search className="h-4 w-4 mr-2" /> Search
                 </Button>
-              )}
+                {searchQuery && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11"
+                    onClick={() => {
+                      setSearchInput("");
+                      setSearchQuery("");
+                    }}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+
+              {/* Sort by Date */}
+              <div className="flex items-center gap-2">
+                <Label htmlFor="sortOrder" className="text-sm font-medium">
+                  Sort by Received Date:
+                </Label>
+                <Select value={sortOrder} onValueChange={setSortOrder}>
+                  <SelectTrigger id="sortOrder" className="w-[200px] h-10">
+                    <ArrowUpDown className="h-4 w-4 mr-2" />
+                    <SelectValue placeholder="Sort order" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="desc">Newest First</SelectItem>
+                    <SelectItem value="asc">Oldest First</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </form>
 
             <div className="rounded-lg border">

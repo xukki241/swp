@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardHeader,
@@ -33,7 +34,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Eye, Trash2, PlusCircle, Calendar, Edit } from "lucide-react";
+import {
+  Search,
+  Eye,
+  Trash2,
+  PlusCircle,
+  Calendar,
+  Edit,
+  ArrowUpDown,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -48,6 +57,7 @@ export default function PurchaseOrderListPage() {
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("desc"); // desc = newest first, asc = oldest first
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [editStatusOpen, setEditStatusOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -75,8 +85,16 @@ export default function PurchaseOrderListPage() {
           (o.status || "").toLowerCase().includes(q)
       );
     }
+
+    // Sort by order date
+    orders.sort((a, b) => {
+      const dateA = new Date(a.orderDate);
+      const dateB = new Date(b.orderDate);
+      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+    });
+
     return orders;
-  }, [purchaseOrders, searchQuery, statusFilter]);
+  }, [purchaseOrders, searchQuery, statusFilter, sortOrder]);
 
   const handleDelete = (id) => {
     setSelectedId(id);
@@ -181,45 +199,64 @@ export default function PurchaseOrderListPage() {
                 e.preventDefault();
                 setSearchQuery(searchInput);
               }}
-              className="mb-6 flex flex-col gap-4 md:flex-row"
+              className="mb-6 space-y-4"
             >
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Search by supplier or status..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-10 h-11"
-                />
-              </div>
-              <Button type="submit" className="h-11">
-                <Search className="h-4 w-4 mr-2" /> Search
-              </Button>
-              {searchQuery && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-11"
-                  onClick={() => {
-                    setSearchInput("");
-                    setSearchQuery("");
-                  }}
-                >
-                  Clear
+              <div className="flex flex-col gap-4 md:flex-row">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    placeholder="Search by supplier or status..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    className="pl-10 h-11"
+                  />
+                </div>
+                <Button type="submit" className="h-11">
+                  <Search className="h-4 w-4 mr-2" /> Search
                 </Button>
-              )}
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full md:w-[180px] h-11">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="ordered">Ordered</SelectItem>
-                  <SelectItem value="received">Received</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
+                {searchQuery && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11"
+                    onClick={() => {
+                      setSearchInput("");
+                      setSearchQuery("");
+                    }}
+                  >
+                    Clear
+                  </Button>
+                )}
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full md:w-[180px] h-11">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="ordered">Ordered</SelectItem>
+                    <SelectItem value="received">Received</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Sort by Date */}
+              <div className="flex items-center gap-2">
+                <Label htmlFor="sortOrder" className="text-sm font-medium">
+                  Sort by Order Date:
+                </Label>
+                <Select value={sortOrder} onValueChange={setSortOrder}>
+                  <SelectTrigger id="sortOrder" className="w-[200px] h-10">
+                    <ArrowUpDown className="h-4 w-4 mr-2" />
+                    <SelectValue placeholder="Sort order" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="desc">Newest First</SelectItem>
+                    <SelectItem value="asc">Oldest First</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </form>
 
             <div className="rounded-lg border">
