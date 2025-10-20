@@ -26,8 +26,6 @@ export const warehouseZoneService = {
   async getAll(filters = {}) {
     const { search, type, limit = 100, offset = 0 } = filters;
 
-    let query = db.select().from(warehouseZones);
-
     const conditions = [];
 
     if (search) {
@@ -44,46 +42,36 @@ export const warehouseZoneService = {
       conditions.push(eq(warehouseZones.type, type));
     }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    const results = await db.query.warehouseZones.findMany({
+      where: conditions.length > 0 ? and(...conditions) : undefined,
+      with: {
+        racks: true,
+      },
+      limit,
+      offset,
+    });
 
-    const results = await query.limit(limit).offset(offset);
     return results;
   },
 
   async getById(id) {
-    const [zone] = await db
-      .select()
-      .from(warehouseZones)
-      .where(eq(warehouseZones.id, id));
+    const zone = await db.query.warehouseZones.findFirst({
+      where: eq(warehouseZones.id, id),
+      with: {
+        racks: true,
+      },
+    });
 
-    if (!zone) {
-      return null;
-    }
-
-    // Get all racks in this zone
-    const racks = await db
-      .select({
-        id: warehouseRacks.id,
-        code: warehouseRacks.code,
-        name: warehouseRacks.name,
-        description: warehouseRacks.description,
-      })
-      .from(warehouseRacks)
-      .where(eq(warehouseRacks.zoneId, id));
-
-    return {
-      ...zone,
-      racks,
-    };
+    return zone;
   },
 
   async getByCode(code) {
-    const [zone] = await db
-      .select()
-      .from(warehouseZones)
-      .where(eq(warehouseZones.code, code));
+    const zone = await db.query.warehouseZones.findFirst({
+      where: eq(warehouseZones.code, code),
+      with: {
+        racks: true,
+      },
+    });
 
     return zone;
   },
@@ -99,11 +87,13 @@ export const warehouseZoneService = {
   },
 
   async delete(id) {
-    // Check if zone has racks
-    const racks = await db
-      .select()
-      .from(warehouseRacks)
-      .where(eq(warehouseRacks.zoneId, id));
+    // Check if zone has racks using db.query API
+    const racks = await db.query.warehouseRacks.findMany({
+      where: eq(warehouseRacks.zoneId, id),
+      columns: {
+        id: true,
+      },
+    });
 
     if (racks.length > 0) {
       throw new Error(

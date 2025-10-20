@@ -108,15 +108,34 @@ UpdateSalesOrderRequest:
       $ref: "../common/enums.yaml#/SalesOrderStatus"
       description: Update order status
 
+CreateSalesOrderResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Sales order created successfully"
+        data:
+          $ref: "#/SalesOrder"
+
+SalesOrderResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Sales order retrieved successfully"
+        data:
+          $ref: "#/SalesOrder"
+
 SalesOrderListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/SalesOrder"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Sales orders retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/SalesOrder"

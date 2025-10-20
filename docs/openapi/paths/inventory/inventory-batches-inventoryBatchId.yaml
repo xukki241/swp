@@ -1,4 +1,4 @@
-/inventory/{inventoryId}:
+/inventory/batches/{inventoryBatchId}:
   get:
     tags:
       - Inventory
@@ -8,9 +8,9 @@
     security:
       - bearerAuth: []
     parameters:
-      - name: inventoryId
+      - name: inventoryBatchId
         in: path
-        description: Inventory ID
+        description: Inventory Batch ID
         required: true
         schema:
           type: string
@@ -38,9 +38,9 @@
     security:
       - bearerAuth: []
     parameters:
-      - name: inventoryId
+      - name: inventoryBatchId
         in: path
-        description: Inventory ID
+        description: Inventory Batch ID
         required: true
         schema:
           type: string

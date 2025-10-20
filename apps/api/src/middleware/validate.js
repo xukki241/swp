@@ -4,30 +4,44 @@ import logger from "../utils/logger.js";
 
 /**
  * Validation middleware factory using Zod schemas
- * @param {Object} schemas - Object containing schemas for body, query, or params
+ * Parses and replaces request body, query, params, and headers with validated data
+ * @param {Object} schemas - Object containing schemas for body, query, params, or headers
  * @param {z.ZodSchema} schemas.body - Zod schema for request body
  * @param {z.ZodSchema} schemas.query - Zod schema for query parameters
  * @param {z.ZodSchema} schemas.params - Zod schema for URL parameters
+ * @param {z.ZodSchema} schemas.headers - Zod schema for request headers
  * @returns {Function} Express middleware
  */
 export const validate = (schemas) => {
   return async (req, res, next) => {
     try {
-      // Validate request body if schema provided
+      // Validate and replace request body if schema provided
       if (schemas.body) {
-        req.body = await schemas.body.parseAsync(req.body);
+        const parsed = await schemas.body.parseAsync(req.body);
+        req.body = parsed;
       }
 
-      // Validate query parameters if schema provided
+      // Validate and replace query parameters if schema provided
       if (schemas.query) {
-        // Just validate without reassigning to avoid read-only errors
-        await schemas.query.parseAsync(req.query);
+        const parsed = await schemas.query.parseAsync(req.query);
+        // Create a new object to replace query (avoid read-only issues)
+        Object.keys(req.query).forEach((key) => delete req.query[key]);
+        Object.assign(req.query, parsed);
       }
 
-      // Validate URL parameters if schema provided
+      // Validate and replace URL parameters if schema provided
       if (schemas.params) {
-        // Just validate without reassigning to avoid read-only errors
-        await schemas.params.parseAsync(req.params);
+        const parsed = await schemas.params.parseAsync(req.params);
+        // Create a new object to replace params (avoid read-only issues)
+        Object.keys(req.params).forEach((key) => delete req.params[key]);
+        Object.assign(req.params, parsed);
+      }
+
+      // Validate and replace headers if schema provided
+      if (schemas.headers) {
+        const parsed = await schemas.headers.parseAsync(req.headers);
+        // Store parsed headers in a custom property to avoid modifying actual headers
+        req.validatedHeaders = parsed;
       }
 
       next();
@@ -41,9 +55,9 @@ export const validate = (schemas) => {
         return res.status(400).json({
           success: false,
           message: "Validation failed",
-          errors: error.errors.map((err) => ({
-            field: err.path.join("."),
-            message: err.message,
+          errors: (error.errors || []).map((err) => ({
+            field: err.path ? err.path.join(".") : "unknown",
+            message: err.message || "Validation error",
           })),
         });
       }
@@ -56,22 +70,29 @@ export const validate = (schemas) => {
 };
 
 /**
- * Validate request body only
+ * Validate and replace request body only
  * @param {z.ZodSchema} schema - Zod schema for request body
  * @returns {Function} Express middleware
  */
 export const validateBody = (schema) => validate({ body: schema });
 
 /**
- * Validate query parameters only
+ * Validate and replace query parameters only
  * @param {z.ZodSchema} schema - Zod schema for query parameters
  * @returns {Function} Express middleware
  */
 export const validateQuery = (schema) => validate({ query: schema });
 
 /**
- * Validate URL parameters only
+ * Validate and replace URL parameters only
  * @param {z.ZodSchema} schema - Zod schema for URL parameters
  * @returns {Function} Express middleware
  */
 export const validateParams = (schema) => validate({ params: schema });
+
+/**
+ * Validate headers only
+ * @param {z.ZodSchema} schema - Zod schema for request headers
+ * @returns {Function} Express middleware
+ */
+export const validateHeaders = (schema) => validate({ headers: schema });

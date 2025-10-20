@@ -14,6 +14,9 @@ import { validateBody } from "../../middleware/validate.js";
 
 export const warehouseRacksRouter = express.Router();
 
+// GET /api/warehouse/racks (get all racks across all zones)
+warehouseRacksRouter.get("/racks", warehouseRackController.getAll);
+
 // POST /api/warehouse/zones/:zoneId/racks (create racks in a zone)
 warehouseRacksRouter.post(
   "/zones/:zoneId/racks",

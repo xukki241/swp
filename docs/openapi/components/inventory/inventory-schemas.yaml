@@ -114,27 +114,38 @@ MoveInventoryRequest:
       example: "Reorganization of warehouse storage"
 
 MoveInventoryResponse:
-  type: object
-  required:
-    - message
-  properties:
-    message:
-      type: string
-      description: Success message
-      example: "Inventory moved successfully"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Inventory moved successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
+
+InventoryResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Inventory retrieved successfully"
+        data:
+          $ref: "#/Inventory"
 
 InventoryListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/Inventory"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Inventory retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/Inventory"
 
 InventorySummary:
   type: object
@@ -158,14 +169,13 @@ InventorySummary:
       description: Available quantity (total - reserved)
 
 InventorySummaryListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/InventorySummary"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Inventory summary retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/InventorySummary"

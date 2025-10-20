@@ -37,10 +37,39 @@ CreateWarehouseRacksRequest:
   description: Array of warehouse racks to create
 
 CreateWarehouseRacksResponse:
-  type: array
-  items:
-    $ref: "#/WarehouseRack"
-  description: Array of created warehouse racks
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse racks created successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/WarehouseRack"
+          description: Array of created warehouse racks
+
+WarehouseRackResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse rack retrieved successfully"
+        data:
+          $ref: "#/WarehouseRack"
+
+DeleteWarehouseRackResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse rack deleted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
 
 BatchCreateWarehouseRacks:
   type: object
@@ -73,14 +102,13 @@ UpdateWarehouseRack:
       $ref: "../common/schemas.yaml#/Description"
 
 WarehouseRackListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/WarehouseRack"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse racks retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/WarehouseRack"

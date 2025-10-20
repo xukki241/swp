@@ -1,13 +1,10 @@
 import { eq, and, gte, lte, sql, desc } from "drizzle-orm";
 
 import { db } from "../db/index.js";
-import { customers } from "../db/schema/customers.js";
 import { inventory } from "../db/schema/inventory.js";
-import { medications } from "../db/schema/medications.js";
 import { medicationVariants } from "../db/schema/medicationVariants.js";
 import { salesOrderItems } from "../db/schema/salesOrderItems.js";
 import { salesOrders } from "../db/schema/salesOrders.js";
-import { users } from "../db/schema/users.js";
 
 export const salesOrderService = {
   /**
@@ -29,18 +26,18 @@ export const salesOrderService = {
       for (const item of items) {
         const { medication_variant_id, quantity } = item;
 
-        // Get medication variant details
-        const [variant] = await tx
-          .select({
-            id: medicationVariants.id,
-            name: medicationVariants.name,
-            sku: medicationVariants.sku,
-            sellPrice: medicationVariants.sellPrice,
-            isForSale: medicationVariants.isForSale,
-            isActive: medicationVariants.isActive,
-          })
-          .from(medicationVariants)
-          .where(eq(medicationVariants.id, medication_variant_id));
+        // Get medication variant details using query API
+        const variant = await tx.query.medicationVariants.findFirst({
+          where: eq(medicationVariants.id, medication_variant_id),
+          columns: {
+            id: true,
+            name: true,
+            sku: true,
+            sellPrice: true,
+            isForSale: true,
+            isActive: true,
+          },
+        });
 
         if (!variant) {
           throw new Error(
@@ -55,6 +52,8 @@ export const salesOrderService = {
         }
 
         // Check available inventory (FEFO - First Expired First Out)
+        // Note: Using .select() for inventory FEFO queries in transactions
+        // because we need precise control over orderBy with multiple columns and computed columns
         const availableInventory = await tx
           .select({
             id: inventory.id,
@@ -153,7 +152,7 @@ export const salesOrderService = {
   },
 
   /**
-   * Get all sales orders with optional filtering
+   * Get all sales orders with optional filtering and pagination
    */
   async getAll(filters = {}) {
     const {
@@ -163,28 +162,11 @@ export const salesOrderService = {
       salespersonId,
       orderDateFrom,
       orderDateTo,
+      sortBy = "orderDate",
+      sortOrder = "desc",
       limit = 100,
       offset = 0,
     } = filters;
-
-    let query = db
-      .select({
-        id: salesOrders.id,
-        customerId: salesOrders.customerId,
-        orderDate: salesOrders.orderDate,
-        totalAmount: salesOrders.totalAmount,
-        status: salesOrders.status,
-        paymentMethod: salesOrders.paymentMethod,
-        salespersonId: salesOrders.salespersonId,
-        customerName: customers.name,
-        customerEmail: customers.email,
-        customerPhone: customers.phone,
-        salespersonName: users.name,
-      })
-      .from(salesOrders)
-      .leftJoin(customers, eq(salesOrders.customerId, customers.id))
-      .leftJoin(users, eq(salesOrders.salespersonId, users.id))
-      .orderBy(desc(salesOrders.orderDate));
 
     const conditions = [];
 
@@ -212,86 +194,78 @@ export const salesOrderService = {
       conditions.push(lte(salesOrders.orderDate, new Date(orderDateTo)));
     }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    // Get total count
+    const countResult = await db
+      .select({ count: sql`count(*)`.as("count") })
+      .from(salesOrders)
+      .where(conditions.length > 0 ? and(...conditions) : undefined);
 
-    const results = await query.limit(limit).offset(offset);
-    return results;
+    const totalCount = Number(countResult[0]?.count || 0);
+
+    // Get data with relations
+    const data = await db.query.salesOrders.findMany({
+      where: conditions.length > 0 ? and(...conditions) : undefined,
+      with: {
+        customer: true,
+        salesperson: true,
+      },
+      orderBy:
+        sortOrder === "asc"
+          ? salesOrders[sortBy] || salesOrders.orderDate
+          : desc(salesOrders[sortBy] || salesOrders.orderDate),
+      limit,
+      offset,
+    });
+
+    return {
+      data,
+      total: totalCount,
+    };
   },
 
   /**
    * Get sales order by ID with items
+   * @param {string} id - UUID string
    */
   async getById(id) {
-    const [order] = await db
-      .select({
-        id: salesOrders.id,
-        customerId: salesOrders.customerId,
-        orderDate: salesOrders.orderDate,
-        totalAmount: salesOrders.totalAmount,
-        status: salesOrders.status,
-        paymentMethod: salesOrders.paymentMethod,
-        salespersonId: salesOrders.salespersonId,
-        customerName: customers.name,
-        customerEmail: customers.email,
-        customerPhone: customers.phone,
-        customerAddress: customers.address,
-        salespersonName: users.name,
-      })
-      .from(salesOrders)
-      .leftJoin(customers, eq(salesOrders.customerId, customers.id))
-      .leftJoin(users, eq(salesOrders.salespersonId, users.id))
-      .where(eq(salesOrders.id, id));
+    const order = await db.query.salesOrders.findFirst({
+      where: eq(salesOrders.id, id),
+      with: {
+        customer: true,
+        salesperson: true,
+        items: {
+          with: {
+            medicationVariant: {
+              with: {
+                medication: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
-    if (!order) {
-      return null;
-    }
-
-    // Fetch items for this sales order
-    const items = await db
-      .select({
-        id: salesOrderItems.id,
-        salesOrderId: salesOrderItems.salesOrderId,
-        medicationVariantId: salesOrderItems.medicationVariantId,
-        quantity: salesOrderItems.quantity,
-        unitPrice: salesOrderItems.unitPrice,
-        totalPrice: salesOrderItems.totalPrice,
-        medicationName: medications.name,
-        medicationCode: medications.code,
-        variantName: medicationVariants.name,
-        variantSku: medicationVariants.sku,
-        variantUnit: medicationVariants.unit,
-      })
-      .from(salesOrderItems)
-      .leftJoin(
-        medicationVariants,
-        eq(salesOrderItems.medicationVariantId, medicationVariants.id)
-      )
-      .leftJoin(
-        medications,
-        eq(medicationVariants.medicationId, medications.id)
-      )
-      .where(eq(salesOrderItems.salesOrderId, id));
-
-    return {
-      ...order,
-      items,
-    };
+    return order;
   },
 
   /**
    * Update sales order status
    * When completed: deduct from inventory
    * When cancelled: unreserve inventory
+   * @param {string} id - UUID string
    */
   async update(id, updateData) {
     return await db.transaction(async (tx) => {
-      // Get current order
-      const [currentOrder] = await tx
-        .select()
-        .from(salesOrders)
-        .where(eq(salesOrders.id, id));
+      // Get current order using query API
+      const currentOrder = await tx.query.salesOrders.findFirst({
+        where: eq(salesOrders.id, id),
+        columns: {
+          id: true,
+          status: true,
+          customerId: true,
+          totalAmount: true,
+        },
+      });
 
       if (!currentOrder) {
         return null;
@@ -301,11 +275,17 @@ export const salesOrderService = {
 
       // Handle status transitions
       if (newStatus && newStatus !== currentOrder.status) {
-        // Get order items
-        const items = await tx
-          .select()
-          .from(salesOrderItems)
-          .where(eq(salesOrderItems.salesOrderId, id));
+        // Get order items using query API
+        const items = await tx.query.salesOrderItems.findMany({
+          where: eq(salesOrderItems.salesOrderId, id),
+          columns: {
+            id: true,
+            medicationVariantId: true,
+            quantity: true,
+            unitPrice: true,
+            totalPrice: true,
+          },
+        });
 
         // If completing order: deduct inventory
         if (newStatus === "completed" && currentOrder.status === "pending") {
@@ -313,6 +293,8 @@ export const salesOrderService = {
             // Deduct reserved quantity from inventory (FEFO)
             let remainingQuantity = Number(item.quantity);
 
+            // Note: Using .select() for inventory FEFO queries in transactions
+            // because we need precise control over orderBy and column selection
             const inventoryRecords = await tx
               .select({
                 id: inventory.id,
@@ -354,6 +336,8 @@ export const salesOrderService = {
           for (const item of items) {
             let remainingQuantity = Number(item.quantity);
 
+            // Note: Using .select() for inventory FEFO queries in transactions
+            // because we need precise control over orderBy and column selection
             const inventoryRecords = await tx
               .select({
                 id: inventory.id,
@@ -403,19 +387,27 @@ export const salesOrderService = {
   /**
    * Delete (cancel) sales order
    * Unreserves all inventory
+   * @param {string} id - UUID string
    */
   async delete(id) {
     return await db.transaction(async (tx) => {
-      // Get order items to unreserve inventory
-      const items = await tx
-        .select()
-        .from(salesOrderItems)
-        .where(eq(salesOrderItems.salesOrderId, id));
+      // Get order items to unreserve inventory using query API
+      const items = await tx.query.salesOrderItems.findMany({
+        where: eq(salesOrderItems.salesOrderId, id),
+        columns: {
+          id: true,
+          medicationVariantId: true,
+          quantity: true,
+        },
+      });
 
       // Unreserve inventory for all items
       for (const item of items) {
         let remainingQuantity = Number(item.quantity);
 
+        // Note: For inventory updates within transactions, we still need .select()
+        // because db.query doesn't support orderBy with multiple columns directly
+        // in a way that's compatible with transaction context
         const inventoryRecords = await tx
           .select({
             id: inventory.id,

@@ -60,10 +60,39 @@ CreateSuppliersRequest:
   description: Array of suppliers to create
 
 CreateSuppliersResponse:
-  type: array
-  items:
-    $ref: "#/Supplier"
-  description: Array of created suppliers
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Suppliers created successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/Supplier"
+          description: Array of created suppliers
+
+SupplierResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Supplier retrieved successfully"
+        data:
+          $ref: "#/Supplier"
+
+DeleteSupplierResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Supplier deleted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
 
 UpdateSupplier:
   type: object
@@ -84,17 +113,16 @@ UpdateSupplier:
       $ref: "../common/enums.yaml#/SupplierStatus"
 
 SupplierListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/Supplier"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Suppliers retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/Supplier"
 
 SupplierMedicationVariant:
   type: object
@@ -147,10 +175,29 @@ CreateSupplierMedicationsRequest:
   description: Array of medication variants to add to supplier
 
 CreateSupplierMedicationsResponse:
-  type: array
-  items:
-    $ref: "#/SupplierMedicationVariant"
-  description: Array of created supplier medication variants
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Supplier medications created successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/SupplierMedicationVariant"
+          description: Array of created supplier medication variants
+
+DeleteSupplierMedicationResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Supplier medication deleted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
 
 UpdateSupplierMedication:
   type: object
@@ -167,14 +214,13 @@ UpdateSupplierMedication:
       description: Lead time in days
 
 SupplierMedicationListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/SupplierMedicationVariant"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Supplier medications retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/SupplierMedicationVariant"

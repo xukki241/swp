@@ -107,10 +107,10 @@ paths:
     $ref: "./paths/inventory/inventory-low-stock.yaml#/~1inventory~1low-stock"
   /inventory/move:
     $ref: "./paths/inventory/inventory-move.yaml#/~1inventory~1move"
-  /inventory/{inventoryId}:
-    $ref: "./paths/inventory/inventory-inventoryId.yaml#/~1inventory~1{inventoryId}"
-  /inventory/{inventoryId}/adjust:
-    $ref: "./paths/inventory/inventory-inventoryId-adjust.yaml#/~1inventory~1{inventoryId}~1adjust"
+  /inventory/batches/{inventoryBatchId}:
+    $ref: "./paths/inventory/inventory-batches-inventoryBatchId.yaml#/~1inventory~1batches~1{inventoryBatchId}"
+  /inventory/batches/{inventoryBatchId}/adjust:
+    $ref: "./paths/inventory/inventory-batches-inventoryBatchId-adjust.yaml#/~1inventory~1batches~1{inventoryBatchId}~1adjust"
 
   # Report endpoints
   /reports:
@@ -151,12 +151,16 @@ paths:
     $ref: "./paths/warehouse/warehouse-zones-zoneId-racks.yaml#/~1warehouse~1zones~1{zoneId}~1racks"
   /warehouse/zones/{zoneId}/racks/batch:
     $ref: "./paths/warehouse/warehouse-zones-zoneId-racks-batch.yaml#/~1warehouse~1zones~1{zoneId}~1racks~1batch"
+  /warehouse/racks:
+    $ref: "./paths/warehouse/warehouse-racks.yaml#/~1warehouse~1racks"
   /warehouse/racks/{rackId}:
     $ref: "./paths/warehouse/warehouse-racks-rackId.yaml#/~1warehouse~1racks~1{rackId}"
   /warehouse/racks/{rackId}/bins:
     $ref: "./paths/warehouse/warehouse-racks-rackId-bins.yaml#/~1warehouse~1racks~1{rackId}~1bins"
   /warehouse/racks/{rackId}/bins/batch:
     $ref: "./paths/warehouse/warehouse-racks-rackId-bins-batch.yaml#/~1warehouse~1racks~1{rackId}~1bins~1batch"
+  /warehouse/bins:
+    $ref: "./paths/warehouse/warehouse-bins.yaml#/~1warehouse~1bins"
   /warehouse/bins/{binId}:
     $ref: "./paths/warehouse/warehouse-bins-binId.yaml#/~1warehouse~1bins~1{binId}"
 

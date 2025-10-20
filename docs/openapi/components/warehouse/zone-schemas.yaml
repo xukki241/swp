@@ -50,10 +50,39 @@ CreateWarehouseZonesRequest:
   description: Array of warehouse zones to create
 
 CreateWarehouseZonesResponse:
-  type: array
-  items:
-    $ref: "#/WarehouseZone"
-  description: Array of created warehouse zones
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse zones created successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/WarehouseZone"
+          description: Array of created warehouse zones
+
+WarehouseZoneResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse zone retrieved successfully"
+        data:
+          $ref: "#/WarehouseZone"
+
+DeleteWarehouseZoneResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse zone deleted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
 
 BatchCreateWarehouseZones:
   type: object
@@ -91,14 +120,13 @@ UpdateWarehouseZone:
       $ref: "../common/schemas.yaml#/Description"
 
 WarehouseZoneListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/WarehouseZone"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse zones retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/WarehouseZone"

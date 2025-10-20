@@ -42,10 +42,39 @@ CreateCustomersRequest:
   description: Array of customers to create
 
 CreateCustomersResponse:
-  type: array
-  items:
-    $ref: "#/Customer"
-  description: Array of created customers
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Customers created successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/Customer"
+          description: Array of created customers
+
+CustomerResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Customer retrieved successfully"
+        data:
+          $ref: "#/Customer"
+
+DeleteCustomerResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Customer deleted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
 
 UpdateCustomer:
   type: object
@@ -60,14 +89,13 @@ UpdateCustomer:
       $ref: "../common/schemas.yaml#/Address"
 
 CustomerListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/Customer"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Customers retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/Customer"

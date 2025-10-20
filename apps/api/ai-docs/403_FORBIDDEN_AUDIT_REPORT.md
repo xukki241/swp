@@ -50,8 +50,8 @@ All API specifications have been audited for proper `403 ForbiddenError` respons
 
 ### Inventory Module (3 endpoints)
 
-- ✅ PATCH /inventory/{inventoryId}
-- ✅ POST /inventory/{inventoryId}/adjust
+- ✅ PATCH /inventory/batches/{inventoryBatchId}
+- ✅ POST /inventory/batches/{inventoryBatchId}/adjust
 - ✅ POST /inventory/move
 
 ### Suppliers Module (6 endpoints)
