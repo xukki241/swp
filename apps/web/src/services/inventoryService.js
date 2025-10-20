@@ -2,7 +2,7 @@
 import { instance } from "../lib/axios";
 
 /**
- * Warehouse Management API Services
+ * Inventory Management API Services
  */
 
 // Get all zones
@@ -61,4 +61,26 @@ export const deleteBin = async (id) => {
 export const getBinInventory = async (binId) => {
   const response = await instance.get(`/warehouse-bins/${binId}/inventory`);
   return response.data;
+};
+
+// Get low-stock medicine
+export const getLowStock = async () => {
+  try {
+    const response = await instance.get("inventory/low-stock");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch low stock items:", error);
+    throw error;
+  }
+};
+
+// Get expiry medicine
+export const getExpiring = async () => {
+  try {
+    const response = await instance.get("inventory/expiring");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch expiring items:", error);
+    throw error;
+  }
 };

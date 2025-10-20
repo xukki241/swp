@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { toast } from "sonner";
 import { Mail, Phone, User, KeyRound } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Loading } from "@/components/ui/loading";
 
 export default function UserProfile() {

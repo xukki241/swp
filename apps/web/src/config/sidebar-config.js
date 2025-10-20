@@ -34,7 +34,7 @@ export const sidebarConfig = [
     children: [
       { label: "Stock Overview", path: "/inventory/stock" },
       { label: "Warehouse Map", path: "/inventory/warehouse" },
-      { label: "Expiry Tracking", path: "/inventory/expiry" },
+      { label: "Inventory Tracking", path: "/inventory/tracking" },
     ],
   },
   {

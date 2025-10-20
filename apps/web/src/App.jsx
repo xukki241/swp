@@ -12,6 +12,7 @@ import POSPage from "@/pages/POSPage";
 import PolicyPage from "@/pages/PolicyPage";
 import StockOverviewPage from "@/pages/inventory/StockOverviewPage";
 import WarehousePage from "@/pages/inventory/WarehousePage";
+import InventoryTrackingPage from "@/pages/inventory/InventoryTrackingPage";
 
 function App() {
   return (
@@ -73,6 +74,14 @@ function App() {
           element={
             <ProtectedRoute>
               <WarehousePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/inventory/tracking"
+          element={
+            <ProtectedRoute>
+              <InventoryTrackingPage />
             </ProtectedRoute>
           }
         />

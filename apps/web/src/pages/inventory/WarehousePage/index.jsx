@@ -1,21 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useWarehouse } from "../../hooks/useInventory";
+import { useWarehouse } from "../../../hooks/useWarehouse";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
+} from "../../../components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
-import { Skeleton } from "../../components/ui/skeleton";
+} from "../../../components/ui/select";
+import { Skeleton } from "../../../components/ui/skeleton";
 import ZoneDetailsCard from "./components/zone-details-card";
 import { RackList } from "./components/rack-list";
 import { AppLayout } from "@/components/layouts/app-layout";
