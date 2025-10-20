@@ -1,5 +1,4 @@
 import * as userService from "../services/userService.js";
-import { convertBigIntIds } from "../utils/bigint.js";
 import logger from "../utils/logger.js";
 
 /**
@@ -8,8 +7,8 @@ import logger from "../utils/logger.js";
  */
 export const getAllUsers = async (req, res, next) => {
   try {
-    const { search } = req.query;
-    const users = await userService.getAllUsers({ search });
+    const { search, role, status } = req.query;
+    const users = await userService.getAllUsers({ search, role, status });
 
     res.status(200).json({
       success: true,
@@ -28,7 +27,7 @@ export const getAllUsers = async (req, res, next) => {
  */
 export const getUserById = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
     const user = await userService.getUserById(id);
 
     if (!user) {
@@ -110,8 +109,8 @@ export const createUser = async (req, res, next) => {
  */
 export const updateUser = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
-    const currentUserId = BigInt(req.user.userId);
+    const id = req.params.id; // UUID is a string
+    const currentUserId = req.user.userId; // UUID is a string
     const { name, email, phone, address, role, status } = req.body;
 
     // Check if user exists
@@ -208,8 +207,8 @@ export const updateUser = async (req, res, next) => {
  */
 export const deleteUser = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
-    const currentUserId = BigInt(req.user.userId);
+    const id = req.params.id; // UUID is a string
+    const currentUserId = req.user.userId; // UUID is a string
 
     // Prevent deleting self
     if (id === currentUserId) {
@@ -266,7 +265,7 @@ export const getAllStaff = async (req, res, next) => {
  */
 export const activateUser = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
 
     const user = await userService.activateUser(id);
 
@@ -294,8 +293,8 @@ export const activateUser = async (req, res, next) => {
  */
 export const deactivateUser = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
-    const currentUserId = BigInt(req.user.userId);
+    const id = req.params.id; // UUID is a string
+    const currentUserId = req.user.userId; // UUID is a string
 
     // Prevent deactivating self
     if (id === currentUserId) {
@@ -331,8 +330,8 @@ export const deactivateUser = async (req, res, next) => {
  */
 export const suspendUser = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
-    const currentUserId = BigInt(req.user.userId);
+    const id = req.params.id; // UUID is a string
+    const currentUserId = req.user.userId; // UUID is a string
 
     // Prevent suspending self
     if (id === currentUserId) {

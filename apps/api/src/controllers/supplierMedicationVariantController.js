@@ -1,6 +1,14 @@
 import { supplierMedicationVariantService } from "../services/supplierMedicationVariantService.js";
 
 export const supplierMedicationVariantController = {
+  async bulkCreate(req, res) {
+    try {
+      const smvs = await supplierMedicationVariantService.bulkCreate(req.body);
+      res.status(201).json(smvs);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
   // Create a new supplier medication variant
   async create(req, res) {
     try {
@@ -14,29 +22,27 @@ export const supplierMedicationVariantController = {
   // Get all supplier medication variants
   async getAll(req, res) {
     try {
+      const supplierIdParam =
+        req.params.supplierId || req.query.supplierId || undefined;
+
       const filters = {
-        supplierId: req.query.supplierId
-          ? Number.parseInt(req.query.supplierId)
-          : undefined,
-        medicationVariantId: req.query.medicationVariantId
-          ? Number.parseInt(req.query.medicationVariantId)
-          : undefined,
-        limit: Number.parseInt(req.query.limit) || 100,
-        offset: Number.parseInt(req.query.offset) || 0,
+        supplierId: supplierIdParam || undefined, // UUID is a string
+        medicationVariantId: req.query.medicationVariantId || undefined, // UUID is a string
+        limit: Number(req.query.limit) || 100,
+        offset: Number(req.query.offset) || 0,
       };
+
       const smvs = await supplierMedicationVariantService.getAll(filters);
       res.json(smvs);
     } catch (error) {
+      console.error("❌ Error in getAll:", error);
       res.status(500).json({ error: error.message });
     }
   },
-
   // Get supplier medication variant by ID
   async getById(req, res) {
     try {
-      const smv = await supplierMedicationVariantService.getById(
-        Number.parseInt(req.params.id)
-      );
+      const smv = await supplierMedicationVariantService.getById(req.params.id); // UUID is a string
       if (!smv) {
         return res
           .status(404)
@@ -51,7 +57,7 @@ export const supplierMedicationVariantController = {
   async update(req, res) {
     try {
       const smv = await supplierMedicationVariantService.update(
-        Number.parseInt(req.params.id),
+        req.params.id, // UUID is a string
         req.body
       );
       if (!smv) {
@@ -68,9 +74,7 @@ export const supplierMedicationVariantController = {
   // Delete supplier medication variant
   async delete(req, res) {
     try {
-      const smv = await supplierMedicationVariantService.delete(
-        Number.parseInt(req.params.id)
-      );
+      const smv = await supplierMedicationVariantService.delete(req.params.id); // UUID is a string
       if (!smv) {
         return res
           .status(404)

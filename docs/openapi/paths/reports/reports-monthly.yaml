@@ -1,0 +1,29 @@
+/reports/monthly:
+  get:
+    tags:
+      - Reports
+    summary: Generate monthly sales report
+    description: Generate a sales report for the current or specified month
+    operationId: generateMonthlySalesReport
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: month
+        in: query
+        description: Month for the report in YYYY-MM format (defaults to current month if not specified)
+        required: false
+        schema:
+          type: string
+          pattern: '^\d{4}-\d{2}$'
+          example: "2025-10"
+    responses:
+      "200":
+        description: Monthly sales report generated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/reports/report-schemas.yaml#/MonthlySalesReport"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

@@ -3,7 +3,7 @@ import express from "express";
 import * as authController from "../controllers/authController.js";
 import { authenticate } from "../middleware/checkAuth.js";
 
-const router = express.Router();
+export const authRouter = express.Router();
 
 /**
  * @route   POST /api/auth/register
@@ -11,7 +11,7 @@ const router = express.Router();
  * @access  Public
  * @body    { name, email, phone, address, password }
  */
-router.post("/register", authController.register);
+authRouter.post("/register", authController.register);
 
 /**
  * @route   POST /api/auth/login
@@ -19,14 +19,14 @@ router.post("/register", authController.register);
  * @access  Public
  * @body    { email, password }
  */
-router.post("/login", authController.login);
+authRouter.post("/login", authController.login);
 
 /**
  * @route   POST /api/auth/logout
  * @desc    Logout user (client-side token removal)
  * @access  Public
  */
-router.post("/logout", authController.logout);
+authRouter.post("/logout", authController.logout);
 
 /**
  * @route   POST /api/auth/reset-password
@@ -34,7 +34,7 @@ router.post("/logout", authController.logout);
  * @access  Public
  * @body    { email, newPassword }
  */
-router.post("/reset-password", authController.resetPassword);
+authRouter.post("/reset-password", authController.resetPassword);
 
 /**
  * @route   POST /api/auth/change-password
@@ -42,14 +42,18 @@ router.post("/reset-password", authController.resetPassword);
  * @access  Private
  * @body    { oldPassword, newPassword }
  */
-router.post("/change-password", authenticate, authController.changePassword);
+authRouter.post(
+  "/change-password",
+  authenticate,
+  authController.changePassword
+);
 
 /**
  * @route   GET /api/auth/me
  * @desc    Get current user info
  * @access  Private
  */
-router.get("/me", authenticate, authController.getCurrentUser);
+authRouter.get("/me", authenticate, authController.getCurrentUser);
 
 /**
  * @route   POST /api/auth/forgot-password
@@ -57,7 +61,7 @@ router.get("/me", authenticate, authController.getCurrentUser);
  * @access  Public
  * @body    { identifier (email or phone), method ('email' or 'sms') }
  */
-router.post("/forgot-password", authController.requestPasswordReset);
+authRouter.post("/forgot-password", authController.requestPasswordReset);
 
 /**
  * @route   POST /api/auth/verify-reset-otp
@@ -65,6 +69,6 @@ router.post("/forgot-password", authController.requestPasswordReset);
  * @access  Public
  * @body    { identifier, otp, newPassword, method }
  */
-router.post("/verify-reset-otp", authController.verifyOTPAndResetPassword);
+authRouter.post("/verify-reset-otp", authController.verifyOTPAndResetPassword);
 
-export default router;
+export default authRouter;

@@ -1,0 +1,78 @@
+/medications/{medicationId}:
+  get:
+    tags:
+      - Medications
+    summary: Get medication by ID
+    description: Retrieve a specific medication by its ID
+    operationId: getMedicationById
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/MedicationIdParam"
+    responses:
+      "200":
+        description: Medication retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/medications/medication-schemas.yaml#/Medication"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  patch:
+    tags:
+      - Medications
+    summary: Update medication
+    description: Update medication information
+    operationId: updateMedication
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/MedicationIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/medications/medication-schemas.yaml#/UpdateMedication"
+    responses:
+      "200":
+        description: Medication updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/medications/medication-schemas.yaml#/Medication"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  delete:
+    tags:
+      - Medications
+    summary: Delete medication
+    description: Delete a medication
+    operationId: deleteMedication
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/MedicationIdParam"
+    responses:
+      "200":
+        description: Medication deleted successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/common/schemas.yaml#/Response"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

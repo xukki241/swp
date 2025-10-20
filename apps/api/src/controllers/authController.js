@@ -1,5 +1,4 @@
 import * as authService from "../services/authService.js";
-import { convertBigIntIds } from "../utils/bigint.js";
 import logger from "../utils/logger.js";
 
 /**
@@ -170,7 +169,7 @@ export const changePassword = async (req, res, next) => {
     }
 
     const result = await authService.changePassword(
-      BigInt(userId),
+      userId, // UUID is a string
       oldPassword,
       newPassword
     );

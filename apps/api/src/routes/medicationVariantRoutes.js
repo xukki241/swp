@@ -1,71 +1,92 @@
+import {
+  createVariantsRequestSchema,
+  listVariantsQuerySchema,
+  updateVariantRequestSchema,
+  uuidSchema,
+} from "@pharmaflow/dto";
+import {
+  validateBody,
+  validateParams,
+  validateQuery,
+} from "@pharmaflow/dto/middleware";
 import express from "express";
+import { z } from "zod";
 
 import * as medicationVariantController from "../controllers/medicationVariantController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
-const router = express.Router();
+export const medicationVariantRouter = express.Router({ mergeParams: true });
+
+medicationVariantRouter.use(authenticate);
+
+const medicationIdParamSchema = z.object({
+  medicationId: uuidSchema,
+});
+
+const medicationIdAndIdParamSchema = z.object({
+  medicationId: uuidSchema,
+  id: uuidSchema,
+});
 
 /**
- * @route   GET /api/medication-variants
- * @desc    Get all medication variants with optional search and filters
- * @access  Private (Owner, Staff)
- * @query   search - Search term for name, sku, or barcode
- * @query   medicationId - Filter by medication ID
- * @query   isActive - Filter by active status (true/false)
+ * @route   GET /api/medications/:medicationId/variants
+ * @desc    Get all variants for a medication
+ * @access  Private (Authenticated)
  */
-router.get(
+medicationVariantRouter.get(
   "/",
-  authenticate,
+  validateParams(medicationIdParamSchema),
+  validateQuery(listVariantsQuerySchema),
   medicationVariantController.getAllMedicationVariants
 );
 
 /**
- * @route   GET /api/medication-variants/:id
- * @desc    Get medication variant by ID
- * @access  Private (Owner, Staff)
+ * @route   GET /api/medications/:medicationId/variants/:id
+ * @desc    Get variant by ID
+ * @access  Private (Authenticated)
  */
-router.get(
+medicationVariantRouter.get(
   "/:id",
-  authenticate,
+  validateParams(medicationIdAndIdParamSchema),
   medicationVariantController.getMedicationVariantById
 );
 
 /**
- * @route   POST /api/medication-variants
- * @desc    Create a new medication variant (owner only)
- * @access  Private (Owner)
- * @body    { medicationId, sku, name, unit, unitFactor?, barcode?, sellPrice, isActive?, isForSale? }
+ * @route   POST /api/medications/:medicationId/variants
+ * @desc    Create medication variants (batch)
+ * @access  Private (Owner only)
  */
-router.post(
+medicationVariantRouter.post(
   "/",
-  authenticate,
   authorize("owner"),
+  validateParams(medicationIdParamSchema),
+  validateBody(createVariantsRequestSchema),
   medicationVariantController.createMedicationVariant
 );
 
 /**
- * @route   PUT /api/medication-variants/:id
- * @desc    Update medication variant by ID (owner only)
- * @access  Private (Owner)
- * @body    { medicationId?, sku?, name?, unit?, unitFactor?, barcode?, sellPrice?, isActive?, isForSale? }
+ * @route   PATCH /api/medications/:medicationId/variants/:id
+ * @desc    Update medication variant by ID
+ * @access  Private (Owner only)
  */
-router.put(
+medicationVariantRouter.patch(
   "/:id",
-  authenticate,
   authorize("owner"),
+  validateParams(medicationIdAndIdParamSchema),
+  validateBody(updateVariantRequestSchema),
   medicationVariantController.updateMedicationVariant
 );
 
 /**
- * @route   DELETE /api/medication-variants/:id
- * @desc    Delete medication variant by ID (owner only)
- * @access  Private (Owner)
+ * @route   DELETE /api/medications/:medicationId/variants/:id
+ * @desc    Delete medication variant by ID
+ * @access  Private (Owner only)
  */
-router.delete(
+medicationVariantRouter.delete(
   "/:id",
-  authenticate,
   authorize("owner"),
+  validateParams(medicationIdAndIdParamSchema),
   medicationVariantController.deleteMedicationVariant
 );
 
-export default router;
+export default medicationVariantRouter;

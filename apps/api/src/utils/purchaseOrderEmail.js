@@ -1,0 +1,237 @@
+import nodemailer from "nodemailer";
+
+import config from "../config/environment.js";
+
+import logger from "./logger.js";
+
+/**
+ * Create email transporter
+ */
+const createTransporter = () => {
+  const shouldSendRealEmail = true;
+
+  if (shouldSendRealEmail || config.nodeEnv === "production") {
+    return nodemailer.createTransport({
+      host: config.smtpHost || "smtp.gmail.com",
+      port: config.smtpPort || 587,
+      secure: false,
+      auth: {
+        user: config.smtpUser,
+        pass: config.smtpPass,
+      },
+    });
+  }
+
+  // Development fallback
+  return {
+    sendMail: async (mailOptions) => {
+      logger.info("📧 [DEV MODE] Email would be sent:", {
+        to: mailOptions.to,
+        subject: mailOptions.subject,
+      });
+      return { messageId: "dev-mode-email" };
+    },
+  };
+};
+
+/**
+ * Send Purchase Order notification email to supplier
+ * @param {Object} purchaseOrderData - Purchase order details
+ * @returns {Promise<boolean>} Success status
+ */
+export const sendPurchaseOrderEmail = async (purchaseOrderData) => {
+  try {
+    const {
+      supplierEmail,
+      supplierName,
+      supplierContact,
+      buyerInfo,
+      items,
+      totalAmount,
+      expectedDeliveryDate,
+      orderNumber,
+      orderDate,
+    } = purchaseOrderData;
+
+    const transporter = createTransporter();
+
+    // Generate items table HTML
+    const itemsTableRows = items
+      .map(
+        (item, index) => `
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 12px; text-align: center;">${index + 1}</td>
+          <td style="padding: 12px;">${item.medicationName}</td>
+          <td style="padding: 12px;">${item.variantName || "-"}</td>
+          <td style="padding: 12px; text-align: center;">${item.quantity}</td>
+          <td style="padding: 12px; text-align: right;">${Number(item.unitPrice).toLocaleString()} ₫</td>
+          <td style="padding: 12px; text-align: right; font-weight: 600;">${(item.quantity * item.unitPrice).toLocaleString()} ₫</td>
+        </tr>
+      `
+      )
+      .join("");
+
+    const mailOptions = {
+      from: config.smtpFrom || "noreply@pharmaflow.com",
+      to: supplierEmail,
+      subject: `New Purchase Order #${orderNumber} - PharmaFlow`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Purchase Order</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 20px;">
+            <tr>
+              <td align="center">
+                <table width="100%" style="max-width: 800px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                  
+                  <!-- Header -->
+                  <tr>
+                    <td style="background: linear-gradient(135deg, #1f2937 0%, #374151 100%); padding: 30px; text-align: center;">
+                      <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Purchase Order</h1>
+                      <p style="color: #d1d5db; margin: 10px 0 0 0; font-size: 14px;">Order #${orderNumber}</p>
+                    </td>
+                  </tr>
+
+                  <!-- Order Info -->
+                  <tr>
+                    <td style="padding: 30px;">
+                      <table width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td width="50%" style="vertical-align: top;">
+                            <h3 style="color: #1f2937; margin: 0 0 15px 0; font-size: 16px; font-weight: 600;">Dear ${supplierContact},</h3>
+                            <p style="color: #6b7280; margin: 0; line-height: 1.6;">We are pleased to place the following purchase order with <strong>${supplierName}</strong>.</p>
+                          </td>
+                          <td width="50%" style="vertical-align: top; text-align: right;">
+                            <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 14px;">
+                              <strong style="color: #1f2937;">Order Date:</strong><br/>
+                              ${orderDate}
+                            </p>
+                            <p style="margin: 0; color: #6b7280; font-size: 14px;">
+                              <strong style="color: #1f2937;">Expected Delivery:</strong><br/>
+                              ${expectedDeliveryDate}
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+
+                  <!-- Buyer & Supplier Info -->
+                  <tr>
+                    <td style="padding: 0 30px 30px 30px;">
+                      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border-radius: 8px; overflow: hidden;">
+                        <tr>
+                          <td width="50%" style="padding: 20px; border-right: 1px solid #e5e7eb;">
+                            <h4 style="color: #1f2937; margin: 0 0 12px 0; font-size: 14px; font-weight: 600; text-transform: uppercase;">Buyer Information</h4>
+                            <p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 1.8;">
+                              <strong>Contact:</strong> ${buyerInfo.contact || "N/A"}<br/>
+                              <strong>Email:</strong> ${buyerInfo.email || "N/A"}<br/>
+                              <strong>Phone:</strong> ${buyerInfo.phone || "N/A"}<br/>
+                              <strong>Address:</strong> ${buyerInfo.address || "N/A"}
+                            </p>
+                          </td>
+                          <td width="50%" style="padding: 20px;">
+                            <h4 style="color: #1f2937; margin: 0 0 12px 0; font-size: 14px; font-weight: 600; text-transform: uppercase;">Supplier Information</h4>
+                            <p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 1.8;">
+                              <strong>Company:</strong> ${supplierName}<br/>
+                              <strong>Contact:</strong> ${supplierContact}<br/>
+                              <strong>Email:</strong> ${supplierEmail}
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+
+                  <!-- Order Items -->
+                  <tr>
+                    <td style="padding: 0 30px 30px 30px;">
+                      <h3 style="color: #1f2937; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">Order Details</h3>
+                      <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                        <thead>
+                          <tr style="background-color: #f9fafb;">
+                            <th style="padding: 12px; text-align: center; font-size: 13px; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb;">#</th>
+                            <th style="padding: 12px; text-align: left; font-size: 13px; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb;">Medication</th>
+                            <th style="padding: 12px; text-align: left; font-size: 13px; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb;">Variant</th>
+                            <th style="padding: 12px; text-align: center; font-size: 13px; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb;">Quantity</th>
+                            <th style="padding: 12px; text-align: right; font-size: 13px; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb;">Unit Price</th>
+                            <th style="padding: 12px; text-align: right; font-size: 13px; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb;">Subtotal</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${itemsTableRows}
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+
+                  <!-- Total Amount -->
+                  <tr>
+                    <td style="padding: 0 30px 30px 30px;">
+                      <table width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td width="60%"></td>
+                          <td width="40%" style="background-color: #1f2937; border-radius: 8px; padding: 20px;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                              <tr>
+                                <td style="color: #d1d5db; font-size: 14px; padding-bottom: 8px;">Total Amount:</td>
+                                <td style="color: #ffffff; font-size: 24px; font-weight: 700; text-align: right;">${totalAmount.toLocaleString()} ₫</td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+
+                  <!-- Footer Notes -->
+                  <tr>
+                    <td style="padding: 0 30px 30px 30px;">
+                      <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 4px;">
+                        <p style="margin: 0; color: #92400e; font-size: 14px; line-height: 1.6;">
+                          <strong>📌 Important Notes:</strong><br/>
+                          • Please confirm receipt of this purchase order within 24 hours.<br/>
+                          • Ensure delivery by the expected date mentioned above.<br/>
+                          • Contact us immediately if you have any questions or concerns.
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Footer -->
+                  <tr>
+                    <td style="background-color: #f9fafb; padding: 20px 30px; border-top: 1px solid #e5e7eb;">
+                      <p style="margin: 0; color: #6b7280; font-size: 13px; text-align: center; line-height: 1.6;">
+                        This is an automated email. Please do not reply directly to this message.<br/>
+                        For inquiries, contact us at <a href="mailto:${buyerInfo.email || config.smtpFrom}" style="color: #2563eb; text-decoration: none;">${buyerInfo.email || config.smtpFrom}</a>
+                      </p>
+                      <p style="margin: 15px 0 0 0; color: #9ca3af; font-size: 12px; text-align: center;">
+                        © 2025 PharmaFlow - Pharmacy Management System
+                      </p>
+                    </td>
+                  </tr>
+
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    logger.info(`Purchase Order email sent to ${supplierEmail}`, {
+      messageId: info.messageId,
+    });
+    return true;
+  } catch (error) {
+    logger.error("Error sending Purchase Order email:", error);
+    throw new Error("Failed to send Purchase Order email");
+  }
+};

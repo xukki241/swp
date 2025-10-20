@@ -1,0 +1,226 @@
+Supplier:
+  type: object
+  required:
+    - id
+    - name
+    - email
+    - phone
+    - address
+    - status
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    contactName:
+      type: string
+      maxLength: 100
+      nullable: true
+      description: Primary contact person name
+      example: "John Smith"
+    email:
+      $ref: "../common/schemas.yaml#/Email"
+    phone:
+      $ref: "../common/schemas.yaml#/Phone"
+    address:
+      $ref: "../common/schemas.yaml#/Address"
+    status:
+      $ref: "../common/enums.yaml#/SupplierStatus"
+
+CreateSupplier:
+  type: object
+  required:
+    - name
+    - email
+    - phone
+    - address
+  properties:
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    contactName:
+      type: string
+      maxLength: 100
+      description: Primary contact person name
+      example: "John Smith"
+    email:
+      $ref: "../common/schemas.yaml#/Email"
+    phone:
+      $ref: "../common/schemas.yaml#/Phone"
+    address:
+      $ref: "../common/schemas.yaml#/Address"
+    status:
+      allOf:
+        - $ref: "../common/enums.yaml#/SupplierStatus"
+        - default: active
+
+CreateSuppliersRequest:
+  type: array
+  items:
+    $ref: "#/CreateSupplier"
+  description: Array of suppliers to create
+
+CreateSuppliersResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Suppliers created successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/Supplier"
+          description: Array of created suppliers
+
+SupplierResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Supplier retrieved successfully"
+        data:
+          $ref: "#/Supplier"
+
+DeleteSupplierResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Supplier deleted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
+
+UpdateSupplier:
+  type: object
+  properties:
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    contactName:
+      type: string
+      maxLength: 100
+      description: Primary contact person name
+    email:
+      $ref: "../common/schemas.yaml#/Email"
+    phone:
+      $ref: "../common/schemas.yaml#/Phone"
+    address:
+      $ref: "../common/schemas.yaml#/Address"
+    status:
+      $ref: "../common/enums.yaml#/SupplierStatus"
+
+SupplierListResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Suppliers retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/Supplier"
+
+SupplierMedicationVariant:
+  type: object
+  required:
+    - id
+    - supplierId
+    - medicationVariantId
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    supplierId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the supplier
+    medicationVariantId:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the medication variant
+    supplierSku:
+      type: string
+      maxLength: 50
+      nullable: true
+      description: Supplier's SKU/product code
+      example: "SUP-MED-001"
+    leadTimeDays:
+      allOf:
+        - $ref: "../common/schemas.yaml#/NonNegativeInteger"
+        - nullable: true
+          description: Lead time in days for this medication from this supplier
+
+CreateSupplierMedication:
+  type: object
+  required:
+    - medication_variant_id
+  properties:
+    medication_variant_id:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the medication variant to add
+    supplier_sku:
+      type: string
+      maxLength: 50
+      description: Supplier's SKU/product code
+      example: "SUP-MED-001"
+    lead_time_days:
+      $ref: "../common/schemas.yaml#/NonNegativeInteger"
+      description: Lead time in days
+
+CreateSupplierMedicationsRequest:
+  type: array
+  items:
+    $ref: "#/CreateSupplierMedication"
+  description: Array of medication variants to add to supplier
+
+CreateSupplierMedicationsResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Supplier medications created successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/SupplierMedicationVariant"
+          description: Array of created supplier medication variants
+
+DeleteSupplierMedicationResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Supplier medication deleted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
+
+UpdateSupplierMedication:
+  type: object
+  properties:
+    medication_variant_id:
+      $ref: "../common/schemas.yaml#/UUID"
+      description: ID of the medication variant
+    supplier_sku:
+      type: string
+      maxLength: 50
+      description: Supplier's SKU/product code
+    lead_time_days:
+      $ref: "../common/schemas.yaml#/NonNegativeInteger"
+      description: Lead time in days
+
+SupplierMedicationListResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Supplier medications retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/SupplierMedicationVariant"

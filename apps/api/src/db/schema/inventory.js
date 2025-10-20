@@ -1,12 +1,6 @@
-import {
-  pgTable,
-  bigint,
-  varchar,
-  date,
-  uniqueIndex,
-} from "drizzle-orm/pg-core";
+import { pgTable, varchar, date, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { decimalColumn, identityPrimaryKey } from "./common.js";
+import { decimalColumn, identityPrimaryKey, foreignKey } from "./common.js";
 import { medicationVariants } from "./medicationVariants.js";
 import { purchaseOrderReceiptItems } from "./purchaseOrderReceiptItems.js";
 import { warehouseBins } from "./warehouseBins.js";
@@ -15,36 +9,20 @@ export const inventory = pgTable(
   "inventory",
   {
     id: identityPrimaryKey(),
-    medicationVariantId: bigint("medication_variant_id", { mode: "number" })
-      .notNull()
-      .references(() => medicationVariants.id, {
-        onDelete: "restrict",
-        onUpdate: "cascade",
-      }),
-    purchaseOrderReceiptItemsId: bigint("purchase_order_receipt_items_id", {
-      mode: "bigint",
-    })
-      .notNull()
-      .references(() => purchaseOrderReceiptItems.id, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
-    binId: bigint("bin_id", { mode: "number" })
-      .notNull()
-      .references(() => warehouseBins.id, {
-        onDelete: "restrict",
-        onUpdate: "cascade",
-      }),
+    medicationVariantId: foreignKey(
+      "medication_variant_id",
+      medicationVariants.id
+    ).notNull(),
+    purchaseOrderReceiptItemsId: foreignKey(
+      "purchase_order_receipt_items_id",
+      purchaseOrderReceiptItems.id
+    ).notNull(),
+    binId: foreignKey("bin_id", warehouseBins.id).notNull(),
     batchNumber: varchar("batch_number", { length: 100 }).notNull(),
     manufactureDate: date("manufacture_date"),
     expiryDate: date("expiry_date"),
-    quantity: decimalColumn("quantity", { precision: 10, scale: 2 }).notNull(),
-    quantityReserved: decimalColumn("quantity_reserved", {
-      precision: 10,
-      scale: 2,
-    })
-      .notNull()
-      .default(0),
+    quantity: decimalColumn("quantity").notNull(),
+    quantityReserved: decimalColumn("quantity_reserved").notNull().default(0),
   },
   (table) => [
     uniqueIndex(

@@ -1,5 +1,4 @@
 import * as registrationService from "../services/registrationService.js";
-import { convertBigIntIds } from "../utils/bigint.js";
 import logger from "../utils/logger.js";
 
 /**
@@ -29,7 +28,7 @@ export const getAllRegistrations = async (req, res, next) => {
  */
 export const getRegistrationById = async (req, res, next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
 
     const registration = await registrationService.getRegistrationById(id);
 
@@ -54,9 +53,9 @@ export const getRegistrationById = async (req, res, next) => {
  * Approve registration request (User Story 2)
  * @route POST /api/registrations/:id/approve
  */
-export const approveRegistration = async (req, res, next) => {
+export const approveRegistration = async (req, res, _next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
     const { role } = req.body;
 
     // Validate role
@@ -87,9 +86,9 @@ export const approveRegistration = async (req, res, next) => {
  * Reject registration request (User Story 2)
  * @route POST /api/registrations/:id/reject
  */
-export const rejectRegistration = async (req, res, next) => {
+export const rejectRegistration = async (req, res, _next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
 
     const result = await registrationService.rejectRegistration(id);
 
@@ -107,9 +106,9 @@ export const rejectRegistration = async (req, res, next) => {
  * Delete registration request
  * @route DELETE /api/registrations/:id
  */
-export const deleteRegistration = async (req, res, next) => {
+export const deleteRegistration = async (req, res, _next) => {
   try {
-    const id = BigInt(req.params.id);
+    const id = req.params.id; // UUID is a string
 
     const result = await registrationService.deleteRegistration(id);
 

@@ -1,0 +1,70 @@
+/inventory/batches/{inventoryBatchId}:
+  get:
+    tags:
+      - Inventory
+    summary: Get inventory by ID
+    description: Retrieve a specific inventory entry by its ID
+    operationId: getInventoryById
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: inventoryBatchId
+        in: path
+        description: Inventory Batch ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Inventory entry retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/inventory/inventory-schemas.yaml#/Inventory"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  patch:
+    tags:
+      - Inventory
+    summary: Update inventory
+    description: Update inventory entry information (Owner only)
+    operationId: updateInventory
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: inventoryBatchId
+        in: path
+        description: Inventory Batch ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/inventory/inventory-schemas.yaml#/UpdateInventory"
+    responses:
+      "200":
+        description: Inventory updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/inventory/inventory-schemas.yaml#/Inventory"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

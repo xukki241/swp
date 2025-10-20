@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
-  getAllStaff,
   getAllUsers,
   getUserById,
   createUser,
@@ -11,18 +10,6 @@ import {
   deactivateUser,
   suspendUser,
 } from "@/services/userService";
-
-/**
- * Hook to fetch all staff with filters
- * @param {Object} filters - { search, role, status }
- */
-export const useStaff = (filters = {}) => {
-  return useQuery({
-    queryKey: ["staff", filters],
-    queryFn: () => getAllStaff(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
-  });
-};
 
 /**
  * Hook to fetch all users
@@ -56,8 +43,15 @@ export const useCreateUser = () => {
   return useMutation({
     mutationFn: createUser,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      queryClient.invalidateQueries({ queryKey: ["staff"] });
+      // Invalidate and refetch user lists
+      queryClient.invalidateQueries({
+        queryKey: ["users"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["staff"],
+        refetchType: "active",
+      });
     },
   });
 };
@@ -71,9 +65,19 @@ export const useUpdateUser = () => {
   return useMutation({
     mutationFn: updateUser,
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      queryClient.invalidateQueries({ queryKey: ["staff"] });
-      queryClient.invalidateQueries({ queryKey: ["users", variables.id] });
+      // Invalidate and refetch all user-related queries
+      queryClient.invalidateQueries({
+        queryKey: ["users"],
+        refetchType: "active", // Only refetch active queries
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["staff"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["users", variables.id],
+        refetchType: "active",
+      });
     },
   });
 };
@@ -87,8 +91,16 @@ export const useDeleteUser = () => {
   return useMutation({
     mutationFn: deleteUser,
     onSuccess: (data, userId) => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      queryClient.invalidateQueries({ queryKey: ["staff"] });
+      // Invalidate and refetch lists
+      queryClient.invalidateQueries({
+        queryKey: ["users"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["staff"],
+        refetchType: "active",
+      });
+      // Remove specific user from cache
       queryClient.removeQueries({ queryKey: ["users", userId] });
     },
   });
@@ -103,9 +115,19 @@ export const useActivateUser = () => {
   return useMutation({
     mutationFn: activateUser,
     onSuccess: (data, userId) => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      queryClient.invalidateQueries({ queryKey: ["staff"] });
-      queryClient.invalidateQueries({ queryKey: ["users", userId] });
+      // Invalidate and refetch all user-related queries
+      queryClient.invalidateQueries({
+        queryKey: ["users"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["staff"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["users", userId],
+        refetchType: "active",
+      });
     },
   });
 };
@@ -119,9 +141,19 @@ export const useDeactivateUser = () => {
   return useMutation({
     mutationFn: deactivateUser,
     onSuccess: (data, userId) => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      queryClient.invalidateQueries({ queryKey: ["staff"] });
-      queryClient.invalidateQueries({ queryKey: ["users", userId] });
+      // Invalidate and refetch all user-related queries
+      queryClient.invalidateQueries({
+        queryKey: ["users"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["staff"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["users", userId],
+        refetchType: "active",
+      });
     },
   });
 };
@@ -135,9 +167,19 @@ export const useSuspendUser = () => {
   return useMutation({
     mutationFn: suspendUser,
     onSuccess: (data, userId) => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      queryClient.invalidateQueries({ queryKey: ["staff"] });
-      queryClient.invalidateQueries({ queryKey: ["users", userId] });
+      // Invalidate and refetch all user-related queries
+      queryClient.invalidateQueries({
+        queryKey: ["users"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["staff"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["users", userId],
+        refetchType: "active",
+      });
     },
   });
 };

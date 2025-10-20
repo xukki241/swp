@@ -3,7 +3,7 @@ import express from "express";
 import * as userController from "../controllers/userController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
-const router = express.Router();
+export const userRouter = express.Router();
 
 /**
  * @route   GET /api/users/staff
@@ -13,7 +13,7 @@ const router = express.Router();
  * @query   role - Filter by role
  * @query   status - Filter by status
  */
-router.get(
+userRouter.get(
   "/staff",
   authenticate,
   authorize("owner"),
@@ -25,7 +25,7 @@ router.get(
  * @desc    Activate user account (owner only)
  * @access  Private (Owner)
  */
-router.patch(
+userRouter.patch(
   "/:id/activate",
   authenticate,
   authorize("owner"),
@@ -37,7 +37,7 @@ router.patch(
  * @desc    Deactivate user account (owner only)
  * @access  Private (Owner)
  */
-router.patch(
+userRouter.patch(
   "/:id/deactivate",
   authenticate,
   authorize("owner"),
@@ -49,7 +49,7 @@ router.patch(
  * @desc    Suspend user account (owner only)
  * @access  Private (Owner)
  */
-router.patch(
+userRouter.patch(
   "/:id/suspend",
   authenticate,
   authorize("owner"),
@@ -62,14 +62,19 @@ router.patch(
  * @access  Private (Owner)
  * @query   search - Search term for name, email, or phone
  */
-router.get("/", authenticate, authorize("owner"), userController.getAllUsers);
+userRouter.get(
+  "/",
+  authenticate,
+  authorize("owner"),
+  userController.getAllUsers
+);
 
 /**
  * @route   GET /api/users/:id
  * @desc    Get user by ID
  * @access  Private (Owner, or self)
  */
-router.get("/:id", authenticate, userController.getUserById);
+userRouter.get("/:id", authenticate, userController.getUserById);
 
 /**
  * @route   POST /api/users
@@ -77,7 +82,12 @@ router.get("/:id", authenticate, userController.getUserById);
  * @access  Private (Owner)
  * @body    { name, email, phone, address?, role?, status? }
  */
-router.post("/", authenticate, authorize("owner"), userController.createUser);
+userRouter.post(
+  "/",
+  authenticate,
+  authorize("owner"),
+  userController.createUser
+);
 
 /**
  * @route   PUT /api/users/:id
@@ -85,18 +95,23 @@ router.post("/", authenticate, authorize("owner"), userController.createUser);
  * @access  Private (Owner)
  * @body    { name?, email?, phone?, address?, role?, status? }
  */
-router.put("/:id", authenticate, authorize("owner"), userController.updateUser);
+userRouter.put(
+  "/:id",
+  authenticate,
+  authorize("owner"),
+  userController.updateUser
+);
 
 /**
  * @route   DELETE /api/users/:id
  * @desc    Delete user by ID (owner only)
  * @access  Private (Owner)
  */
-router.delete(
+userRouter.delete(
   "/:id",
   authenticate,
   authorize("owner"),
   userController.deleteUser
 );
 
-export default router;
+export default userRouter;

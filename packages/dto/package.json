@@ -6,11 +6,16 @@
   "main": "src/index.js",
   "exports": {
     ".": {
-      "import": "./src/index.js"
+      "import": "./src/core/index.js"
+    },
+    "./middleware": {
+      "import": "./src/middleware/index.js"
     }
   },
   "scripts": {},
   "dependencies": {
+    "drizzle-orm": "^0.44.6",
+    "drizzle-zod": "^0.8.3",
     "zod": "^4.1.12"
   }
 }

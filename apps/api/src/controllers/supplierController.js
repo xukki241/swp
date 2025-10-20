@@ -4,31 +4,15 @@ export const supplierController = {
   // Create a new supplier with medication variants
   async create(req, res) {
     try {
-      // Validate required fields
-      const { name, contactName, email, phone, address, medicationVariants } =
-        req.body;
-
-      if (!name || !contactName || !email || !phone || !address) {
-        return res.status(400).json({
-          error: "Missing required fields: name, contactName, email, phone",
-        });
-      }
-
-      // Validate medication variants if provided
-      if (medicationVariants && Array.isArray(medicationVariants)) {
-        for (const variant of medicationVariants) {
-          if (!variant.medicationVariantId) {
-            return res.status(400).json({
-              error: "Each medication variant must have medicationVariantId",
-            });
-          }
-        }
-      }
-
-      const supplier = await supplierService.create(req.body);
-      res.status(201).json(supplier);
+      const suppliers = await supplierService.create(req.body);
+      res.status(201).json(suppliers);
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      console.error("Error creating supplier:", error.message);
+      // <-- THAY ĐỔI QUAN TRỌNG
+      // Gửi thẳng message lỗi từ service về cho frontend
+      res.status(400).json({
+        error: error.message,
+      });
     }
   },
 
@@ -50,9 +34,7 @@ export const supplierController = {
 
   async getById(req, res) {
     try {
-      const supplier = await supplierService.getById(
-        Number.parseInt(req.params.id)
-      );
+      const supplier = await supplierService.getById(req.params.id);
       if (!supplier) {
         return res.status(404).json({ error: "Supplier not found" });
       }
@@ -64,15 +46,14 @@ export const supplierController = {
 
   async update(req, res) {
     try {
-      const supplier = await supplierService.update(
-        Number.parseInt(req.params.id),
-        req.body
-      );
+      // Hàm update trong service cũng sẽ throw lỗi validation
+      const supplier = await supplierService.update(req.params.id, req.body);
       if (!supplier) {
         return res.status(404).json({ error: "Supplier not found" });
       }
       res.json(supplier);
     } catch (error) {
+      console.error("Error updating supplier:", error.message);
       res.status(400).json({ error: error.message });
     }
   },
@@ -80,16 +61,12 @@ export const supplierController = {
   // Delete supplier
   async delete(req, res) {
     try {
-      const supplier = await supplierService.delete(
-        Number.parseInt(req.params.id)
-      );
+      const supplier = await supplierService.delete(req.params.id);
       if (!supplier) {
         return res.status(404).json({ error: "Supplier not found" });
       }
-      res.json({
-        message: "Supplier deleted successfully",
-        supplier: supplier,
-      });
+      // Trả về 204 No Content là một thực hành tốt cho việc xóa thành công
+      res.status(204).send();
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

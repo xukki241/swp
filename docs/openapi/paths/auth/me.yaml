@@ -1,0 +1,18 @@
+/auth/me:
+  get:
+    tags:
+      - Auth
+    summary: Get current user
+    description: Get authenticated user's information
+    operationId: getCurrentUser
+    responses:
+      "200":
+        description: User information retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/auth/schemas.yaml#/MeResponse"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

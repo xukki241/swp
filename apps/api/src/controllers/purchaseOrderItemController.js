@@ -1,6 +1,17 @@
 import { purchaseOrderItemService } from "../services/purchaseOrderItemService.js";
 
 export const purchaseOrderItemController = {
+  // 🔹 Get all items by specific purchase order
+  async getAllByPurchaseOrder(req, res) {
+    try {
+      const purchaseOrderId = req.params.purchaseOrderId; // UUID string
+      const items = await purchaseOrderItemService.getAll({ purchaseOrderId });
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
   // Create a new purchase order item
   async create(req, res) {
     try {
@@ -15,9 +26,7 @@ export const purchaseOrderItemController = {
   async getAll(req, res) {
     try {
       const filters = {
-        purchaseOrderId: req.query.purchaseOrderId
-          ? Number.parseInt(req.query.purchaseOrderId)
-          : undefined,
+        purchaseOrderId: req.query.purchaseOrderId || undefined, // UUID string
         limit: Number.parseInt(req.query.limit) || 100,
         offset: Number.parseInt(req.query.offset) || 0,
       };
@@ -42,6 +51,7 @@ export const purchaseOrderItemController = {
       res.status(500).json({ error: error.message });
     }
   },
+
   // Update purchase order item
   async update(req, res) {
     try {

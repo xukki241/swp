@@ -1,0 +1,56 @@
+/warehouse/zones:
+  get:
+    tags:
+      - Warehouse
+    summary: List warehouse zones
+    description: Retrieve a paginated list of warehouse zones
+    operationId: listWarehouseZones
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/PageParam"
+      - $ref: "../../components/common/parameters.yaml#/LimitParam"
+      - $ref: "../../components/common/parameters.yaml#/SortByParam"
+      - $ref: "../../components/common/parameters.yaml#/SortOrderParam"
+      - $ref: "../../components/common/parameters.yaml#/SearchParam"
+    responses:
+      "200":
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/warehouse/zone-schemas.yaml#/WarehouseZoneListResponse"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  post:
+    tags:
+      - Warehouse
+    summary: Create warehouse zones
+    description: Create one or more warehouse zones
+    operationId: createWarehouseZones
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/warehouse/zone-schemas.yaml#/CreateWarehouseZonesRequest"
+    responses:
+      "201":
+        description: Warehouse zones created successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/warehouse/zone-schemas.yaml#/CreateWarehouseZonesResponse"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
