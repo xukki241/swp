@@ -11,6 +11,7 @@ vi.mock("@/db/index.js", () => ({
     update: vi.fn(),
     delete: vi.fn(),
     transaction: vi.fn(),
+    query: {},
   },
 }));
 

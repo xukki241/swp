@@ -65,10 +65,17 @@ CreateUsersRequest:
   description: Array of users to create
 
 CreateUsersResponse:
-  type: array
-  items:
-    $ref: "#/User"
-  description: Array of created users
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Users created successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/User"
+          description: Array of created users
 
 UpdateUser:
   type: object
@@ -82,15 +89,36 @@ UpdateUser:
     role:
       $ref: "../common/enums.yaml#/UserRole"
 
+UserResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "User retrieved successfully"
+        data:
+          $ref: "#/User"
+
+DeleteUserResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "User deleted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
+
 UserListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/User"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Users retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/User"

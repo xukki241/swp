@@ -34,8 +34,8 @@ Since the API uses role-based authorization (Owner and Staff roles), all endpoin
 
 #### Inventory Module
 
-- PATCH /inventory/{inventoryId} (Owner only) ✅
-- POST /inventory/{inventoryId}/adjust (Owner only) ✅
+- PATCH /inventory/batches/{inventoryBatchId} (Owner only) ✅
+- POST /inventory/batches/{inventoryBatchId}/adjust (Owner only) ✅
 - POST /inventory/move (Owner only) ✅
 
 #### Suppliers Module

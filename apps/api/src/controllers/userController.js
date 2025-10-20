@@ -7,8 +7,8 @@ import logger from "../utils/logger.js";
  */
 export const getAllUsers = async (req, res, next) => {
   try {
-    const { search } = req.query;
-    const users = await userService.getAllUsers({ search });
+    const { search, role, status } = req.query;
+    const users = await userService.getAllUsers({ search, role, status });
 
     res.status(200).json({
       success: true,

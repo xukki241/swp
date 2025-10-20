@@ -41,18 +41,27 @@ CreateReportRequest:
           $ref: "../common/schemas.yaml#/DateTime"
           description: End date for report period
 
+ReportResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Report retrieved successfully"
+        data:
+          $ref: "#/Report"
+
 ReportListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/Report"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Reports retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/Report"
 
 DailySalesReport:
   type: object

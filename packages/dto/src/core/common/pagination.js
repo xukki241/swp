@@ -1,11 +1,15 @@
 import { z } from "zod";
 
+// Sorting schemas
+export const sortBySchema = z.string().optional();
+export const sortOrderSchema = z.enum(["asc", "desc"]).default("asc");
+
 // Pagination query schema
 export const paginationSchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(10),
-  sortBy: z.string().optional(),
-  sortOrder: z.enum(["asc", "desc"]).default("asc"),
+  sortBy: sortBySchema,
+  sortOrder: sortOrderSchema,
 });
 
 // Paginated response schema

@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { toast } from "sonner";
 import { Mail, Phone, User, KeyRound } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Loading } from "@/components/ui/loading";
 
 export default function UserProfile() {
@@ -49,6 +49,7 @@ export default function UserProfile() {
   const handlePasswordReset = async (e) => {
     e.preventDefault();
 
+    // validate reset password form
     if (!passwordData.oldPassword.trim()) {
       toast.error("Validation Error", {
         description: "Old password is required",

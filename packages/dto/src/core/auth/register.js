@@ -4,6 +4,7 @@ import {
   emailSchema,
   phoneSchema,
   addressSchema,
+  successResponseSchema,
 } from "../common/index.js";
 
 // POST /api/auth/register - Public registration
@@ -20,6 +21,4 @@ export const registerRequestSchema = z.object({
   }),
 });
 
-export const registerResponseSchema = z.object({
-  message: z.string(),
-});
+export const registerResponseSchema = successResponseSchema(z.null());

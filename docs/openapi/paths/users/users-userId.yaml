@@ -13,7 +13,7 @@
         content:
           application/json:
             schema:
-              $ref: "../../components/users/schemas.yaml#/User"
+              $ref: "../../components/users/schemas.yaml#/UserResponse"
       "401":
         $ref: "../../components/common/responses.yaml#/UnauthorizedError"
       "403":
@@ -43,7 +43,7 @@
         content:
           application/json:
             schema:
-              $ref: "../../components/users/schemas.yaml#/User"
+              $ref: "../../components/users/schemas.yaml#/UserResponse"
       "400":
         $ref: "../../components/common/responses.yaml#/BadRequestError"
       "401":
@@ -69,7 +69,7 @@
         content:
           application/json:
             schema:
-              $ref: "../../components/common/schemas.yaml#/Response"
+              $ref: "../../components/users/schemas.yaml#/DeleteUserResponse"
       "401":
         $ref: "../../components/common/responses.yaml#/UnauthorizedError"
       "403":

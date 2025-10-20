@@ -108,7 +108,7 @@ async function seed() {
       ])
       .returning();
 
-    // 2. Seed User Credentials (password: "password123" for all users)
+    // 2. Seed User Credentials (password: "admin123" for all users)
     console.log("🔐 Seeding user credentials...");
     await db.insert(userCredentials).values([
       {

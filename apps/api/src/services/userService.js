@@ -4,22 +4,40 @@ import { db } from "../db/index.js";
 import { users } from "../db/schema/index.js";
 
 /**
- * Get all users with optional search
+ * Get all users with optional search and filters
  * @param {Object} options - Query options
  * @param {string} options.search - Search term for name, email, or phone
+ * @param {string} options.role - Filter by role
+ * @param {string} options.status - Filter by status
  * @returns {Promise<Array>} List of users
  */
-export const getAllUsers = async ({ search } = {}) => {
+export const getAllUsers = async ({ search, role, status } = {}) => {
   try {
     let query = db.select().from(users);
 
+    const conditions = [];
+
     if (search) {
-      query = query.where(
+      conditions.push(
         or(
           ilike(users.name, `%${search}%`),
           ilike(users.email, `%${search}%`),
           ilike(users.phone, `%${search}%`)
         )
+      );
+    }
+
+    if (role) {
+      conditions.push(eq(users.role, role));
+    }
+
+    if (status) {
+      conditions.push(eq(users.status, status));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(
+        conditions.length === 1 ? conditions[0] : and(...conditions)
       );
     }
 

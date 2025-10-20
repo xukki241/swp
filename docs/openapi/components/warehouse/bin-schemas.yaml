@@ -55,10 +55,39 @@ CreateWarehouseBinsRequest:
   description: Array of warehouse bins to create
 
 CreateWarehouseBinsResponse:
-  type: array
-  items:
-    $ref: "#/WarehouseBin"
-  description: Array of created warehouse bins
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse bins created successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/WarehouseBin"
+          description: Array of created warehouse bins
+
+WarehouseBinResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse bin retrieved successfully"
+        data:
+          $ref: "#/WarehouseBin"
+
+DeleteWarehouseBinResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse bin deleted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
 
 BatchCreateWarehouseBinsGrid:
   type: object
@@ -154,14 +183,13 @@ UpdateWarehouseBin:
       $ref: "../common/schemas.yaml#/Description"
 
 WarehouseBinListResponse:
-  type: object
-  required:
-    - data
-    - pagination
-  properties:
-    data:
-      type: array
-      items:
-        $ref: "#/WarehouseBin"
-    pagination:
-      $ref: "../common/schemas.yaml#/Pagination"
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse bins retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/WarehouseBin"

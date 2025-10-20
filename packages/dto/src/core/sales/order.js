@@ -5,6 +5,8 @@ import {
   positiveDecimalSchema,
   positiveIntSchema,
   paginationSchema,
+  sortBySchema,
+  sortOrderSchema,
 } from "../common/index.js";
 import {
   salesOrderStatusEnum,
@@ -32,6 +34,11 @@ export const salesOrderItemSchema = z.object({
   totalPrice: positiveDecimalSchema,
 });
 
+// Sales order with items (for GET /:id response)
+export const salesOrderWithItemsSchema = salesOrderSchema.extend({
+  items: z.array(salesOrderItemSchema),
+});
+
 // POST /api/sales - Create sales order with items
 export const createSalesOrderItemSchema = z.object({
   medication_variant_id: uuidSchema,
@@ -40,14 +47,16 @@ export const createSalesOrderItemSchema = z.object({
 
 export const createSalesOrderRequestSchema = z.object({
   customer_id: uuidSchema,
-  payment_method: salesOrderPaymentMethodEnum.default("cash"),
+  payment_method: salesOrderPaymentMethodEnum.default("cash").optional(),
   items: z.array(createSalesOrderItemSchema).min(1),
 });
 
 export const createSalesOrderResponseSchema = salesOrderSchema;
 
-// GET /api/sales
+// GET /api/sales - List sales orders
 export const listSalesOrdersQuerySchema = paginationSchema.extend({
+  sortBy: sortBySchema.optional(),
+  sortOrder: sortOrderSchema.optional(),
   customerId: uuidSchema.optional(),
   status: salesOrderStatusEnum.optional(),
   paymentMethod: salesOrderPaymentMethodEnum.optional(),
@@ -68,18 +77,21 @@ export const listSalesOrdersResponseSchema = z.object({
 });
 
 // GET /api/sales/:id
-export const getSalesOrderResponseSchema = salesOrderSchema.extend({
-  items: z.array(salesOrderItemSchema).optional(),
+export const salesOrderIdParamSchema = z.object({
+  id: uuidSchema,
 });
 
-// PATCH /api/sales/:id
+export const getSalesOrderResponseSchema = salesOrderWithItemsSchema;
+
+// PATCH /api/sales/:id - Update sales order status
 export const updateSalesOrderRequestSchema = z.object({
   status: salesOrderStatusEnum.optional(),
 });
 
 export const updateSalesOrderResponseSchema = salesOrderSchema;
 
-// DELETE /api/sales/:id
+// DELETE /api/sales/:id - Cancel sales order
 export const deleteSalesOrderResponseSchema = z.object({
+  success: z.boolean(),
   message: z.string(),
 });

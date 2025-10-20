@@ -7,6 +7,9 @@ import { validateBody } from "../../middleware/validate.js";
 
 export const warehouseBinsRouter = express.Router();
 
+// GET /api/warehouse/bins (get all bins across all racks)
+warehouseBinsRouter.get("/bins", warehouseBinController.getAll);
+
 // GET /api/warehouse/bins/:id
 warehouseBinsRouter.get("/bins/:id", warehouseBinController.getById);
 
