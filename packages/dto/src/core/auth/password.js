@@ -1,13 +1,12 @@
 import { z } from "zod";
+import { successResponseSchema } from "../common/index.js";
 
 // POST /api/auth/forgot-password
 export const forgotPasswordRequestSchema = z.object({
   email: z.string().email(),
 });
 
-export const forgotPasswordResponseSchema = z.object({
-  message: z.string(),
-});
+export const forgotPasswordResponseSchema = successResponseSchema(z.null());
 
 // POST /api/auth/reset-password
 export const resetPasswordRequestSchema = z.object({
@@ -15,9 +14,7 @@ export const resetPasswordRequestSchema = z.object({
   newPassword: z.string().min(8).max(255),
 });
 
-export const resetPasswordResponseSchema = z.object({
-  message: z.string(),
-});
+export const resetPasswordResponseSchema = successResponseSchema(z.null());
 
 // POST /api/auth/change-password
 export const changePasswordRequestSchema = z.object({
@@ -25,6 +22,4 @@ export const changePasswordRequestSchema = z.object({
   newPassword: z.string().min(8).max(255),
 });
 
-export const changePasswordResponseSchema = z.object({
-  message: z.string(),
-});
+export const changePasswordResponseSchema = successResponseSchema(z.null());

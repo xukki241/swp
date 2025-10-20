@@ -1,0 +1,195 @@
+WarehouseBin:
+  type: object
+  required:
+    - id
+    - rackId
+    - code
+    - name
+    - level
+    - number
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    rackId:
+      $ref: "../common/schemas.yaml#/UUID"
+    code:
+      $ref: "../common/schemas.yaml#/Code"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    level:
+      $ref: "../common/schemas.yaml#/PositiveInteger"
+    number:
+      $ref: "../common/schemas.yaml#/PositiveInteger"
+    description:
+      $ref: "../common/schemas.yaml#/Description"
+
+CreateWarehouseBin:
+  type: object
+  required:
+    - code
+    - name
+    - level
+    - number
+  properties:
+    code:
+      $ref: "../common/schemas.yaml#/Code"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    level:
+      type: integer
+      minimum: 1
+      description: Vertical level number
+      example: 1
+    number:
+      type: integer
+      minimum: 1
+      description: Bin position number on the level
+      example: 1
+    description:
+      $ref: "../common/schemas.yaml#/Description"
+
+CreateWarehouseBinsRequest:
+  type: array
+  items:
+    $ref: "#/CreateWarehouseBin"
+  description: Array of warehouse bins to create
+
+CreateWarehouseBinsResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse bins created successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/WarehouseBin"
+          description: Array of created warehouse bins
+
+WarehouseBinResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse bin retrieved successfully"
+        data:
+          $ref: "#/WarehouseBin"
+
+DeleteWarehouseBinResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse bin deleted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
+
+BatchCreateWarehouseBinsGrid:
+  type: object
+  required:
+    - mode
+    - levels
+    - binsPerLevel
+  properties:
+    mode:
+      type: string
+      enum: [grid]
+      description: Grid mode creates bins in a uniform grid pattern
+    levels:
+      type: integer
+      minimum: 1
+      description: Number of vertical levels
+      example: 5
+    binsPerLevel:
+      type: integer
+      minimum: 1
+      description: Number of bins per level
+      example: 10
+    codePrefix:
+      type: string
+      maxLength: 50
+      default: "BIN"
+      description: Prefix for auto-generated bin codes
+      example: "BIN"
+    namePrefix:
+      type: string
+      maxLength: 100
+      default: "Bin"
+      description: Prefix for auto-generated bin names
+      example: "Bin"
+
+BatchCreateWarehouseBinsList:
+  type: object
+  required:
+    - mode
+    - binsPerLevelList
+  properties:
+    mode:
+      type: string
+      enum: [list]
+      description: List mode creates bins with custom bins per level
+    binsPerLevelList:
+      type: array
+      minItems: 1
+      items:
+        type: integer
+        minimum: 1
+      description: Array specifying number of bins for each level
+      example: [10, 8, 6, 4, 2]
+    codePrefix:
+      type: string
+      maxLength: 50
+      default: "BIN"
+      description: Prefix for auto-generated bin codes
+      example: "BIN"
+    namePrefix:
+      type: string
+      maxLength: 100
+      default: "Bin"
+      description: Prefix for auto-generated bin names
+      example: "Bin"
+
+BatchCreateWarehouseBins:
+  oneOf:
+    - $ref: "#/BatchCreateWarehouseBinsGrid"
+    - $ref: "#/BatchCreateWarehouseBinsList"
+  discriminator:
+    propertyName: mode
+    mapping:
+      grid: "#/BatchCreateWarehouseBinsGrid"
+      list: "#/BatchCreateWarehouseBinsList"
+
+UpdateWarehouseBin:
+  type: object
+  properties:
+    code:
+      $ref: "../common/schemas.yaml#/Code"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    level:
+      type: integer
+      minimum: 1
+      description: Vertical level number
+    number:
+      type: integer
+      minimum: 1
+      description: Bin position number on the level
+    description:
+      $ref: "../common/schemas.yaml#/Description"
+
+WarehouseBinListResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Warehouse bins retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/WarehouseBin"

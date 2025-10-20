@@ -1,0 +1,86 @@
+/medications/{medicationId}/variants:
+  get:
+    tags:
+      - Medications
+    summary: List medication variants
+    description: Get paginated list of variants for a specific medication
+    operationId: listMedicationVariants
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/MedicationIdParam"
+      - $ref: "../../components/common/parameters.yaml#/PageParam"
+      - $ref: "../../components/common/parameters.yaml#/LimitParam"
+      - $ref: "../../components/common/parameters.yaml#/SortByParam"
+      - $ref: "../../components/common/parameters.yaml#/SortOrderParam"
+      - name: sku
+        in: query
+        description: Filter by SKU
+        required: false
+        schema:
+          type: string
+      - name: barcode
+        in: query
+        description: Filter by barcode
+        required: false
+        schema:
+          type: string
+      - name: isActive
+        in: query
+        description: Filter by active status
+        required: false
+        schema:
+          type: boolean
+      - name: isForSale
+        in: query
+        description: Filter by sale availability
+        required: false
+        schema:
+          type: boolean
+    responses:
+      "200":
+        description: Medication variants retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/medications/variant-schemas.yaml#/MedicationVariantListResponse"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  post:
+    tags:
+      - Medications
+    summary: Create medication variants (batch)
+    description: Create one or more variants for a specific medication
+    operationId: createMedicationVariants
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/MedicationIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/medications/variant-schemas.yaml#/CreateMedicationVariantsRequest"
+    responses:
+      "201":
+        description: Medication variants created successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/medications/variant-schemas.yaml#/CreateMedicationVariantsResponse"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "409":
+        $ref: "../../components/common/responses.yaml#/ConflictError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { successResponseSchema } from "../common/index.js";
 
 // POST /api/auth/login
 export const loginRequestSchema = z.object({
@@ -6,7 +7,9 @@ export const loginRequestSchema = z.object({
   password: z.string().min(1),
 });
 
-export const loginResponseSchema = z.object({
+const loginDataSchema = z.object({
   accessToken: z.string(),
   refreshToken: z.string(),
 });
+
+export const loginResponseSchema = successResponseSchema(loginDataSchema);

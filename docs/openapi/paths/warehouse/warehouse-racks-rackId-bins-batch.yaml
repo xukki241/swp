@@ -1,0 +1,50 @@
+/warehouse/racks/{rackId}/bins/batch:
+  post:
+    tags:
+      - Warehouse
+    summary: Batch create bins in a rack
+    description: Create multiple bins within a rack with auto-generated codes and names. Supports grid mode (uniform levels x bins) or list mode (custom bins per level)
+    operationId: batchCreateBinsInRack
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/RackIdParam"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/warehouse/bin-schemas.yaml#/BatchCreateWarehouseBins"
+          examples:
+            gridMode:
+              summary: Grid mode - uniform levels and bins
+              value:
+                mode: "grid"
+                levels: 5
+                binsPerLevel: 10
+                codePrefix: "BIN"
+                namePrefix: "Bin"
+            listMode:
+              summary: List mode - custom bins per level
+              value:
+                mode: "list"
+                binsPerLevelList: [10, 8, 6, 4, 2]
+                codePrefix: "BIN"
+                namePrefix: "Bin"
+    responses:
+      "201":
+        description: Warehouse bins created successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/warehouse/bin-schemas.yaml#/CreateWarehouseBinsResponse"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "403":
+        $ref: "../../components/common/responses.yaml#/ForbiddenError"
+      "404":
+        $ref: "../../components/common/responses.yaml#/NotFoundError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

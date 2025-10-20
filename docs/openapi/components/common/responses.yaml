@@ -1,0 +1,81 @@
+BadRequestError:
+  description: Bad request - Invalid input parameters
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas.yaml#/ErrorResponse"
+      example:
+        success: false
+        error: "Validation failed"
+        reasons:
+          - "Invalid email format"
+          - "Password must be at least 8 characters"
+
+UnauthorizedError:
+  description: Unauthorized - Authentication required
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas.yaml#/ErrorResponse"
+      example:
+        success: false
+        error: "Authentication required"
+
+ForbiddenError:
+  description: Forbidden - Insufficient permissions
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas.yaml#/ErrorResponse"
+      example:
+        success: false
+        error: "Insufficient permissions"
+
+NotFoundError:
+  description: Not found - Resource does not exist
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas.yaml#/ErrorResponse"
+      example:
+        success: false
+        error: "Resource not found"
+
+ConflictError:
+  description: Conflict - Resource already exists
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas.yaml#/ErrorResponse"
+      example:
+        success: false
+        error: "Resource already exists"
+        reasons:
+          - "Email already in use"
+
+InternalServerError:
+  description: Internal server error
+  content:
+    application/json:
+      schema:
+        $ref: "./schemas.yaml#/ErrorResponseWithTrace"
+      example:
+        success: false
+        error: "Internal server error"
+        trace: "Error: Database connection failed\n    at connect (/app/db.js:15:9)"
+
+# Aliases without "Error" suffix for consistency
+BadRequest:
+  $ref: "#/BadRequestError"
+
+Unauthorized:
+  $ref: "#/UnauthorizedError"
+
+Forbidden:
+  $ref: "#/ForbiddenError"
+
+NotFound:
+  $ref: "#/NotFoundError"
+
+Conflict:
+  $ref: "#/ConflictError"

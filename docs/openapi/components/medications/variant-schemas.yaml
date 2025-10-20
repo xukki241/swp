@@ -1,0 +1,195 @@
+MedicationVariant:
+  type: object
+  required:
+    - id
+    - medicationId
+    - sku
+    - name
+    - unit
+    - unitFactor
+    - sellPrice
+    - isActive
+    - isForSale
+  properties:
+    id:
+      $ref: "../common/schemas.yaml#/UUID"
+    medicationId:
+      $ref: "../common/schemas.yaml#/UUID"
+    sku:
+      type: string
+      maxLength: 50
+      description: Stock Keeping Unit
+      example: "MED-001-BOX"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    unit:
+      type: string
+      maxLength: 50
+      description: Unit of measurement
+      example: "Box of 10 tablets"
+    unitFactor:
+      type: number
+      format: float
+      minimum: 0
+      description: Conversion factor to base unit
+      example: 1.0
+    barcode:
+      type: string
+      maxLength: 50
+      nullable: true
+      description: Barcode number
+      example: "1234567890123"
+    sellPrice:
+      type: number
+      format: float
+      minimum: 0
+      description: Selling price
+      example: 150000.00
+    isActive:
+      type: boolean
+      description: Whether this variant is active
+      example: true
+    isForSale:
+      type: boolean
+      description: Whether this variant is available for sale
+      example: true
+
+CreateMedicationVariant:
+  type: object
+  required:
+    - sku
+    - name
+    - unit
+    - sellPrice
+  properties:
+    sku:
+      type: string
+      minLength: 1
+      maxLength: 50
+      description: Stock Keeping Unit
+      example: "MED-001-BOX"
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    unit:
+      type: string
+      minLength: 1
+      maxLength: 50
+      description: Unit of measurement
+      example: "Box of 10 tablets"
+    unitFactor:
+      type: number
+      format: float
+      minimum: 0
+      default: 1.0
+      description: Conversion factor to base unit
+      example: 1.0
+    barcode:
+      type: string
+      maxLength: 50
+      description: Barcode number
+      example: "1234567890123"
+    sellPrice:
+      type: number
+      format: float
+      minimum: 0
+      description: Selling price
+      example: 150000.00
+    isActive:
+      type: boolean
+      default: true
+      description: Whether this variant is active
+      example: true
+    isForSale:
+      type: boolean
+      default: false
+      description: Whether this variant is available for sale
+      example: true
+
+CreateMedicationVariantsRequest:
+  type: array
+  items:
+    $ref: "#/CreateMedicationVariant"
+  description: Array of medication variants to create
+
+CreateMedicationVariantsResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Medication variants created successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/MedicationVariant"
+          description: Array of created medication variants
+
+MedicationVariantResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Medication variant retrieved successfully"
+        data:
+          $ref: "#/MedicationVariant"
+
+DeleteMedicationVariantResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessResponse"
+    - type: object
+      properties:
+        message:
+          example: "Medication variant deleted successfully"
+        data:
+          type: object
+          nullable: true
+          example: null
+
+UpdateMedicationVariant:
+  type: object
+  properties:
+    sku:
+      type: string
+      minLength: 1
+      maxLength: 50
+      description: Stock Keeping Unit
+    name:
+      $ref: "../common/schemas.yaml#/Name"
+    unit:
+      type: string
+      minLength: 1
+      maxLength: 50
+      description: Unit of measurement
+    unitFactor:
+      type: number
+      format: float
+      minimum: 0
+      description: Conversion factor to base unit
+    barcode:
+      type: string
+      maxLength: 50
+      description: Barcode number
+    sellPrice:
+      type: number
+      format: float
+      minimum: 0
+      description: Selling price
+    isActive:
+      type: boolean
+      description: Whether this variant is active
+    isForSale:
+      type: boolean
+      description: Whether this variant is available for sale
+
+MedicationVariantListResponse:
+  allOf:
+    - $ref: "../common/schemas.yaml#/SuccessListResponse"
+    - type: object
+      properties:
+        message:
+          example: "Medication variants retrieved successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/MedicationVariant"

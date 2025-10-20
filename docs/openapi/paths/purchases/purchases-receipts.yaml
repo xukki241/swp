@@ -1,0 +1,53 @@
+/purchases/receipts:
+  get:
+    tags:
+      - Purchases
+    summary: List all receipts
+    description: Get paginated list of all purchase order receipts across all orders
+    operationId: listAllReceipts
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/PageParam"
+      - $ref: "../../components/common/parameters.yaml#/LimitParam"
+      - $ref: "../../components/common/parameters.yaml#/SortByParam"
+      - $ref: "../../components/common/parameters.yaml#/SortOrderParam"
+      - name: purchaseOrderId
+        in: query
+        description: Filter by purchase order ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: receivedBy
+        in: query
+        description: Filter by user who received the items
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: receivedDateFrom
+        in: query
+        description: Filter by received date from
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: receivedDateTo
+        in: query
+        description: Filter by received date to
+        required: false
+        schema:
+          type: string
+          format: date-time
+    responses:
+      "200":
+        description: Receipts retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/purchases/receipt-schemas.yaml#/ReceiptListResponse"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

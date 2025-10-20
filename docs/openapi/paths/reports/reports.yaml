@@ -1,0 +1,85 @@
+/reports:
+  get:
+    tags:
+      - Reports
+    summary: List all reports
+    description: Get paginated list of generated reports with optional filtering
+    operationId: listReports
+    security:
+      - bearerAuth: []
+    parameters:
+      - $ref: "../../components/common/parameters.yaml#/PageParam"
+      - $ref: "../../components/common/parameters.yaml#/LimitParam"
+      - $ref: "../../components/common/parameters.yaml#/SortByParam"
+      - $ref: "../../components/common/parameters.yaml#/SortOrderParam"
+      - name: type
+        in: query
+        description: Filter by report type
+        required: false
+        schema:
+          $ref: "../../components/common/enums.yaml#/ReportType"
+      - name: reportDateFrom
+        in: query
+        description: Filter by report date from (ISO 8601 format)
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: reportDateTo
+        in: query
+        description: Filter by report date to (ISO 8601 format)
+        required: false
+        schema:
+          type: string
+          format: date-time
+    responses:
+      "200":
+        description: Reports retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/reports/report-schemas.yaml#/ReportListResponse"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"
+
+  post:
+    tags:
+      - Reports
+    summary: Generate a new report
+    description: Create and generate a new report based on specified type and parameters
+    operationId: generateReport
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/reports/report-schemas.yaml#/CreateReportRequest"
+          examples:
+            inventoryReport:
+              summary: Generate inventory report
+              value:
+                type: "inventory"
+            salesSummary:
+              summary: Generate sales summary with date range
+              value:
+                type: "sales_summary"
+                parameters:
+                  startDate: "2025-10-01T00:00:00Z"
+                  endDate: "2025-10-16T23:59:59Z"
+    responses:
+      "201":
+        description: Report generated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../../components/reports/report-schemas.yaml#/Report"
+      "400":
+        $ref: "../../components/common/responses.yaml#/BadRequestError"
+      "401":
+        $ref: "../../components/common/responses.yaml#/UnauthorizedError"
+      "500":
+        $ref: "../../components/common/responses.yaml#/InternalServerError"

@@ -1,492 +1,255 @@
+import asyncHandler from "express-async-handler";
+
 import { inventoryService } from "../services/inventoryService.js";
 
 export const inventoryController = {
   /**
-   * Get all inventory items
-   * @route GET /api/inventory
+   * GET /api/inventory - List all inventory items with pagination
    */
-  async getAll(req, res) {
-    try {
-      const filters = {
-        medicationVariantId: req.query.medicationVariantId
-          ? Number.parseInt(req.query.medicationVariantId)
-          : undefined,
-        binId: req.query.binId ? Number.parseInt(req.query.binId) : undefined,
-        batchNumber: req.query.batchNumber,
-        expiryDateFrom: req.query.expiryDateFrom,
-        expiryDateTo: req.query.expiryDateTo,
-        zoneId: req.query.zoneId
-          ? Number.parseInt(req.query.zoneId)
-          : undefined,
-        rackId: req.query.rackId
-          ? Number.parseInt(req.query.rackId)
-          : undefined,
-        limit: Number.parseInt(req.query.limit) || 100,
-        offset: Number.parseInt(req.query.offset) || 0,
-      };
+  getAll: asyncHandler(async (req, res) => {
+    const page = req.query.page ? Number.parseInt(req.query.page) : 1;
+    const limit = req.query.limit ? Number.parseInt(req.query.limit) : 100;
+    const offset = (page - 1) * limit;
 
-      const items = await inventoryService.getAll(filters);
+    const filters = {
+      medicationVariantId: req.query.medication_variant_id,
+      binId: req.query.bin_id,
+      batchNumber: req.query.batchNumber,
+      expiryDateFrom: req.query.expiryDateFrom,
+      expiryDateTo: req.query.expiryDateTo,
+      sortBy: req.query.sortBy,
+      sortOrder: req.query.sortOrder,
+      limit,
+      offset,
+    };
 
-      res.json({
-        success: true,
-        data: items,
-        pagination: {
-          total: Array.isArray(items) ? items.length : 0,
-          limit: filters.limit,
-          offset: filters.offset,
-        },
-      });
-    } catch (error) {
-      res.status(500).json({
-        error: "Failed to retrieve inventory",
-        details: error.message,
-      });
-    }
-  },
+    const result = await inventoryService.getAll(filters);
 
-  /**
-   * Get inventory by ID
-   * @route GET /api/inventory/:id
-   */
-  async getById(req, res) {
-    try {
-      const item = await inventoryService.getById(
-        Number.parseInt(req.params.id)
-      );
-
-      if (!item) {
-        return res.status(404).json({
-          error: "Inventory item not found",
-        });
-      }
-
-      res.json({
-        success: true,
-        data: item,
-      });
-    } catch (error) {
-      res.status(500).json({
-        error: "Failed to retrieve inventory",
-        details: error.message,
-      });
-    }
-  },
-
-  /**
-   * Get inventory summary by medication variant
-   * @route GET /api/inventory/summary/by-variant
-   */
-  async getSummaryByVariant(req, res) {
-    try {
-      const filters = {
-        medicationId: req.query.medicationId
-          ? Number.parseInt(req.query.medicationId)
-          : undefined,
-        zoneId: req.query.zoneId
-          ? Number.parseInt(req.query.zoneId)
-          : undefined,
-        rackId: req.query.rackId
-          ? Number.parseInt(req.query.rackId)
-          : undefined,
-      };
-
-      const summary = await inventoryService.getSummaryByVariant(filters);
-
-      res.json({
-        success: true,
-        data: summary,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  },
-
-  /**
-   * Get expiring inventory items
-   * @route GET /api/inventory/expiring
-   */
-  // New API expected by unit tests
-  async getExpiringSoon(req, res) {
-    try {
-      const days = req.query.days ? Number.parseInt(req.query.days) : 30;
-      const limit = Number.parseInt(req.query.limit) || 100;
-      const offset = Number.parseInt(req.query.offset) || 0;
-
-      const items = await inventoryService.getExpiringSoon({
-        days,
+    res.json({
+      success: true,
+      data: result.data,
+      pagination: {
+        page,
         limit,
-        offset,
-      });
-
-      res.json({
-        success: true,
-        data: items,
-        pagination: {
-          total: Array.isArray(items) ? items.length : 0,
-          limit,
-          offset,
-        },
-      });
-    } catch (error) {
-      res.status(500).json({
-        error: "Failed to retrieve expiring inventory",
-        details: error.message,
-      });
-    }
-  },
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+        hasMore: offset + result.data.length < result.total,
+      },
+    });
+  }),
 
   /**
-   * Get low stock items
-   * @route GET /api/inventory/low-stock
+   * GET /api/inventory/batches/:inventoryBatchId - Get inventory by ID
    */
-  async getLowStock(req, res) {
-    try {
-      const threshold = req.query.threshold
-        ? Number.parseInt(req.query.threshold)
-        : 100;
-      const limit = Number.parseInt(req.query.limit) || 100;
-      const offset = Number.parseInt(req.query.offset) || 0;
+  getById: asyncHandler(async (req, res) => {
+    const item = await inventoryService.getById(req.params.inventoryBatchId);
 
-      const items = await inventoryService.getLowStock({
-        threshold,
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: "Inventory item not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: item,
+    });
+  }),
+
+  /**
+   * GET /api/inventory/summary/by-variant - Get inventory summary by medication variant
+   */
+  getSummaryByVariant: asyncHandler(async (req, res) => {
+    const page = req.query.page ? Number.parseInt(req.query.page) : 1;
+    const limit = req.query.limit ? Number.parseInt(req.query.limit) : 100;
+    const offset = (page - 1) * limit;
+
+    const filters = {
+      sortBy: req.query.sortBy,
+      sortOrder: req.query.sortOrder,
+      limit,
+      offset,
+    };
+
+    const result = await inventoryService.getSummaryByVariant(filters);
+
+    res.json({
+      success: true,
+      data: result.data,
+      pagination: {
+        page,
         limit,
-        offset,
-      });
-
-      res.json({
-        success: true,
-        data: items,
-        pagination: {
-          total: Array.isArray(items) ? items.length : 0,
-          limit,
-          offset,
-        },
-      });
-    } catch (error) {
-      res.status(500).json({
-        error: "Failed to retrieve low stock items",
-        details: error.message,
-      });
-    }
-  },
-
-  async getByLocation(req, res) {
-    try {
-      const filters = {
-        zoneId: req.query.zoneId
-          ? Number.parseInt(req.query.zoneId)
-          : undefined,
-        rackId: req.query.rackId
-          ? Number.parseInt(req.query.rackId)
-          : undefined,
-      };
-
-      const data = await inventoryService.getByLocation(filters);
-
-      res.json({ success: true, data });
-    } catch (error) {
-      res.status(500).json({
-        error: "Failed to retrieve inventory by location",
-        details: error.message,
-      });
-    }
-  },
-
-  async adjustQuantity(req, res) {
-    try {
-      const body = { ...req.body };
-      const inventoryId = body.inventoryId
-        ? Number.parseInt(body.inventoryId)
-        : undefined;
-      const adjustmentType = body.adjustmentType;
-      const quantity = body.quantity
-        ? Number.parseInt(body.quantity)
-        : undefined;
-      const reason = body.reason;
-      const notes = body.notes;
-
-      // Validate required fields
-      if (!inventoryId || !adjustmentType || !quantity || !reason) {
-        return res.status(400).json({
-          error: "Missing required fields: adjustmentType, quantity, reason",
-        });
-      }
-
-      if (adjustmentType !== "increase" && adjustmentType !== "decrease") {
-        return res.status(400).json({
-          error: "Invalid adjustment type. Must be 'increase' or 'decrease'",
-        });
-      }
-
-      const result = await inventoryService.adjustQuantity({
-        inventoryId,
-        adjustmentType,
-        quantity,
-        reason,
-        notes,
-      });
-
-      res.json({
-        success: true,
-        data: result,
-        message: "Inventory adjusted successfully",
-      });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
-
-  async transferInventory(req, res) {
-    try {
-      const body = { ...req.body };
-      const inventoryId = body.inventoryId
-        ? Number.parseInt(body.inventoryId)
-        : undefined;
-      const fromBinId = body.fromBinId
-        ? Number.parseInt(body.fromBinId)
-        : undefined;
-      const toBinId = body.toBinId ? Number.parseInt(body.toBinId) : undefined;
-      const quantity = body.quantity
-        ? Number.parseInt(body.quantity)
-        : undefined;
-      const reason = body.reason;
-      const notes = body.notes;
-
-      if (!inventoryId || !fromBinId || !toBinId || !quantity || !reason) {
-        return res.status(400).json({ error: "Missing required fields" });
-      }
-
-      if (fromBinId === toBinId) {
-        return res
-          .status(400)
-          .json({ error: "Cannot transfer to the same bin" });
-      }
-
-      const result = await inventoryService.transferInventory({
-        inventoryId,
-        fromBinId,
-        toBinId,
-        quantity,
-        reason,
-        notes,
-      });
-
-      res.json({
-        success: true,
-        data: result,
-        message: "Inventory transferred successfully",
-      });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
-
-  async reserveInventory(req, res) {
-    try {
-      const body = { ...req.body };
-      const inventoryId = body.inventoryId
-        ? Number.parseInt(body.inventoryId)
-        : undefined;
-      const quantity = body.quantity
-        ? Number.parseInt(body.quantity)
-        : undefined;
-      const orderId = body.orderId;
-      const notes = body.notes;
-
-      if (!inventoryId || !quantity || !orderId) {
-        return res.status(400).json({ error: "Missing required fields" });
-      }
-
-      const result = await inventoryService.reserveInventory({
-        inventoryId,
-        quantity,
-        orderId,
-        notes,
-      });
-
-      res.json({
-        success: true,
-        data: result,
-        message: "Inventory reserved successfully",
-      });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
-
-  async unreserveInventory(req, res) {
-    try {
-      const body = { ...req.body };
-      const inventoryId = body.inventoryId
-        ? Number.parseInt(body.inventoryId)
-        : undefined;
-      const quantity = body.quantity
-        ? Number.parseInt(body.quantity)
-        : undefined;
-      const orderId = body.orderId;
-      const notes = body.notes;
-
-      if (!inventoryId || !quantity || !orderId) {
-        return res.status(400).json({ error: "Missing required fields" });
-      }
-
-      const result = await inventoryService.unreserveInventory({
-        inventoryId,
-        quantity,
-        orderId,
-        notes,
-      });
-
-      res.json({
-        success: true,
-        data: result,
-        message: "Inventory unreserved successfully",
-      });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+        hasMore: offset + result.data.length < result.total,
+      },
+    });
+  }),
 
   /**
-   * Update inventory item
-   * @route PATCH /api/inventory/:id
+   * GET /api/inventory/expiring - Get expiring inventory items
    */
-  async update(req, res) {
-    try {
-      const updateData = { ...req.body };
+  getExpiringSoon: asyncHandler(async (req, res) => {
+    const page = req.query.page ? Number.parseInt(req.query.page) : 1;
+    const limit = req.query.limit ? Number.parseInt(req.query.limit) : 100;
+    const offset = (page - 1) * limit;
+    const daysUntilExpiry = req.query.daysUntilExpiry
+      ? Number.parseInt(req.query.daysUntilExpiry)
+      : 30;
 
-      // Parse numeric fields
-      if (updateData.medicationVariantId) {
-        updateData.medicationVariantId = Number.parseInt(
-          updateData.medicationVariantId
-        );
-      }
-      if (updateData.binId) {
-        updateData.binId = Number.parseInt(updateData.binId);
-      }
+    const filters = {
+      daysUntilExpiry,
+      sortBy: req.query.sortBy,
+      sortOrder: req.query.sortOrder,
+      limit,
+      offset,
+    };
 
-      const item = await inventoryService.update(
-        Number.parseInt(req.params.id),
-        updateData
-      );
+    const result = await inventoryService.getExpiringSoon(filters);
 
-      if (!item) {
-        return res.status(404).json({
-          success: false,
-          message: "Inventory item not found",
-        });
-      }
-
-      res.json({
-        success: true,
-        message: "Inventory item updated successfully",
-        data: item,
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  },
+    res.json({
+      success: true,
+      data: result.data,
+      pagination: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+        hasMore: offset + result.data.length < result.total,
+      },
+    });
+  }),
 
   /**
-   * Adjust inventory quantity
-   * @route PATCH /api/inventory/:id/adjust
+   * GET /api/inventory/low-stock - Get low stock items
    */
-  async adjust(req, res) {
-    try {
-      const id = Number.parseInt(req.params.id);
-      const { newQuantity, reason } = req.body;
+  getLowStock: asyncHandler(async (req, res) => {
+    const page = req.query.page ? Number.parseInt(req.query.page) : 1;
+    const limit = req.query.limit ? Number.parseInt(req.query.limit) : 100;
+    const offset = (page - 1) * limit;
+    const threshold = req.query.threshold
+      ? Number.parseFloat(req.query.threshold)
+      : 10;
 
-      // Get current inventory
-      const currentInventory = await inventoryService.getById(id);
-      if (!currentInventory) {
-        return res.status(404).json({
-          success: false,
-          message: "Inventory item not found",
-        });
-      }
+    const filters = {
+      threshold,
+      sortBy: req.query.sortBy,
+      sortOrder: req.query.sortOrder,
+      limit,
+      offset,
+    };
 
-      // Update quantity
-      const item = await inventoryService.update(id, {
-        quantity: newQuantity,
-      });
+    const result = await inventoryService.getLowStock(filters);
 
-      res.json({
-        success: true,
-        message: `Inventory adjusted successfully. Reason: ${reason}`,
-        data: item,
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  },
+    res.json({
+      success: true,
+      data: result.data,
+      pagination: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+        hasMore: offset + result.data.length < result.total,
+      },
+    });
+  }),
 
   /**
-   * Move inventory between bins
-   * @route POST /api/inventory/move
+   * PATCH /api/inventory/batches/:inventoryBatchId - Update inventory item
    */
-  async move(req, res) {
-    try {
-      const { fromInventoryId, toBinId, quantity, reason } = req.body;
+  update: asyncHandler(async (req, res) => {
+    const item = await inventoryService.update(
+      req.params.inventoryBatchId,
+      req.body
+    );
 
-      // Get source inventory
-      const fromInventory = await inventoryService.getById(fromInventoryId);
-      if (!fromInventory) {
-        return res.status(404).json({
-          success: false,
-          message: "Source inventory not found",
-        });
-      }
-
-      // Validate quantity
-      if (quantity > fromInventory.quantity) {
-        return res.status(400).json({
-          success: false,
-          message: "Insufficient quantity in source inventory",
-        });
-      }
-
-      // Check if target bin already has this batch
-      const targetInventory = await inventoryService.getAll({
-        medicationVariantId: fromInventory.medicationVariantId,
-        binId: toBinId,
-        batchNumber: fromInventory.batchNumber,
-      });
-
-      if (targetInventory && targetInventory.length > 0) {
-        // Update existing inventory in target bin
-        const target = targetInventory[0];
-        await inventoryService.update(target.id, {
-          quantity: target.quantity + quantity,
-        });
-      } else {
-        // Create new inventory record in target bin
-        // Note: This would require a create method in inventoryService
-        // For now, we'll just update the source
-      }
-
-      // Update source inventory
-      await inventoryService.update(fromInventoryId, {
-        quantity: fromInventory.quantity - quantity,
-      });
-
-      res.json({
-        success: true,
-        message: `Inventory moved successfully. Reason: ${reason}`,
-      });
-    } catch (error) {
-      res.status(400).json({
+    if (!item) {
+      return res.status(404).json({
         success: false,
-        message: error.message,
+        message: "Inventory item not found",
       });
     }
-  },
+
+    res.json({
+      success: true,
+      message: "Inventory item updated successfully",
+      data: item,
+    });
+  }),
+
+  /**
+   * PATCH /api/inventory/batches/:inventoryBatchId/adjust - Adjust inventory quantity
+   */
+  adjust: asyncHandler(async (req, res) => {
+    const { newQuantity, reason } = req.body;
+
+    // Get current inventory
+    const currentInventory = await inventoryService.getById(
+      req.params.inventoryBatchId
+    );
+    if (!currentInventory) {
+      return res.status(404).json({
+        success: false,
+        message: "Inventory item not found",
+      });
+    }
+
+    // Update quantity
+    const item = await inventoryService.update(req.params.inventoryBatchId, {
+      quantity: newQuantity,
+    });
+
+    res.json({
+      success: true,
+      message: `Inventory adjusted successfully. Reason: ${reason}`,
+      data: item,
+    });
+  }),
+
+  /**
+   * POST /api/inventory/move - Move inventory between bins
+   */
+  move: asyncHandler(async (req, res) => {
+    const { fromInventoryId, toBinId, quantity, reason } = req.body;
+
+    // Get source inventory
+    const fromInventory = await inventoryService.getById(fromInventoryId);
+    if (!fromInventory) {
+      return res.status(404).json({
+        success: false,
+        message: "Source inventory not found",
+      });
+    }
+
+    // Validate quantity
+    const availableQuantity =
+      Number(fromInventory.quantity) - Number(fromInventory.quantityReserved);
+    if (quantity > availableQuantity) {
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient available quantity in source inventory",
+      });
+    }
+
+    // Perform the move operation
+    await inventoryService.move({
+      fromInventoryId,
+      toBinId,
+      quantity,
+      reason,
+      medicationVariantId: fromInventory.medicationVariantId,
+      batchNumber: fromInventory.batchNumber,
+      manufactureDate: fromInventory.manufactureDate,
+      expiryDate: fromInventory.expiryDate,
+      purchaseOrderReceiptItemsId: fromInventory.purchaseOrderReceiptItemsId,
+    });
+
+    res.json({
+      success: true,
+      message: `Inventory moved successfully. Reason: ${reason}`,
+    });
+  }),
 };
+
+export default inventoryController;
