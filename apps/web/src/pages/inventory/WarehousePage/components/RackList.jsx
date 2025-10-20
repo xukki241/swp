@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "../../../../components/ui/card";
 import { Button } from "../../../../components/ui/button";
-import { RackItem } from "./rack-item";
+import { RackItem } from "./RackItem";
 
 export function RackList({ racks }) {
   const [expandedRacks, setExpandedRacks] = useState(new Set());

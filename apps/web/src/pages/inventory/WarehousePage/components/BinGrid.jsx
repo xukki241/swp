@@ -1,6 +1,6 @@
 "use client";
 
-import { BinCard } from "./bin-card";
+import { BinCard } from "./BinCard";
 
 export function BinGrid({ rackId, bins }) {
   if (!bins || bins.length === 0) {

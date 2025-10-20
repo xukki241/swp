@@ -16,8 +16,8 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Skeleton } from "../../../components/ui/skeleton";
-import ZoneDetailsCard from "./components/zone-details-card";
-import { RackList } from "./components/rack-list";
+import ZoneDetailsCard from "./components/ZoneDetailsCard";
+import { RackList } from "./components/RackList";
 import { AppLayout } from "@/components/layouts/app-layout";
 
 export default function WarehousePage() {
