@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import { authRouter } from "./authRoutes.js";
 import { customerRouter } from "./customerRoutes.js";
+import emailRouter from "./emailRoutes.js";
 import { inventoryRouter } from "./inventoryRoutes.js";
 import { medicationRouter } from "./medicationRoutes.js";
 import { purchaseOrderItemRouter } from "./purchaseOrderItemRoutes.js";
@@ -29,5 +30,6 @@ apiRouter.use("/warehouse", warehouseRouter);
 apiRouter.use("/inventory", inventoryRouter);
 apiRouter.use("/sales", salesOrderRouter);
 apiRouter.use("/reports", reportRouter);
+apiRouter.use(emailRouter); // Email routes
 
 export default apiRouter;

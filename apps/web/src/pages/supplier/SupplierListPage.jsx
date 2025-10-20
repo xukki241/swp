@@ -46,6 +46,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Eye } from "lucide-react";
 
 export default function SupplierListPage() {
   const navigate = useNavigate();
@@ -276,12 +277,10 @@ export default function SupplierListPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() =>
-                                navigate(`/suppliers/${s.id}/edit/`)
-                              }
-                              title="Edit Details"
+                              onClick={() => navigate(`/suppliers/${s.id}`)}
+                              title="View Details"
                             >
-                              <Edit className="w-4 h-4" />
+                              <Eye className="w-4 h-4" />
                             </Button>
                             <Button
                               size="sm"

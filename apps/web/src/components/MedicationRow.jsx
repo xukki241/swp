@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState, useMemo } from "react";
 import { useMedicationVariants } from "@/hooks/useMedications";
 import {
   Select,
@@ -10,7 +11,7 @@ import {
 } from "./ui/select";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { useEffect, useState } from "react";
+import { AutocompleteCombobox } from "./ui/AutocompleteCombobox";
 
 export function MedicationRow({
   index,
@@ -22,15 +23,25 @@ export function MedicationRow({
   const [selectedMedId, setSelectedMedId] = useState(
     rowData.medicationId || ""
   );
+
   const { data: variantsData, isLoading: isLoadingVariants } =
     useMedicationVariants(selectedMedId || undefined);
   const availableVariants = variantsData?.data || [];
+
+  const medicationOptions = useMemo(
+    () =>
+      allMedications.map((med) => ({
+        value: med.id,
+        label: med.name,
+      })),
+    [allMedications]
+  );
 
   useEffect(() => {
     if (rowData.medicationId && rowData.medicationId !== selectedMedId) {
       setSelectedMedId(rowData.medicationId);
     }
-  }, [rowData.medicationId]);
+  }, [rowData.medicationId, selectedMedId]);
 
   useEffect(() => {
     if (
@@ -83,34 +94,29 @@ export function MedicationRow({
     onChange(index, { ...rowData, [field]: value });
   };
 
-  // Medication and Variant get more space, other fields are smaller
   return (
     <div className="flex flex-col gap-3 p-4 border rounded-lg bg-card">
+      {/* Hàng 1: Medication và Variant */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {/* Medication Combobox */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-muted-foreground">
-            Medication
+            Medication *
           </label>
-          <Select
-            value={selectedMedId || undefined}
+          <AutocompleteCombobox
+            options={medicationOptions}
+            value={selectedMedId}
             onValueChange={handleMedicationChange}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select medication" />
-            </SelectTrigger>
-            <SelectContent>
-              {allMedications.map((med) => (
-                <SelectItem key={med.id} value={med.id}>
-                  {med.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            placeholder="Select medication"
+            searchPlaceholder="Search for a medication..."
+            emptyMessage="No medication found."
+          />
         </div>
 
+        {/* Variant Select */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-muted-foreground">
-            Variant
+            Variant *
           </label>
           <Select
             key={selectedMedId || `med-row-${index}`}
@@ -152,10 +158,12 @@ export function MedicationRow({
         </div>
       </div>
 
+      {/* Hàng 2: SKU, Lead Time và nút Remove */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+        {/* Supplier SKU Input */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-muted-foreground">
-            Supplier SKU
+            Supplier SKU *
           </label>
           <Input
             placeholder="Enter SKU"
@@ -164,18 +172,20 @@ export function MedicationRow({
           />
         </div>
 
+        {/* Lead Time Input */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-muted-foreground">
             Lead Time (days)
           </label>
           <Input
-            placeholder="Days"
+            placeholder="e.g., 7"
             type="number"
             value={rowData.leadTimeDays || ""}
             onChange={(e) => handleFieldChange("leadTimeDays", e.target.value)}
           />
         </div>
 
+        {/* Remove Button */}
         <Button
           type="button"
           variant="destructive"

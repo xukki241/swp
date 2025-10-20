@@ -25,15 +25,13 @@ export const purchaseOrderReceiptItemSchema = z.object({
 
 // POST /api/purchases/:purchaseOrderId/receipts - Create receipt with items
 export const createReceiptItemSchema = z.object({
-  purchase_order_item_id: uuidSchema,
+  purchaseOrderItemId: uuidSchema,
   quantity: positiveIntSchema,
-  bin_id: uuidSchema,
-  batch_number: z.string().min(1).max(100),
-  manufacture_date: dateSchema.optional(),
-  expiry_date: dateSchema.optional(),
 });
 
 export const createReceiptRequestSchema = z.object({
+  receivedDate: dateSchema.optional(),
+  receivedBy: uuidSchema.optional(),
   items: z.array(createReceiptItemSchema).min(1),
 });
 

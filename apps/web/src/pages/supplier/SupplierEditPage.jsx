@@ -7,6 +7,7 @@ import { useSupplier, useUpdateSupplier } from "@/hooks/useSuppliers";
 import { useMedications, useMedicationsVariants } from "@/hooks/useMedications";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -45,7 +46,6 @@ export default function SupplierEditPage() {
 
   useEffect(() => {
     if (supplier) {
-      // Always populate basic supplier info regardless of medications
       setForm({
         name: supplier.name || "",
         contactName: supplier.contactName || supplier.contact_name || "",
@@ -58,7 +58,6 @@ export default function SupplierEditPage() {
   }, [supplier]);
 
   useEffect(() => {
-    // Only populate medications if they exist and we have the necessary data
     if (
       supplier &&
       Array.isArray(supplier.medicationVariants) &&
@@ -124,23 +123,60 @@ export default function SupplierEditPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      if (!form.name || !form.email || !form.phone || !form.address) {
-        toast.error("Please fill in all required fields");
-        return;
-      }
+    const validationErrors = [];
+    if (!form.name.trim()) {
+      validationErrors.push("Supplier Name is required.");
+    }
+    if (!form.email.trim()) {
+      validationErrors.push("Email is required.");
+    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+      validationErrors.push("Email format is invalid.");
+    }
+    if (!form.phone.trim()) {
+      validationErrors.push("Phone Number is required.");
+    }
+    if (!form.address.trim()) {
+      validationErrors.push("Address is required.");
+    }
 
+    meds.forEach((med, index) => {
+      if (med.medicationId || med.supplierSku.trim()) {
+        if (!med.medicationVariantId) {
+          validationErrors.push(
+            `Medication #${index + 1}: Medication Variant must be selected.`
+          );
+        }
+        if (!med.supplierSku.trim()) {
+          validationErrors.push(
+            `Medication #${index + 1}: Supplier SKU is required.`
+          );
+        }
+      }
+    });
+
+    if (validationErrors.length > 0) {
+      toast.error("Validation Failed", {
+        description: (
+          <pre className="text-sm text-left whitespace-pre-wrap">
+            {validationErrors.join("\n")}
+          </pre>
+        ),
+      });
+      return;
+    }
+
+    try {
       const variants = meds
-        .filter((m) => m.medicationId && m.medicationVariantId)
+        .filter((m) => m.medicationVariantId && m.supplierSku.trim())
         .map((m) => ({
           medication_variant_id: m.medicationVariantId,
-          supplier_sku: m.supplierSku || null,
+          supplier_sku: m.supplierSku.trim(),
           lead_time_days: m.leadTimeDays
             ? Number.parseInt(m.leadTimeDays, 10)
             : null,
         }));
 
-      const updateData = {
+      const payload = {
         name: form.name.trim(),
         contactName: form.contactName?.trim() || null,
         email: form.email.trim(),
@@ -150,21 +186,16 @@ export default function SupplierEditPage() {
         medicationVariants: variants,
       };
 
-      console.log("Update payload:", updateData);
-
-      await updateSupplier.mutateAsync({
-        id,
-        ...updateData,
-      });
-
+      await updateSupplier.mutateAsync({ id, ...payload });
       toast.success("Supplier updated successfully!");
-      navigate(`/suppliers/${id}`);
+      navigate(`/suppliers`);
     } catch (error) {
-      console.error("Update error:", error);
-      toast.error("Failed to update supplier", {
+      console.error("Submission error:", error);
+      toast.error("Failed to save supplier", {
         description:
           error?.response?.data?.error ||
-          "Validation failed. Please check your input.",
+          error.message ||
+          "An unexpected error occurred.",
       });
     }
   };
@@ -179,36 +210,56 @@ export default function SupplierEditPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              placeholder="Supplier Name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-            <Input
-              placeholder="Contact Name"
-              value={form.contactName}
-              onChange={(e) =>
-                setForm({ ...form, contactName: e.target.value })
-              }
-            />
-            <Input
-              placeholder="Email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
-            <Input
-              placeholder="Phone Number"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            />
-            <Input
-              placeholder="Address"
-              value={form.address}
-              onChange={(e) => setForm({ ...form, address: e.target.value })}
-            />
-
             <div className="space-y-2">
-              <label className="text-sm font-medium">Status</label>
+              <Label htmlFor="supplierName">Supplier Name *</Label>
+              <Input
+                id="supplierName"
+                placeholder="e.g., Global Pharma Inc."
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="contactName">Contact Name</Label>
+              <Input
+                id="contactName"
+                placeholder="e.g., John Doe"
+                value={form.contactName}
+                onChange={(e) =>
+                  setForm({ ...form, contactName: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email *</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="e.g., contact@globalpharma.com"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number *</Label>
+              <Input
+                id="phone"
+                placeholder="e.g., +1 234 567 890"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="address">Address *</Label>
+              <Input
+                id="address"
+                placeholder="e.g., 123 Health St, Medicine City"
+                value={form.address}
+                onChange={(e) => setForm({ ...form, address: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Status</Label>
               <Select
                 value={form.status}
                 onValueChange={(value) => setForm({ ...form, status: value })}

@@ -4,9 +4,10 @@ export const purchaseOrderController = {
   // Create a new purchase order
   async create(req, res) {
     try {
-      const po = await purchaseOrderService.create(req.body);
+      const po = await purchaseOrderService.create(req.body, req.user.id);
       res.status(201).json(po);
     } catch (error) {
+      console.error(error);
       res.status(400).json({ error: error.message });
     }
   },

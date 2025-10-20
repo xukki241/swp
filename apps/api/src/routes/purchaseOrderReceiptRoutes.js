@@ -12,7 +12,7 @@ import express from "express";
 import { z } from "zod";
 
 import { purchaseOrderReceiptController } from "../controllers/purchaseOrderReceiptController.js";
-import { authenticate, authorize } from "../middleware/checkAuth.js";
+import { authorize } from "../middleware/checkAuth.js";
 
 // Nested router for /api/purchases/:purchaseOrderId/receipts
 export const nestedReceiptRouter = express.Router({ mergeParams: true });
@@ -20,12 +20,10 @@ export const nestedReceiptRouter = express.Router({ mergeParams: true });
 // Standalone router for /api/purchases/receipts
 export const standaloneReceiptRouter = express.Router();
 
-// All routes require authentication
-nestedReceiptRouter.use(authenticate);
-standaloneReceiptRouter.use(authenticate);
+// Note: Authentication is already applied in purchaseOrderRouter
 
 // Param validation schemas
-const idParamSchema = z.object({
+const receiptIdParamSchema = z.object({
   id: uuidSchema,
 });
 
@@ -33,7 +31,7 @@ const purchaseOrderIdParamSchema = z.object({
   purchaseOrderId: uuidSchema,
 });
 
-const purchaseOrderIdAndIdParamSchema = z.object({
+const purchaseOrderIdAndReceiptIdParamSchema = z.object({
   purchaseOrderId: uuidSchema,
   id: uuidSchema,
 });
@@ -59,7 +57,7 @@ nestedReceiptRouter.get(
  */
 nestedReceiptRouter.get(
   "/:id",
-  validateParams(purchaseOrderIdAndIdParamSchema),
+  validateParams(purchaseOrderIdAndReceiptIdParamSchema),
   purchaseOrderReceiptController.getById
 );
 
@@ -79,13 +77,24 @@ nestedReceiptRouter.post(
 // ========== Standalone Routes (under /api/purchases/receipts) ==========
 
 /**
+ * @route   GET /api/purchases/receipts
+ * @desc    Get all receipts (across all purchase orders)
+ * @access  Private (Authenticated)
+ */
+standaloneReceiptRouter.get(
+  "/",
+  validateQuery(listReceiptsQuerySchema),
+  purchaseOrderReceiptController.getAll
+);
+
+/**
  * @route   GET /api/purchases/receipts/:id
  * @desc    Get receipt by ID (without requiring purchaseOrderId)
  * @access  Private (Authenticated)
  */
 standaloneReceiptRouter.get(
   "/:id",
-  validateParams(idParamSchema),
+  validateParams(receiptIdParamSchema),
   purchaseOrderReceiptController.getById
 );
 

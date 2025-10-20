@@ -27,7 +27,7 @@ export const dateSchema = z.union([
   z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   z.date(),
 ]);
-export const timestampSchema = z.union([z.string().datetime(), z.date()]);
+export const timestampSchema = z.date();
 
 // Boolean
 export const booleanSchema = z.boolean();

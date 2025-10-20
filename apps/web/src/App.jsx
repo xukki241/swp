@@ -10,6 +10,18 @@ import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import UserListPage from "@/pages/UserListPage";
 import POSPage from "@/pages/POSPage";
 import PolicyPage from "@/pages/PolicyPage";
+// Supplier & Purchase Order imports
+import SupplierListPage from "./pages/supplier/SupplierListPage";
+import SupplierCreatePage from "./pages/supplier/SupplierCreatePage";
+import SupplierDetailPage from "./pages/supplier/SupplierDetailPage";
+import SupplierEditPage from "./pages/supplier/SupplierEditPage";
+import PurchaseOrderListPage from "./pages/purchaseOrder/PurchaseOrderListPage";
+import PurchaseOrderCreatePage from "./pages/purchaseOrder/PurchaseOrderCreatePage";
+import PurchaseOrderDetailPage from "./pages/purchaseOrder/PurchaseOrderDetailPage";
+import PurchaseOrderReceiptListPage from "./pages/purchaseOrder/PurchaseOrderReceiptListPage";
+import PurchaseOrderReceiptDetailPage from "./pages/purchaseOrder/PurchaseOrderReceiptDetailPage";
+import PurchaseOrderReceiptCreatePage from "./pages/purchaseOrder/PurchaseOrderReceiptCreatePage";
+// Inventory imports
 import StockOverviewPage from "@/pages/inventory/StockOverviewPage";
 import WarehousePage from "@/pages/inventory/WarehousePage";
 import InventoryTrackingPage from "@/pages/inventory/InventoryTrackingPage";
@@ -61,6 +73,92 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Supplier Routes */}
+        <Route
+          path="/suppliers"
+          element={
+            <ProtectedRoute>
+              <SupplierListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/suppliers/create"
+          element={
+            <ProtectedRoute>
+              <SupplierCreatePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/suppliers/:id"
+          element={
+            <ProtectedRoute>
+              <SupplierDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/suppliers/:id/edit"
+          element={
+            <ProtectedRoute>
+              <SupplierEditPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Purchase Order Routes */}
+        <Route
+          path="/procurement/purchase-orders"
+          element={
+            <ProtectedRoute>
+              <PurchaseOrderListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/purchase-orders/create"
+          element={
+            <ProtectedRoute>
+              <PurchaseOrderCreatePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/purchase-orders/:id"
+          element={
+            <ProtectedRoute>
+              <PurchaseOrderDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/procurement/receipts"
+          element={
+            <ProtectedRoute>
+              <PurchaseOrderReceiptListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/procurement/receipts/:id"
+          element={
+            <ProtectedRoute>
+              <PurchaseOrderReceiptDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/purchase-orders/:purchaseOrderId/receipts/create"
+          element={
+            <ProtectedRoute>
+              <PurchaseOrderReceiptCreatePage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Inventory Routes */}
         <Route
           path="/inventory/stock"
           element={
@@ -88,19 +186,35 @@ function App() {
 
         {/* Public routes - redirect to dashboard if already logged in */}
         <Route
-          path="/inventory/warehouse"
+          path="/login"
           element={
-            <ProtectedRoute>
-              <WarehousePage />
-            </ProtectedRoute>
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
           }
         />
         <Route
-          path="/inventory/tracking"
+          path="/register"
           element={
-            <ProtectedRoute>
-              <InventoryTrackingPage />
-            </ProtectedRoute>
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPasswordPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <PublicRoute>
+              <ResetPasswordPage />
+            </PublicRoute>
           }
         />
         <Route

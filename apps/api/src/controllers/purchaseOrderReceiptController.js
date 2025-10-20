@@ -3,7 +3,7 @@ import { purchaseOrderReceiptService } from "../services/purchaseOrderReceiptSer
 export const purchaseOrderReceiptController = {
   async getAllByPurchaseOrder(req, res) {
     try {
-      const purchaseOrderId = Number.parseInt(req.params.purchaseOrderId);
+      const purchaseOrderId = req.params.purchaseOrderId;
       const receipts = await purchaseOrderReceiptService.getAll({
         purchaseOrderId,
       });
@@ -15,7 +15,7 @@ export const purchaseOrderReceiptController = {
   // Create a new purchase order receipt
   async create(req, res) {
     try {
-      const purchaseOrderId = Number.parseInt(req.params.purchaseOrderId);
+      const purchaseOrderId = req.params.purchaseOrderId;
       const receipt = await purchaseOrderReceiptService.create({
         purchaseOrderId,
         ...req.body,
@@ -30,9 +30,7 @@ export const purchaseOrderReceiptController = {
   async getAll(req, res) {
     try {
       const filters = {
-        purchaseOrderId: req.query.purchaseOrderId
-          ? Number.parseInt(req.query.purchaseOrderId)
-          : undefined,
+        purchaseOrderId: req.query.purchaseOrderId || undefined,
         startDate: req.query.startDate,
         endDate: req.query.endDate,
         limit: Number.parseInt(req.query.limit) || 100,
@@ -48,9 +46,7 @@ export const purchaseOrderReceiptController = {
   // Get purchase order receipt by ID
   async getById(req, res) {
     try {
-      const receipt = await purchaseOrderReceiptService.getById(
-        Number.parseInt(req.params.id)
-      );
+      const receipt = await purchaseOrderReceiptService.getById(req.params.id);
       if (!receipt) {
         return res
           .status(404)
@@ -65,7 +61,7 @@ export const purchaseOrderReceiptController = {
   async update(req, res) {
     try {
       const receipt = await purchaseOrderReceiptService.update(
-        Number.parseInt(req.params.id),
+        req.params.id,
         req.body
       );
       if (!receipt) {
@@ -82,9 +78,7 @@ export const purchaseOrderReceiptController = {
   // Delete purchase order receipt
   async delete(req, res) {
     try {
-      const receipt = await purchaseOrderReceiptService.delete(
-        Number.parseInt(req.params.id)
-      );
+      const receipt = await purchaseOrderReceiptService.delete(req.params.id);
       if (!receipt) {
         return res
           .status(404)
