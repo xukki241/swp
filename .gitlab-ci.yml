@@ -67,12 +67,13 @@ stages:
 
 # Docker base for Azure ACR
 .docker_azure_base:
-  image: docker:24-dind
+  image: mcr.microsoft.com/azure-cli:latest
   services:
     - docker:24-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
   before_script:
-    - apk add --no-cache python3 py3-pip bash
-    - pip3 install --break-system-packages azure-cli
+    - apk add --no-cache docker-cli
     - echo "Logging in to Azure..."
     - az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
     - az account set --subscription $AZURE_SUBSCRIPTION_ID
