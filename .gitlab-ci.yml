@@ -67,22 +67,27 @@ stages:
 
 # Docker base for Azure ACR
 .docker_azure_base:
-  image: alpine:3.19
+  image: docker:24-alpine
   services:
     - docker:24-dind
   variables:
     DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
   before_script:
     - echo "Installing Docker CLI and dependencies..."
-    - apk add --no-cache docker-cli bash curl
+    - apk add --no-cache bash curl
     - echo "Installing Azure CLI with build dependencies..."
     - apk add --no-cache python3 py3-pip gcc musl-dev python3-dev libffi-dev openssl-dev make
     - pip3 install --break-system-packages azure-cli --no-cache-dir
+    - echo "Verifying Docker connection..."
+    - docker info
     - echo "Logging in to Azure..."
     - az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
     - az account set --subscription $AZURE_SUBSCRIPTION_ID
-    - echo "Logging in to Azure Container Registry..."
-    - az acr login --name $AZURE_ACR_NAME
+    - echo "Logging in to Azure Container Registry (using token method)..."
+    - |
+      ACCESS_TOKEN=$(az acr login --name $AZURE_ACR_NAME --expose-token --output tsv --query accessToken)
+      echo $ACCESS_TOKEN | docker login ${AZURE_ACR_LOGIN_SERVER} --username 00000000-0000-0000-0000-000000000000 --password-stdin
 
 # Azure CLI base
 .azure_cli_base:
