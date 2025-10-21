@@ -125,10 +125,10 @@ install_dependencies:
       - apps/*/node_modules
       - packages/*/node_modules
     expire_in: 1 hour
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "next"'
-    - if: '$CI_COMMIT_BRANCH == "production"'
+  only:
+    - merge_requests
+    - next
+    - production
 
 # ===========================================
 # TEST STAGE
@@ -142,19 +142,10 @@ lint:
     - echo "Running linters..."
     - pnpm lint
   allow_failure: false
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
-        - "**/*.js"
-        - "**/*.jsx"
-        - "**/*.ts"
-        - "**/*.tsx"
-        - "**/*.vue"
-        - "**/eslint.config.js"
-        - "pnpm-lock.yaml"
-        - "package.json"
-    - if: '$CI_COMMIT_BRANCH == "next"'
-    - if: '$CI_COMMIT_BRANCH == "production"'
+  only:
+    - merge_requests
+    - next
+    - production
 
 format_check:
   stage: test
@@ -164,21 +155,10 @@ format_check:
     - echo "Checking code formatting..."
     - pnpm format:check
   allow_failure: true
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
-        - "**/*.js"
-        - "**/*.jsx"
-        - "**/*.ts"
-        - "**/*.tsx"
-        - "**/*.vue"
-        - "**/*.json"
-        - "**/*.md"
-        - "**/*.yaml"
-        - "**/*.yml"
-        - "prettier.config.js"
-    - if: '$CI_COMMIT_BRANCH == "next"'
-    - if: '$CI_COMMIT_BRANCH == "production"'
+  only:
+    - merge_requests
+    - next
+    - production
 
 test_api:
   stage: test
@@ -186,14 +166,11 @@ test_api:
   needs: [install_dependencies]
   services:
     - postgres:18-alpine
-    - redis:7-alpine
   variables:
     POSTGRES_DB: pharmaflow_test
     POSTGRES_USER: pharmaflow_test
     POSTGRES_PASSWORD: test_password
     DATABASE_URL: postgresql://pharmaflow_test:test_password@postgres:5432/pharmaflow_test
-    REDIS_HOST: redis
-    REDIS_PORT: 6379
     NODE_ENV: test
     JWT_SECRET: test-secret-key-for-ci
   script:
@@ -210,34 +187,10 @@ test_api:
     paths:
       - apps/api/coverage/
     expire_in: 1 week
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
-        - "apps/api/**/*"
-        - "packages/**/*"
-        - "pnpm-lock.yaml"
-        - "package.json"
-    - if: '$CI_COMMIT_BRANCH == "next"'
-    - if: '$CI_COMMIT_BRANCH == "production"'
-
-cve_check:
-  stage: test
-  extends: .node_base
-  needs: [install_dependencies]
-  script:
-    - echo "Checking for security vulnerabilities..."
-    - pnpm audit --audit-level=moderate || true
-    - echo "Security audit complete"
-  allow_failure: true
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
-        - "pnpm-lock.yaml"
-        - "package.json"
-        - "apps/*/package.json"
-        - "packages/*/package.json"
-    - if: '$CI_COMMIT_BRANCH == "next"'
-    - if: '$CI_COMMIT_BRANCH == "production"'
+  only:
+    - merge_requests
+    - next
+    - production
 
 # ===========================================
 # BUILD STAGE - AZURE
@@ -255,23 +208,9 @@ build_api_azure:
     - docker push $AZURE_IMAGE_API:$CI_COMMIT_SHORT_SHA
     - docker push $AZURE_IMAGE_API:$CI_COMMIT_REF_NAME
     - echo "Successfully pushed to ACR"
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "next"'
-      changes:
-        - "apps/api/**/*"
-        - "packages/**/*"
-        - "pnpm-lock.yaml"
-        - "package.json"
-        - "pnpm-workspace.yaml"
-        - "apps/api/Dockerfile"
-    - if: '$CI_COMMIT_BRANCH == "production"'
-      changes:
-        - "apps/api/**/*"
-        - "packages/**/*"
-        - "pnpm-lock.yaml"
-        - "package.json"
-        - "pnpm-workspace.yaml"
-        - "apps/api/Dockerfile"
+  only:
+    - next
+    - production
 
 build_web_azure:
   stage: build
@@ -285,23 +224,9 @@ build_web_azure:
     - docker push $AZURE_IMAGE_WEB:$CI_COMMIT_SHORT_SHA
     - docker push $AZURE_IMAGE_WEB:$CI_COMMIT_REF_NAME
     - echo "Successfully pushed to ACR"
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "next"'
-      changes:
-        - "apps/web/**/*"
-        - "packages/**/*"
-        - "pnpm-lock.yaml"
-        - "package.json"
-        - "pnpm-workspace.yaml"
-        - "apps/web/Dockerfile"
-    - if: '$CI_COMMIT_BRANCH == "production"'
-      changes:
-        - "apps/web/**/*"
-        - "packages/**/*"
-        - "pnpm-lock.yaml"
-        - "package.json"
-        - "pnpm-workspace.yaml"
-        - "apps/web/Dockerfile"
+  only:
+    - next
+    - production
 
 # ===========================================
 # DEPLOY STAGE - AZURE
@@ -310,11 +235,7 @@ build_web_azure:
 deploy_azure_next:
   stage: deploy
   extends: .azure_cli_base
-  needs:
-    - job: build_api_azure
-      optional: true
-    - job: build_web_azure
-      optional: true
+  needs: [build_api_azure, build_web_azure]
   script:
     - echo "Deploying to Azure App Service (Next Environment)..."
     - echo "Resource Group $AZURE_RESOURCE_GROUP"
@@ -387,18 +308,13 @@ deploy_azure_next:
   environment:
     name: azure-next
     url: https://${AZURE_WEB_APP_NAME_NEXT}.azurewebsites.net
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "next"'
-      when: on_success
+  only:
+    - next
 
 deploy_azure_production:
   stage: deploy
   extends: .azure_cli_base
-  needs:
-    - job: build_api_azure
-      optional: true
-    - job: build_web_azure
-      optional: true
+  needs: [build_api_azure, build_web_azure]
   script:
     - echo "Deploying to Azure App Service (Production Environment)..."
     - echo "Resource Group $AZURE_RESOURCE_GROUP"
@@ -474,9 +390,9 @@ deploy_azure_production:
   environment:
     name: azure-production
     url: https://pharmaflow.${DOMAIN}
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "production"'
-      when: on_success
+  only:
+    - production
+  when: manual
 
 # ===========================================
 # UTILITY JOBS
@@ -494,9 +410,9 @@ rollback_azure_next:
       az webapp restart --name $AZURE_WEB_APP_NAME_NEXT --resource-group $AZURE_RESOURCE_GROUP
   environment:
     name: azure-next
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "next"'
-      when: manual
+  only:
+    - next
+  when: manual
 
 # Rollback Azure Production
 rollback_azure_production:
@@ -510,6 +426,6 @@ rollback_azure_production:
       az webapp restart --name $AZURE_WEB_APP_NAME_PROD --resource-group $AZURE_RESOURCE_GROUP
   environment:
     name: azure-production
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "production"'
-      when: manual
+  only:
+    - production
+  when: manual
