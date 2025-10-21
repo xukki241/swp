@@ -1,7 +1,11 @@
-import { eq, ilike, or, and } from "drizzle-orm";
+import { eq, ilike, or, and, sql } from "drizzle-orm";
 
 import { db } from "../db/index.js";
-import { medicationVariants } from "../db/schema/index.js";
+import {
+  medicationVariants,
+  medications,
+  inventory,
+} from "../db/schema/index.js";
 /**
  * Get all medication variants with optional search and filters
  * @param {Object} options - Query options
@@ -132,5 +136,82 @@ export const deleteMedicationVariant = async (id) => {
     return result[0] || null;
   } catch (error) {
     throw new Error(`Failed to delete medication variant: ${error.message}`);
+  }
+};
+
+/**
+ * Search medication variants for POS with inventory data
+ * @param {Object} options - Query options
+ * @param {string} options.search - Search term
+ * @returns {Promise<Array>} List of variants with medication name and available quantity
+ */
+export const searchVariantsForSale = async ({ search } = {}) => {
+  try {
+    const { medications, inventory } = await import("../db/schema/index.js");
+    const { sql } = await import("drizzle-orm");
+
+    const conditions = [
+      eq(medicationVariants.isActive, true),
+      eq(medicationVariants.isForSale, true),
+    ];
+
+    // Add search filter if provided
+    if (search) {
+      conditions.push(
+        or(
+          ilike(medicationVariants.name, `%${search}%`),
+          ilike(medicationVariants.sku, `%${search}%`),
+          ilike(medicationVariants.barcode, `%${search}%`),
+          ilike(medications.name, `%${search}%`)
+        )
+      );
+    }
+
+    const query = db
+      .select({
+        id: medicationVariants.id,
+        medicationId: medicationVariants.medicationId,
+        medicationName: medications.name,
+        variantName: medicationVariants.name,
+        sku: medicationVariants.sku,
+        barcode: medicationVariants.barcode,
+        sellPrice: medicationVariants.sellPrice,
+        unit: medicationVariants.unit,
+        isActive: medicationVariants.isActive,
+        isForSale: medicationVariants.isForSale,
+        availableQuantity: sql`COALESCE(SUM(${inventory.quantity} - ${inventory.quantityReserved}), 0)`,
+      })
+      .from(medicationVariants)
+      .leftJoin(
+        medications,
+        eq(medicationVariants.medicationId, medications.id)
+      )
+      .leftJoin(
+        inventory,
+        eq(medicationVariants.id, inventory.medicationVariantId)
+      )
+      .where(and(...conditions))
+      .groupBy(
+        medicationVariants.id,
+        medicationVariants.medicationId,
+        medications.name,
+        medicationVariants.name,
+        medicationVariants.sku,
+        medicationVariants.barcode,
+        medicationVariants.sellPrice,
+        medicationVariants.unit,
+        medicationVariants.isActive,
+        medicationVariants.isForSale
+      );
+
+    const result = await query;
+
+    // Convert availableQuantity to number explicitly
+    return result.map((item) => ({
+      ...item,
+      availableQuantity: Number(item.availableQuantity) || 0,
+    }));
+  } catch (error) {
+    throw new Error(`Failed to search variants for sale: ${error.message}`);
   }
 };

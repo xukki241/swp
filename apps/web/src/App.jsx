@@ -9,7 +9,6 @@ import NotFoundPage from "@/pages/NotFoundPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import UserListPage from "@/pages/UserListPage";
 import UserProfilePage from "@/pages/UserProfilePage";
-import POSPage from "@/pages/POSPage";
 import PolicyPage from "@/pages/PolicyPage";
 // Supplier & Purchase Order imports
 import SupplierListPage from "./pages/supplier/SupplierListPage";
@@ -29,6 +28,9 @@ import InventoryTrackingPage from "@/pages/inventory/InventoryTrackingPage";
 import MedicationListPage from "@/pages/medications/MedicationListPage";
 import MedicationDetailPage from "@/pages/medications/MedicationDetailPage";
 import MedicationFormPage from "@/pages/medications/MedicationFormPage";
+import SalesPage from "./pages/sales/SalesPage";
+import SalesOrderListPage from "./pages/sales/SalesOrderListPage";
+import SalesOrderDetailPage from "./pages/sales/SalesOrderDetailPage";
 
 function App() {
   return (
@@ -50,14 +52,6 @@ function App() {
           element={
             <ProtectedRoute>
               <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/pos"
-          element={
-            <ProtectedRoute>
-              <POSPage />
             </ProtectedRoute>
           }
         />
@@ -192,6 +186,33 @@ function App() {
           element={
             <ProtectedRoute>
               <InventoryTrackingPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/sales"
+          element={
+            <ProtectedRoute>
+              <SalesPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/sales/orders"
+          element={
+            <ProtectedRoute>
+              <SalesOrderListPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/sales/orders/:id"
+          element={
+            <ProtectedRoute>
+              <SalesOrderDetailPage />
             </ProtectedRoute>
           }
         />

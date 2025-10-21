@@ -26,6 +26,35 @@ export const getAllMedicationVariants = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Search medication variants for POS/Sales
+ * @route GET /api/medications/variants/search-for-sale
+ */
+export const searchVariantsForSale = async (req, res, next) => {
+  try {
+    const { search } = req.query;
+    logger.info(`[POS Search] Searching for: "${search}"`);
+
+    const variants = await medicationVariantService.searchVariantsForSale({
+      search,
+    });
+
+    logger.info(`[POS Search] Found ${variants.length} variants`);
+    if (variants.length > 0) {
+      logger.info(`[POS Search] First result:`, variants[0]);
+    }
+
+    res.status(200).json({
+      success: true,
+      count: variants.length,
+      data: variants,
+    });
+  } catch (error) {
+    logger.error("Error in searchVariantsForSale controller:", error);
+    next(error);
+  }
+};
 /**
  * Get medication variant by ID
  * @route GET /api/medication-variants/:id
