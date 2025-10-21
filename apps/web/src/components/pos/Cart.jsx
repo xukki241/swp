@@ -1,7 +1,7 @@
-import { Trash2, Minus, Plus, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 
 export function Cart({ cart, onUpdateQuantity, onRemoveItem, calculateTotal }) {
   const formatPrice = (price) => {

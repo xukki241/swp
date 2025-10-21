@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as registrationController from "@/controllers/registrationController.js";
 import * as registrationService from "@/services/registrationService.js";
@@ -59,7 +59,7 @@ describe("RegistrationController", () => {
 
       await registrationController.getRegistrationById(req, res, next);
 
-      expect(registrationService.getRegistrationById).toHaveBeenCalledWith(1n);
+      expect(registrationService.getRegistrationById).toHaveBeenCalledWith("1");
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
@@ -84,7 +84,7 @@ describe("RegistrationController", () => {
       await registrationController.approveRegistration(req, res, next);
 
       expect(registrationService.approveRegistration).toHaveBeenCalledWith(
-        1n,
+        "1",
         "staff"
       );
       expect(res.status).toHaveBeenCalledWith(200);
@@ -100,7 +100,7 @@ describe("RegistrationController", () => {
       await registrationController.approveRegistration(req, res, next);
 
       expect(registrationService.approveRegistration).toHaveBeenCalledWith(
-        1n,
+        "1",
         "sales"
       );
     });
@@ -140,7 +140,7 @@ describe("RegistrationController", () => {
 
       await registrationController.rejectRegistration(req, res, next);
 
-      expect(registrationService.rejectRegistration).toHaveBeenCalledWith(1n);
+      expect(registrationService.rejectRegistration).toHaveBeenCalledWith("1");
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
@@ -165,7 +165,7 @@ describe("RegistrationController", () => {
 
       await registrationController.deleteRegistration(req, res, next);
 
-      expect(registrationService.deleteRegistration).toHaveBeenCalledWith(1n);
+      expect(registrationService.deleteRegistration).toHaveBeenCalledWith("1");
       expect(res.status).toHaveBeenCalledWith(200);
     });
 

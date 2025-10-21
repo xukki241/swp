@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { warehouseRackController } from "@/controllers/warehouse/warehouseRackController.js";
 import { warehouseRackService } from "@/services/warehouse/warehouseRackService.js";
@@ -24,7 +24,7 @@ describe("WarehouseRackController", () => {
       await warehouseRackController.create(req, res);
 
       expect(warehouseRackService.create).toHaveBeenCalledWith({
-        zoneId: 1,
+        zoneId: "1",
         code: "R001",
         name: "Rack A",
         description: undefined,
@@ -36,9 +36,9 @@ describe("WarehouseRackController", () => {
       req.body = { zoneId: "1" };
       warehouseRackService.create.mockRejectedValue(new Error("Error"));
 
-      await warehouseRackController.create(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
+      await expect(warehouseRackController.create(req, res)).rejects.toThrow(
+        "Error"
+      );
     });
   });
 
@@ -51,7 +51,7 @@ describe("WarehouseRackController", () => {
 
       expect(warehouseRackService.getAll).toHaveBeenCalledWith({
         search: "rack",
-        zoneId: 1,
+        zoneId: "1",
         limit: 100,
         offset: 0,
       });
@@ -64,9 +64,9 @@ describe("WarehouseRackController", () => {
     it("should handle errors", async () => {
       warehouseRackService.getAll.mockRejectedValue(new Error("Error"));
 
-      await warehouseRackController.getAll(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(500);
+      await expect(warehouseRackController.getAll(req, res)).rejects.toThrow(
+        "Error"
+      );
     });
   });
 
@@ -103,7 +103,7 @@ describe("WarehouseRackController", () => {
 
       await warehouseRackController.getByZoneId(req, res);
 
-      expect(warehouseRackService.getByZoneId).toHaveBeenCalledWith(1);
+      expect(warehouseRackService.getByZoneId).toHaveBeenCalledWith("1");
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: [{ id: 1 }, { id: 2 }],
@@ -114,9 +114,9 @@ describe("WarehouseRackController", () => {
       req.params = { zoneId: "1" };
       warehouseRackService.getByZoneId.mockRejectedValue(new Error("Error"));
 
-      await warehouseRackController.getByZoneId(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(500);
+      await expect(
+        warehouseRackController.getByZoneId(req, res)
+      ).rejects.toThrow("Error");
     });
   });
 
@@ -133,7 +133,7 @@ describe("WarehouseRackController", () => {
 
       expect(warehouseRackService.update).toHaveBeenCalledWith(1, {
         name: "Updated Rack",
-        zoneId: 2,
+        zoneId: "2",
       });
       expect(res.json).toHaveBeenCalledWith({
         success: true,

@@ -3,20 +3,20 @@
  */
 
 import express from "express";
+import { z } from "zod";
 import {
-  validate,
-  validateBody,
-  validateQuery,
-  validateParams,
-  users,
   auth,
+  inventory,
   medications,
-  warehouse,
   purchases,
   sales,
-  inventory,
+  users,
+  validate,
+  validateBody,
+  validateParams,
+  validateQuery,
+  warehouse,
 } from "../src/core";
-import { z } from "zod";
 
 const app = express();
 app.use(express.json());

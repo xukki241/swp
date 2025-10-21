@@ -1,10 +1,10 @@
 import { pgTable, timestamp } from "drizzle-orm/pg-core";
 
 import {
-  decimalColumn,
-  identityPrimaryKey,
-  foreignKey,
   createdAt,
+  decimalColumn,
+  foreignKey,
+  identityPrimaryKey,
 } from "./common.js";
 import { purchaseOrderStatus } from "./enums.js";
 import { suppliers } from "./suppliers.js";

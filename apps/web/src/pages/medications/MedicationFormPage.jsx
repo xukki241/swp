@@ -1,15 +1,7 @@
-import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router";
 import { AppLayout } from "@/components/layouts/app-layout";
-import {
-  useMedicationDetail,
-  useCreateMedication,
-  useUpdateMedication,
-} from "@/hooks/useMedications";
-import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -17,6 +9,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  useCreateMedication,
+  useMedicationDetail,
+  useUpdateMedication,
+} from "@/hooks/useMedications";
+import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router";
 
 export default function MedicationFormPage() {
   const navigate = useNavigate();

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as medicationController from "@/controllers/medicationController.js";
 import { inventoryService } from "@/services/inventoryService.js";
@@ -69,7 +69,7 @@ describe("MedicationController", () => {
 
       await medicationController.getMedicationById(req, res, next);
 
-      expect(medicationService.getMedicationById).toHaveBeenCalledWith(1n);
+      expect(medicationService.getMedicationById).toHaveBeenCalledWith("1");
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
@@ -205,8 +205,8 @@ describe("MedicationController", () => {
 
       await medicationController.updateMedication(req, res, next);
 
-      expect(medicationService.getMedicationById).toHaveBeenCalledWith(1n);
-      expect(medicationService.updateMedication).toHaveBeenCalledWith(1n, {
+      expect(medicationService.getMedicationById).toHaveBeenCalledWith("1");
+      expect(medicationService.updateMedication).toHaveBeenCalledWith("1", {
         name: "Aspirin Updated",
         brand: "Bayer",
         status: "active",
@@ -246,7 +246,7 @@ describe("MedicationController", () => {
 
       await medicationController.updateMedication(req, res, next);
 
-      expect(medicationService.updateMedication).toHaveBeenCalledWith(1n, {
+      expect(medicationService.updateMedication).toHaveBeenCalledWith("1", {
         name: "New Name",
       });
     });
@@ -274,7 +274,7 @@ describe("MedicationController", () => {
 
       await medicationController.deleteMedication(req, res, next);
 
-      expect(medicationService.deleteMedication).toHaveBeenCalledWith(1n);
+      expect(medicationService.deleteMedication).toHaveBeenCalledWith("1");
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
@@ -328,7 +328,7 @@ describe("MedicationController", () => {
 
       await medicationController.getMedicationInventory(req, res, next);
 
-      expect(inventoryService.getByMedicationId).toHaveBeenCalledWith(1);
+      expect(inventoryService.getByMedicationId).toHaveBeenCalledWith("1");
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         count: 1,

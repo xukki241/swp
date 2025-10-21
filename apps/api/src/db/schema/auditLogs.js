@@ -1,6 +1,6 @@
-import { pgTable, varchar, jsonb, uuid } from "drizzle-orm/pg-core";
+import { jsonb, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey, foreignKey, createdAt } from "./common.js";
+import { createdAt, foreignKey, identityPrimaryKey } from "./common.js";
 import { users } from "./users.js";
 
 export const auditLogs = pgTable("audit_logs", {

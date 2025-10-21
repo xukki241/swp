@@ -1,11 +1,11 @@
-import { pgTable, varchar, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 
 import {
   decimalColumn,
-  identityPrimaryKey,
   foreignKey,
-  name,
+  identityPrimaryKey,
   isActive,
+  name,
 } from "./common.js";
 import { medications } from "./medications.js";
 

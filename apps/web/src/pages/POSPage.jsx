@@ -1,8 +1,8 @@
 import { AppLayout } from "@/components/layouts/app-layout";
-import { CustomerSelector } from "@/components/pos/CustomerSelector";
-import { ProductSearch } from "@/components/pos/ProductSearch";
 import { Cart } from "@/components/pos/Cart";
 import { CheckoutPanel } from "@/components/pos/CheckoutPanel";
+import { CustomerSelector } from "@/components/pos/CustomerSelector";
+import { ProductSearch } from "@/components/pos/ProductSearch";
 import { usePOS } from "@/hooks/usePOS";
 
 export default function POSPage() {

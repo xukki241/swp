@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { purchaseOrderController } from "@/controllers/purchaseOrderController.js";
 import { purchaseOrderService } from "@/services/purchaseOrderService.js";
@@ -13,6 +13,7 @@ describe("PurchaseOrderController", () => {
       body: {},
       params: {},
       query: {},
+      user: { id: 1 }, // Mock authenticated user
     };
     res = {
       status: vi.fn().mockReturnThis(),
@@ -33,7 +34,10 @@ describe("PurchaseOrderController", () => {
 
       await purchaseOrderController.create(req, res);
 
-      expect(purchaseOrderService.create).toHaveBeenCalledWith(req.body);
+      expect(purchaseOrderService.create).toHaveBeenCalledWith(
+        req.body,
+        req.user.id
+      );
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(mockPO);
     });
@@ -68,7 +72,7 @@ describe("PurchaseOrderController", () => {
       await purchaseOrderController.getAll(req, res);
 
       expect(purchaseOrderService.getAll).toHaveBeenCalledWith({
-        supplierId: 1,
+        supplierId: "1", // Query params are strings
         status: "pending",
         startDate: undefined,
         endDate: undefined,
@@ -107,13 +111,13 @@ describe("PurchaseOrderController", () => {
 
   describe("getById", () => {
     it("should return purchase order by id", async () => {
-      req.params = { id: "1" };
-      const mockPO = { id: 1, supplierId: 1 };
+      req.params.id = "1";
+      const mockPO = { id: "1", supplierId: 1 };
       purchaseOrderService.getById.mockResolvedValue(mockPO);
 
       await purchaseOrderController.getById(req, res);
 
-      expect(purchaseOrderService.getById).toHaveBeenCalledWith(1);
+      expect(purchaseOrderService.getById).toHaveBeenCalledWith("1");
       expect(res.json).toHaveBeenCalledWith(mockPO);
     });
 
@@ -143,14 +147,14 @@ describe("PurchaseOrderController", () => {
 
   describe("update", () => {
     it("should update purchase order", async () => {
-      req.params = { id: "1" };
+      req.params.id = "1";
       req.body = { status: "approved" };
-      const mockPO = { id: 1, status: "approved" };
+      const mockPO = { id: "1", status: "approved" };
       purchaseOrderService.update.mockResolvedValue(mockPO);
 
       await purchaseOrderController.update(req, res);
 
-      expect(purchaseOrderService.update).toHaveBeenCalledWith(1, req.body);
+      expect(purchaseOrderService.update).toHaveBeenCalledWith("1", req.body);
       expect(res.json).toHaveBeenCalledWith(mockPO);
     });
 
@@ -182,13 +186,13 @@ describe("PurchaseOrderController", () => {
 
   describe("delete", () => {
     it("should delete purchase order", async () => {
-      req.params = { id: "1" };
-      const mockPO = { id: 1, supplierId: 1 };
+      req.params.id = "1";
+      const mockPO = { id: "1", supplierId: 1 };
       purchaseOrderService.delete.mockResolvedValue(mockPO);
 
       await purchaseOrderController.delete(req, res);
 
-      expect(purchaseOrderService.delete).toHaveBeenCalledWith(1);
+      expect(purchaseOrderService.delete).toHaveBeenCalledWith("1");
       expect(res.json).toHaveBeenCalledWith({
         message: "Purchase order deleted successfully",
         purchaseOrder: mockPO,

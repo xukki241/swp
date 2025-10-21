@@ -1,5 +1,3 @@
-import { memo } from "react";
-import { Search } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -8,6 +6,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Search } from "lucide-react";
+import { memo } from "react";
 import { UserTableRow } from "./UserTableRow";
 
 /**

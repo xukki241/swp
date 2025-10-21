@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { warehouseZoneController } from "@/controllers/warehouse/warehouseZoneController.js";
 import { warehouseZoneService } from "@/services/warehouse/warehouseZoneService.js";
@@ -52,9 +52,9 @@ describe("WarehouseZoneController", () => {
         new Error("Database error")
       );
 
-      await warehouseZoneController.create(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
+      await expect(warehouseZoneController.create(req, res)).rejects.toThrow(
+        "Database error"
+      );
     });
   });
 
@@ -82,9 +82,9 @@ describe("WarehouseZoneController", () => {
         new Error("Database error")
       );
 
-      await warehouseZoneController.getAll(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(500);
+      await expect(warehouseZoneController.getAll(req, res)).rejects.toThrow(
+        "Database error"
+      );
     });
   });
 

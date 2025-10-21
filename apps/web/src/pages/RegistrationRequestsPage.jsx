@@ -1,23 +1,4 @@
-import { useState } from "react";
-import { Search, CheckCircle, XCircle, Clock } from "lucide-react";
 import { AppLayout } from "@/components/layouts/app-layout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,12 +9,31 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
-  useRegistrationRequests,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   useApproveRegistration,
+  useRegistrationRequests,
   useRejectRegistration,
 } from "@/hooks/useRegistration";
+import { CheckCircle, Clock, Search, XCircle } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function RegistrationRequestsPage() {
   // Separate pending search input from actual search query

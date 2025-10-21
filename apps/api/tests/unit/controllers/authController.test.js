@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as authController from "@/controllers/authController.js";
 import * as authService from "@/services/authService.js";
@@ -316,7 +316,7 @@ describe("AuthController", () => {
       await authController.changePassword(req, res, next);
 
       expect(authService.changePassword).toHaveBeenCalledWith(
-        1n,
+        "1",
         "oldpassword123",
         "newpassword123"
       );

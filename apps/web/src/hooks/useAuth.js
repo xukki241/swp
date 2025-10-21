@@ -2,13 +2,13 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 
 import {
-  loginUser,
-  registerUser,
+  changePassword,
   getCurrentUser,
+  loginUser,
   logoutUser,
+  registerUser,
   requestPasswordReset,
   verifyResetOTP,
-  changePassword,
 } from "@/services/authService";
 
 /**

@@ -1,6 +1,6 @@
-import { pgTable, varchar, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey, foreignKey, int } from "./common.js";
+import { foreignKey, identityPrimaryKey, int } from "./common.js";
 import { files } from "./files.js";
 
 export const fileAttachments = pgTable(

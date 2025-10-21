@@ -1,5 +1,5 @@
-import { CheckCircle, XCircle, Ban } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Ban, CheckCircle, XCircle } from "lucide-react";
 
 /**
  * Status badge variants configuration

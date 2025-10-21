@@ -1,14 +1,14 @@
 import bcrypt from "bcryptjs";
-import { eq, count, and } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 
 import config from "../config/environment.js";
 import { db } from "../db/index.js";
 import {
-  users,
+  passwordResetTokens,
   userCredentials,
   userRegistrations,
-  passwordResetTokens,
+  users,
 } from "../db/schema/index.js";
 import { sendOTPEmail } from "../utils/email.js";
 import { generateOTP, getOTPExpiration, isOTPExpired } from "../utils/otp.js";
@@ -339,7 +339,7 @@ export const verifyToken = async (token) => {
   try {
     const decoded = jwt.verify(token, config.jwtSecret || "your-secret-key");
     return decoded;
-  } catch (error) {
+  } catch {
     throw new Error("Invalid or expired token");
   }
 };
@@ -347,10 +347,10 @@ export const verifyToken = async (token) => {
 /**
  * Request password reset OTP (Forgot Password Step 1)
  * @param {string} identifier - Email or phone number
- * @param {string} method - 'email' or 'sms'
+ * @param {string} _method - 'email' or 'sms'
  * @returns {Promise<Object>} Request result
  */
-export const requestPasswordReset = async (identifier, method = "email") => {
+export const requestPasswordReset = async (identifier, _method = "email") => {
   try {
     // Find user by email only (SMS removed)
     const [user] = await db
@@ -415,16 +415,16 @@ export const requestPasswordReset = async (identifier, method = "email") => {
 /**
  * Verify OTP and reset password (Forgot Password Step 2)
  * @param {string} identifier - Email or phone number
- * @param {string} otp - OTP code
+ * @param {string} otp - One-time password
  * @param {string} newPassword - New password
- * @param {string} method - 'email' or 'sms'
+ * @param {string} _method - 'email' or 'sms'
  * @returns {Promise<Object>} Reset result
  */
 export const verifyOTPAndResetPassword = async (
   identifier,
   otp,
   newPassword,
-  method = "email"
+  _method = "email"
 ) => {
   try {
     // Find user by email only (SMS removed)

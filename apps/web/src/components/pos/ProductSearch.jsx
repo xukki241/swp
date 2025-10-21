@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Search, Package } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { medicationService } from "@/services/medicationService";
+import { Package, Search } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export function ProductSearch({ onAddToCart }) {

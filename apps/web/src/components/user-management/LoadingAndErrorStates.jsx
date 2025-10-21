@@ -1,6 +1,6 @@
-import { XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { XCircle } from "lucide-react";
 
 /**
  * Loading state component

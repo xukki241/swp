@@ -1,12 +1,12 @@
 import {
-  listInventoryQuerySchema,
-  updateInventorySchema,
   adjustInventoryRequestSchema,
-  moveInventoryRequestSchema,
-  getInventorySummaryQuerySchema,
   getExpiringInventoryQuerySchema,
+  getInventorySummaryQuerySchema,
   getLowStockInventoryQuerySchema,
   inventoryBatchIdParamSchema,
+  listInventoryQuerySchema,
+  moveInventoryRequestSchema,
+  updateInventorySchema,
 } from "@pharmaflow/dto";
 import express from "express";
 
@@ -14,8 +14,8 @@ import { inventoryController } from "../controllers/inventoryController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 import {
   validateBody,
-  validateQuery,
   validateParams,
+  validateQuery,
 } from "../middleware/validate.js";
 
 export const inventoryRouter = express.Router();
