@@ -8,10 +8,6 @@ variables:
   ARTIFACT_COMPRESSION_LEVEL: "fast"
   CACHE_COMPRESSION_LEVEL: "fast"
 
-stages:
-  - prepare
-  - quality
-
 # Cache configuration
 .pnpm_cache:
   cache:
