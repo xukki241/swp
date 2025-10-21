@@ -8,6 +8,12 @@
 #   - next: Deploys to pharmaflow-next.{domain} (staging)
 #   - production: Deploys to pharmaflow.{domain} (production)
 
+stages:
+  - prepare
+  - quality
+  - build
+  - deploy
+
 include:
   - local: .gitlab-ci-quality.yml
   - local: .gitlab-ci-api.yml

@@ -12,10 +12,6 @@ variables:
   AZURE_REGISTRY: ${AZURE_ACR_LOGIN_SERVER}
   AZURE_IMAGE_WEB: ${AZURE_ACR_LOGIN_SERVER}/web
 
-stages:
-  - build
-  - deploy
-
 # Docker base for Azure ACR
 .docker_azure_base:
   image: docker:24-dind
