@@ -32,7 +32,7 @@ const currentUserId = req.user.userId; // UUID is a string
 ### Controllers (High Priority)
 
 - [x] `userController.js` - FIXED ✅
-- [x] `medicationController.js` - FIXED ✅
+- [x] `medicationController.js` - FIXED ✅ (All Number.parseInt removed - Oct 21, 2025)
 - [x] `medicationVariantController.js` - FIXED ✅ (partial)
 - [x] `registrationController.js` - FIXED ✅
 - [x] `authController.js` - FIXED ✅
@@ -121,8 +121,12 @@ if (userId === anotherUserId) // Correct (both strings)
   - `checkAuth.js` middleware ✅
   - `userService.js` ✅
   - `authService.js` ✅
-- **Medication Management Flow** (95%):
-  - `medicationController.js` ✅
+- **Medication Management Flow** (100%):
+  - `medicationController.js` ✅ (All 4 Number.parseInt removed - Oct 21, 2025)
+    - `getMedicationInventory` ✅
+    - `getMedicationSuppliers` ✅
+    - `getMedicationPurchases` ✅
+    - `getMedicationSales` ✅
   - `medicationVariantController.js` ✅ (3 BigInt(medicationId) còn lại)
 - **Supplier Management Flow** (100%):
   - `supplierController.js` ✅
@@ -160,5 +164,5 @@ If issues occur:
 
 ---
 
-**Last Updated**: October 14, 2025
-**Status**: In Progress
+**Last Updated**: October 21, 2025
+**Status**: 90% Complete (3 controllers pending)

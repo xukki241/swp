@@ -8,6 +8,7 @@ import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import UserListPage from "@/pages/UserListPage";
+import UserProfilePage from "@/pages/UserProfilePage";
 import POSPage from "@/pages/POSPage";
 import PolicyPage from "@/pages/PolicyPage";
 // Supplier & Purchase Order imports
@@ -70,6 +71,14 @@ function App() {
           element={
             <ProtectedRoute>
               <RegistrationRequestsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user-profile"
+          element={
+            <ProtectedRoute>
+              <UserProfilePage />
             </ProtectedRoute>
           }
         />
