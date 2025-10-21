@@ -288,7 +288,11 @@ build_web_azure:
 deploy_azure_next:
   stage: deploy
   extends: .azure_cli_base
-  needs: [build_api_azure, build_web_azure]
+  needs:
+    - job: build_api_azure
+      optional: true
+    - job: build_web_azure
+      optional: true
   script:
     - echo "Deploying to Azure App Service (Next Environment)..."
     - echo "Resource Group $AZURE_RESOURCE_GROUP"
@@ -368,7 +372,11 @@ deploy_azure_next:
 deploy_azure_production:
   stage: deploy
   extends: .azure_cli_base
-  needs: [build_api_azure, build_web_azure]
+  needs:
+    - job: build_api_azure
+      optional: true
+    - job: build_web_azure
+      optional: true
   script:
     - echo "Deploying to Azure App Service (Production Environment)..."
     - echo "Resource Group $AZURE_RESOURCE_GROUP"
