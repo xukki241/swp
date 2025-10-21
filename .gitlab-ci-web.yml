@@ -1,0 +1,188 @@
+# Web Application Pipeline - Build and Deploy
+# Runs on next and production branches when web files change
+
+variables:
+  NODE_VERSION: "22"
+  PNPM_VERSION: "10.18.2"
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  FF_USE_FASTZIP: "true"
+
+  # Azure Container Registry
+  AZURE_REGISTRY: ${AZURE_ACR_LOGIN_SERVER}
+  AZURE_IMAGE_WEB: ${AZURE_ACR_LOGIN_SERVER}/web
+
+stages:
+  - build
+  - deploy
+
+# Docker base for Azure ACR
+.docker_azure_base:
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - echo "Installing Azure CLI dependencies..."
+    - apk add --no-cache bash curl python3 py3-pip gcc musl-dev python3-dev libffi-dev openssl-dev make
+    - pip3 install --break-system-packages azure-cli --no-cache-dir
+    - echo "Verifying Docker connection..."
+    - docker info
+    - echo "Logging in to Azure..."
+    - az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+    - az account set --subscription $AZURE_SUBSCRIPTION_ID
+    - echo "Logging in to Azure Container Registry..."
+    - |
+      ACCESS_TOKEN=$(az acr login --name $AZURE_ACR_NAME --expose-token --output tsv --query accessToken)
+      echo $ACCESS_TOKEN | docker login ${AZURE_ACR_LOGIN_SERVER} --username 00000000-0000-0000-0000-000000000000 --password-stdin
+
+# Azure CLI base
+.azure_cli_base:
+  image: mcr.microsoft.com/azure-cli:latest
+  before_script:
+    - echo "Logging in to Azure..."
+    - az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+    - az account set --subscription $AZURE_SUBSCRIPTION_ID
+
+# ===========================================
+# BUILD STAGE
+# ===========================================
+
+build_web:
+  stage: build
+  extends: .docker_azure_base
+  script:
+    - echo "Building Web for Azure Container Registry..."
+    - echo "Registry $AZURE_ACR_LOGIN_SERVER"
+    - docker build -f apps/web/Dockerfile -t $AZURE_IMAGE_WEB:$CI_COMMIT_SHORT_SHA -t $AZURE_IMAGE_WEB:$CI_COMMIT_REF_NAME .
+    - echo "Pushing to Azure Container Registry..."
+    - docker push $AZURE_IMAGE_WEB:$CI_COMMIT_SHORT_SHA
+    - docker push $AZURE_IMAGE_WEB:$CI_COMMIT_REF_NAME
+    - echo "Successfully pushed to ACR"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "next"'
+      changes:
+        - "apps/web/**/*"
+        - "packages/**/*"
+        - "pnpm-lock.yaml"
+        - "package.json"
+        - "pnpm-workspace.yaml"
+        - "apps/web/Dockerfile"
+    - if: '$CI_COMMIT_BRANCH == "production"'
+      changes:
+        - "apps/web/**/*"
+        - "packages/**/*"
+        - "pnpm-lock.yaml"
+        - "package.json"
+        - "pnpm-workspace.yaml"
+        - "apps/web/Dockerfile"
+
+# ===========================================
+# DEPLOY STAGE
+# ===========================================
+
+deploy_web_next:
+  stage: deploy
+  extends: .azure_cli_base
+  needs:
+    - job: build_web
+      optional: true
+  script:
+    - echo "Deploying Web to Azure App Service (Next Environment)..."
+    - echo "Resource Group $AZURE_RESOURCE_GROUP"
+
+    # Deploy Web Container
+    - echo "Updating Web container image..."
+    - |
+      az webapp config container set \
+        --name $AZURE_WEB_APP_NAME_NEXT \
+        --resource-group $AZURE_RESOURCE_GROUP \
+        --docker-custom-image-name ${AZURE_IMAGE_WEB}:next \
+        --docker-registry-server-url https://${AZURE_ACR_LOGIN_SERVER}
+
+    # Configure Web Environment Variables
+    - echo "Configuring Web environment variables..."
+    - |
+      az webapp config appsettings set \
+        --resource-group $AZURE_RESOURCE_GROUP \
+        --name $AZURE_WEB_APP_NAME_NEXT \
+        --settings \
+          WEBSITES_PORT=80 \
+          VITE_API_URL="https://${AZURE_API_APP_NAME_NEXT}.azurewebsites.net"
+
+    # Restart Web
+    - echo "Restarting Web service..."
+    - az webapp restart --name $AZURE_WEB_APP_NAME_NEXT --resource-group $AZURE_RESOURCE_GROUP
+
+    # Wait for service
+    - echo "Waiting for service to start..."
+    - sleep 20
+
+    # Display URL
+    - |
+      echo "================================"
+      echo "Web Deployment Complete!"
+      echo "================================"
+      echo "Web URL: https://${AZURE_WEB_APP_NAME_NEXT}.azurewebsites.net"
+      echo "================================"
+
+  environment:
+    name: azure-web-next
+    url: https://${AZURE_WEB_APP_NAME_NEXT}.azurewebsites.net
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "next"'
+      when: on_success
+
+deploy_web_production:
+  stage: deploy
+  extends: .azure_cli_base
+  needs:
+    - job: build_web
+      optional: true
+  script:
+    - echo "Deploying Web to Azure App Service (Production Environment)..."
+    - echo "Resource Group $AZURE_RESOURCE_GROUP"
+
+    # Deploy Web Container
+    - echo "Updating Web container image..."
+    - |
+      az webapp config container set \
+        --name $AZURE_WEB_APP_NAME_PROD \
+        --resource-group $AZURE_RESOURCE_GROUP \
+        --docker-custom-image-name ${AZURE_IMAGE_WEB}:production \
+        --docker-registry-server-url https://${AZURE_ACR_LOGIN_SERVER}
+
+    # Configure Web Environment Variables
+    - echo "Configuring Web environment variables..."
+    - |
+      az webapp config appsettings set \
+        --resource-group $AZURE_RESOURCE_GROUP \
+        --name $AZURE_WEB_APP_NAME_PROD \
+        --settings \
+          WEBSITES_PORT=80 \
+          VITE_API_URL="https://${AZURE_API_APP_NAME_PROD}.azurewebsites.net"
+
+    # Restart Web
+    - echo "Restarting Web service..."
+    - az webapp restart --name $AZURE_WEB_APP_NAME_PROD --resource-group $AZURE_RESOURCE_GROUP
+
+    # Wait for service
+    - echo "Waiting for service to start..."
+    - sleep 20
+
+    # Display URL
+    - |
+      echo "================================"
+      echo "Web Production Deployment Complete!"
+      echo "================================"
+      echo "Web URL: https://pharmaflow.${DOMAIN}"
+      echo "================================"
+
+  environment:
+    name: azure-web-production
+    url: https://pharmaflow.${DOMAIN}
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "production"'
+      when: on_success
