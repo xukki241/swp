@@ -297,7 +297,6 @@ deploy_azure_next:
     url: https://${AZURE_WEB_APP_NAME_NEXT}.azurewebsites.net
   only:
     - next
-  when: manual
 
 deploy_azure_production:
   stage: deploy
