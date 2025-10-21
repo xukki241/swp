@@ -1,34 +1,34 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import DashboardPage from "@/pages/Dashboard";
-import LoginPage from "@/pages/LoginPage";
-import RegisterPage from "@/pages/RegisterPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
-import ResetPasswordPage from "@/pages/ResetPasswordPage";
+import LoginPage from "@/pages/LoginPage";
 import NotFoundPage from "@/pages/NotFoundPage";
-import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
-import UserListPage from "@/pages/UserListPage";
-import UserProfilePage from "@/pages/UserProfilePage";
 import POSPage from "@/pages/POSPage";
 import PolicyPage from "@/pages/PolicyPage";
+import RegisterPage from "@/pages/RegisterPage";
+import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
+import UserListPage from "@/pages/UserListPage";
+import UserProfilePage from "@/pages/UserProfilePage";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 // Supplier & Purchase Order imports
-import SupplierListPage from "./pages/supplier/SupplierListPage";
+import PurchaseOrderCreatePage from "./pages/purchaseOrder/PurchaseOrderCreatePage";
+import PurchaseOrderDetailPage from "./pages/purchaseOrder/PurchaseOrderDetailPage";
+import PurchaseOrderListPage from "./pages/purchaseOrder/PurchaseOrderListPage";
+import PurchaseOrderReceiptCreatePage from "./pages/purchaseOrder/PurchaseOrderReceiptCreatePage";
+import PurchaseOrderReceiptDetailPage from "./pages/purchaseOrder/PurchaseOrderReceiptDetailPage";
+import PurchaseOrderReceiptListPage from "./pages/purchaseOrder/PurchaseOrderReceiptListPage";
 import SupplierCreatePage from "./pages/supplier/SupplierCreatePage";
 import SupplierDetailPage from "./pages/supplier/SupplierDetailPage";
 import SupplierEditPage from "./pages/supplier/SupplierEditPage";
-import PurchaseOrderListPage from "./pages/purchaseOrder/PurchaseOrderListPage";
-import PurchaseOrderCreatePage from "./pages/purchaseOrder/PurchaseOrderCreatePage";
-import PurchaseOrderDetailPage from "./pages/purchaseOrder/PurchaseOrderDetailPage";
-import PurchaseOrderReceiptListPage from "./pages/purchaseOrder/PurchaseOrderReceiptListPage";
-import PurchaseOrderReceiptDetailPage from "./pages/purchaseOrder/PurchaseOrderReceiptDetailPage";
-import PurchaseOrderReceiptCreatePage from "./pages/purchaseOrder/PurchaseOrderReceiptCreatePage";
+import SupplierListPage from "./pages/supplier/SupplierListPage";
 // Inventory imports
+import InventoryTrackingPage from "@/pages/inventory/InventoryTrackingPage";
 import StockOverviewPage from "@/pages/inventory/StockOverviewPage";
 import WarehousePage from "@/pages/inventory/WarehousePage";
-import InventoryTrackingPage from "@/pages/inventory/InventoryTrackingPage";
-import MedicationListPage from "@/pages/medications/MedicationListPage";
 import MedicationDetailPage from "@/pages/medications/MedicationDetailPage";
 import MedicationFormPage from "@/pages/medications/MedicationFormPage";
+import MedicationListPage from "@/pages/medications/MedicationListPage";
 
 function App() {
   return (

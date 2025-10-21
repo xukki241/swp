@@ -1,17 +1,66 @@
 // Ensure module-alias is registered for path aliases
 import "module-alias/register.js";
 
-import { vi, beforeEach } from "vitest";
+import { beforeEach, vi } from "vitest";
 
 // Global mocks setup
 vi.mock("@/db/index.js", () => ({
   db: {
-    select: vi.fn(),
-    insert: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-    transaction: vi.fn(),
-    query: {},
+    select: vi.fn(() => ({
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          limit: vi.fn(() => []),
+          orderBy: vi.fn(() => []),
+        })),
+        leftJoin: vi.fn(() => ({
+          where: vi.fn(() => ({
+            groupBy: vi.fn(() => []),
+          })),
+        })),
+        orderBy: vi.fn(() => []),
+        limit: vi.fn(() => []),
+      })),
+    })),
+    insert: vi.fn(() => ({
+      values: vi.fn(() => ({
+        returning: vi.fn(() => []),
+      })),
+    })),
+    update: vi.fn(() => ({
+      set: vi.fn(() => ({
+        where: vi.fn(() => ({
+          returning: vi.fn(() => []),
+        })),
+      })),
+    })),
+    delete: vi.fn(() => ({
+      where: vi.fn(() => ({
+        returning: vi.fn(() => []),
+      })),
+    })),
+    transaction: vi.fn((callback) => callback(this.db)),
+    query: {
+      inventory: {
+        findMany: vi.fn(() => []),
+        findFirst: vi.fn(() => null),
+      },
+      warehouseBins: {
+        findMany: vi.fn(() => []),
+        findFirst: vi.fn(() => null),
+      },
+      warehouseRacks: {
+        findMany: vi.fn(() => []),
+        findFirst: vi.fn(() => null),
+      },
+      warehouseZones: {
+        findMany: vi.fn(() => []),
+        findFirst: vi.fn(() => null),
+      },
+      suppliers: {
+        findMany: vi.fn(() => []),
+        findFirst: vi.fn(() => null),
+      },
+    },
   },
 }));
 

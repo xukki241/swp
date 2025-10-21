@@ -1,6 +1,6 @@
-import { CreditCard, Banknote, Smartphone, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Banknote, Building2, CreditCard, Smartphone } from "lucide-react";
 
 const paymentMethods = [
   { value: "cash", label: "Cash", icon: Banknote },

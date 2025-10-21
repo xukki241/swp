@@ -1,11 +1,11 @@
 import { z } from "zod";
 import {
-  uuidSchema,
-  nameSchema,
-  emailSchema,
-  phoneSchema,
   addressSchema,
+  emailSchema,
+  nameSchema,
   paginationSchema,
+  phoneSchema,
+  uuidSchema,
 } from "../common/index.js";
 
 // Customer schema

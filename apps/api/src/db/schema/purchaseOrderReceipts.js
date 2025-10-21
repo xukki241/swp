@@ -1,6 +1,6 @@
 import { pgTable } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey, foreignKey, createdAt } from "./common.js";
+import { createdAt, foreignKey, identityPrimaryKey } from "./common.js";
 import { purchaseOrders } from "./purchaseOrders.js";
 import { users } from "./users.js";
 

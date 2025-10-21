@@ -1,4 +1,4 @@
-import { eq, ilike, or, and } from "drizzle-orm";
+import { and, eq, ilike, or } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import { medicationVariants } from "../db/schema/index.js";

@@ -1,8 +1,8 @@
 import eslint from "@eslint/js";
-import { defineConfig, globalIgnores } from "eslint/config";
 import importPlugin from "eslint-plugin-import";
-import promisePlugin from "eslint-plugin-promise";
 import prettierPlugin from "eslint-plugin-prettier/recommended";
+import promisePlugin from "eslint-plugin-promise";
+import { defineConfig, globalIgnores } from "eslint/config";
 
 export const baseConfig = defineConfig([
   globalIgnores([

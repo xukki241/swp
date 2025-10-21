@@ -1,6 +1,6 @@
-import { pgTable, jsonb } from "drizzle-orm/pg-core";
+import { jsonb, pgTable } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey, createdAt } from "./common.js";
+import { createdAt, identityPrimaryKey } from "./common.js";
 import { reportType } from "./enums.js";
 
 export const reports = pgTable("reports", {

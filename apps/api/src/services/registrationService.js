@@ -2,9 +2,9 @@ import { eq } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import {
-  users,
   userCredentials,
   userRegistrations,
+  users,
 } from "../db/schema/index.js";
 
 /**

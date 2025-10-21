@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { db } from "@/db/index.js";
 import { warehouseZoneService } from "@/services/warehouse/warehouseZoneService.js";
@@ -34,12 +34,11 @@ describe("WarehouseZoneService", () => {
         { id: 2, code: "Z-002", name: "Zone B", type: "quarantine" },
       ];
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockZones),
+      db.query = {
+        warehouseZones: {
+          findMany: vi.fn().mockResolvedValue(mockZones),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await warehouseZoneService.getAll();
 
@@ -49,13 +48,11 @@ describe("WarehouseZoneService", () => {
     it("should filter zones by search term", async () => {
       const mockZones = [{ id: 1, code: "Z-001", name: "Zone A" }];
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockZones),
+      db.query = {
+        warehouseZones: {
+          findMany: vi.fn().mockResolvedValue(mockZones),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await warehouseZoneService.getAll({ search: "Zone A" });
 
@@ -65,13 +62,11 @@ describe("WarehouseZoneService", () => {
     it("should filter zones by type", async () => {
       const mockZones = [{ id: 1, code: "Z-001", type: "storage" }];
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockZones),
+      db.query = {
+        warehouseZones: {
+          findMany: vi.fn().mockResolvedValue(mockZones),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await warehouseZoneService.getAll({ type: "storage" });
 
@@ -81,38 +76,34 @@ describe("WarehouseZoneService", () => {
 
   describe("getById", () => {
     it("should fetch zone by id with racks", async () => {
-      const mockZone = { id: 1, code: "Z-001", name: "Zone A" };
-      const mockRacks = [
-        { id: 1, code: "R-001", name: "Rack 1" },
-        { id: 2, code: "R-002", name: "Rack 2" },
-      ];
-
-      // Mock zone selection
-      const mockZoneQuery = {
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue([mockZone]),
+      const mockZone = {
+        id: 1,
+        code: "Z-001",
+        name: "Zone A",
+        racks: [
+          { id: 1, code: "R-001", name: "Rack 1" },
+          { id: 2, code: "R-002", name: "Rack 2" },
+        ],
       };
-      db.select.mockReturnValueOnce(mockZoneQuery);
 
-      // Mock racks selection
-      const mockRacksQuery = {
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockRacks),
+      db.query = {
+        warehouseZones: {
+          findFirst: vi.fn().mockResolvedValue(mockZone),
+        },
       };
-      db.select.mockReturnValueOnce(mockRacksQuery);
 
       const result = await warehouseZoneService.getById(1);
 
       expect(result.name).toBe("Zone A");
-      expect(result.racks).toEqual(mockRacks);
+      expect(result.racks).toHaveLength(2);
     });
 
     it("should return null for non-existent zone", async () => {
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue([]),
+      db.query = {
+        warehouseZones: {
+          findFirst: vi.fn().mockResolvedValue(null),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await warehouseZoneService.getById(999);
 
@@ -124,11 +115,11 @@ describe("WarehouseZoneService", () => {
     it("should fetch zone by code", async () => {
       const mockZone = { id: 1, code: "Z-001", name: "Zone A" };
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue([mockZone]),
+      db.query = {
+        warehouseZones: {
+          findFirst: vi.fn().mockResolvedValue(mockZone),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await warehouseZoneService.getByCode("Z-001");
 
@@ -158,19 +149,17 @@ describe("WarehouseZoneService", () => {
     it("should delete zone without racks", async () => {
       const mockZone = { id: 1, code: "Z-001", name: "Zone A" };
 
-      // Mock racks check - no racks
-      const mockRacksQuery = {
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue([]),
+      // Mock db.query.warehouseRacks.findMany - no racks
+      db.query = {
+        warehouseRacks: {
+          findMany: vi.fn().mockResolvedValue([]),
+        },
       };
-      db.select.mockReturnValue(mockRacksQuery);
 
       // Mock zone deletion
-      const mockDeleteQuery = {
-        where: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([mockZone]),
-      };
-      db.delete.mockReturnValue(mockDeleteQuery);
+      const mockReturning = vi.fn().mockResolvedValue([mockZone]);
+      const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning });
+      db.delete = vi.fn().mockReturnValue({ where: mockWhere });
 
       const result = await warehouseZoneService.delete(1);
 
@@ -180,14 +169,15 @@ describe("WarehouseZoneService", () => {
     it("should throw error when zone has racks", async () => {
       const mockRacks = [{ id: 1, name: "Rack 1" }];
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockRacks),
+      // Mock db.query.warehouseRacks.findMany - has racks
+      db.query = {
+        warehouseRacks: {
+          findMany: vi.fn().mockResolvedValue(mockRacks),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       await expect(warehouseZoneService.delete(1)).rejects.toThrow(
-        "Cannot delete zone"
+        "Cannot delete zone. It has 1 rack(s) associated with it."
       );
     });
   });

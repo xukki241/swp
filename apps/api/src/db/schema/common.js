@@ -1,12 +1,12 @@
 import { sql } from "drizzle-orm";
 import {
-  varchar,
   boolean,
-  timestamp,
-  text,
   doublePrecision,
-  uuid,
   integer,
+  text,
+  timestamp,
+  uuid,
+  varchar,
 } from "drizzle-orm/pg-core";
 
 export const id = uuid("id").primaryKey().defaultRandom();

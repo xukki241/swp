@@ -1,11 +1,6 @@
 "use client";
 
-import { Link, useNavigate } from "react-router";
-import { useForm } from "react-hook-form";
-import { Pill, AlertCircle, CheckCircle, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -13,9 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Loading } from "@/components/ui/loading";
 import { useVerifyResetOTP } from "@/hooks/useAuth";
+import { AlertCircle, CheckCircle, Eye, EyeOff, Pill } from "lucide-react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router";
 
 export default function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);

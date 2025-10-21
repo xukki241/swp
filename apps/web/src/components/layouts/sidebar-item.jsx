@@ -1,7 +1,7 @@
+import { cn } from "@/lib/utils";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export function SidebarItem({ item, collapsed }) {
   const location = useLocation();

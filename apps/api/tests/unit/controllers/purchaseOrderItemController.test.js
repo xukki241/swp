@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { purchaseOrderItemController } from "@/controllers/purchaseOrderItemController.js";
 import { purchaseOrderItemService } from "@/services/purchaseOrderItemService.js";
@@ -18,7 +18,11 @@ describe("PurchaseOrderItemController", () => {
 
   describe("create", () => {
     it("should create purchase order item", async () => {
-      req.body = { purchaseOrderId: 1, medicationVariantId: 1, quantity: 100 };
+      req.body = {
+        purchaseOrderId: "1",
+        medicationVariantId: 1,
+        quantity: 100,
+      };
       const mockItem = { id: 1, ...req.body };
       purchaseOrderItemService.create.mockResolvedValue(mockItem);
 
@@ -54,7 +58,7 @@ describe("PurchaseOrderItemController", () => {
       await purchaseOrderItemController.getAll(req, res);
 
       expect(purchaseOrderItemService.getAll).toHaveBeenCalledWith({
-        purchaseOrderId: 1,
+        purchaseOrderId: "1",
         limit: 50,
         offset: 0,
       });

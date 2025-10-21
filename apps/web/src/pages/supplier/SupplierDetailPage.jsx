@@ -1,8 +1,15 @@
 "use client";
 
-import { useParams, useNavigate } from "react-router";
 import { AppLayout } from "@/components/layouts/app-layout";
-import { useSupplier, useSupplierMedications } from "@/hooks/useSuppliers";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -11,16 +18,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Pencil, CheckCircle, XCircle, Ban } from "lucide-react";
+import { useSupplier, useSupplierMedications } from "@/hooks/useSuppliers";
+import { ArrowLeft, Ban, CheckCircle, Pencil, XCircle } from "lucide-react";
+import { useNavigate, useParams } from "react-router";
 
 export default function SupplierDetailPage() {
   const { id } = useParams();

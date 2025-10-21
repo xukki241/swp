@@ -1,13 +1,14 @@
 import { z } from "zod";
 import {
-  uuidSchema,
-  nameSchema,
-  emailSchema,
-  phoneSchema,
   addressSchema,
+  emailSchema,
+  nameSchema,
   paginationSchema,
+  phoneSchema,
+  userRoleEnum,
+  userStatusEnum,
+  uuidSchema,
 } from "../common/index.js";
-import { userRoleEnum, userStatusEnum } from "../common/index.js";
 
 // Base user schema
 export const userSchema = z.object({

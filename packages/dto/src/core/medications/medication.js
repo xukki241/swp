@@ -1,12 +1,12 @@
 import { z } from "zod";
 import {
-  uuidSchema,
-  nameSchema,
-  descriptionSchema,
   booleanSchema,
+  descriptionSchema,
+  medicationStatusEnum,
+  nameSchema,
   paginationSchema,
+  uuidSchema,
 } from "../common/index.js";
-import { medicationStatusEnum } from "../common/index.js";
 
 // Medication schema
 export const medicationSchema = z.object({

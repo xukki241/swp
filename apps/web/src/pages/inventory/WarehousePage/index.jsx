@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useWarehouse } from "../../../hooks/useWarehouse";
+import { AppLayout } from "@/components/layouts/app-layout";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -16,9 +16,9 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Skeleton } from "../../../components/ui/skeleton";
-import ZoneDetailsCard from "./components/ZoneDetailsCard";
+import { useWarehouse } from "../../../hooks/useWarehouse";
 import { RackList } from "./components/RackList";
-import { AppLayout } from "@/components/layouts/app-layout";
+import ZoneDetailsCard from "./components/ZoneDetailsCard";
 
 export default function WarehousePage() {
   const { zones, selectZone, selectedZone, racks, loading } = useWarehouse();

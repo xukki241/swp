@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -6,9 +5,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Eye } from "lucide-react";
-import MedicineDialog from "./MedicineDialog";
 import { cn } from "@/lib/utils";
+import { Eye } from "lucide-react";
+import { useState } from "react";
+import MedicineDialog from "./MedicineDialog";
 
 const MedicineCard = ({ medicine, variant }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);

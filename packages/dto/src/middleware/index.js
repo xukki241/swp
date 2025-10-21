@@ -1,8 +1,8 @@
 export {
-  validateBody,
-  validateQuery,
-  validateParams,
-  validate,
   asyncValidate,
   safeValidate,
+  validate,
+  validateBody,
+  validateParams,
+  validateQuery,
 } from "./validate.js";

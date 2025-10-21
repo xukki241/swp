@@ -132,7 +132,7 @@ export const optionalAuth = async (req, res, next) => {
     }
 
     next();
-  } catch (error) {
+  } catch {
     // If optional auth fails, just continue without user
     next();
   }

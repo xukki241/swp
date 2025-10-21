@@ -55,7 +55,7 @@ export const getMedicationVariantById = async (req, res, next) => {
  * Create a new medication variant
  * @route POST /api/medication-variants
  */
-export const createMedicationVariant = async (req, res, next) => {
+export const createMedicationVariant = async (req, res, _next) => {
   try {
     const {
       medicationId,
@@ -119,7 +119,7 @@ export const createMedicationVariant = async (req, res, next) => {
  * Update medication variant by ID
  * @route PUT /api/medication-variants/:id
  */
-export const updateMedicationVariant = async (req, res, next) => {
+export const updateMedicationVariant = async (req, res, _next) => {
   try {
     const id = req.params.id; // UUID is a string
     const {

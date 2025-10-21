@@ -1,8 +1,10 @@
 "use client";
 
-import { useCurrentUser, useChangePassword } from "@/hooks/useAuth";
+import { useChangePassword, useCurrentUser } from "@/hooks/useAuth";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -19,17 +21,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { AppLayout } from "@/components/layouts/app-layout";
-import { toast } from "sonner";
-import { Mail, Phone, User, KeyRound } from "lucide-react";
-import { useState } from "react";
 import { Loading } from "@/components/ui/loading";
+import { KeyRound, Mail, Phone, User } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function UserProfile() {
   const { data: currentUser, isLoading, isError } = useCurrentUser();

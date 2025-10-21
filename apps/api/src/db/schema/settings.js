@@ -1,6 +1,6 @@
-import { pgTable, varchar, uniqueIndex, jsonb } from "drizzle-orm/pg-core";
+import { jsonb, pgTable, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey, description } from "./common.js";
+import { description, identityPrimaryKey } from "./common.js";
 
 export const settings = pgTable(
   "settings",

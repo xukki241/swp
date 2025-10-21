@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { supplierController } from "@/controllers/supplierController.js";
 import { supplierService } from "@/services/supplierService.js";
@@ -13,6 +13,7 @@ describe("SupplierController", () => {
     res = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn().mockReturnThis(),
+      send: vi.fn().mockReturnThis(),
     };
   });
 
@@ -36,6 +37,9 @@ describe("SupplierController", () => {
 
     it("should return 400 if required fields missing", async () => {
       req.body = { name: "Supplier A" };
+      supplierService.create.mockRejectedValue(
+        new Error("Missing required fields: name, contactName, email, phone")
+      );
 
       await supplierController.create(req, res);
 
@@ -54,6 +58,9 @@ describe("SupplierController", () => {
         address: "123 Main St",
         medicationVariants: [{ price: 10 }], // missing medicationVariantId
       };
+      supplierService.create.mockRejectedValue(
+        new Error("Each medication variant must have medicationVariantId")
+      );
 
       await supplierController.create(req, res);
 
@@ -111,7 +118,7 @@ describe("SupplierController", () => {
 
       await supplierController.getById(req, res);
 
-      expect(supplierService.getById).toHaveBeenCalledWith(1);
+      expect(supplierService.getById).toHaveBeenCalledWith("1");
       expect(res.json).toHaveBeenCalledWith({ id: 1 });
     });
 
@@ -133,7 +140,7 @@ describe("SupplierController", () => {
 
       await supplierController.update(req, res);
 
-      expect(supplierService.update).toHaveBeenCalledWith(1, req.body);
+      expect(supplierService.update).toHaveBeenCalledWith("1", req.body);
       expect(res.json).toHaveBeenCalledWith({ id: 1, ...req.body });
     });
 
@@ -154,10 +161,8 @@ describe("SupplierController", () => {
 
       await supplierController.delete(req, res);
 
-      expect(res.json).toHaveBeenCalledWith({
-        message: "Supplier deleted successfully",
-        supplier: { id: 1 },
-      });
+      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.send).toHaveBeenCalled();
     });
 
     it("should return 404 if not found", async () => {

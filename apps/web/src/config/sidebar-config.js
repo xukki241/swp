@@ -1,13 +1,13 @@
 import {
-  LayoutDashboard,
-  Truck,
-  ClipboardList,
-  Package,
-  ShoppingCart,
   BarChart2,
-  Settings,
-  Users,
+  ClipboardList,
+  LayoutDashboard,
+  Package,
   Pill,
+  Settings,
+  ShoppingCart,
+  Truck,
+  Users,
 } from "lucide-react";
 
 export const sidebarConfig = [
