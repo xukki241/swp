@@ -50,7 +50,9 @@ export default function MedicationSearch({
                 </p>
                 <div className="flex gap-4 mt-2 text-sm">
                   <span className="text-gray-600">
-                    Price: ${medication.sellPrice?.toFixed(2)}
+                    Price:{" "}
+                    {Number(medication.sellPrice || 0).toLocaleString("vi-VN")}{" "}
+                    VNĐ
                   </span>
                   <span className="text-gray-600">
                     Stock: {medication.availableQuantity}

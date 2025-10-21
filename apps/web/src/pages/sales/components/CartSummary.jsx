@@ -15,7 +15,7 @@ export default function CartSummary({
   };
 
   return (
-    <Card className="border border-gray-200 sticky top-8">
+    <Card className="border border-gray-200 sticky top-8 bg-gray-50">
       <CardHeader className="bg-gray-50 border-b border-gray-200">
         <div className="flex items-center gap-2">
           <ShoppingCart className="w-5 h-5" />

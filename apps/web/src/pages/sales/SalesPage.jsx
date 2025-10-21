@@ -380,7 +380,7 @@ export default function SalesPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Step 1: Customer Selection */}
-            <Card className="border border-gray-200">
+            <Card className="border border-gray-200 bg-gray-50">
               <CardHeader className="bg-gray-50 border-b border-gray-200">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold">
@@ -494,7 +494,7 @@ export default function SalesPage() {
             </Card>
 
             {/* Step 2: Add Products */}
-            <Card className="border border-gray-200">
+            <Card className="border border-gray-200 bg-gray-50">
               <CardHeader className="bg-gray-50 border-b border-gray-200">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold">
@@ -515,7 +515,7 @@ export default function SalesPage() {
 
             {/* Step 3: Manage Cart */}
             {cart.length > 0 && (
-              <Card className="border border-gray-200">
+              <Card className="border border-gray-200 bg-gray-50">
                 <CardHeader className="bg-gray-50 border-b border-gray-200">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold">
@@ -574,7 +574,7 @@ export default function SalesPage() {
 
             {/* Step 4: Payment Method */}
             {cart.length > 0 && (
-              <Card className="border border-gray-200">
+              <Card className="border border-gray-200 bg-gray-50">
                 <CardHeader className="bg-gray-50 border-b border-gray-200">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold">
