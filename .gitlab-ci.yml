@@ -191,8 +191,6 @@ build_api_azure:
   only:
     - next
     - production
-  tags:
-    - docker
 
 build_web_azure:
   stage: build
@@ -209,8 +207,6 @@ build_web_azure:
   only:
     - next
     - production
-  tags:
-    - docker
 
 # ===========================================
 # DEPLOY STAGE - AZURE
