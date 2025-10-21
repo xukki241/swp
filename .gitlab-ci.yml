@@ -273,7 +273,8 @@ deploy_azure_next:
         --resource-group $AZURE_RESOURCE_GROUP \
         --name $AZURE_WEB_APP_NAME_NEXT \
         --settings \
-          WEBSITES_PORT=80
+          WEBSITES_PORT=80 \
+          VITE_API_URL="https://${AZURE_API_APP_NAME_NEXT}.azurewebsites.net"
 
     # Restart Web
     - echo "Restarting Web service..."
@@ -354,7 +355,8 @@ deploy_azure_production:
         --resource-group $AZURE_RESOURCE_GROUP \
         --name $AZURE_WEB_APP_NAME_PROD \
         --settings \
-          WEBSITES_PORT=80
+          WEBSITES_PORT=80 \
+          VITE_API_URL="https://${AZURE_API_APP_NAME_PROD}.azurewebsites.net"
 
     # Restart Web
     - echo "Restarting Web service..."
