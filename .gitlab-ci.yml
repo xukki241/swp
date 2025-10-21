@@ -35,26 +35,40 @@ stages:
   - build
   - deploy
 
-# Cache configuration
+# Cache configuration - Enhanced pnpm caching
 .pnpm_cache:
   cache:
     key:
       files:
         - pnpm-lock.yaml
+      prefix: pnpm-v2
     paths:
       - .pnpm-store
+    policy: pull-push
+
+.node_modules_cache:
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+      prefix: node-modules-v2
+    paths:
       - node_modules
       - apps/*/node_modules
       - packages/*/node_modules
+    policy: pull
 
 # Node.js base
 .node_base:
   image: node:${NODE_VERSION}-alpine
+  extends:
+    - .pnpm_cache
+    - .node_modules_cache
   before_script:
     - corepack enable
     - corepack prepare pnpm@${PNPM_VERSION} --activate
     - pnpm config set store-dir .pnpm-store
-    - pnpm install --frozen-lockfile
+    - pnpm install --frozen-lockfile --prefer-offline
 
 # Docker base for GitLab Registry
 .docker_gitlab_base:
@@ -103,7 +117,6 @@ install_dependencies:
   stage: prepare
   extends:
     - .node_base
-    - .pnpm_cache
   script:
     - echo "Dependencies installed successfully"
   artifacts:
@@ -111,12 +124,11 @@ install_dependencies:
       - node_modules
       - apps/*/node_modules
       - packages/*/node_modules
-      - .pnpm-store
     expire_in: 1 hour
-  only:
-    - merge_requests
-    - next
-    - production
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "next"'
+    - if: '$CI_COMMIT_BRANCH == "production"'
 
 # ===========================================
 # TEST STAGE
@@ -130,10 +142,19 @@ lint:
     - echo "Running linters..."
     - pnpm lint
   allow_failure: false
-  only:
-    - merge_requests
-    - next
-    - production
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "**/*.js"
+        - "**/*.jsx"
+        - "**/*.ts"
+        - "**/*.tsx"
+        - "**/*.vue"
+        - "**/eslint.config.js"
+        - "pnpm-lock.yaml"
+        - "package.json"
+    - if: '$CI_COMMIT_BRANCH == "next"'
+    - if: '$CI_COMMIT_BRANCH == "production"'
 
 format_check:
   stage: test
@@ -143,10 +164,21 @@ format_check:
     - echo "Checking code formatting..."
     - pnpm format:check
   allow_failure: true
-  only:
-    - merge_requests
-    - next
-    - production
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "**/*.js"
+        - "**/*.jsx"
+        - "**/*.ts"
+        - "**/*.tsx"
+        - "**/*.vue"
+        - "**/*.json"
+        - "**/*.md"
+        - "**/*.yaml"
+        - "**/*.yml"
+        - "prettier.config.js"
+    - if: '$CI_COMMIT_BRANCH == "next"'
+    - if: '$CI_COMMIT_BRANCH == "production"'
 
 test_api:
   stage: test
@@ -175,10 +207,15 @@ test_api:
     paths:
       - apps/api/coverage/
     expire_in: 1 week
-  only:
-    - merge_requests
-    - next
-    - production
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "apps/api/**/*"
+        - "packages/**/*"
+        - "pnpm-lock.yaml"
+        - "package.json"
+    - if: '$CI_COMMIT_BRANCH == "next"'
+    - if: '$CI_COMMIT_BRANCH == "production"'
 
 # ===========================================
 # BUILD STAGE - AZURE
@@ -196,9 +233,23 @@ build_api_azure:
     - docker push $AZURE_IMAGE_API:$CI_COMMIT_SHORT_SHA
     - docker push $AZURE_IMAGE_API:$CI_COMMIT_REF_NAME
     - echo "Successfully pushed to ACR"
-  only:
-    - next
-    - production
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "next"'
+      changes:
+        - "apps/api/**/*"
+        - "packages/**/*"
+        - "pnpm-lock.yaml"
+        - "package.json"
+        - "pnpm-workspace.yaml"
+        - "apps/api/Dockerfile"
+    - if: '$CI_COMMIT_BRANCH == "production"'
+      changes:
+        - "apps/api/**/*"
+        - "packages/**/*"
+        - "pnpm-lock.yaml"
+        - "package.json"
+        - "pnpm-workspace.yaml"
+        - "apps/api/Dockerfile"
 
 build_web_azure:
   stage: build
@@ -212,9 +263,23 @@ build_web_azure:
     - docker push $AZURE_IMAGE_WEB:$CI_COMMIT_SHORT_SHA
     - docker push $AZURE_IMAGE_WEB:$CI_COMMIT_REF_NAME
     - echo "Successfully pushed to ACR"
-  only:
-    - next
-    - production
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "next"'
+      changes:
+        - "apps/web/**/*"
+        - "packages/**/*"
+        - "pnpm-lock.yaml"
+        - "package.json"
+        - "pnpm-workspace.yaml"
+        - "apps/web/Dockerfile"
+    - if: '$CI_COMMIT_BRANCH == "production"'
+      changes:
+        - "apps/web/**/*"
+        - "packages/**/*"
+        - "pnpm-lock.yaml"
+        - "package.json"
+        - "pnpm-workspace.yaml"
+        - "apps/web/Dockerfile"
 
 # ===========================================
 # DEPLOY STAGE - AZURE
@@ -296,8 +361,9 @@ deploy_azure_next:
   environment:
     name: azure-next
     url: https://${AZURE_WEB_APP_NAME_NEXT}.azurewebsites.net
-  only:
-    - next
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "next"'
+      when: on_success
 
 deploy_azure_production:
   stage: deploy
@@ -378,9 +444,9 @@ deploy_azure_production:
   environment:
     name: azure-production
     url: https://pharmaflow.${DOMAIN}
-  only:
-    - production
-  when: manual
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "production"'
+      when: on_success
 
 # ===========================================
 # UTILITY JOBS
@@ -398,9 +464,9 @@ rollback_azure_next:
       az webapp restart --name $AZURE_WEB_APP_NAME_NEXT --resource-group $AZURE_RESOURCE_GROUP
   environment:
     name: azure-next
-  only:
-    - next
-  when: manual
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "next"'
+      when: manual
 
 # Rollback Azure Production
 rollback_azure_production:
@@ -414,6 +480,6 @@ rollback_azure_production:
       az webapp restart --name $AZURE_WEB_APP_NAME_PROD --resource-group $AZURE_RESOURCE_GROUP
   environment:
     name: azure-production
-  only:
-    - production
-  when: manual
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "production"'
+      when: manual
