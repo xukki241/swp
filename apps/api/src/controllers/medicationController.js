@@ -197,7 +197,7 @@ export const deleteMedication = async (req, res, next) => {
  */
 export const getMedicationInventory = async (req, res, next) => {
   try {
-    const id = Number.parseInt(req.params.id);
+    const id = req.params.id; // UUID is a string
     const items = await inventoryService.getByMedicationId(id);
 
     res.status(200).json({
@@ -217,7 +217,7 @@ export const getMedicationInventory = async (req, res, next) => {
  */
 export const getMedicationSuppliers = async (req, res, next) => {
   try {
-    const id = Number.parseInt(req.params.id);
+    const id = req.params.id; // UUID is a string
     const suppliers = await medicationService.getMedicationSuppliers(id);
 
     res.status(200).json({
@@ -237,7 +237,7 @@ export const getMedicationSuppliers = async (req, res, next) => {
  */
 export const getMedicationPurchases = async (req, res, next) => {
   try {
-    const id = Number.parseInt(req.params.id);
+    const id = req.params.id; // UUID is a string
     const purchases = await medicationService.getMedicationPurchases(id);
 
     res.status(200).json({
@@ -257,7 +257,7 @@ export const getMedicationPurchases = async (req, res, next) => {
  */
 export const getMedicationSales = async (req, res, next) => {
   try {
-    const id = Number.parseInt(req.params.id);
+    const id = req.params.id; // UUID is a string
     const sales = await medicationService.getMedicationSales(id);
 
     res.status(200).json({

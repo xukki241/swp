@@ -7,6 +7,7 @@ import {
   BarChart2,
   Settings,
   Users,
+  Pill,
 } from "lucide-react";
 
 export const sidebarConfig = [
@@ -19,6 +20,11 @@ export const sidebarConfig = [
     title: "Suppliers",
     icon: Truck,
     path: "/suppliers",
+  },
+  {
+    title: "Medication",
+    icon: Pill,
+    path: "/medications",
   },
   {
     title: "Procurement",
