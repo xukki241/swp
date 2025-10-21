@@ -386,10 +386,11 @@ rollback_azure_next:
   stage: deploy
   extends: .azure_cli_base
   script:
-    - echo "Rolling back Azure Next environment..."
-    - echo "Note: Pull previous image tag manually or use Azure Deployment Slots"
-    - az webapp restart --name $AZURE_API_APP_NAME_NEXT --resource-group $AZURE_RESOURCE_GROUP
-    - az webapp restart --name $AZURE_WEB_APP_NAME_NEXT --resource-group $AZURE_RESOURCE_GROUP
+    - |
+      echo "Rolling back Azure Next environment..."
+      echo "Note: Pull previous image tag manually or use Azure Deployment Slots"
+      az webapp restart --name $AZURE_API_APP_NAME_NEXT --resource-group $AZURE_RESOURCE_GROUP
+      az webapp restart --name $AZURE_WEB_APP_NAME_NEXT --resource-group $AZURE_RESOURCE_GROUP
   environment:
     name: azure-next
   only:
@@ -401,10 +402,11 @@ rollback_azure_production:
   stage: deploy
   extends: .azure_cli_base
   script:
-    - echo "Rolling back Azure Production environment..."
-    - echo "Note: Pull previous image tag manually or use Azure Deployment Slots"
-    - az webapp restart --name $AZURE_API_APP_NAME_PROD --resource-group $AZURE_RESOURCE_GROUP
-    - az webapp restart --name $AZURE_WEB_APP_NAME_PROD --resource-group $AZURE_RESOURCE_GROUP
+    - |
+      echo "Rolling back Azure Production environment..."
+      echo "Note: Pull previous image tag manually or use Azure Deployment Slots"
+      az webapp restart --name $AZURE_API_APP_NAME_PROD --resource-group $AZURE_RESOURCE_GROUP
+      az webapp restart --name $AZURE_WEB_APP_NAME_PROD --resource-group $AZURE_RESOURCE_GROUP
   environment:
     name: azure-production
   only:
