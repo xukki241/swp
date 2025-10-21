@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 

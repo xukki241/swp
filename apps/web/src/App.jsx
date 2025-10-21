@@ -26,6 +26,9 @@ import PurchaseOrderReceiptCreatePage from "./pages/purchaseOrder/PurchaseOrderR
 import StockOverviewPage from "@/pages/inventory/StockOverviewPage";
 import WarehousePage from "@/pages/inventory/WarehousePage";
 import InventoryTrackingPage from "@/pages/inventory/InventoryTrackingPage";
+import MedicationListPage from "@/pages/medications/MedicationListPage";
+import MedicationDetailPage from "@/pages/medications/MedicationDetailPage";
+import MedicationFormPage from "@/pages/medications/MedicationFormPage";
 
 function App() {
   return (
@@ -232,6 +235,39 @@ function App() {
             <PublicRoute>
               <PolicyPage />
             </PublicRoute>
+          }
+        />
+        {/* --- Medications routes --- */}
+        <Route
+          path="/medications"
+          element={
+            <ProtectedRoute>
+              <MedicationListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/medications/new"
+          element={
+            <ProtectedRoute>
+              <MedicationFormPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/medications/edit/:id"
+          element={
+            <ProtectedRoute>
+              <MedicationFormPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/medications/:id"
+          element={
+            <ProtectedRoute>
+              <MedicationDetailPage />
+            </ProtectedRoute>
           }
         />
 

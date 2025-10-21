@@ -1,40 +1,219 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { instance } from "@/lib/axios";
-export const getAllMedications = async () => {
+import * as api from "@/services/medicationsService";
+
+const FIVE_MIN = 5 * 60 * 1000;
+
+/**
+ * Helper: fetch all medications.
+ * Prefer a service helper if available, otherwise use axios instance.
+ */
+export const getAllMedications = async (filters) => {
+  if (filters && Object.keys(filters).length) {
+    // If filters provided, prefer service getMedications (if it exists).
+    if (typeof api.getMedications === "function") {
+      return api.getMedications(filters);
+    }
+    // fallback to instance with query params
+    const res = await instance.get("/medications", { params: filters });
+    return res.data;
+  }
+
+  if (typeof api.getAllMedications === "function") {
+    return api.getAllMedications();
+  }
+
+  if (typeof api.getMedications === "function") {
+    // call without filters
+    return api.getMedications({});
+  }
+
   const res = await instance.get("/medications");
   return res.data;
 };
-export const useMedications = () => {
-  return useQuery({
-    queryKey: ["medications"],
-    queryFn: getAllMedications,
-    staleTime: 5 * 60 * 1000,
+
+/**
+ * Hook: list medications (supports filters)
+ */
+export const useMedications = (filters = {}) =>
+  useQuery({
+    queryKey: ["medications", filters],
+    queryFn: () => getAllMedications(filters),
+    keepPreviousData: true,
+    staleTime: FIVE_MIN,
+  });
+
+/**
+ * Hook: medication detail
+ */
+export const useMedicationDetail = (id) =>
+  useQuery({
+    queryKey: ["medication", id],
+    queryFn: async () => {
+      if (typeof api.getMedicationById === "function") {
+        return api.getMedicationById(id);
+      }
+      const res = await instance.get(`/medications/${id}`);
+      return res.data;
+    },
+    enabled: !!id,
+    staleTime: FIVE_MIN,
+  });
+
+/**
+ * CRUD mutations for medications
+ */
+export const useCreateMedication = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data) =>
+      typeof api.createMedication === "function"
+        ? api.createMedication(data)
+        : instance.post("/medications", data).then((r) => r.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["medications"] }),
   });
 };
+
+export const useUpdateMedication = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }) =>
+      typeof api.updateMedication === "function"
+        ? api.updateMedication(id, payload)
+        : instance.put(`/medications/${id}`, payload).then((r) => r.data),
+    onSuccess: (_, vars) => {
+      // ensure both list & detail refresh
+      qc.invalidateQueries({ queryKey: ["medications"] });
+      if (vars && vars.id) {
+        qc.invalidateQueries({ queryKey: ["medication", vars.id] });
+      }
+    },
+  });
+};
+
+export const useDeleteMedication = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id) =>
+      typeof api.deleteMedication === "function"
+        ? api.deleteMedication(id)
+        : instance.delete(`/medications/${id}`).then((r) => r.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["medications"] }),
+  });
+};
+
+/**
+ * VARIANTS
+ *
+ * - useMedicationVariants: returns variants for a specific medication.
+ *   Tries service helpers first, then falls back to reading the medication and returning its variants,
+ *   then to an explicit endpoint /medications/:id/variants if available.
+ *
+ * - useMedicationsVariants: reads all variants across medications (endpoint /medications/variants/all).
+ */
+export const useMedicationVariants = (medicationId) =>
+  useQuery({
+    queryKey: ["medicationVariants", medicationId],
+    queryFn: async () => {
+      if (!medicationId) {
+        return [];
+      }
+
+      // 1) api.getMedicationVariants(medicationId)
+      if (typeof api.getMedicationVariants === "function") {
+        return api.getMedicationVariants(medicationId);
+      }
+
+      // 2) api.getMedicationById -> .variants
+      if (typeof api.getMedicationById === "function") {
+        const med = await api.getMedicationById(medicationId);
+        return med?.variants ?? [];
+      }
+
+      // 3) fallback axios endpoint
+      const res = await instance.get(`/medications/${medicationId}/variants`);
+      return res.data;
+    },
+    enabled: !!medicationId,
+    staleTime: FIVE_MIN,
+  });
+
 export const getAllMedicationsVariants = async () => {
+  if (typeof api.getAllMedicationsVariants === "function") {
+    return api.getAllMedicationsVariants();
+  }
+  if (typeof api.getAllMedicationVariants === "function") {
+    // attempt alternate naming
+    return api.getAllMedicationVariants();
+  }
   const res = await instance.get("/medications/variants/all");
   return res.data;
 };
 
-export const useMedicationsVariants = () => {
-  return useQuery({
+export const useMedicationsVariants = () =>
+  useQuery({
     queryKey: ["medicationVariantsAll"],
     queryFn: getAllMedicationsVariants,
-    staleTime: 5 * 60 * 1000,
+    staleTime: FIVE_MIN,
+  });
+
+/**
+ * Variant mutations (create/update/delete)
+ */
+export const useCreateVariant = (medicationId) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload) => {
+      if (typeof api.createVariant === "function") {
+        return api.createVariant({ medicationId, ...payload });
+      }
+      return instance
+        .post(`/medications/${medicationId}/variants`, payload)
+        .then((r) => r.data);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["medication", medicationId] });
+      qc.invalidateQueries({ queryKey: ["medicationVariants", medicationId] });
+      qc.invalidateQueries({ queryKey: ["medicationVariantsAll"] });
+    },
   });
 };
-export const useMedicationVariants = (medicationId) => {
-  return useQuery({
-    queryKey: ["medicationVariants", medicationId],
 
-    queryFn: async () => {
-      const res = await instance.get(`/medications/${medicationId}/variants`);
-      return res.data;
+export const useUpdateVariant = (medicationId) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ variantId, payload }) => {
+      if (typeof api.updateVariant === "function") {
+        return api.updateVariant(variantId, payload);
+      }
+      return instance
+        .put(`/medications/variants/${variantId}`, payload)
+        .then((r) => r.data);
     },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["medication", medicationId] });
+      qc.invalidateQueries({ queryKey: ["medicationVariants", medicationId] });
+      qc.invalidateQueries({ queryKey: ["medicationVariantsAll"] });
+    },
+  });
+};
 
-    enabled: !!medicationId,
-
-    staleTime: 5 * 60 * 1000,
+export const useDeleteVariant = (medicationId) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (variantId) => {
+      if (typeof api.deleteVariant === "function") {
+        return api.deleteVariant(variantId);
+      }
+      return instance
+        .delete(`/medications/variants/${variantId}`)
+        .then((r) => r.data);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["medication", medicationId] });
+      qc.invalidateQueries({ queryKey: ["medicationVariants", medicationId] });
+      qc.invalidateQueries({ queryKey: ["medicationVariantsAll"] });
+    },
   });
 };
