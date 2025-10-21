@@ -544,8 +544,8 @@ export const reportService = {
         .from(salesOrders)
         .where(
           and(
-            gte(salesOrders.createdAt, weekStart),
-            lte(salesOrders.createdAt, weekEnd)
+            gte(salesOrders.orderDate, weekStart),
+            lte(salesOrders.orderDate, weekEnd)
           )
         );
 

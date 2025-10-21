@@ -1,12 +1,12 @@
-import { pgTable } from "drizzle-orm/pg-core";
+import { pgTable, timestamp } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey, foreignKey, createdAt } from "./common.js";
+import { identityPrimaryKey, foreignKey } from "./common.js";
 import { purchaseOrders } from "./purchaseOrders.js";
 import { users } from "./users.js";
 
 export const purchaseOrderReceipts = pgTable("purchase_order_receipts", {
   id: identityPrimaryKey(),
   purchaseOrderId: foreignKey("purchase_order_id", purchaseOrders.id).notNull(),
-  receivedDate: createdAt("received_date"),
+  receivedDate: timestamp("received_date").notNull(),
   receivedBy: foreignKey("received_by", users.id),
 });

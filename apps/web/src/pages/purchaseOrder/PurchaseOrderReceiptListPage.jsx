@@ -223,6 +223,7 @@ export default function PurchaseOrderReceiptListPage() {
                     <TableHead>Received Date</TableHead>
                     <TableHead>Received By</TableHead>
                     <TableHead>Order Status</TableHead>
+                    <TableHead className="text-right">Total Amount</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -230,7 +231,7 @@ export default function PurchaseOrderReceiptListPage() {
                   {filteredReceipts.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={5}
+                        colSpan={6}
                         className="text-center py-8 text-muted-foreground"
                       >
                         <div className="flex flex-col items-center gap-2">
@@ -260,6 +261,14 @@ export default function PurchaseOrderReceiptListPage() {
                         </TableCell>
                         <TableCell>{r.receivedByName || "N/A"}</TableCell>
                         <TableCell>{getStatusBadge(r.poStatus)}</TableCell>
+                        <TableCell className="text-right font-semibold text-primary">
+                          {r.totalAmount
+                            ? new Intl.NumberFormat("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              }).format(r.totalAmount)
+                            : "N/A"}
+                        </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Button

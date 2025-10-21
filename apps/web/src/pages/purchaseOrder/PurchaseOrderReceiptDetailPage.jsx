@@ -292,6 +292,23 @@ export default function PurchaseOrderReceiptDetailPage() {
                       </TableCell>
                     </TableRow>
                   )}
+                  {receipt.items && receipt.items.length > 0 && (
+                    <TableRow className="bg-muted/50">
+                      <TableCell colSpan={6} className="text-right font-bold">
+                        Total Received Value:
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-primary text-lg">
+                        {formatCurrency(
+                          receipt.items.reduce(
+                            (sum, item) =>
+                              sum +
+                              (item.unitPrice || 0) * (item.quantity || 0),
+                            0
+                          )
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>
