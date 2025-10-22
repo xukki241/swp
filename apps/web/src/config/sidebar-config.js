@@ -1,13 +1,11 @@
 import {
-  LayoutDashboard,
-  Truck,
   ClipboardList,
+  LayoutDashboard,
   Package,
-  ShoppingCart,
-  BarChart2,
-  Settings,
-  Users,
   Pill,
+  ShoppingCart,
+  Truck,
+  Users,
 } from "lucide-react";
 
 export const sidebarConfig = [
@@ -22,7 +20,7 @@ export const sidebarConfig = [
     path: "/suppliers",
   },
   {
-    title: "Medication",
+    title: "Medications",
     icon: Pill,
     path: "/medications",
   },
@@ -47,19 +45,9 @@ export const sidebarConfig = [
     title: "Sales",
     icon: ShoppingCart,
     children: [
+      { label: "Point of Sale (POS)", path: "/sales" },
       { label: "Sales Orders", path: "/sales/orders" },
-      { label: "Customers", path: "/sales/customers" },
     ],
-  },
-  {
-    title: "Reports",
-    icon: BarChart2,
-    path: "/reports",
-  },
-  {
-    title: "Settings",
-    icon: Settings,
-    path: "/settings",
   },
   {
     title: "Users",

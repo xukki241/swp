@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Plus, Eye, Settings2, Search } from "lucide-react";
+import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
 import { AppLayout } from "@/components/layouts/app-layout";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -21,9 +19,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Eye, Plus, Search, Settings2 } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
-import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
 
 // Mock data - replace with actual API call
 const medicines = [

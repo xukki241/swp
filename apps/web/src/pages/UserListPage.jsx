@@ -1,4 +1,3 @@
-import { useState, useMemo, useCallback } from "react";
 import { AppLayout } from "@/components/layouts/app-layout";
 import {
   Card,
@@ -7,21 +6,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { toast } from "sonner";
+import { EditUserDialog } from "@/components/user-management/EditUserDialog";
 import {
-  useUsers,
-  useUpdateUser,
+  ErrorState,
+  LoadingState,
+} from "@/components/user-management/LoadingAndErrorStates";
+import { UserFilters } from "@/components/user-management/UserFilters";
+import { UserTable } from "@/components/user-management/UserTable";
+import {
   useActivateUser,
   useDeactivateUser,
   useSuspendUser,
+  useUpdateUser,
+  useUsers,
 } from "@/hooks/useUsers";
-import { UserFilters } from "@/components/user-management/UserFilters";
-import { UserTable } from "@/components/user-management/UserTable";
-import { EditUserDialog } from "@/components/user-management/EditUserDialog";
-import {
-  LoadingState,
-  ErrorState,
-} from "@/components/user-management/LoadingAndErrorStates";
+import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export default function UserListPage() {
   // Search state - controlled with submit button

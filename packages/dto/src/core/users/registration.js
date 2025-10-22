@@ -1,13 +1,14 @@
 import { z } from "zod";
 import {
-  uuidSchema,
-  nameSchema,
-  emailSchema,
-  phoneSchema,
   addressSchema,
+  emailSchema,
+  nameSchema,
   paginationSchema,
+  phoneSchema,
+  userRegistrationStatusEnum,
+  userRoleEnum,
+  uuidSchema,
 } from "../common/index.js";
-import { userRegistrationStatusEnum, userRoleEnum } from "../common/index.js";
 
 // User registration schema
 export const userRegistrationSchema = z.object({

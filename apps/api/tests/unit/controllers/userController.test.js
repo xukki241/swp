@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as userController from "@/controllers/userController.js";
 import * as userService from "@/services/userService.js";
@@ -51,7 +51,7 @@ describe("UserController", () => {
 
       await userController.getUserById(req, res, next);
 
-      expect(userService.getUserById).toHaveBeenCalledWith(1n);
+      expect(userService.getUserById).toHaveBeenCalledWith("1");
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
@@ -132,7 +132,7 @@ describe("UserController", () => {
 
       await userController.updateUser(req, res, next);
 
-      expect(userService.updateUser).toHaveBeenCalledWith(1n, {
+      expect(userService.updateUser).toHaveBeenCalledWith("1", {
         name: "John Updated",
       });
       expect(res.status).toHaveBeenCalledWith(200);
@@ -182,7 +182,7 @@ describe("UserController", () => {
 
       await userController.deleteUser(req, res, next);
 
-      expect(userService.suspendUser).toHaveBeenCalledWith(1n);
+      expect(userService.suspendUser).toHaveBeenCalledWith("1");
       expect(res.status).toHaveBeenCalledWith(200);
     });
   });
@@ -194,7 +194,7 @@ describe("UserController", () => {
 
       await userController.activateUser(req, res, next);
 
-      expect(userService.activateUser).toHaveBeenCalledWith(1n);
+      expect(userService.activateUser).toHaveBeenCalledWith("1");
       expect(res.status).toHaveBeenCalledWith(200);
     });
   });
@@ -210,7 +210,7 @@ describe("UserController", () => {
 
       await userController.deactivateUser(req, res, next);
 
-      expect(userService.deactivateUser).toHaveBeenCalledWith(1n);
+      expect(userService.deactivateUser).toHaveBeenCalledWith("1");
       expect(res.status).toHaveBeenCalledWith(200);
     });
   });
@@ -226,7 +226,7 @@ describe("UserController", () => {
 
       await userController.suspendUser(req, res, next);
 
-      expect(userService.suspendUser).toHaveBeenCalledWith(1n);
+      expect(userService.suspendUser).toHaveBeenCalledWith("1");
       expect(res.status).toHaveBeenCalledWith(200);
     });
   });

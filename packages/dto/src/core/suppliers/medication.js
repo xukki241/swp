@@ -1,8 +1,8 @@
 import { z } from "zod";
 import {
-  uuidSchema,
   nonNegativeIntSchema,
   paginationSchema,
+  uuidSchema,
 } from "../common/index.js";
 // Supplier medication variant schema
 export const supplierMedicationVariantSchema = z.object({

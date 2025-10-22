@@ -1,9 +1,9 @@
 import {
+  batchCreateBinsRequestSchema,
+  batchCreateRacksRequestSchema,
   createWarehouseBinSchema,
   createWarehouseRackSchema,
   updateWarehouseRackSchema,
-  batchCreateRacksRequestSchema,
-  batchCreateBinsRequestSchema,
 } from "@pharmaflow/dto";
 import express from "express";
 

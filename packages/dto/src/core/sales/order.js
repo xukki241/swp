@@ -1,16 +1,14 @@
 import { z } from "zod";
 import {
-  uuidSchema,
-  timestampSchema,
+  paginationSchema,
   positiveDecimalSchema,
   positiveIntSchema,
-  paginationSchema,
+  salesOrderPaymentMethodEnum,
+  salesOrderStatusEnum,
   sortBySchema,
   sortOrderSchema,
-} from "../common/index.js";
-import {
-  salesOrderStatusEnum,
-  salesOrderPaymentMethodEnum,
+  timestampSchema,
+  uuidSchema,
 } from "../common/index.js";
 
 // Sales order schema

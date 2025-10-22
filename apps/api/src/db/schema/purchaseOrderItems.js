@@ -2,8 +2,8 @@ import { pgTable } from "drizzle-orm/pg-core";
 
 import {
   decimalColumn,
-  identityPrimaryKey,
   foreignKey,
+  identityPrimaryKey,
   int,
 } from "./common.js";
 import { purchaseOrders } from "./purchaseOrders.js";

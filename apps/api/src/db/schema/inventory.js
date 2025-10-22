@@ -1,6 +1,6 @@
-import { pgTable, varchar, date, uniqueIndex } from "drizzle-orm/pg-core";
+import { date, pgTable, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 
-import { decimalColumn, identityPrimaryKey, foreignKey } from "./common.js";
+import { decimalColumn, foreignKey, identityPrimaryKey } from "./common.js";
 import { medicationVariants } from "./medicationVariants.js";
 import { purchaseOrderReceiptItems } from "./purchaseOrderReceiptItems.js";
 import { warehouseBins } from "./warehouseBins.js";

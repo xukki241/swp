@@ -3,20 +3,22 @@ import instance from "@/lib/axios";
 export const medicationService = {
   // Get all medication variants (for sale)
   async getMedicationVariants(params = {}) {
-    const response = await instance.get("/medication-variants", { params });
+    const response = await instance.get("/medications/variants/all", {
+      params,
+    });
     return response.data;
   },
 
   // Get single medication variant
   async getMedicationVariant(id) {
-    const response = await instance.get(`/medication-variants/${id}`);
+    const response = await instance.get(`/medications/variants/${id}`);
     return response.data;
   },
 
-  // Search medications
+  // Search medications for POS
   async searchMedications(search) {
-    const response = await instance.get("/medication-variants", {
-      params: { search, isForSale: true },
+    const response = await instance.get("/medications/variants/all", {
+      params: { search, isActive: true },
     });
     return response.data;
   },

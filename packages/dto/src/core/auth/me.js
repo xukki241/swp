@@ -1,13 +1,14 @@
 import { z } from "zod";
 import {
-  uuidSchema,
-  nameSchema,
-  emailSchema,
-  phoneSchema,
   addressSchema,
+  emailSchema,
+  nameSchema,
+  phoneSchema,
   successResponseSchema,
+  userRoleEnum,
+  userStatusEnum,
+  uuidSchema,
 } from "../common/index.js";
-import { userRoleEnum, userStatusEnum } from "../common/index.js";
 
 // GET /api/auth/me
 const meDataSchema = z.object({

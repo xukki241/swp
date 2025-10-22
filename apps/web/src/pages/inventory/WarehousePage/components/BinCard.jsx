@@ -1,16 +1,7 @@
 "use client";
 
+import { Edit2, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Card, CardContent } from "../../../../components/ui/card";
-import { Button } from "../../../../components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../../../components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,11 +12,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../../../components/ui/alert-dialog";
+import { Button } from "../../../../components/ui/button";
+import { Card, CardContent } from "../../../../components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../../components/ui/dialog";
 import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
 import { Textarea } from "../../../../components/ui/textarea";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
-import { Edit2, Trash2 } from "lucide-react";
 
 export function BinCard({ bin, rackId }) {
   const { updateBinData, deleteBinData } = useWarehouse();

@@ -1,6 +1,6 @@
+import nodePlugin from "eslint-plugin-n";
 import { defineConfig } from "eslint/config";
 import globals from "globals";
-import nodePlugin from "eslint-plugin-n";
 
 import { baseConfig } from "./base.js";
 

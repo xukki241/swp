@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { db } from "@/db/index.js";
 import { warehouseBinService } from "@/services/warehouse/warehouseBinService.js";
@@ -14,22 +14,19 @@ describe("WarehouseBinService", () => {
         number: 1,
       };
 
-      const mockRack = { id: 1, code: "R-001", name: "Rack 1" };
+      const mockRack = { id: 1 };
       const mockBin = { id: 1, ...binData };
 
-      // Mock rack check
-      const mockRackQuery = {
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue([mockRack]),
+      // Mock db.query.warehouseRacks.findFirst
+      db.query = {
+        warehouseRacks: {
+          findFirst: vi.fn().mockResolvedValue(mockRack),
+        },
       };
-      db.select.mockReturnValue(mockRackQuery);
 
-      // Mock bin insertion
-      const mockInsertQuery = {
-        values: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([mockBin]),
-      };
-      db.insert.mockReturnValue(mockInsertQuery);
+      const mockReturning = vi.fn().mockResolvedValue([mockBin]);
+      const mockValues = vi.fn().mockReturnValue({ returning: mockReturning });
+      db.insert = vi.fn().mockReturnValue({ values: mockValues });
 
       const result = await warehouseBinService.create(binData);
 
@@ -43,11 +40,12 @@ describe("WarehouseBinService", () => {
         rackId: 999,
       };
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue([]),
+      // Mock db.query.warehouseRacks.findFirst to return null
+      db.query = {
+        warehouseRacks: {
+          findFirst: vi.fn().mockResolvedValue(null),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       await expect(warehouseBinService.create(binData)).rejects.toThrow(
         "Rack with ID 999 not found"
@@ -62,13 +60,11 @@ describe("WarehouseBinService", () => {
         { id: 2, code: "B-002", name: "Bin 2", level: 2 },
       ];
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockBins),
+      db.query = {
+        warehouseBins: {
+          findMany: vi.fn().mockResolvedValue(mockBins),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await warehouseBinService.getAll();
 
@@ -78,14 +74,11 @@ describe("WarehouseBinService", () => {
     it("should filter bins by search term", async () => {
       const mockBins = [{ id: 1, code: "B-001", name: "Bin 1" }];
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockBins),
+      db.query = {
+        warehouseBins: {
+          findMany: vi.fn().mockResolvedValue(mockBins),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await warehouseBinService.getAll({ search: "Bin 1" });
 
@@ -95,14 +88,11 @@ describe("WarehouseBinService", () => {
     it("should filter bins by rackId", async () => {
       const mockBins = [{ id: 1, code: "B-001", rackId: 1 }];
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockBins),
+      db.query = {
+        warehouseBins: {
+          findMany: vi.fn().mockResolvedValue(mockBins),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await warehouseBinService.getAll({ rackId: 1 });
 
@@ -110,16 +100,13 @@ describe("WarehouseBinService", () => {
     });
 
     it("should filter bins by zoneId", async () => {
-      const mockBins = [{ id: 1, code: "B-001", zoneId: 1 }];
+      const mockBins = [{ id: 1, code: "B-001", rack: { zone: { id: 1 } } }];
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockBins),
+      db.query = {
+        warehouseBins: {
+          findMany: vi.fn().mockResolvedValue(mockBins),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await warehouseBinService.getAll({ zoneId: 1 });
 
@@ -129,14 +116,11 @@ describe("WarehouseBinService", () => {
     it("should filter bins by level", async () => {
       const mockBins = [{ id: 1, code: "B-001", level: 1 }];
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockBins),
+      db.query = {
+        warehouseBins: {
+          findMany: vi.fn().mockResolvedValue(mockBins),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await warehouseBinService.getAll({ level: 1 });
 
@@ -148,12 +132,11 @@ describe("WarehouseBinService", () => {
     it("should fetch bin by id", async () => {
       const mockBin = { id: 1, code: "B-001", name: "Bin 1" };
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue([mockBin]),
+      db.query = {
+        warehouseBins: {
+          findFirst: vi.fn().mockResolvedValue(mockBin),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await warehouseBinService.getById(1);
 
@@ -168,11 +151,11 @@ describe("WarehouseBinService", () => {
         { id: 2, code: "B-002", rackId: 1 },
       ];
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockBins),
+      db.query = {
+        warehouseBins: {
+          findMany: vi.fn().mockResolvedValue(mockBins),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await warehouseBinService.getByRackId(1);
 
@@ -185,12 +168,10 @@ describe("WarehouseBinService", () => {
       const binData = { name: "Bin 1 Updated" };
       const mockBin = { id: 1, code: "B-001", name: "Bin 1 Updated" };
 
-      const mockQuery = {
-        set: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([mockBin]),
-      };
-      db.update.mockReturnValue(mockQuery);
+      const mockReturning = vi.fn().mockResolvedValue([mockBin]);
+      const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning });
+      const mockSet = vi.fn().mockReturnValue({ where: mockWhere });
+      db.update = vi.fn().mockReturnValue({ set: mockSet });
 
       const result = await warehouseBinService.update(1, binData);
 
@@ -199,7 +180,7 @@ describe("WarehouseBinService", () => {
 
     it("should update bin with new rackId", async () => {
       const binData = { name: "Bin 1 Updated", rackId: 2 };
-      const mockRack = { id: 2, name: "Rack 2" };
+      const mockRack = { id: 2 };
       const mockBin = {
         id: 1,
         code: "B-001",
@@ -207,20 +188,17 @@ describe("WarehouseBinService", () => {
         rackId: 2,
       };
 
-      // Mock rack check
-      const mockRackQuery = {
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue([mockRack]),
+      // Mock db.query.warehouseRacks.findFirst
+      db.query = {
+        warehouseRacks: {
+          findFirst: vi.fn().mockResolvedValue(mockRack),
+        },
       };
-      db.select.mockReturnValue(mockRackQuery);
 
-      // Mock bin update
-      const mockUpdateQuery = {
-        set: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([mockBin]),
-      };
-      db.update.mockReturnValue(mockUpdateQuery);
+      const mockReturning = vi.fn().mockResolvedValue([mockBin]);
+      const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning });
+      const mockSet = vi.fn().mockReturnValue({ where: mockWhere });
+      db.update = vi.fn().mockReturnValue({ set: mockSet });
 
       const result = await warehouseBinService.update(1, binData);
 
@@ -230,11 +208,12 @@ describe("WarehouseBinService", () => {
     it("should throw error when updating with non-existent rackId", async () => {
       const binData = { rackId: 999 };
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue([]),
+      // Mock db.query.warehouseRacks.findFirst to return null
+      db.query = {
+        warehouseRacks: {
+          findFirst: vi.fn().mockResolvedValue(null),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       await expect(warehouseBinService.update(1, binData)).rejects.toThrow(
         "Rack with ID 999 not found"

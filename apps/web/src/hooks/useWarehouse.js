@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import {
-  getAllZones,
-  getZoneById,
-  updateZone,
-  getRacksByZone,
-  updateRack,
-  getBinsByRack,
-  updateBin,
   deleteBin,
+  getAllZones,
+  getBinsByRack,
+  getRacksByZone,
+  getZoneById,
+  updateBin,
+  updateRack,
+  updateZone,
 } from "../services/inventoryService";
 
 /**

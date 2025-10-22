@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { getLowStock, getExpiring } from "@/services/inventoryService";
+import { getExpiring, getLowStock } from "@/services/inventoryService";
 
 export const useInventoryTracking = () => {
   const [lowStock, setLowStock] = useState([]);
