@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { customerService } from "@/services/customerService";
+import { Loader2, Search } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export default function CustomerSelector({ onSelectCustomer }) {

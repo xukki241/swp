@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search, Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, Plus, Search } from "lucide-react";
+import { useState } from "react";
 
 export default function MedicationSearch({
   onSearch,

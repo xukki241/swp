@@ -1,5 +1,5 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { ShoppingCart, User, CreditCard } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CreditCard, ShoppingCart, User } from "lucide-react";
 
 export default function CartSummary({
   cart,

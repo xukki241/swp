@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { CheckCircle, X, Printer } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle, Printer, X } from "lucide-react";
 
 export default function OrderSuccessModal({ order, onClose }) {
   const handlePrint = () => {

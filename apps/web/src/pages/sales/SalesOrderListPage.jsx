@@ -1,20 +1,20 @@
-import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layouts/app-layout";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { salesService } from "@/services/salesService";
 import {
-  Search,
-  Eye,
-  ShoppingCart,
-  Loader2,
   CheckCircle,
+  Eye,
+  Loader2,
+  Search,
+  ShoppingCart,
   XCircle,
 } from "lucide-react";
-import { salesService } from "@/services/salesService";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 export default function SalesOrderListPage() {
   const navigate = useNavigate();

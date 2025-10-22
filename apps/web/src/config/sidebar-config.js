@@ -1,15 +1,11 @@
 import {
-  BarChart2,
   ClipboardList,
   LayoutDashboard,
   Package,
   Pill,
-  Settings,
   ShoppingCart,
   Truck,
   Users,
-  Pill,
-  CreditCard,
 } from "lucide-react";
 
 export const sidebarConfig = [

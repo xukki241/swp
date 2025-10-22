@@ -3,14 +3,12 @@ import DashboardPage from "@/pages/Dashboard";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import LoginPage from "@/pages/LoginPage";
 import NotFoundPage from "@/pages/NotFoundPage";
-import POSPage from "@/pages/POSPage";
 import PolicyPage from "@/pages/PolicyPage";
 import RegisterPage from "@/pages/RegisterPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import UserListPage from "@/pages/UserListPage";
 import UserProfilePage from "@/pages/UserProfilePage";
-import PolicyPage from "@/pages/PolicyPage";
 // Supplier & Purchase Order imports
 import PurchaseOrderCreatePage from "./pages/purchaseOrder/PurchaseOrderCreatePage";
 import PurchaseOrderDetailPage from "./pages/purchaseOrder/PurchaseOrderDetailPage";
@@ -28,9 +26,9 @@ import StockOverviewPage from "@/pages/inventory/StockOverviewPage";
 import WarehousePage from "@/pages/inventory/WarehousePage";
 import MedicationDetailPage from "@/pages/medications/MedicationDetailPage";
 import MedicationFormPage from "@/pages/medications/MedicationFormPage";
-import SalesPage from "./pages/sales/SalesPage";
-import SalesOrderListPage from "./pages/sales/SalesOrderListPage";
 import SalesOrderDetailPage from "./pages/sales/SalesOrderDetailPage";
+import SalesOrderListPage from "./pages/sales/SalesOrderListPage";
+import SalesPage from "./pages/sales/SalesPage";
 
 function App() {
   return (

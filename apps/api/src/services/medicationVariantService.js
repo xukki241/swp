@@ -1,11 +1,7 @@
-import { eq, ilike, or, and, sql } from "drizzle-orm";
+import { and, eq, ilike, or } from "drizzle-orm";
 
 import { db } from "../db/index.js";
-import {
-  medicationVariants,
-  medications,
-  inventory,
-} from "../db/schema/index.js";
+import { medicationVariants } from "../db/schema/index.js";
 /**
  * Get all medication variants with optional search and filters
  * @param {Object} options - Query options

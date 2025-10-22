@@ -1,20 +1,20 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { ShoppingCart, Trash2, Plus, Loader2, CheckCircle } from "lucide-react";
 import { customerService } from "@/services/customerService";
 import { searchMedications } from "@/services/medicationsService";
 import { salesService } from "@/services/salesService";
+import { CheckCircle, Loader2, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
+import CartSummary from "./components/CartSummary";
 import CustomerSelector from "./components/CustomerSelector";
 import MedicationSearch from "./components/MedicationSearch";
-import CartSummary from "./components/CartSummary";
-import PaymentMethodSelector from "./components/PaymentMethodSelector";
 import OrderSuccessModal from "./components/OrderSuccessModal";
+import PaymentMethodSelector from "./components/PaymentMethodSelector";
 
 export default function SalesPage() {
   // Step 1: Customer Selection

@@ -1,23 +1,23 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { salesService } from "@/services/salesService";
 import {
   ArrowLeft,
-  Printer,
-  Package,
-  User,
-  CreditCard,
   Calendar,
+  CheckCircle,
+  Clock,
+  CreditCard,
   FileText,
   Loader2,
-  CheckCircle,
+  Package,
+  Printer,
+  User,
   XCircle,
-  Clock,
 } from "lucide-react";
-import { salesService } from "@/services/salesService";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 export default function SalesOrderDetailPage() {
   const { id } = useParams();
