@@ -136,7 +136,7 @@ export const reportService = {
       })
       .from(salesOrders)
       .where(
-        and(gte(salesOrders.createdAt, start), lte(salesOrders.createdAt, end))
+        and(gte(salesOrders.orderDate, start), lte(salesOrders.orderDate, end))
       );
 
     // Sales by status
@@ -148,7 +148,7 @@ export const reportService = {
       })
       .from(salesOrders)
       .where(
-        and(gte(salesOrders.createdAt, start), lte(salesOrders.createdAt, end))
+        and(gte(salesOrders.orderDate, start), lte(salesOrders.orderDate, end))
       )
       .groupBy(salesOrders.status);
 
@@ -174,7 +174,7 @@ export const reportService = {
         eq(medicationVariants.medicationId, medications.id)
       )
       .where(
-        and(gte(salesOrders.createdAt, start), lte(salesOrders.createdAt, end))
+        and(gte(salesOrders.orderDate, start), lte(salesOrders.orderDate, end))
       )
       .groupBy(medications.id, medications.name, medicationVariants.name)
       .orderBy(desc(sum(salesOrderItems.quantity)))
@@ -189,7 +189,7 @@ export const reportService = {
       })
       .from(salesOrders)
       .where(
-        and(gte(salesOrders.createdAt, start), lte(salesOrders.createdAt, end))
+        and(gte(salesOrders.orderDate, start), lte(salesOrders.orderDate, end))
       )
       .groupBy(salesOrders.paymentMethod);
 
@@ -477,8 +477,8 @@ export const reportService = {
         .from(salesOrders)
         .where(
           and(
-            gte(salesOrders.createdAt, dayStart),
-            lte(salesOrders.createdAt, dayEnd)
+            gte(salesOrders.orderDate, dayStart),
+            lte(salesOrders.orderDate, dayEnd)
           )
         );
 
