@@ -1,4 +1,4 @@
-﻿# GitLab CI/CD Pipeline for PharmaFlow with Azure Support
+# GitLab CI/CD Pipeline for PharmaFlow with Azure Support
 # This pipeline supports deployment to:
 #   - GitLab Container Registry (for self-hosted/VM deployments)
 #   - Azure Container Registry + Azure App Service
@@ -286,7 +286,7 @@ deploy_azure_next:
         --name $AZURE_WEB_APP_NAME_NEXT \
         --settings \
           WEBSITES_PORT=80 \
-          VITE_API_URL="https://${AZURE_API_APP_NAME_NEXT}.azurewebsites.net"
+          VITE_API_BASE_URL="https://${AZURE_API_APP_NAME_NEXT}.azurewebsites.net/api"
 
     # Restart Web
     - echo "Restarting Web service..."
@@ -368,7 +368,7 @@ deploy_azure_production:
         --name $AZURE_WEB_APP_NAME_PROD \
         --settings \
           WEBSITES_PORT=80 \
-          VITE_API_URL="https://${AZURE_API_APP_NAME_PROD}.azurewebsites.net"
+          VITE_API_BASE_URL="https://${AZURE_API_APP_NAME_PROD}.azurewebsites.net/api"
 
     # Restart Web
     - echo "Restarting Web service..."
