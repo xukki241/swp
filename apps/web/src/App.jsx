@@ -1,3 +1,4 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import DashboardPage from "@/pages/Dashboard";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
@@ -29,6 +30,7 @@ import MedicationFormPage from "@/pages/medications/MedicationFormPage";
 import SalesOrderDetailPage from "./pages/sales/SalesOrderDetailPage";
 import SalesOrderListPage from "./pages/sales/SalesOrderListPage";
 import SalesPage from "./pages/sales/SalesPage";
+import MedicationListPage from "./pages/medications/MedicationListPage";
 
 function App() {
   return (
