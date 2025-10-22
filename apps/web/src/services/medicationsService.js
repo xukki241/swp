@@ -17,7 +17,7 @@ export async function createMedication(payload) {
 }
 
 export async function updateMedication(id, payload) {
-  const response = await instance.put(`/medications/${id}`, payload);
+  const response = await instance.patch(`/medications/${id}`, payload);
   return response.data;
 }
 
@@ -28,30 +28,48 @@ export async function deleteMedication(id) {
 
 // ===== VARIANTS =====
 export async function getMedicationVariants(params = {}) {
-  const response = await instance.get("/medication-variants", { params });
+  const response = await instance.get("/medications/variants/all", { params });
   return response.data;
 }
 
-export async function getMedicationVariant(id) {
-  const response = await instance.get(`/medication-variants/${id}`);
+// Note: To get a single variant, you need medicationId
+// Use: GET /medications/{medicationId}/variants/{variantId}
+export async function getMedicationVariant(medicationId, variantId) {
+  const response = await instance.get(
+    `/medications/${medicationId}/variants/${variantId}`
+  );
   return response.data;
 }
 
-export async function createVariant(payload) {
-  const response = await instance.post("/medication-variants", payload);
-  return response.data;
-}
-
-export async function updateVariant(variantId, payload) {
-  const response = await instance.put(
-    `/medication-variants/${variantId}`,
+export async function createVariant(medicationId, payload) {
+  const response = await instance.post(
+    `/medications/${medicationId}/variants`,
     payload
   );
   return response.data;
 }
 
-export async function deleteVariant(variantId) {
-  const response = await instance.delete(`/medication-variants/${variantId}`);
+export async function updateVariant(medicationId, variantId, payload) {
+  const response = await instance.patch(
+    `/medications/${medicationId}/variants/${variantId}`,
+    payload
+  );
+  return response.data;
+}
+
+export async function deleteVariant(medicationId, variantId) {
+  const response = await instance.delete(
+    `/medications/${medicationId}/variants/${variantId}`
+  );
+  return response.data;
+}
+
+// ===== SEARCH =====
+// For POS: search medications with inventory data
+export async function searchMedications(search) {
+  const response = await instance.get("/medications/variants/search-for-sale", {
+    params: { search },
+  });
   return response.data;
 }
 
@@ -60,7 +78,7 @@ export async function findVariantsByBarcode(barcode) {
   if (!barcode) {
     return [];
   }
-  const response = await instance.get("/medication-variants", {
+  const response = await instance.get("/medications/variants/all", {
     params: { search: barcode },
   });
   const data = response.data;

@@ -44,7 +44,16 @@ medicationRouter.get(
   medicationController.getAllMedications
 );
 /**
- * @route   GET /api/medications/:medicationId/variants/all
+ * @route   GET /api/medications/variants/search-for-sale
+ * @desc    Search variants for POS/Sales with inventory data
+ * @access  Private (Authenticated)
+ */
+medicationRouter.get(
+  "/variants/search-for-sale",
+  medicationVariantController.searchVariantsForSale
+);
+/**
+ * @route   GET /api/medications/variants/all
  * @desc    Get all variants for a medication
  * @access  Private (Authenticated)
  */

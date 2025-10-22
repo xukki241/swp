@@ -1,10 +1,8 @@
 import {
-  BarChart2,
   ClipboardList,
   LayoutDashboard,
   Package,
   Pill,
-  Settings,
   ShoppingCart,
   Truck,
   Users,
@@ -22,7 +20,7 @@ export const sidebarConfig = [
     path: "/suppliers",
   },
   {
-    title: "Medication",
+    title: "Medications",
     icon: Pill,
     path: "/medications",
   },
@@ -47,19 +45,9 @@ export const sidebarConfig = [
     title: "Sales",
     icon: ShoppingCart,
     children: [
+      { label: "Point of Sale (POS)", path: "/sales" },
       { label: "Sales Orders", path: "/sales/orders" },
-      { label: "Customers", path: "/sales/customers" },
     ],
-  },
-  {
-    title: "Reports",
-    icon: BarChart2,
-    path: "/reports",
-  },
-  {
-    title: "Settings",
-    icon: Settings,
-    path: "/settings",
   },
   {
     title: "Users",
