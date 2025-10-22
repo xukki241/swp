@@ -1,6 +1,5 @@
 import { z } from "zod";
 import {
-  dateSchema,
   paginationSchema,
   positiveIntSchema,
   timestampSchema,

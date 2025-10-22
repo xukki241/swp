@@ -1,4 +1,3 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import DashboardPage from "@/pages/Dashboard";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
@@ -10,6 +9,7 @@ import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import UserListPage from "@/pages/UserListPage";
 import UserProfilePage from "@/pages/UserProfilePage";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 // Supplier & Purchase Order imports
 import PurchaseOrderCreatePage from "./pages/purchaseOrder/PurchaseOrderCreatePage";
 import PurchaseOrderDetailPage from "./pages/purchaseOrder/PurchaseOrderDetailPage";
@@ -27,10 +27,10 @@ import StockOverviewPage from "@/pages/inventory/StockOverviewPage";
 import WarehousePage from "@/pages/inventory/WarehousePage";
 import MedicationDetailPage from "@/pages/medications/MedicationDetailPage";
 import MedicationFormPage from "@/pages/medications/MedicationFormPage";
+import MedicationListPage from "./pages/medications/MedicationListPage";
 import SalesOrderDetailPage from "./pages/sales/SalesOrderDetailPage";
 import SalesOrderListPage from "./pages/sales/SalesOrderListPage";
 import SalesPage from "./pages/sales/SalesPage";
-import MedicationListPage from "./pages/medications/MedicationListPage";
 
 function App() {
   return (

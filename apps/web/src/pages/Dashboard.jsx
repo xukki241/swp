@@ -1,19 +1,19 @@
-import { useMemo } from "react";
 import { AppLayout } from "@/components/layouts/app-layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Package,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  ShoppingCart,
-  AlertTriangle,
-  Calendar,
-  ArrowUpRight,
-} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCurrentUser } from "@/hooks/useAuth";
 import { useMonthlySalesReport } from "@/hooks/useReports";
+import {
+  AlertTriangle,
+  ArrowUpRight,
+  Calendar,
+  DollarSign,
+  Package,
+  ShoppingCart,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
+import { useMemo } from "react";
 
 export default function DashboardPage() {
   const { data: currentUser } = useCurrentUser();
