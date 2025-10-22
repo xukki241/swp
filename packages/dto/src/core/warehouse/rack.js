@@ -1,11 +1,11 @@
 import { z } from "zod";
 import {
-  uuidSchema,
   codeSchema,
-  nameSchema,
   descriptionSchema,
+  nameSchema,
   paginationSchema,
   positiveIntSchema,
+  uuidSchema,
 } from "../common/index.js";
 
 // Rack schema

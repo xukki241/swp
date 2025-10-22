@@ -1,13 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Edit, Trash2, Package, PlusCircle } from "lucide-react";
-import { useForm, Controller } from "react-hook-form";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -17,32 +29,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { toast } from "sonner";
-import {
-  useMedications,
   useCreateMedication,
-  useUpdateMedication,
-  useDeleteMedication,
-  useMedicationVariants,
   useCreateVariant,
-  useUpdateVariant,
+  useDeleteMedication,
   useDeleteVariant,
+  useMedications,
+  useMedicationVariants,
+  useUpdateMedication,
+  useUpdateVariant,
 } from "@/hooks/useMedications";
 import { findVariantsByBarcode } from "@/services/medicationsService";
+import { Edit, Package, PlusCircle, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 // debounce
 function useDebounced(value, delay = 350) {

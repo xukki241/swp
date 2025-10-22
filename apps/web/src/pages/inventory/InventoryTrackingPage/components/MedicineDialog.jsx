@@ -1,11 +1,11 @@
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { AlertTriangle } from "lucide-react";
 
 const MedicineDialog = ({ medicine, open, onOpenChange, highlight }) => {

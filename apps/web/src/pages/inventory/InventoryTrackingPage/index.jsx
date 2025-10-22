@@ -1,17 +1,17 @@
-import { Button } from "@/components/ui/button";
+import { AppLayout } from "@/components/layouts/app-layout";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useInventoryTracking } from "@/hooks/useInventoryTracking";
 import MedicineCard from "./components/MedicineCard";
-import { Skeleton } from "@/components/ui/skeleton";
-import { AppLayout } from "@/components/layouts/app-layout";
 
-import { lowStockItems, expiringItems } from "@/hooks/useInventoryTracking";
 import { Card } from "@/components/ui/card";
+import { expiringItems, lowStockItems } from "@/hooks/useInventoryTracking";
 
 const InventoryTracking = () => {
   const {

@@ -1,11 +1,11 @@
 import { pgTable, uniqueIndex } from "drizzle-orm/pg-core";
 
 import {
-  identityPrimaryKey,
-  foreignKey,
   code,
-  name,
   description,
+  foreignKey,
+  identityPrimaryKey,
+  name,
 } from "./common.js";
 import { warehouseZones } from "./warehouseZones.js";
 

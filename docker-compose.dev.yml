@@ -1,0 +1,46 @@
+# Development Docker Compose Configuration
+# This file extends docker-compose.yml with development-specific settings
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: "3.8"
+
+services:
+  db:
+    # Development database settings
+    ports:
+      - "5432:5432"
+    # Expose database for local development tools
+
+  api:
+    # Development API settings with hot reload
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile.dev
+    volumes:
+      # Mount source code for hot reload
+      - ./apps/api:/app/apps/api
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/apps/api/node_modules
+    environment:
+      NODE_ENV: development
+    command: ["pnpm", "dev"]
+
+  web:
+    # Development web settings with hot reload
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile.dev
+    volumes:
+      # Mount source code for hot reload
+      - ./apps/web:/app/apps/web
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/apps/web/node_modules
+    environment:
+      NODE_ENV: development
+    command: ["pnpm", "dev", "--host"]
+
+  # Always include pgAdmin in development
+  pgadmin:
+    profiles: []

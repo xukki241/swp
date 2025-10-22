@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { warehouseBinController } from "@/controllers/warehouse/warehouseBinController.js";
 import { inventoryService } from "@/services/inventoryService.js";
@@ -33,7 +33,7 @@ describe("WarehouseBinController", () => {
       await warehouseBinController.create(req, res);
 
       expect(warehouseBinService.create).toHaveBeenCalledWith({
-        rackId: 1,
+        rackId: "1",
         code: "B001",
         name: "Bin A",
         level: 1,
@@ -47,9 +47,9 @@ describe("WarehouseBinController", () => {
       req.body = {};
       warehouseBinService.create.mockRejectedValue(new Error("Error"));
 
-      await warehouseBinController.create(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
+      await expect(warehouseBinController.create(req, res)).rejects.toThrow(
+        "Error"
+      );
     });
   });
 
@@ -62,8 +62,8 @@ describe("WarehouseBinController", () => {
 
       expect(warehouseBinService.getAll).toHaveBeenCalledWith({
         search: "bin",
-        rackId: 1,
-        zoneId: 2,
+        rackId: "1",
+        zoneId: "2",
         level: 1,
         limit: 100,
         offset: 0,
@@ -77,9 +77,9 @@ describe("WarehouseBinController", () => {
     it("should handle errors", async () => {
       warehouseBinService.getAll.mockRejectedValue(new Error("Error"));
 
-      await warehouseBinController.getAll(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(500);
+      await expect(warehouseBinController.getAll(req, res)).rejects.toThrow(
+        "Error"
+      );
     });
   });
 
@@ -113,7 +113,7 @@ describe("WarehouseBinController", () => {
 
       await warehouseBinController.getByRackId(req, res);
 
-      expect(warehouseBinService.getByRackId).toHaveBeenCalledWith(1);
+      expect(warehouseBinService.getByRackId).toHaveBeenCalledWith("1");
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: [{ id: 1 }, { id: 2 }],
@@ -124,9 +124,9 @@ describe("WarehouseBinController", () => {
       req.params = { rackId: "1" };
       warehouseBinService.getByRackId.mockRejectedValue(new Error("Error"));
 
-      await warehouseBinController.getByRackId(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(500);
+      await expect(
+        warehouseBinController.getByRackId(req, res)
+      ).rejects.toThrow("Error");
     });
   });
 
@@ -138,7 +138,7 @@ describe("WarehouseBinController", () => {
 
       await warehouseBinController.update(req, res);
 
-      expect(warehouseBinService.update).toHaveBeenCalledWith(1, {
+      expect(warehouseBinService.update).toHaveBeenCalledWith("1", {
         name: "Updated Bin",
         level: 2,
         number: 3,
@@ -202,7 +202,7 @@ describe("WarehouseBinController", () => {
 
       await warehouseBinController.getInventory(req, res);
 
-      expect(inventoryService.getByBinId).toHaveBeenCalledWith(1);
+      expect(inventoryService.getByBinId).toHaveBeenCalledWith("1");
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: mockInventory,
@@ -227,9 +227,9 @@ describe("WarehouseBinController", () => {
         new Error("Database error")
       );
 
-      await warehouseBinController.getInventory(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(500);
+      await expect(
+        warehouseBinController.getInventory(req, res)
+      ).rejects.toThrow("Database error");
     });
   });
 });

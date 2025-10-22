@@ -1,27 +1,23 @@
 "use client";
 
-import { useState, useMemo } from "react"; // <-- THAY ĐỔI: Thêm useMemo
-import { useNavigate } from "react-router";
-import { useSuppliers, useDeleteSupplier } from "@/hooks/useSuppliers";
 import { AppLayout } from "@/components/layouts/app-layout";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -30,23 +26,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  PlusCircle,
-  Edit,
-  Trash2,
-  CheckCircle,
-  XCircle,
-  Ban,
-  Search,
-} from "lucide-react";
-import { toast } from "sonner";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useDeleteSupplier, useSuppliers } from "@/hooks/useSuppliers";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Eye } from "lucide-react";
+  Ban,
+  CheckCircle,
+  Eye,
+  PlusCircle,
+  Search,
+  Trash2,
+  XCircle,
+} from "lucide-react";
+import { useMemo, useState } from "react"; // <-- THAY ĐỔI: Thêm useMemo
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 export default function SupplierListPage() {
   const navigate = useNavigate();

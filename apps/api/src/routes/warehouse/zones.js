@@ -1,7 +1,7 @@
 import {
+  batchCreateZonesRequestSchema,
   createWarehouseZoneSchema,
   updateWarehouseZoneSchema,
-  batchCreateZonesRequestSchema,
 } from "@pharmaflow/dto";
 import express from "express";
 

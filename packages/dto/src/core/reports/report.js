@@ -1,11 +1,11 @@
 import { z } from "zod";
 import {
-  uuidSchema,
-  timestampSchema,
   jsonSchema,
   paginationSchema,
+  reportTypeEnum,
+  timestampSchema,
+  uuidSchema,
 } from "../common/index.js";
-import { reportTypeEnum } from "../common/index.js";
 
 // Report schema
 export const reportSchema = z.object({

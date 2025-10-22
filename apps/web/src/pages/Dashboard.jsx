@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, TrendingUp, Users, DollarSign } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useAuth";
+import { DollarSign, Package, TrendingUp, Users } from "lucide-react";
 
 export default function DashboardPage() {
   const { data: currentUser } = useCurrentUser();

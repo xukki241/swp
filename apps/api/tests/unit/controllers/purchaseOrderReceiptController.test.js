@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { purchaseOrderReceiptController } from "@/controllers/purchaseOrderReceiptController.js";
 import { purchaseOrderReceiptService } from "@/services/purchaseOrderReceiptService.js";
@@ -18,7 +18,7 @@ describe("PurchaseOrderReceiptController", () => {
 
   describe("create", () => {
     it("should create receipt", async () => {
-      req.body = { purchaseOrderId: 1, receivedBy: 1 };
+      req.body = { purchaseOrderId: "1", receivedBy: 1 };
       const mockReceipt = { id: 1, ...req.body };
       purchaseOrderReceiptService.create.mockResolvedValue(mockReceipt);
 
@@ -48,7 +48,7 @@ describe("PurchaseOrderReceiptController", () => {
       await purchaseOrderReceiptController.getAll(req, res);
 
       expect(purchaseOrderReceiptService.getAll).toHaveBeenCalledWith({
-        purchaseOrderId: 1,
+        purchaseOrderId: "1",
         startDate: undefined,
         endDate: undefined,
         limit: 50,

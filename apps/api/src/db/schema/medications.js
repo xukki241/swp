@@ -1,6 +1,6 @@
-import { pgTable, varchar, boolean } from "drizzle-orm/pg-core";
+import { boolean, pgTable, varchar } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey, name, description } from "./common.js";
+import { description, identityPrimaryKey, name } from "./common.js";
 import { medicationStatus } from "./enums.js";
 
 export const medications = pgTable("medications", {

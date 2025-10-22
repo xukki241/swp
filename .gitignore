@@ -107,3 +107,10 @@ ConsoleHost_history.txt
 # npm package distribution
 .tgz
 
+
+# Azure Setup Files (Sensitive)
+azure-config.json
+azure-acr-credentials.json
+azure-db-info.json
+gitlab-variables.json
+AZURE_SETUP_COMPLETE.md

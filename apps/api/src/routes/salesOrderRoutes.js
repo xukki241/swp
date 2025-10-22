@@ -1,8 +1,8 @@
 import {
   createSalesOrderRequestSchema,
-  updateSalesOrderRequestSchema,
   listSalesOrdersQuerySchema,
   salesOrderIdParamSchema,
+  updateSalesOrderRequestSchema,
 } from "@pharmaflow/dto";
 import express from "express";
 
@@ -10,8 +10,8 @@ import { salesOrderController } from "../controllers/salesOrderController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 import {
   validateBody,
-  validateQuery,
   validateParams,
+  validateQuery,
 } from "../middleware/validate.js";
 
 export const salesOrderRouter = express.Router();

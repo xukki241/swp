@@ -1,6 +1,6 @@
 import { pgTable } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey, foreignKey, int } from "./common.js";
+import { foreignKey, identityPrimaryKey, int } from "./common.js";
 import { purchaseOrderItems } from "./purchaseOrderItems.js";
 import { purchaseOrderReceipts } from "./purchaseOrderReceipts.js";
 

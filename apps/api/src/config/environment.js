@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-import { getEnvAsNumber, getEnv } from "../utils/env.js";
+import { getEnv, getEnvAsNumber } from "../utils/env.js";
 
 import pkg from "./package-json.js";
 

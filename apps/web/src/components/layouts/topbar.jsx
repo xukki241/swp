@@ -1,6 +1,5 @@
-import { Bell, Settings, PanelLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +8,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useLogout, useCurrentUser } from "@/hooks/useAuth";
+import { useCurrentUser, useLogout } from "@/hooks/useAuth";
+import { Bell, PanelLeft, Settings } from "lucide-react";
 import { useNavigate } from "react-router";
 
 export function Topbar({ title, onToggleSidebar, sidebarCollapsed }) {

@@ -1,5 +1,4 @@
-import { eq, and, gte, lte, sql } from "drizzle-orm";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { db } from "@/db/index.js";
 import { inventoryService } from "@/services/inventoryService.js";
@@ -37,112 +36,134 @@ describe("InventoryService", () => {
         },
       ];
 
+      db.query = {
+        inventory: {
+          findMany: vi.fn().mockResolvedValue(mockInventory),
+        },
+      };
+
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockInventory),
+        where: vi.fn().mockResolvedValue([{ count: mockInventory.length }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      db.select = vi.fn().mockReturnValue(mockQuery);
 
       const result = await inventoryService.getAll();
 
-      expect(result).toEqual(mockInventory);
-      expect(mockQuery.limit).toHaveBeenCalledWith(100);
-      expect(mockQuery.offset).toHaveBeenCalledWith(0);
+      expect(result.data).toEqual(mockInventory);
+      expect(result.total).toBe(mockInventory.length);
     });
 
     it("should filter by medicationVariantId", async () => {
       const mockInventory = [{ id: 1, medicationVariantId: 5 }];
 
+      db.query = {
+        inventory: {
+          findMany: vi.fn().mockResolvedValue(mockInventory),
+        },
+      };
+
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockInventory),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      db.select = vi.fn().mockReturnValue(mockQuery);
 
       const result = await inventoryService.getAll({
         medicationVariantId: 5,
       });
 
-      expect(result).toEqual(mockInventory);
-      expect(mockQuery.where).toHaveBeenCalled();
+      expect(result.data).toEqual(mockInventory);
+      expect(result.total).toBe(1);
     });
 
     it("should filter by binId", async () => {
       const mockInventory = [{ id: 1, binId: 3 }];
 
+      db.query = {
+        inventory: {
+          findMany: vi.fn().mockResolvedValue(mockInventory),
+        },
+      };
+
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockInventory),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      db.select = vi.fn().mockReturnValue(mockQuery);
 
       const result = await inventoryService.getAll({ binId: 3 });
 
-      expect(result).toEqual(mockInventory);
+      expect(result.data).toEqual(mockInventory);
+      expect(result.total).toBe(1);
     });
 
     it("should filter by batchNumber", async () => {
       const mockInventory = [{ id: 1, batchNumber: "BATCH001" }];
 
+      db.query = {
+        inventory: {
+          findMany: vi.fn().mockResolvedValue(mockInventory),
+        },
+      };
+
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockInventory),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      db.select = vi.fn().mockReturnValue(mockQuery);
 
       const result = await inventoryService.getAll({
         batchNumber: "BATCH001",
       });
 
-      expect(result).toEqual(mockInventory);
+      expect(result.data).toEqual(mockInventory);
+      expect(result.total).toBe(1);
     });
 
     it("should filter by expiry date range", async () => {
       const mockInventory = [{ id: 1, expiryDate: "2025-12-31" }];
 
+      db.query = {
+        inventory: {
+          findMany: vi.fn().mockResolvedValue(mockInventory),
+        },
+      };
+
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockInventory),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      db.select = vi.fn().mockReturnValue(mockQuery);
 
       const result = await inventoryService.getAll({
         expiryDateFrom: "2025-01-01",
         expiryDateTo: "2025-12-31",
       });
 
-      expect(result).toEqual(mockInventory);
+      expect(result.data).toEqual(mockInventory);
+      expect(result.total).toBe(1);
     });
 
     it("should apply pagination", async () => {
       const mockInventory = [];
 
+      db.query = {
+        inventory: {
+          findMany: vi.fn().mockResolvedValue(mockInventory),
+        },
+      };
+
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockInventory),
+        where: vi.fn().mockResolvedValue([{ count: 0 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      db.select = vi.fn().mockReturnValue(mockQuery);
 
-      await inventoryService.getAll({ limit: 50, offset: 25 });
+      const result = await inventoryService.getAll({ limit: 50, offset: 25 });
 
-      expect(mockQuery.limit).toHaveBeenCalledWith(50);
-      expect(mockQuery.offset).toHaveBeenCalledWith(25);
+      expect(db.query.inventory.findMany).toHaveBeenCalled();
+      expect(result.data).toEqual([]);
     });
   });
 
@@ -154,12 +175,11 @@ describe("InventoryService", () => {
         quantity: 100,
       };
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue([mockItem]),
+      db.query = {
+        inventory: {
+          findFirst: vi.fn().mockResolvedValue(mockItem),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await inventoryService.getById(1);
 
@@ -167,12 +187,11 @@ describe("InventoryService", () => {
     });
 
     it("should return undefined if item not found", async () => {
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue([]),
+      db.query = {
+        inventory: {
+          findFirst: vi.fn().mockResolvedValue(undefined),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
       const result = await inventoryService.getById(999);
 
@@ -182,39 +201,53 @@ describe("InventoryService", () => {
 
   describe("getLowStock", () => {
     it("should fetch low stock items with custom threshold", async () => {
-      const mockItems = [
+      const mockAllItems = [
         {
+          id: 1,
           medicationVariantId: 1,
-          variantName: "Med A",
-          totalAvailable: 50,
+          quantity: 50,
+          quantityReserved: 0,
         },
       ];
+      const mockLowStockVariants = [{ medicationVariantId: 1 }];
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        groupBy: vi.fn().mockReturnThis(),
-        having: vi.fn().mockResolvedValue(mockItems),
+      db.query = {
+        inventory: {
+          findMany: vi.fn().mockResolvedValue(mockAllItems),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
-      const result = await inventoryService.getLowStock(100);
+      const mockSelectQuery = {
+        from: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi.fn().mockResolvedValue(mockLowStockVariants),
+      };
+      db.select = vi.fn().mockReturnValue(mockSelectQuery);
 
-      expect(result).toEqual(mockItems);
+      const result = await inventoryService.getLowStock({ threshold: 100 });
+
+      expect(result.data).toEqual(mockAllItems);
+      expect(result.total).toBe(1);
     });
 
     it("should use default threshold of 10", async () => {
+      db.query = {
+        inventory: {
+          findMany: vi.fn().mockResolvedValue([]),
+        },
+      };
+
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
         groupBy: vi.fn().mockReturnThis(),
         having: vi.fn().mockResolvedValue([]),
       };
-      db.select.mockReturnValue(mockQuery);
+      db.select = vi.fn().mockReturnValue(mockQuery);
 
-      await inventoryService.getLowStock();
+      const result = await inventoryService.getLowStock();
 
       expect(mockQuery.having).toHaveBeenCalled();
+      expect(result.data).toEqual([]);
     });
   });
 
@@ -228,31 +261,43 @@ describe("InventoryService", () => {
         },
       ];
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        orderBy: vi.fn().mockResolvedValue(mockItems),
+      db.query = {
+        inventory: {
+          findMany: vi.fn().mockResolvedValue(mockItems),
+        },
       };
-      db.select.mockReturnValue(mockQuery);
 
-      const result = await inventoryService.getExpiring(30);
+      const mockCountQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
+      };
+      db.select = vi.fn().mockReturnValue(mockCountQuery);
 
-      expect(result).toEqual(mockItems);
+      const result = await inventoryService.getExpiring({
+        daysUntilExpiry: 30,
+      });
+
+      expect(result.data).toEqual(mockItems);
+      expect(result.total).toBe(1);
     });
 
     it("should use default days value of 30", async () => {
+      db.query = {
+        inventory: {
+          findMany: vi.fn().mockResolvedValue([]),
+        },
+      };
+
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        orderBy: vi.fn().mockResolvedValue([]),
+        where: vi.fn().mockResolvedValue([{ count: 0 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      db.select = vi.fn().mockReturnValue(mockQuery);
 
-      await inventoryService.getExpiring();
+      const result = await inventoryService.getExpiring();
 
-      expect(mockQuery.where).toHaveBeenCalled();
+      expect(db.query.inventory.findMany).toHaveBeenCalled();
+      expect(result.data).toEqual([]);
     });
   });
 

@@ -1,13 +1,10 @@
 // Example usage of the validation schemas
 import {
-  createUserSchema,
-  updateUserSchema,
-  userSchema,
   createMedicationSchema,
-  createCustomerSchema,
-  salesOrderSchema,
-  userRoleSchema,
+  createUserSchema,
   positiveDecimalSchema,
+  updateUserSchema,
+  userRoleSchema,
 } from "./index.js";
 
 // Example: Validate user creation

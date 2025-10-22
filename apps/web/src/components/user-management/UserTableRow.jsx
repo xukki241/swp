@@ -1,8 +1,8 @@
-import { memo } from "react";
-import { Edit, CheckCircle, XCircle, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { StatusBadge, RoleBadge } from "./UserBadges";
+import { Ban, CheckCircle, Edit, XCircle } from "lucide-react";
+import { memo } from "react";
+import { RoleBadge, StatusBadge } from "./UserBadges";
 
 /**
  * User action buttons component

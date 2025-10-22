@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
 import { useMedicationVariants } from "@/hooks/useMedications";
+import { useEffect, useMemo, useState } from "react";
+import { AutocompleteCombobox } from "./ui/AutocompleteCombobox";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import {
   Select,
   SelectContent,
@@ -9,9 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
-import { AutocompleteCombobox } from "./ui/AutocompleteCombobox";
 
 export function MedicationRow({
   index,

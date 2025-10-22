@@ -1,11 +1,4 @@
-import { Link } from "react-router";
-import { useForm } from "react-hook-form";
-import { Pill, AlertCircle } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardContent,
@@ -13,8 +6,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Loading } from "@/components/ui/loading";
 import { useLogin } from "@/hooks/useAuth";
+import { Pill } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Link } from "react-router";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const {

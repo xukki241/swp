@@ -1,7 +1,7 @@
-import { Link } from "react-router";
-import { Pill } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { sidebarConfig } from "@/config/sidebar-config";
+import { cn } from "@/lib/utils";
+import { Pill } from "lucide-react";
+import { Link } from "react-router";
 import { SidebarItem } from "./sidebar-item";
 
 export function Sidebar({ collapsed, onToggle }) {

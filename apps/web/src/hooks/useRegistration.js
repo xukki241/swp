@@ -1,11 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
-  getRegistrationRequests,
-  getRegistrationRequestById,
   approveRegistrationRequest,
-  rejectRegistrationRequest,
   deleteRegistrationRequest,
+  getRegistrationRequestById,
+  getRegistrationRequests,
+  rejectRegistrationRequest,
 } from "@/services/registrationService";
 
 /**
