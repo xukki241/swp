@@ -43,7 +43,16 @@ export default function PurchaseOrderReceiptCreatePage() {
   const navigate = useNavigate();
   const { data: order, isLoading } = usePurchaseOrder(purchaseOrderId);
   const { mutate: createReceipt, isPending } = useCreatePurchaseOrderReceipt();
-  const { data: currentUser } = useCurrentUser();
+  const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser();
+
+  // Debug logging
+  console.log("Current user data:", {
+    currentUser,
+    isLoadingUser,
+    hasUser: !!currentUser?.user,
+    userId: currentUser?.user?.userId,
+    userStructure: currentUser,
+  });
 
   const [receivedDate, setReceivedDate] = useState(
     new Date().toISOString().split("T")[0]
@@ -98,9 +107,19 @@ export default function PurchaseOrderReceiptCreatePage() {
       return;
     }
 
+    if (!currentUser?.user?.userId) {
+      console.error("User authentication check failed:", {
+        currentUser,
+        isLoadingUser,
+        hasToken: !!localStorage.getItem("token"),
+      });
+      toast.error("User not authenticated. Please login again.");
+      return;
+    }
+
     const payload = {
       receivedDate,
-      receivedBy: currentUser?.user?.id,
+      receivedBy: currentUser.user.userId,
       items: items
         .filter((item) => item.quantity > 0)
         .map((item) => ({
@@ -109,14 +128,28 @@ export default function PurchaseOrderReceiptCreatePage() {
         })),
     };
 
+    console.log("Creating receipt with payload:", {
+      payload,
+      receivedDateType: typeof receivedDate,
+      receivedDateValue: receivedDate,
+      receivedByType: typeof currentUser?.user?.userId,
+      receivedByValue: currentUser?.user?.userId,
+      itemsCount: payload.items.length,
+    });
+
     createReceipt(
       { purchaseOrderId, payload },
       {
         onSuccess: () => {
           toast.success("Receipt created successfully!");
-          navigate(`/purchase-orders/${purchaseOrderId}`);
+          navigate("/procurement/receipts");
         },
         onError: (error) => {
+          console.error("Failed to create receipt:", {
+            error,
+            response: error?.response,
+            data: error?.response?.data,
+          });
           toast.error("Failed to create receipt!", {
             description: error?.response?.data?.error || error.message,
           });

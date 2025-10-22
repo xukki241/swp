@@ -10,12 +10,42 @@ import { purchaseOrders } from "../db/schema/purchaseOrders.js";
 import { supplierMedicationVariants } from "../db/schema/supplierMedicationVariants.js";
 import { suppliers } from "../db/schema/suppliers.js";
 import { users } from "../db/schema/users.js";
+import logger from "../utils/logger.js";
 
 export const purchaseOrderReceiptService = {
   // Create a new purchase order receipt with items
   async create(data) {
+    logger.info("purchaseOrderReceiptService.create called with:", {
+      data,
+      dataKeys: Object.keys(data),
+      receivedDate: data.receivedDate,
+      receivedDateType: typeof data.receivedDate,
+      receivedBy: data.receivedBy,
+      purchaseOrderId: data.purchaseOrderId,
+    });
+
     return await db.transaction(async (tx) => {
       const { items, ...receiptData } = data;
+
+      // Convert receivedDate string to Date object if needed
+      if (
+        receiptData.receivedDate &&
+        typeof receiptData.receivedDate === "string"
+      ) {
+        receiptData.receivedDate = new Date(receiptData.receivedDate);
+        logger.info("Converted receivedDate to Date object:", {
+          original: data.receivedDate,
+          converted: receiptData.receivedDate,
+          type: typeof receiptData.receivedDate,
+        });
+      }
+
+      logger.info("Inserting receipt with data:", {
+        receiptData,
+        receiptDataKeys: Object.keys(receiptData),
+        receivedDateFinal: receiptData.receivedDate,
+        receivedDateType: typeof receiptData.receivedDate,
+      });
 
       // Create purchase order receipt
       const [receipt] = await tx
@@ -97,7 +127,40 @@ export const purchaseOrderReceiptService = {
     }
 
     const results = await query.limit(limit).offset(offset);
-    return results;
+
+    // Calculate total amount for each receipt
+    const receiptsWithTotals = await Promise.all(
+      results.map(async (receipt) => {
+        const items = await db
+          .select({
+            quantity: purchaseOrderReceiptItems.quantity,
+            unitPrice: purchaseOrderItems.unitPrice,
+          })
+          .from(purchaseOrderReceiptItems)
+          .leftJoin(
+            purchaseOrderItems,
+            eq(
+              purchaseOrderReceiptItems.purchaseOrderItemId,
+              purchaseOrderItems.id
+            )
+          )
+          .where(
+            eq(purchaseOrderReceiptItems.purchaseOrderReceiptId, receipt.id)
+          );
+
+        const totalAmount = items.reduce(
+          (sum, item) => sum + (item.quantity || 0) * (item.unitPrice || 0),
+          0
+        );
+
+        return {
+          ...receipt,
+          totalAmount,
+        };
+      })
+    );
+
+    return receiptsWithTotals;
   },
 
   // Get purchase order receipt by ID with items

@@ -1,4 +1,5 @@
 import { purchaseOrderReceiptService } from "../services/purchaseOrderReceiptService.js";
+import logger from "../utils/logger.js";
 
 export const purchaseOrderReceiptController = {
   async getAllByPurchaseOrder(req, res) {
@@ -9,6 +10,7 @@ export const purchaseOrderReceiptController = {
       });
       res.json(receipts);
     } catch (error) {
+      logger.error("Error in getAllByPurchaseOrder:", error);
       res.status(500).json({ error: error.message });
     }
   },
@@ -16,12 +18,40 @@ export const purchaseOrderReceiptController = {
   async create(req, res) {
     try {
       const purchaseOrderId = req.params.purchaseOrderId;
+
+      // Log incoming request data
+      logger.info("Creating receipt with data:", {
+        purchaseOrderId,
+        body: req.body,
+        bodyKeys: Object.keys(req.body),
+        receivedDate: req.body.receivedDate,
+        receivedDateType: typeof req.body.receivedDate,
+        receivedBy: req.body.receivedBy,
+        itemsCount: req.body.items?.length,
+      });
+
+      // Remove undefined fields to avoid database issues
+      const cleanedBody = Object.fromEntries(
+        Object.entries(req.body).filter(([_, value]) => value !== undefined)
+      );
+
+      logger.info("Cleaned body:", {
+        cleanedBody,
+        cleanedBodyKeys: Object.keys(cleanedBody),
+      });
+
       const receipt = await purchaseOrderReceiptService.create({
         purchaseOrderId,
-        ...req.body,
+        ...cleanedBody,
       });
       res.status(201).json(receipt);
     } catch (error) {
+      logger.error("Error creating receipt:", {
+        message: error.message,
+        stack: error.stack,
+        purchaseOrderId: req.params.purchaseOrderId,
+        body: req.body,
+      });
       res.status(400).json({ error: error.message });
     }
   },
