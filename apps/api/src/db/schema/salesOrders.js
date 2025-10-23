@@ -1,10 +1,11 @@
-import { pgTable } from "drizzle-orm/pg-core";
+import { index, pgTable } from "drizzle-orm/pg-core";
 
 import {
   createdAt,
   decimalColumn,
   foreignKey,
   identityPrimaryKey,
+  searchVector,
 } from "./common.js";
 import { customers } from "./customers.js";
 import { salesOrderPaymentMethod, salesOrderStatus } from "./enums.js";
@@ -22,4 +23,7 @@ export const salesOrders = pgTable("sales_orders", {
     .default("cash"),
   salespersonId: foreignKey("salesperson_id", users.id),
   prescriptionId: foreignKey("prescription_id", files.id),
-});
+  searchVector: searchVector(),
+}, (table) => [
+  index("sales_orders_search_vector_idx").using("gin", table.searchVector),
+]);

@@ -1,10 +1,11 @@
-import { pgTable, timestamp } from "drizzle-orm/pg-core";
+import { index, pgTable, timestamp } from "drizzle-orm/pg-core";
 
 import {
   createdAt,
   decimalColumn,
   foreignKey,
   identityPrimaryKey,
+  searchVector,
 } from "./common.js";
 import { purchaseOrderStatus } from "./enums.js";
 import { suppliers } from "./suppliers.js";
@@ -18,4 +19,7 @@ export const purchaseOrders = pgTable("purchase_orders", {
   status: purchaseOrderStatus("status").notNull().default("pending"),
   totalAmount: decimalColumn("total_amount").notNull().default(0),
   createdBy: foreignKey("created_by", users.id),
-});
+  searchVector: searchVector(),
+}, (table) => [
+  index("purchase_orders_search_vector_idx").using("gin", table.searchVector),
+]);

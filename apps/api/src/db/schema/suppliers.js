@@ -1,6 +1,6 @@
-import { pgTable, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+import { index, pgTable, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 
-import { address, email, identityPrimaryKey, name, phone } from "./common.js";
+import { address, email, identityPrimaryKey, name, phone, searchVector } from "./common.js";
 import { supplierStatus } from "./enums.js";
 
 export const suppliers = pgTable(
@@ -13,9 +13,11 @@ export const suppliers = pgTable(
     phone: phone(),
     address: address(),
     status: supplierStatus("status").notNull().default("active"),
+    searchVector: searchVector(),
   },
   (table) => [
     uniqueIndex("suppliers_email_unique").on(table.email),
     uniqueIndex("suppliers_phone_unique").on(table.phone),
+    index("suppliers_search_vector_idx").using("gin", table.searchVector),
   ]
 );
