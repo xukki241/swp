@@ -1,3 +1,6 @@
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE EXTENSION IF NOT EXISTS unaccent;
+
 -- Add search_vector columns
 ALTER TABLE "customers" ADD COLUMN "search_vector" "tsvector";--> statement-breakpoint
 ALTER TABLE "inventory" ADD COLUMN "search_vector" "tsvector";--> statement-breakpoint
