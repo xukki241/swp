@@ -59,12 +59,8 @@
           "name": "audit_logs_user_id_users_id_fk",
           "tableFrom": "audit_logs",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -214,12 +210,8 @@
           "name": "file_attachments_file_id_files_id_fk",
           "tableFrom": "file_attachments",
           "tableTo": "files",
-          "columnsFrom": [
-            "file_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["file_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -291,12 +283,8 @@
           "name": "files_uploaded_by_users_id_fk",
           "tableFrom": "files",
           "tableTo": "users",
-          "columnsFrom": [
-            "uploaded_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["uploaded_by"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -402,12 +390,8 @@
           "name": "inventory_medication_variant_id_medication_variants_id_fk",
           "tableFrom": "inventory",
           "tableTo": "medication_variants",
-          "columnsFrom": [
-            "medication_variant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["medication_variant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -415,12 +399,8 @@
           "name": "inventory_purchase_order_receipt_items_id_purchase_order_receipt_items_id_fk",
           "tableFrom": "inventory",
           "tableTo": "purchase_order_receipt_items",
-          "columnsFrom": [
-            "purchase_order_receipt_items_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["purchase_order_receipt_items_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -428,12 +408,8 @@
           "name": "inventory_bin_id_warehouse_bins_id_fk",
           "tableFrom": "inventory",
           "tableTo": "warehouse_bins",
-          "columnsFrom": [
-            "bin_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["bin_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -610,12 +586,8 @@
           "name": "medication_variants_medication_id_medications_id_fk",
           "tableFrom": "medication_variants",
           "tableTo": "medications",
-          "columnsFrom": [
-            "medication_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["medication_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -663,12 +635,8 @@
           "name": "notifications_user_id_users_id_fk",
           "tableFrom": "notifications",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -737,12 +705,8 @@
           "name": "password_reset_tokens_user_id_users_id_fk",
           "tableFrom": "password_reset_tokens",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -801,12 +765,8 @@
           "name": "purchase_order_items_purchase_order_id_purchase_orders_id_fk",
           "tableFrom": "purchase_order_items",
           "tableTo": "purchase_orders",
-          "columnsFrom": [
-            "purchase_order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["purchase_order_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -814,12 +774,8 @@
           "name": "purchase_order_items_supplier_medication_variant_id_supplier_medication_variants_id_fk",
           "tableFrom": "purchase_order_items",
           "tableTo": "supplier_medication_variants",
-          "columnsFrom": [
-            "supplier_medication_variant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["supplier_medication_variant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -866,12 +822,8 @@
           "name": "purchase_order_receipt_items_purchase_order_receipt_id_purchase_order_receipts_id_fk",
           "tableFrom": "purchase_order_receipt_items",
           "tableTo": "purchase_order_receipts",
-          "columnsFrom": [
-            "purchase_order_receipt_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["purchase_order_receipt_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -879,12 +831,8 @@
           "name": "purchase_order_receipt_items_purchase_order_item_id_purchase_order_items_id_fk",
           "tableFrom": "purchase_order_receipt_items",
           "tableTo": "purchase_order_items",
-          "columnsFrom": [
-            "purchase_order_item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["purchase_order_item_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -931,12 +879,8 @@
           "name": "purchase_order_receipts_purchase_order_id_purchase_orders_id_fk",
           "tableFrom": "purchase_order_receipts",
           "tableTo": "purchase_orders",
-          "columnsFrom": [
-            "purchase_order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["purchase_order_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -944,12 +888,8 @@
           "name": "purchase_order_receipts_received_by_users_id_fk",
           "tableFrom": "purchase_order_receipts",
           "tableTo": "users",
-          "columnsFrom": [
-            "received_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["received_by"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1018,12 +958,8 @@
           "name": "purchase_orders_supplier_id_suppliers_id_fk",
           "tableFrom": "purchase_orders",
           "tableTo": "suppliers",
-          "columnsFrom": [
-            "supplier_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["supplier_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1031,12 +967,8 @@
           "name": "purchase_orders_created_by_users_id_fk",
           "tableFrom": "purchase_orders",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1141,12 +1073,8 @@
           "name": "sales_order_items_sales_order_id_sales_orders_id_fk",
           "tableFrom": "sales_order_items",
           "tableTo": "sales_orders",
-          "columnsFrom": [
-            "sales_order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["sales_order_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1154,12 +1082,8 @@
           "name": "sales_order_items_medication_variant_id_medication_variants_id_fk",
           "tableFrom": "sales_order_items",
           "tableTo": "medication_variants",
-          "columnsFrom": [
-            "medication_variant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["medication_variant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1230,12 +1154,8 @@
           "name": "sales_orders_customer_id_customers_id_fk",
           "tableFrom": "sales_orders",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1243,12 +1163,8 @@
           "name": "sales_orders_salesperson_id_users_id_fk",
           "tableFrom": "sales_orders",
           "tableTo": "users",
-          "columnsFrom": [
-            "salesperson_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["salesperson_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1396,12 +1312,8 @@
           "name": "supplier_medication_variants_supplier_id_suppliers_id_fk",
           "tableFrom": "supplier_medication_variants",
           "tableTo": "suppliers",
-          "columnsFrom": [
-            "supplier_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["supplier_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1409,12 +1321,8 @@
           "name": "supplier_medication_variants_medication_variant_id_medication_variants_id_fk",
           "tableFrom": "supplier_medication_variants",
           "tableTo": "medication_variants",
-          "columnsFrom": [
-            "medication_variant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["medication_variant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1578,12 +1486,8 @@
           "name": "user_credentials_user_id_users_id_fk",
           "tableFrom": "user_credentials",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1877,12 +1781,8 @@
           "name": "warehouse_bins_rack_id_warehouse_racks_id_fk",
           "tableFrom": "warehouse_bins",
           "tableTo": "warehouse_racks",
-          "columnsFrom": [
-            "rack_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["rack_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1957,12 +1857,8 @@
           "name": "warehouse_racks_zone_id_warehouse_zones_id_fk",
           "tableFrom": "warehouse_racks",
           "tableTo": "warehouse_zones",
-          "columnsFrom": [
-            "zone_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["zone_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -2046,21 +1942,12 @@
     "public.medication_status": {
       "name": "medication_status",
       "schema": "public",
-      "values": [
-        "active",
-        "inactive",
-        "discontinued"
-      ]
+      "values": ["active", "inactive", "discontinued"]
     },
     "public.purchase_order_status": {
       "name": "purchase_order_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "ordered",
-        "received",
-        "cancelled"
-      ]
+      "values": ["pending", "ordered", "received", "cancelled"]
     },
     "public.report_type": {
       "name": "report_type",
@@ -2082,75 +1969,42 @@
     "public.sales_order_payment_method": {
       "name": "sales_order_payment_method",
       "schema": "public",
-      "values": [
-        "cash",
-        "bank_transfer",
-        "credit_card",
-        "mobile_payment"
-      ]
+      "values": ["cash", "bank_transfer", "credit_card", "mobile_payment"]
     },
     "public.sales_order_status": {
       "name": "sales_order_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "paid",
-        "delivered",
-        "cancelled"
-      ]
+      "values": ["pending", "paid", "delivered", "cancelled"]
     },
     "public.supplier_status": {
       "name": "supplier_status",
       "schema": "public",
-      "values": [
-        "active",
-        "inactive",
-        "blacklisted"
-      ]
+      "values": ["active", "inactive", "blacklisted"]
     },
     "public.user_registration_status": {
       "name": "user_registration_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "approved",
-        "rejected"
-      ]
+      "values": ["pending", "approved", "rejected"]
     },
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": [
-        "owner",
-        "staff"
-      ]
+      "values": ["owner", "staff"]
     },
     "public.user_status": {
       "name": "user_status",
       "schema": "public",
-      "values": [
-        "active",
-        "inactive",
-        "suspended"
-      ]
+      "values": ["active", "inactive", "suspended"]
     },
     "public.warehouse_zone_type": {
       "name": "warehouse_zone_type",
       "schema": "public",
-      "values": [
-        "normal",
-        "cold",
-        "hazard",
-        "quarantine"
-      ]
+      "values": ["normal", "cold", "hazard", "quarantine"]
     },
     "public.reset_method": {
       "name": "reset_method",
       "schema": "public",
-      "values": [
-        "email",
-        "sms"
-      ]
+      "values": ["email", "sms"]
     }
   },
   "schemas": {},

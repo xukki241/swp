@@ -146,7 +146,7 @@ export function MedicationRow({
       }
 
       const result = await response.json();
-      
+
       // Update rowData with contract ID and filename
       onChange(index, {
         ...rowData,
@@ -284,9 +284,7 @@ export function MedicationRow({
             step="0.01"
             min="0"
             value={rowData.purchasePrice || ""}
-            onChange={(e) =>
-              handleFieldChange("purchasePrice", e.target.value)
-            }
+            onChange={(e) => handleFieldChange("purchasePrice", e.target.value)}
           />
         </div>
       </div>
@@ -304,7 +302,7 @@ export function MedicationRow({
             onChange={handleFileUpload}
             className="hidden"
           />
-          
+
           {!rowData.contractId ? (
             <Button
               type="button"
