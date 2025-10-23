@@ -8,6 +8,7 @@ import {
 } from "./common.js";
 import { customers } from "./customers.js";
 import { salesOrderPaymentMethod, salesOrderStatus } from "./enums.js";
+import { files } from "./files.js";
 import { users } from "./users.js";
 
 export const salesOrders = pgTable("sales_orders", {
@@ -20,4 +21,5 @@ export const salesOrders = pgTable("sales_orders", {
     .notNull()
     .default("cash"),
   salespersonId: foreignKey("salesperson_id", users.id),
+  prescriptionId: foreignKey("prescription_id", files.id),
 });

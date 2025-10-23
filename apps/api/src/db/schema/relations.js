@@ -2,7 +2,6 @@ import { relations } from "drizzle-orm";
 
 import { auditLogs } from "./auditLogs.js";
 import { customers } from "./customers.js";
-import { fileAttachments } from "./fileAttachments.js";
 import { files } from "./files.js";
 import { inventory } from "./inventory.js";
 import { medications } from "./medications.js";
@@ -42,8 +41,12 @@ export const userCredentialsRelations = relations(
   })
 );
 
-export const medicationsRelations = relations(medications, ({ many }) => ({
+export const medicationsRelations = relations(medications, ({ one, many }) => ({
   variants: many(medicationVariants),
+  image: one(files, {
+    fields: [medications.imageId],
+    references: [files.id],
+  }),
 }));
 
 export const medicationVariantsRelations = relations(
@@ -77,6 +80,10 @@ export const supplierMedicationVariantsRelations = relations(
       references: [medicationVariants.id],
     }),
     purchaseOrderItems: many(purchaseOrderItems),
+    contract: one(files, {
+      fields: [supplierMedicationVariants.contractId],
+      references: [files.id],
+    }),
   })
 );
 
@@ -199,6 +206,10 @@ export const salesOrdersRelations = relations(salesOrders, ({ one, many }) => ({
     references: [users.id],
   }),
   items: many(salesOrderItems),
+  prescription: one(files, {
+    fields: [salesOrders.prescriptionId],
+    references: [files.id],
+  }),
 }));
 
 export const salesOrderItemsRelations = relations(
@@ -220,18 +231,10 @@ export const filesRelations = relations(files, ({ one, many }) => ({
     fields: [files.uploadedBy],
     references: [users.id],
   }),
-  attachments: many(fileAttachments),
+  medicationImages: many(medications),
+  supplierContracts: many(supplierMedicationVariants),
+  salesOrderPrescriptions: many(salesOrders),
 }));
-
-export const fileAttachmentsRelations = relations(
-  fileAttachments,
-  ({ one }) => ({
-    file: one(files, {
-      fields: [fileAttachments.fileId],
-      references: [files.id],
-    }),
-  })
-);
 
 export const notificationsRelations = relations(notifications, ({ one }) => ({
   user: one(users, {

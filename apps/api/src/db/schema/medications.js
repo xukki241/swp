@@ -1,7 +1,8 @@
 import { boolean, pgTable, varchar } from "drizzle-orm/pg-core";
 
-import { description, identityPrimaryKey, name } from "./common.js";
+import { description, foreignKey, identityPrimaryKey, name } from "./common.js";
 import { medicationStatus } from "./enums.js";
+import { files } from "./files.js";
 
 export const medications = pgTable("medications", {
   id: identityPrimaryKey(),
@@ -15,4 +16,5 @@ export const medications = pgTable("medications", {
     .notNull()
     .default(false),
   status: medicationStatus("status").notNull().default("active"),
+  imageId: foreignKey("image_id", files.id),
 });

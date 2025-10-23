@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   boolean,
+  customType,
   doublePrecision,
   integer,
   text,
@@ -54,6 +55,18 @@ export const foreignKey = (columnName, references, actions) =>
 export const int = (columnName) => integer(columnName);
 
 export const decimalColumn = (columnName) => doublePrecision(columnName);
+
+// Custom bytea type for storing binary data (blobs)
+const bytea = customType({
+  dataType() {
+    return "bytea";
+  },
+  toDriver(value) {
+    return value; // Buffer stays as Buffer
+  },
+});
+
+export const blobColumn = (columnName) => bytea(columnName);
 
 export const basicInfo = {
   name,
