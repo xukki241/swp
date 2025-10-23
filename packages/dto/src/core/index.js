@@ -10,6 +10,9 @@ export * from "./users/index.js";
 // Customer endpoints
 export * from "./customers/index.js";
 
+// File endpoints
+export * from "./files/index.js";
+
 // Medication endpoints
 export * from "./medications/index.js";
 
