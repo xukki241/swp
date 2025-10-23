@@ -67,7 +67,7 @@ try {
   console.table(result.rows);
 } catch (error) {
   console.error("❌ Migration failed:", error.message);
-  process.exit(1);
+  throw error;
 } finally {
   await client.end();
 }
