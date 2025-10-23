@@ -176,6 +176,7 @@ export const supplierService = {
           supplierSku: supplierMedicationVariants.supplierSku,
           leadTimeDays: supplierMedicationVariants.leadTimeDays,
           medicationName: medications.name,
+          purchasePrice: supplierMedicationVariants.purchasePrice,
           variantName: medicationVariants.name,
         })
         .from(supplierMedicationVariants)
