@@ -1,6 +1,14 @@
 # Build stage
 FROM node:22-alpine AS builder
 
+# Build arguments for environment variables
+ARG VITE_API_URL=http://localhost:3000
+ARG VITE_API_BASE_URL=http://localhost:3000/api
+
+# Set environment variables for build
+ENV VITE_API_URL=${VITE_API_URL}
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@10.18.2 --activate
 
@@ -20,7 +28,7 @@ COPY apps/web ./apps/web
 # Install dependencies (skip prepare scripts to avoid husky)
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
-# Build the web application
+# Build the web application with environment variables baked in
 RUN pnpm --filter @pharmaflow/web build
 
 # Production stage - using nginx to serve static files
