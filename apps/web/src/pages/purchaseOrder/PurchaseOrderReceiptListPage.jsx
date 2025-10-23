@@ -58,32 +58,16 @@ export default function PurchaseOrderReceiptListPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
-  const { data: receipts = [], isLoading } = usePurchaseOrderReceipts();
+  // Build filters for API
+  const filters = useMemo(() => {
+    const params = {};
+    if (searchQuery) params.search = searchQuery;
+    params.sortOrder = sortOrder;
+    return params;
+  }, [searchQuery, sortOrder]);
+
+  const { data: receipts = [], isLoading } = usePurchaseOrderReceipts(filters);
   const { mutate: deleteReceipt } = useDeletePurchaseOrderReceipt();
-
-  const filteredReceipts = useMemo(() => {
-    let items = [...receipts];
-
-    // Filter by search query
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      items = items.filter(
-        (r) =>
-          (r.supplierName || "").toLowerCase().includes(q) ||
-          (r.receivedByName || "").toLowerCase().includes(q) ||
-          (r.poStatus || "").toLowerCase().includes(q)
-      );
-    }
-
-    // Sort by received date
-    items.sort((a, b) => {
-      const dateA = new Date(a.receivedDate);
-      const dateB = new Date(b.receivedDate);
-      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
-    });
-
-    return items;
-  }, [receipts, searchQuery, sortOrder]);
 
   const handleDelete = (id) => {
     setSelectedId(id);
@@ -227,7 +211,7 @@ export default function PurchaseOrderReceiptListPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredReceipts.length === 0 ? (
+                  {receipts.length === 0 ? (
                     <TableRow>
                       <TableCell
                         colSpan={6}
@@ -245,7 +229,7 @@ export default function PurchaseOrderReceiptListPage() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredReceipts.map((r) => (
+                    receipts.map((r) => (
                       <TableRow key={r.id}>
                         <TableCell className="font-medium">
                           {r.supplierName || "N/A"}
