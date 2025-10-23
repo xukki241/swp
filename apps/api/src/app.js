@@ -19,8 +19,12 @@ app.use(
   })
 );
 // Use morgan for HTTP request logging, routed through winston
+// Skip logging for file upload routes to avoid logging binary data
 app.use(
-  morgan(config.isDevelopment ? "dev" : "combined", { stream: logger.stream })
+  morgan(config.isDevelopment ? "dev" : "combined", {
+    stream: logger.stream,
+    skip: (req) => req.path.startsWith("/api/files") && req.method === "POST",
+  })
 );
 
 app.use(express.json());

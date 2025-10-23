@@ -20,6 +20,11 @@ export const fileController = {
     const userId = req.user?.id; // Get user ID from auth middleware
     const file = req.file;
 
+    // Log file metadata only (not binary content)
+    logger.info(
+      `File upload: ${file.originalname} (${file.mimetype}, ${file.size} bytes) by user ${userId || "anonymous"}`
+    );
+
     // Extract file type from extension
     const fileExtension = path.extname(file.originalname).substring(1);
 
@@ -34,6 +39,8 @@ export const fileController = {
     };
 
     const createdFile = await fileService.create(fileData);
+
+    logger.info(`File uploaded successfully: ID ${createdFile.id}`);
 
     res.status(201).json({
       success: true,
@@ -57,6 +64,10 @@ export const fileController = {
     const userId = req.user?.id;
     const uploadedFiles = [];
 
+    logger.info(
+      `Batch file upload started: ${req.files.length} file(s) by user ${userId || "anonymous"}`
+    );
+
     // Process each file
     for (const file of req.files) {
       const fileExtension = path.extname(file.originalname).substring(1);
@@ -73,6 +84,10 @@ export const fileController = {
       const createdFile = await fileService.create(fileData);
       uploadedFiles.push(createdFile);
     }
+
+    logger.info(
+      `Batch upload completed: ${uploadedFiles.length} file(s) uploaded`
+    );
 
     res.status(201).json({
       success: true,

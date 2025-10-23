@@ -18,12 +18,14 @@ The file upload system allows authenticated users to upload, download, and manag
 ## Supported File Types
 
 ### Images
+
 - JPEG/JPG (`.jpg`, `.jpeg`)
 - PNG (`.png`)
 - GIF (`.gif`)
 - WebP (`.webp`)
 
 ### Documents
+
 - PDF (`.pdf`)
 - Microsoft Word (`.doc`, `.docx`)
 - Microsoft Excel (`.xls`, `.xlsx`)
@@ -33,6 +35,7 @@ The file upload system allows authenticated users to upload, download, and manag
 ## API Endpoints
 
 ### 1. Upload Single File
+
 ```http
 POST /api/files
 Content-Type: multipart/form-data
@@ -43,6 +46,7 @@ Body:
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -60,6 +64,7 @@ Body:
 ```
 
 ### 2. Upload Multiple Files
+
 ```http
 POST /api/files/batch
 Content-Type: multipart/form-data
@@ -72,6 +77,7 @@ Body:
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -85,12 +91,14 @@ Body:
 ```
 
 ### 3. Get File Metadata
+
 ```http
 GET /api/files/:id
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -107,40 +115,47 @@ Authorization: Bearer <token>
 ```
 
 ### 4. Download File
+
 ```http
 GET /api/files/:id/download
 Authorization: Bearer <token>
 ```
 
 **Response:** Binary file data with headers:
+
 - `Content-Type`: file MIME type
 - `Content-Disposition`: attachment; filename="example.pdf"
 - `Content-Length`: file size
 
 ### 5. View File (Inline)
+
 ```http
 GET /api/files/:id/view
 Authorization: Bearer <token>
 ```
 
 **Response:** Binary file data with headers:
+
 - `Content-Type`: file MIME type
 - `Content-Disposition`: inline; filename="example.pdf"
 - `Content-Length`: file size
 
 ### 6. List Files
+
 ```http
 GET /api/files?page=1&limit=50&fileType=pdf&uploadedBy=uuid
 Authorization: Bearer <token>
 ```
 
 **Query Parameters:**
+
 - `page` (optional): Page number (default: 1)
 - `limit` (optional): Items per page (default: 50, max: 100)
 - `fileType` (optional): Filter by file type
 - `uploadedBy` (optional): Filter by uploader UUID
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -159,6 +174,7 @@ Authorization: Bearer <token>
 ```
 
 ### 7. Delete File
+
 ```http
 DELETE /api/files/:id
 Authorization: Bearer <token>
@@ -167,6 +183,7 @@ Authorization: Bearer <token>
 **Access:** Owner only
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -182,6 +199,7 @@ Authorization: Bearer <token>
 ## Usage with Related Entities
 
 ### Medication with Image
+
 ```http
 POST /api/medications
 Content-Type: application/json
@@ -195,6 +213,7 @@ Content-Type: application/json
 ```
 
 ### Supplier Medication Variant with Contract
+
 ```http
 POST /api/suppliers/:supplierId/medications
 Content-Type: application/json
@@ -207,6 +226,7 @@ Content-Type: application/json
 ```
 
 ### Sales Order with Prescription
+
 ```http
 POST /api/sales
 Content-Type: application/json
@@ -227,18 +247,19 @@ Content-Type: application/json
 ## Client-Side Examples
 
 ### JavaScript/Fetch API
+
 ```javascript
 // Upload single file
 const uploadFile = async (file) => {
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append("file", file);
 
-  const response = await fetch('/api/files', {
-    method: 'POST',
+  const response = await fetch("/api/files", {
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     },
-    body: formData
+    body: formData,
   });
 
   const result = await response.json();
@@ -248,16 +269,16 @@ const uploadFile = async (file) => {
 // Upload multiple files
 const uploadMultipleFiles = async (files) => {
   const formData = new FormData();
-  files.forEach(file => {
-    formData.append('files', file);
+  files.forEach((file) => {
+    formData.append("files", file);
   });
 
-  const response = await fetch('/api/files/batch', {
-    method: 'POST',
+  const response = await fetch("/api/files/batch", {
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     },
-    body: formData
+    body: formData,
   });
 
   const result = await response.json();
@@ -268,22 +289,23 @@ const uploadMultipleFiles = async (files) => {
 const downloadFile = async (fileId) => {
   const response = await fetch(`/api/files/${fileId}/download`, {
     headers: {
-      'Authorization': `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
 
   const blob = await response.blob();
   const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
-  a.download = 'filename.ext';
+  a.download = "filename.ext";
   a.click();
 };
 ```
 
 ### React Example
+
 ```jsx
-import { useState } from 'react';
+import { useState } from "react";
 
 function FileUpload() {
   const [file, setFile] = useState(null);
@@ -298,21 +320,21 @@ function FileUpload() {
 
     setUploading(true);
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
     try {
-      const response = await fetch('/api/files', {
-        method: 'POST',
+      const response = await fetch("/api/files", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: formData
+        body: formData,
       });
 
       const result = await response.json();
-      console.log('Uploaded:', result.data);
+      console.log("Uploaded:", result.data);
     } catch (error) {
-      console.error('Upload failed:', error);
+      console.error("Upload failed:", error);
     } finally {
       setUploading(false);
     }
@@ -322,7 +344,7 @@ function FileUpload() {
     <div>
       <input type="file" onChange={handleFileChange} />
       <button onClick={handleUpload} disabled={!file || uploading}>
-        {uploading ? 'Uploading...' : 'Upload'}
+        {uploading ? "Uploading..." : "Upload"}
       </button>
     </div>
   );
@@ -334,6 +356,7 @@ function FileUpload() {
 ### Common Error Responses
 
 **File too large (> 10 MB):**
+
 ```json
 {
   "success": false,
@@ -342,6 +365,7 @@ function FileUpload() {
 ```
 
 **Invalid file type:**
+
 ```json
 {
   "success": false,
@@ -350,6 +374,7 @@ function FileUpload() {
 ```
 
 **No file provided:**
+
 ```json
 {
   "success": false,
@@ -358,6 +383,7 @@ function FileUpload() {
 ```
 
 **Too many files (> 10):**
+
 ```json
 {
   "success": false,
@@ -366,6 +392,7 @@ function FileUpload() {
 ```
 
 **File not found:**
+
 ```json
 {
   "success": false,
@@ -384,6 +411,7 @@ function FileUpload() {
 ## Database Schema
 
 The `files` table structure:
+
 ```sql
 CREATE TABLE files (
   id UUID PRIMARY KEY,
@@ -414,4 +442,3 @@ CREATE TABLE files (
 - [ ] Virus scanning
 - [ ] CDN integration
 - [ ] Direct upload to cloud storage
-

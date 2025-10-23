@@ -33,6 +33,7 @@ export const supplierMedicationVariantService = {
         supplierSku: supplierMedicationVariants.supplierSku,
         leadTimeDays: supplierMedicationVariants.leadTimeDays,
         supplierName: suppliers.name,
+        purchasePrice: supplierMedicationVariants.purchasePrice,
         medicationName: medications.name,
         variantName: medicationVariants.name,
       })
@@ -83,6 +84,7 @@ export const supplierMedicationVariantService = {
         supplierSku: supplierMedicationVariants.supplierSku,
         leadTimeDays: supplierMedicationVariants.leadTimeDays,
         supplierName: suppliers.name,
+        purchasePrice: supplierMedicationVariants.purchasePrice,
         medicationName: medications.name,
         variantName: medicationVariants.name,
       })

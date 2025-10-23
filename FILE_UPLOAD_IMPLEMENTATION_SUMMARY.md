@@ -3,6 +3,7 @@
 ## ✅ Completed Tasks
 
 ### 1. Database Schema Updates
+
 - ✅ Updated `files` table to store file content as `blob` (bytea)
 - ✅ Removed `fileAttachments` table (no longer needed)
 - ✅ Added file references to related entities:
@@ -12,11 +13,14 @@
 - ✅ Updated all database relations bidirectionally
 
 ### 2. Package Installation
+
 - ✅ Installed `multer` for handling multipart/form-data file uploads
 - ✅ Uses memory storage to store files in Buffer before saving to database
 
 ### 3. DTO Schemas (`packages/dto/src/core/files/`)
+
 Created comprehensive validation schemas:
+
 - ✅ `fileSchema` - Complete file metadata
 - ✅ `uploadFileRequestSchema` - Upload validation
 - ✅ `listFilesQuerySchema` - List/pagination parameters
@@ -28,7 +32,9 @@ Created comprehensive validation schemas:
   - `salesOrderSchema` + `createSalesOrderRequestSchema` (prescriptionId)
 
 ### 4. Middleware (`apps/api/src/middleware/upload.js`)
+
 Created multer configuration:
+
 - ✅ Memory storage for efficient database insertion
 - ✅ File type validation (images, PDFs, Office docs)
 - ✅ File size limits (10 MB max per file)
@@ -36,7 +42,9 @@ Created multer configuration:
 - ✅ Comprehensive error handling middleware
 
 ### 5. Service Layer (`apps/api/src/services/fileService.js`)
+
 Implemented database operations:
+
 - ✅ `create()` - Insert file with blob
 - ✅ `getById()` - Get file metadata (without blob)
 - ✅ `getFileWithBlob()` - Get complete file for download
@@ -46,7 +54,9 @@ Implemented database operations:
 - ✅ Updated `salesOrderService` to handle prescriptionId
 
 ### 6. Controller Layer (`apps/api/src/controllers/fileController.js`)
+
 Implemented request handlers:
+
 - ✅ `upload()` - Single file upload
 - ✅ `uploadMultiple()` - Batch file upload (max 10)
 - ✅ `getById()` - Get file metadata
@@ -56,7 +66,9 @@ Implemented request handlers:
 - ✅ `delete()` - Delete file (owner only)
 
 ### 7. Routes (`apps/api/src/routes/fileRoutes.js`)
+
 Created API endpoints:
+
 - ✅ `POST /api/files` - Upload single file
 - ✅ `POST /api/files/batch` - Upload multiple files
 - ✅ `GET /api/files` - List files (paginated)
@@ -68,6 +80,7 @@ Created API endpoints:
 - ✅ Registered in main API router
 
 ### 8. Documentation
+
 - ✅ Created `FILE_UPLOAD_GUIDE.md` with:
   - Complete API documentation
   - Usage examples (JavaScript, React)
@@ -78,6 +91,7 @@ Created API endpoints:
 ## 📊 Features Overview
 
 ### File Management
+
 - **Upload:** Single or multiple files (max 10, 10 MB each)
 - **Storage:** Binary blobs in PostgreSQL database
 - **Download:** Proper MIME type handling and disposition headers
@@ -86,10 +100,12 @@ Created API endpoints:
 - **Delete:** Secure deletion (owner only)
 
 ### Supported File Types
+
 **Images:** JPEG, PNG, GIF, WebP  
 **Documents:** PDF, DOC/DOCX, XLS/XLSX, TXT, CSV
 
 ### Security
+
 - ✅ JWT authentication required for all endpoints
 - ✅ File type validation (whitelist approach)
 - ✅ File size limits to prevent abuse
@@ -98,20 +114,21 @@ Created API endpoints:
 - ✅ Secure MIME type handling
 
 ### Integration Points
+
 - ✅ **Medications:** Can attach product images
 - ✅ **Supplier Contracts:** Can attach contract documents
 - ✅ **Sales Orders:** Can attach prescription images
 
 ## 🔧 Technical Stack
 
-| Component | Technology |
-|-----------|-----------|
-| File Upload | Multer (memory storage) |
-| Storage | PostgreSQL BYTEA (binary) |
-| Validation | Zod schemas |
-| API Framework | Express.js |
-| Authentication | JWT (existing system) |
-| Error Handling | Express async handlers |
+| Component      | Technology                |
+| -------------- | ------------------------- |
+| File Upload    | Multer (memory storage)   |
+| Storage        | PostgreSQL BYTEA (binary) |
+| Validation     | Zod schemas               |
+| API Framework  | Express.js                |
+| Authentication | JWT (existing system)     |
+| Error Handling | Express async handlers    |
 
 ## 📁 File Structure
 
@@ -147,19 +164,20 @@ packages/dto/src/core/
 
 ## 🚀 API Endpoints Summary
 
-| Method | Endpoint | Description | Auth | Permission |
-|--------|----------|-------------|------|------------|
-| POST | `/api/files` | Upload single file | ✓ | All authenticated |
-| POST | `/api/files/batch` | Upload multiple files | ✓ | All authenticated |
-| GET | `/api/files` | List files (paginated) | ✓ | All authenticated |
-| GET | `/api/files/:id` | Get file metadata | ✓ | All authenticated |
-| GET | `/api/files/:id/download` | Download file | ✓ | All authenticated |
-| GET | `/api/files/:id/view` | View file inline | ✓ | All authenticated |
-| DELETE | `/api/files/:id` | Delete file | ✓ | Owner only |
+| Method | Endpoint                  | Description            | Auth | Permission        |
+| ------ | ------------------------- | ---------------------- | ---- | ----------------- |
+| POST   | `/api/files`              | Upload single file     | ✓    | All authenticated |
+| POST   | `/api/files/batch`        | Upload multiple files  | ✓    | All authenticated |
+| GET    | `/api/files`              | List files (paginated) | ✓    | All authenticated |
+| GET    | `/api/files/:id`          | Get file metadata      | ✓    | All authenticated |
+| GET    | `/api/files/:id/download` | Download file          | ✓    | All authenticated |
+| GET    | `/api/files/:id/view`     | View file inline       | ✓    | All authenticated |
+| DELETE | `/api/files/:id`          | Delete file            | ✓    | Owner only        |
 
 ## 📝 Usage Examples
 
 ### Upload File
+
 ```bash
 curl -X POST http://localhost:3000/api/files \
   -H "Authorization: Bearer <token>" \
@@ -167,6 +185,7 @@ curl -X POST http://localhost:3000/api/files \
 ```
 
 ### Create Medication with Image
+
 ```bash
 # 1. Upload image first
 curl -X POST http://localhost:3000/api/files \
@@ -186,6 +205,7 @@ curl -X POST http://localhost:3000/api/medications \
 ```
 
 ### Download File
+
 ```bash
 curl -X GET http://localhost:3000/api/files/<file-uuid>/download \
   -H "Authorization: Bearer <token>" \
@@ -195,11 +215,13 @@ curl -X GET http://localhost:3000/api/files/<file-uuid>/download \
 ## 🎯 Next Steps
 
 ### Immediate
+
 - [ ] Test file upload functionality
 - [ ] Run database migrations to apply schema changes
 - [ ] Update frontend to use file upload endpoints
 
 ### Future Enhancements
+
 - [ ] Add image resizing/thumbnails
 - [ ] Implement file caching
 - [ ] Add virus scanning
@@ -259,4 +281,3 @@ curl -X GET http://localhost:3000/api/files/<file-uuid>/download \
 **Linter Errors:** ✅ None  
 **Tests:** ⚠️ Pending  
 **Documentation:** ✅ Complete
-

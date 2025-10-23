@@ -5,9 +5,11 @@
 ### New Test Files Created
 
 #### 1. File Service Tests (`tests/unit/services/fileService.test.js`)
+
 **Total: 12 tests passing**
 
 Test coverage for `fileService`:
+
 - ✅ `create()` - 2 tests
   - Create file and return metadata without blob
   - Create file with null uploadedBy
@@ -28,9 +30,11 @@ Test coverage for `fileService`:
   - Return false if file does not exist
 
 #### 2. File Controller Tests (`tests/unit/controllers/fileController.test.js`)
+
 **Total: 14 tests passing**
 
 Test coverage for `fileController`:
+
 - ✅ `upload()` - 3 tests
   - Upload file successfully
   - Return 400 if no file provided
@@ -56,6 +60,7 @@ Test coverage for `fileController`:
 ### Database Schema Fix
 
 Fixed the `bytea` column type issue:
+
 ```javascript
 // In common.js - Added custom bytea type
 const bytea = customType({
@@ -79,6 +84,7 @@ npm test
 ```
 
 **Final Results:**
+
 - ✅ **Test Files:** 33 passed (33)
 - ✅ **Total Tests:** 415 passed (415)
 - ✅ **Duration:** 10.46s
@@ -87,20 +93,21 @@ npm test
 
 ### Test Breakdown by Module
 
-| Module | Service Tests | Controller Tests | Total |
-|--------|---------------|------------------|-------|
-| File (NEW) | 12 ✅ | 14 ✅ | **26** |
-| Medication | 11 ✅ | 19 ✅ | 30 |
-| Purchase Order | 11 ✅ | 14 ✅ | 25 |
-| Warehouse | 36 ✅ | 39 ✅ | 75 |
-| User/Auth | 22 ✅ | 38 ✅ | 60 |
-| Supplier | 17 ✅ | 22 ✅ | 39 |
-| Inventory | 12 ✅ | 28 ✅ | 40 |
-| Other | 46 ✅ | 74 ✅ | 120 |
+| Module         | Service Tests | Controller Tests | Total  |
+| -------------- | ------------- | ---------------- | ------ |
+| File (NEW)     | 12 ✅         | 14 ✅            | **26** |
+| Medication     | 11 ✅         | 19 ✅            | 30     |
+| Purchase Order | 11 ✅         | 14 ✅            | 25     |
+| Warehouse      | 36 ✅         | 39 ✅            | 75     |
+| User/Auth      | 22 ✅         | 38 ✅            | 60     |
+| Supplier       | 17 ✅         | 22 ✅            | 39     |
+| Inventory      | 12 ✅         | 28 ✅            | 40     |
+| Other          | 46 ✅         | 74 ✅            | 120    |
 
 ### Test Features Covered
 
 #### File Service Tests Cover:
+
 1. **File Creation**
    - Metadata extraction from uploaded files
    - Blob storage in database
@@ -127,6 +134,7 @@ npm test
    - Boolean existence verification
 
 #### File Controller Tests Cover:
+
 1. **Upload Handling**
    - Single file upload
    - Multiple file upload (batch)
@@ -152,6 +160,7 @@ npm test
 ### Mocking Strategy
 
 Tests use Vitest mocking framework:
+
 - ✅ Database operations mocked via `vi.mock("@/db/index.js")`
 - ✅ Service layer mocked in controller tests
 - ✅ Logger mocked to prevent console spam
@@ -168,13 +177,15 @@ it("should create a file and return metadata without blob", async () => {
     blob: Buffer.from("test content"),
     // ...
   };
-  
-  const mockCreatedFile = { /* ... with blob */ };
-  
+
+  const mockCreatedFile = {
+    /* ... with blob */
+  };
+
   db.insert.mockReturnValue(/* mock chain */);
-  
+
   const result = await fileService.create(mockFileData);
-  
+
   expect(result.blob).toBeUndefined(); // Metadata only
 });
 
@@ -185,11 +196,11 @@ it("should upload a file successfully", async () => {
     buffer: Buffer.from("test content"),
     // ...
   };
-  
+
   fileService.create.mockResolvedValue(mockCreatedFile);
-  
+
   await fileController.upload(mockReq, mockRes, mockNext);
-  
+
   expect(mockRes.status).toHaveBeenCalledWith(201);
 });
 ```
@@ -197,6 +208,7 @@ it("should upload a file successfully", async () => {
 ## 📊 Test Coverage Highlights
 
 ### File Upload Flow
+
 ```
 Client → Controller → Service → Database
    ↓         ↓          ↓          ↓
@@ -209,13 +221,14 @@ Client → Controller → Service → Database
 All steps covered by tests! ✅
 
 ### File Download Flow
+
 ```
 Client → Controller → Service → Database
    ↓         ↓          ↓          ↓
 Request   Get ID    Query     Fetch Blob
    ↓         ↓          ↓          ↓
  Headers  Set MIME   Return    Send Binary
-   ↓      Content    File      
+   ↓      Content    File
 ```
 
 All steps covered by tests! ✅
@@ -223,11 +236,13 @@ All steps covered by tests! ✅
 ## 🔧 Technical Details
 
 ### Test Setup (`tests/setup.js`)
+
 - Module alias registration for `@/` imports
 - Global mocks for database, bcrypt, jwt, logger
 - `beforeEach()` hook to clear mocks between tests
 
 ### Test Environment
+
 - **Framework:** Vitest 3.2.4
 - **Mocking:** Vitest built-in `vi` API
 - **Assertions:** Expect API
@@ -284,6 +299,7 @@ npm run test:ui
 ## 🚀 Continuous Integration
 
 Tests are ready for CI/CD pipeline:
+
 - Fast execution (< 11 seconds)
 - No external dependencies
 - Deterministic results
@@ -297,4 +313,3 @@ Tests are ready for CI/CD pipeline:
 **Coverage:** Complete file upload functionality  
 **Linter Errors:** ✅ None  
 **Ready for Production:** ✅ Yes
-
