@@ -7,7 +7,7 @@ import {
   handleSearchSuggestions,
   handleUnifiedSearch,
 } from "../controllers/searchController.js";
-import { authenticate } from "../middleware/authMiddleware.js";
+import { authenticate } from "../middleware/checkAuth.js";
 
 export const searchRouter = Router();
 
