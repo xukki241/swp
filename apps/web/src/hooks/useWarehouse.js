@@ -35,8 +35,8 @@ export const useWarehouse = () => {
   const fetchZones = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await getAllZones();
-      setZones(data.data || []);
+      const responseData = await getAllZones();
+      setZones(responseData.data || []);
       setError(null);
     } catch (err) {
       setError(err.message);

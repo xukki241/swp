@@ -4,6 +4,12 @@ import { instance } from "../lib/axios";
  * Inventory Management API Services
  */
 
+// Get all inventory
+export const getInventory = async (params = {}) => {
+  const response = await instance.get("/inventory", { params });
+  return response.data;
+};
+
 // Get all zones
 export const getAllZones = async (params = {}) => {
   const response = await instance.get("/warehouse/zones", { params });
