@@ -1,6 +1,6 @@
 import express from "express";
-
 import { createAuditLog } from "src/middleware/auditLog.js";
+
 import * as registrationController from "../controllers/registrationController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 

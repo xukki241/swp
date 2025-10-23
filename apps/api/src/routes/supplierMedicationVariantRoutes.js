@@ -10,9 +10,9 @@ import {
   validateQuery,
 } from "@pharmaflow/dto/middleware";
 import express from "express";
+import { createAuditLog } from "src/middleware/auditLog.js";
 import { z } from "zod";
 
-import { createAuditLog } from "src/middleware/auditLog.js";
 import { supplierMedicationVariantController } from "../controllers/supplierMedicationVariantController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
