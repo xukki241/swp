@@ -29,6 +29,13 @@
       "when": 1761201828100,
       "tag": "0003_slow_naoko",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1761206310688,
+      "tag": "0004_little_wolverine",
+      "breakpoints": true
     }
   ]
 }

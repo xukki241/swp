@@ -12,6 +12,8 @@ import { purchaseOrderRouter } from "./purchaseOrderRoutes.js";
 import { registrationRouter } from "./registrationRoutes.js";
 import { reportRouter } from "./reportRoutes.js";
 import { salesOrderRouter } from "./salesOrderRoutes.js";
+import { shiftAssignmentRouter } from "./shiftAssignmentRoutes.js";
+import { shiftRouter } from "./shiftRoutes.js";
 import { supplierRouter } from "./supplierRoutes.js";
 import { userRouter } from "./userRoutes.js";
 import { warehouseRouter } from "./warehouse/index.js";
@@ -32,6 +34,8 @@ apiRouter.use("/warehouse", warehouseRouter);
 apiRouter.use("/inventory", inventoryRouter);
 apiRouter.use("/sales", salesOrderRouter);
 apiRouter.use("/reports", reportRouter);
+apiRouter.use("/shifts", shiftRouter); // Shift management
+apiRouter.use("/shift-assignments", shiftAssignmentRouter); // Shift assignments
 apiRouter.use(emailRouter); // Email routes
 
 export default apiRouter;

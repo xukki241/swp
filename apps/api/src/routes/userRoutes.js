@@ -1,5 +1,6 @@
 import express from "express";
 
+import * as shiftController from "../controllers/shiftController.js";
 import * as userController from "../controllers/userController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
@@ -75,6 +76,15 @@ userRouter.get(
  * @access  Private (Owner, or self)
  */
 userRouter.get("/:id", authenticate, userController.getUserById);
+
+/**
+ * @route   GET /api/users/:userId/schedule
+ * @desc    Get user's shift schedule
+ * @query   startDate - Required (YYYY-MM-DD)
+ * @query   endDate - Required (YYYY-MM-DD)
+ * @access  Private (Owner, or self)
+ */
+userRouter.get("/:userId/schedule", authenticate, shiftController.getUserSchedule);
 
 /**
  * @route   POST /api/users

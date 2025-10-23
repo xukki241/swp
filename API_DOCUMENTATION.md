@@ -22,7 +22,9 @@
 12. [Sales Order Management](#12-sales-order-management)
 13. [Warehouse Management](#13-warehouse-management)
 14. [Report Management](#14-report-management)
-15. [Email Services](#15-email-services)
+15. [Shift Management](#15-shift-management)
+16. [Shift Assignment Management](#16-shift-assignment-management)
+17. [Email Services](#17-email-services)
 
 ---
 
@@ -276,7 +278,42 @@
 
 ---
 
-## 15. Email Services
+## 15. Shift Management
+
+**Base Path**: `/api/shifts`
+
+**Note**: Quản lý định nghĩa ca làm việc (shift templates)
+
+| Method | Endpoint | Access | Mô tả |
+|--------|----------|--------|-------|
+| GET | `/` | Private | Lấy tất cả shifts (định nghĩa ca làm việc) |
+| GET | `/:id` | Private | Lấy thông tin shift theo ID |
+| GET | `/:shiftId/staff` | Private | Lấy danh sách nhân viên làm việc trong ca này vào ngày cụ thể (query: date) |
+| POST | `/` | Owner | Tạo shift mới |
+| PATCH | `/:id` | Owner | Cập nhật thông tin shift |
+| DELETE | `/:id` | Owner | Xóa shift |
+
+---
+
+## 16. Shift Assignment Management
+
+**Base Path**: `/api/shift-assignments`
+
+**Note**: Quản lý phân ca cho nhân viên theo ngày
+
+| Method | Endpoint | Access | Mô tả |
+|--------|----------|--------|-------|
+| GET | `/` | Private | Lấy tất cả shift assignments (filter: userId, shiftId, startDate, endDate, status) |
+| GET | `/:id` | Private | Lấy thông tin shift assignment theo ID |
+| POST | `/` | Owner | Tạo shift assignment (hỗ trợ single hoặc batch) |
+| PATCH | `/:id` | Owner | Cập nhật shift assignment (status, notes) |
+| POST | `/:id/check-in` | Private | Check-in vào ca làm việc (bắt đầu làm) |
+| POST | `/:id/check-out` | Private | Check-out khỏi ca làm việc (kết thúc) |
+| DELETE | `/:id` | Owner | Xóa shift assignment |
+
+---
+
+## 17. Email Services
 
 **Base Path**: `/api`
 

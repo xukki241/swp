@@ -18,6 +18,8 @@ import {
   salesOrderItems,
   salesOrders,
   settings,
+  shiftAssignments,
+  shifts,
   supplierMedicationVariants,
   suppliers,
   userCredentials,
@@ -52,6 +54,8 @@ async function seed() {
     await db.delete(warehouseZones);
     await db.delete(suppliers);
     await db.delete(customers);
+    await db.delete(shiftAssignments);
+    await db.delete(shifts);
     await db.delete(userCredentials);
     await db.delete(userRegistrations);
     await db.delete(users);
@@ -1441,7 +1445,122 @@ async function seed() {
       },
     ]);
 
-    // 24. Seed Settings
+    // 24. Seed Shifts
+    console.log("⏰ Seeding shifts...");
+    const [morningShift, afternoonShift, nightShift, fullDayShift] = await db
+      .insert(shifts)
+      .values([
+        {
+          name: "Ca sáng",
+          shiftType: "morning",
+          startTime: "06:00:00",
+          endTime: "14:00:00",
+          description: "Ca làm việc buổi sáng từ 6:00 đến 14:00",
+        },
+        {
+          name: "Ca chiều",
+          shiftType: "afternoon",
+          startTime: "14:00:00",
+          endTime: "22:00:00",
+          description: "Ca làm việc buổi chiều từ 14:00 đến 22:00",
+        },
+        {
+          name: "Ca tối",
+          shiftType: "night",
+          startTime: "22:00:00",
+          endTime: "06:00:00",
+          description: "Ca làm việc ban đêm từ 22:00 đến 6:00 sáng hôm sau",
+        },
+        {
+          name: "Ca hành chính",
+          shiftType: "full_day",
+          startTime: "08:00:00",
+          endTime: "17:00:00",
+          description: "Ca hành chính toàn thời gian từ 8:00 đến 17:00",
+        },
+      ])
+      .returning();
+
+    // 25. Seed Shift Assignments
+    console.log("📅 Seeding shift assignments...");
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dayAfter = new Date(today);
+    dayAfter.setDate(dayAfter.getDate() + 2);
+
+    await db.insert(shiftAssignments).values([
+      // Hôm nay
+      {
+        userId: staff1.id,
+        shiftId: morningShift.id,
+        assignedDate: today,
+        status: "completed",
+        checkInTime: new Date(
+          today.setHours(6, 5, 0, 0)
+        ),
+        checkOutTime: new Date(
+          today.setHours(14, 2, 0, 0)
+        ),
+        createdBy: owner.id,
+      },
+      {
+        userId: staff2.id,
+        shiftId: afternoonShift.id,
+        assignedDate: today,
+        status: "in_progress",
+        checkInTime: new Date(
+          today.setHours(14, 3, 0, 0)
+        ),
+        createdBy: owner.id,
+      },
+      {
+        userId: staff3.id,
+        shiftId: nightShift.id,
+        assignedDate: today,
+        status: "scheduled",
+        createdBy: owner.id,
+      },
+      // Ngày mai
+      {
+        userId: staff1.id,
+        shiftId: afternoonShift.id,
+        assignedDate: tomorrow,
+        status: "scheduled",
+        createdBy: owner.id,
+      },
+      {
+        userId: staff2.id,
+        shiftId: morningShift.id,
+        assignedDate: tomorrow,
+        status: "confirmed",
+        createdBy: owner.id,
+      },
+      {
+        userId: staff3.id,
+        shiftId: fullDayShift.id,
+        assignedDate: tomorrow,
+        status: "scheduled",
+        createdBy: owner.id,
+      },
+      // Ngày kia
+      {
+        userId: staff1.id,
+        shiftId: fullDayShift.id,
+        assignedDate: dayAfter,
+        status: "scheduled",
+        createdBy: owner.id,
+      },
+      {
+        userId: staff2.id,
+        shiftId: nightShift.id,
+        assignedDate: dayAfter,
+        status: "scheduled",
+        createdBy: owner.id,
+      },
+    ]);
+
+    // 26. Seed Settings
     console.log("⚙️ Seeding settings...");
     await db.insert(settings).values([
       {
@@ -1548,6 +1667,8 @@ async function seed() {
     - Notifications: 5
     - Audit Logs: 5
     - Reports: 4
+    - Shifts: 4
+    - Shift Assignments: 8
     - Settings: 10
         `);
   } catch (error) {

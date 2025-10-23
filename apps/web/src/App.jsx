@@ -30,7 +30,11 @@ import MedicationFormPage from "@/pages/medications/MedicationFormPage";
 import MedicationListPage from "./pages/medications/MedicationListPage";
 import SalesOrderDetailPage from "./pages/sales/SalesOrderDetailPage";
 import SalesOrderListPage from "./pages/sales/SalesOrderListPage";
-import SalesPage from "./pages/sales/SalesPage";
+import SalesPage from "./pages/sales/SalesPageV2"; // Using V2 with multi-order support
+// Shift management imports
+import MySchedulePage from "./pages/shifts/MySchedulePage";
+import ShiftAssignmentPage from "./pages/shifts/ShiftAssignmentPage";
+import ShiftManagementPage from "./pages/shifts/ShiftManagementPage";
 
 function App() {
   return (
@@ -213,6 +217,32 @@ function App() {
           element={
             <ProtectedRoute>
               <SalesOrderDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Shift Management Routes */}
+        <Route
+          path="/shifts/management"
+          element={
+            <ProtectedRoute>
+              <ShiftManagementPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/shifts/assignments"
+          element={
+            <ProtectedRoute>
+              <ShiftAssignmentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/shifts/my-schedule"
+          element={
+            <ProtectedRoute>
+              <MySchedulePage />
             </ProtectedRoute>
           }
         />
