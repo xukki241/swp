@@ -63,38 +63,19 @@ export default function PurchaseOrderListPage() {
   const [selectedId, setSelectedId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
 
-  const { data: purchaseOrders = [], isLoading } = usePurchaseOrders();
+  // Build filters for API
+  const filters = useMemo(() => {
+    const params = {};
+    if (searchQuery) params.search = searchQuery;
+    if (statusFilter !== "all") params.status = statusFilter;
+    params.sortOrder = sortOrder;
+    return params;
+  }, [searchQuery, statusFilter, sortOrder]);
+
+  const { data: purchaseOrders = [], isLoading } = usePurchaseOrders(filters);
   const { mutate: deletePurchaseOrder } = useDeletePurchaseOrder();
   const { mutate: updateStatus, isPending: isUpdatingStatus } =
     useUpdatePurchaseOrderStatus();
-
-  const filteredOrders = useMemo(() => {
-    let orders = [...purchaseOrders];
-
-    // Filter by status
-    if (statusFilter !== "all") {
-      orders = orders.filter((o) => o.status === statusFilter);
-    }
-
-    // Filter by search query
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      orders = orders.filter(
-        (o) =>
-          (o.supplierName || "").toLowerCase().includes(q) ||
-          (o.status || "").toLowerCase().includes(q)
-      );
-    }
-
-    // Sort by order date
-    orders.sort((a, b) => {
-      const dateA = new Date(a.orderDate);
-      const dateB = new Date(b.orderDate);
-      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
-    });
-
-    return orders;
-  }, [purchaseOrders, searchQuery, statusFilter, sortOrder]);
 
   const handleDelete = (id) => {
     setSelectedId(id);
@@ -272,7 +253,7 @@ export default function PurchaseOrderListPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredOrders.length === 0 ? (
+                  {purchaseOrders.length === 0 ? (
                     <TableRow>
                       <TableCell
                         colSpan={6}
@@ -292,7 +273,7 @@ export default function PurchaseOrderListPage() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredOrders.map((o) => (
+                    purchaseOrders.map((o) => (
                       <TableRow key={o.id}>
                         <TableCell>{o.supplierName || o.supplierId}</TableCell>
                         <TableCell>{getStatusBadge(o.status)}</TableCell>

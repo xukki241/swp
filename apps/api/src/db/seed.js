@@ -828,24 +828,28 @@ async function seed() {
         medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
         supplierSku: "VP-PAR500",
         leadTimeDays: 5,
+        purchasePrice: "40000.00",
       },
       {
         supplierId: supplier1.id,
         medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
         supplierSku: "VP-AMX500",
         leadTimeDays: 7,
+        purchasePrice: "75000.00",
       },
       {
         supplierId: supplier1.id,
         medicationVariantId: medicationVariantsResults[13].id, // Atorvastatin 20mg
         supplierSku: "VP-ATO20",
         leadTimeDays: 10,
+        purchasePrice: "200000.00",
       },
       {
         supplierId: supplier1.id,
         medicationVariantId: medicationVariantsResults[15].id, // Amlodipine 10mg
         supplierSku: "VP-AML10",
         leadTimeDays: 7,
+        purchasePrice: "97500.00",
       },
 
       // Supplier 2 (Saigon MediSupply)
@@ -854,24 +858,28 @@ async function seed() {
         medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
         supplierSku: "SGM-IBU400",
         leadTimeDays: 4,
+        purchasePrice: "45000.00",
       },
       {
         supplierId: supplier2.id,
         medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
         supplierSku: "SGM-OME20",
         leadTimeDays: 6,
+        purchasePrice: "90000.00",
       },
       {
         supplierId: supplier2.id,
         medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
         supplierSku: "SGM-CET10",
         leadTimeDays: 5,
+        purchasePrice: "35000.00",
       },
       {
         supplierId: supplier2.id,
         medicationVariantId: medicationVariantsResults[21].id, // Azithromycin 500mg
         supplierSku: "SGM-AZI500",
         leadTimeDays: 8,
+        purchasePrice: "65000.00",
       },
 
       // Supplier 3 (Global BioMed)
@@ -880,18 +888,21 @@ async function seed() {
         medicationVariantId: medicationVariantsResults[11].id, // Metformin 500mg
         supplierSku: "GBM-MET500",
         leadTimeDays: 12,
+        purchasePrice: "60000.00",
       },
       {
         supplierId: supplier3.id,
         medicationVariantId: medicationVariantsResults[17].id, // Salbutamol Inhaler
         supplierSku: "GBM-SAL-INH",
         leadTimeDays: 14,
+        purchasePrice: "75000.00",
       },
       {
         supplierId: supplier3.id,
         medicationVariantId: medicationVariantsResults[19].id, // Vitamin D3 1000IU
         supplierSku: "GBM-VID1000",
         leadTimeDays: 10,
+        purchasePrice: "50000.00",
       },
 
       // Supplier 4 (Asia Pacific Pharmaceuticals)
@@ -900,18 +911,21 @@ async function seed() {
         medicationVariantId: medicationVariantsResults[23].id, // Tramadol 50mg
         supplierSku: "APP-TRA50",
         leadTimeDays: 15,
+        purchasePrice: "200000.00",
       },
       {
         supplierId: supplier4.id,
         medicationVariantId: medicationVariantsResults[1].id, // Paracetamol 650mg
         supplierSku: "APP-PAR650",
         leadTimeDays: 6,
+        purchasePrice: "28000.00",
       },
       {
         supplierId: supplier4.id,
         medicationVariantId: medicationVariantsResults[6].id, // Ibuprofen 200mg
         supplierSku: "APP-IBU200",
         leadTimeDays: 5,
+        purchasePrice: "32000.00",
       },
     ];
 
