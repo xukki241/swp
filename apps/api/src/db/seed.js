@@ -5,7 +5,6 @@ import { db } from "./connection.js";
 import {
   auditLogs,
   customers,
-  fileAttachments,
   files,
   inventory,
   medications,
@@ -37,7 +36,6 @@ async function seed() {
     console.log("🧹 Clearing existing data...");
     await db.delete(auditLogs);
     await db.delete(notifications);
-    await db.delete(fileAttachments);
     await db.delete(files);
     await db.delete(salesOrderItems);
     await db.delete(salesOrders);
@@ -1263,7 +1261,7 @@ async function seed() {
           fileType: "pdf",
           mimeType: "application/pdf",
           fileSize: 2048576, // 2MB
-          storagePath: "/uploads/contracts/supplier_contract_pharmacorp.pdf",
+          blob: Buffer.from("Sample PDF file content"),
           uploadedBy: owner.id,
           uploadedAt: new Date("2024-01-01"),
         },
@@ -1272,8 +1270,7 @@ async function seed() {
           fileType: "jpg",
           mimeType: "image/jpeg",
           fileSize: 1024768, // 1MB
-          storagePath:
-            "/uploads/certificates/medication_certificate_amoxicillin.jpg",
+          blob: Buffer.from("Sample JPEG file content"),
           uploadedBy: staff1.id,
           uploadedAt: new Date("2024-01-15"),
         },
@@ -1283,37 +1280,14 @@ async function seed() {
           mimeType:
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           fileSize: 512345, // 0.5MB
-          storagePath: "/uploads/reports/monthly_sales_report_may_2024.xlsx",
+          blob: Buffer.from("Sample Excel file content"),
           uploadedBy: owner.id,
           uploadedAt: new Date("2024-06-01"),
         },
       ])
       .returning();
 
-    // 20. Seed File Attachments
-    console.log("🔗 Seeding file attachments...");
-
-    // 🔧 Fix: entityId là integer và NOT NULL → gán tạm giá trị mô phỏng (1, 2, 3)
-    await db.insert(fileAttachments).values([
-      {
-        fileId: file1.id,
-        entityType: "supplier",
-        entityId: 1, // placeholder ID
-      },
-      {
-        fileId: file2.id,
-        entityType: "medication",
-        entityId: 2, // placeholder ID
-      },
-      {
-        fileId: file3.id,
-        entityType: "report",
-        entityId: 3, // placeholder ID
-      },
-    ]);
-
-    console.log("✅ File attachments seeded successfully.");
-    // 21. Seed Notifications
+    // 20. Seed Notifications
     console.log("🔔 Seeding notifications...");
     await db.insert(notifications).values([
       {

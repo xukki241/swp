@@ -2,7 +2,6 @@ export * from "./auditLogs.js";
 export * from "./common.js";
 export * from "./customers.js";
 export * from "./enums.js";
-export * from "./fileAttachments.js";
 export * from "./files.js";
 export * from "./inventory.js";
 export * from "./medications.js";
