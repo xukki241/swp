@@ -2,12 +2,10 @@
 FROM node:22-alpine AS builder
 
 # Build arguments for environment variables
-ARG VITE_API_URL=http://localhost:3000
-ARG VITE_API_BASE_URL=http://localhost:3000/api
+ARG VITE_API_URL=http://localhost:3000/api
 
 # Set environment variables for build
 ENV VITE_API_URL=${VITE_API_URL}
-ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@10.18.2 --activate
