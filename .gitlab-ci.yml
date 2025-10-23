@@ -221,7 +221,7 @@ build_web_azure_next:
     - echo "Registry $AZURE_ACR_LOGIN_SERVER"
     - |
       docker build -f apps/web/Dockerfile \
-        --build-arg VITE_API_URL="https://${AZURE_API_APP_NAME_NEXT}.azurewebsites.net/api" \
+        --build-arg VITE_API_URL="/api" \
         -t $AZURE_IMAGE_WEB:$CI_COMMIT_SHORT_SHA \
         -t $AZURE_IMAGE_WEB:next .
     - echo "Pushing to Azure Container Registry..."
@@ -240,7 +240,7 @@ build_web_azure_production:
     - echo "Registry $AZURE_ACR_LOGIN_SERVER"
     - |
       docker build -f apps/web/Dockerfile \
-        --build-arg VITE_API_URL="https://${AZURE_API_APP_NAME_PROD}.azurewebsites.net/api" \
+        --build-arg VITE_API_URL="/api" \
         -t $AZURE_IMAGE_WEB:$CI_COMMIT_SHORT_SHA \
         -t $AZURE_IMAGE_WEB:production .
     - echo "Pushing to Azure Container Registry..."
@@ -307,7 +307,8 @@ deploy_azure_next:
         --resource-group $AZURE_RESOURCE_GROUP \
         --name $AZURE_WEB_APP_NAME_NEXT \
         --settings \
-          WEBSITES_PORT=80
+          WEBSITES_PORT=80 \
+          API_URL="https://${AZURE_API_APP_NAME_NEXT}.azurewebsites.net"
 
     # Restart Web
     - echo "Restarting Web service..."
@@ -388,7 +389,8 @@ deploy_azure_production:
         --resource-group $AZURE_RESOURCE_GROUP \
         --name $AZURE_WEB_APP_NAME_PROD \
         --settings \
-          WEBSITES_PORT=80
+          WEBSITES_PORT=80 \
+          API_URL="https://${AZURE_API_APP_NAME_PROD}.azurewebsites.net"
 
     # Restart Web
     - echo "Restarting Web service..."
