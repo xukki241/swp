@@ -1,4 +1,10 @@
-import { integer, pgTable, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+import {
+  integer,
+  numeric,
+  pgTable,
+  uniqueIndex,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 import { foreignKey, identityPrimaryKey } from "./common.js";
 import { files } from "./files.js";
@@ -14,8 +20,13 @@ export const supplierMedicationVariants = pgTable(
       "medication_variant_id",
       medicationVariants.id
     ).notNull(),
+
     supplierSku: varchar("supplier_sku", { length: 50 }),
     leadTimeDays: integer("lead_time_days"),
+    purchasePrice: numeric("purchase_price", {
+      precision: 10,
+      scale: 2,
+    }).notNull(),
     contractId: foreignKey("contract_id", files.id),
   },
   (table) => [
