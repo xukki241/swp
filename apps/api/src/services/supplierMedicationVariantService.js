@@ -34,6 +34,7 @@ export const supplierMedicationVariantService = {
         leadTimeDays: supplierMedicationVariants.leadTimeDays,
         supplierName: suppliers.name,
         purchasePrice: supplierMedicationVariants.purchasePrice,
+        contractId: supplierMedicationVariants.contractId,
         medicationName: medications.name,
         variantName: medicationVariants.name,
       })
@@ -85,6 +86,7 @@ export const supplierMedicationVariantService = {
         leadTimeDays: supplierMedicationVariants.leadTimeDays,
         supplierName: suppliers.name,
         purchasePrice: supplierMedicationVariants.purchasePrice,
+        contractId: supplierMedicationVariants.contractId,
         medicationName: medications.name,
         variantName: medicationVariants.name,
       })

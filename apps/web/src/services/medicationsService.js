@@ -27,8 +27,15 @@ export async function deleteMedication(id) {
 }
 
 // ===== VARIANTS =====
-export async function getMedicationVariants(params = {}) {
+// Get all variants across all medications
+export async function getAllMedicationsVariants(params = {}) {
   const response = await instance.get("/medications/variants/all", { params });
+  return response.data;
+}
+
+// Get variants for a specific medication
+export async function getMedicationVariants(medicationId) {
+  const response = await instance.get(`/medications/${medicationId}/variants`);
   return response.data;
 }
 

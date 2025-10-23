@@ -117,21 +117,15 @@ export const useMedicationVariants = (medicationId) =>
     queryKey: ["medicationVariants", medicationId],
     queryFn: async () => {
       if (!medicationId) {
-        return [];
+        return { data: [] };
       }
 
-      // 1) api.getMedicationVariants(medicationId)
+      // 1) api.getMedicationVariants(medicationId) - returns full response with data property
       if (typeof api.getMedicationVariants === "function") {
         return api.getMedicationVariants(medicationId);
       }
 
-      // 2) api.getMedicationById -> .variants
-      if (typeof api.getMedicationById === "function") {
-        const med = await api.getMedicationById(medicationId);
-        return med?.variants ?? [];
-      }
-
-      // 3) fallback axios endpoint
+      // 2) fallback axios endpoint
       const res = await instance.get(`/medications/${medicationId}/variants`);
       return res.data;
     },

@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   nonNegativeIntSchema,
   paginationSchema,
+  positiveDecimalSchema,
   uuidSchema,
 } from "../common/index.js";
 // Supplier medication variant schema
@@ -11,6 +12,7 @@ export const supplierMedicationVariantSchema = z.object({
   medicationVariantId: uuidSchema,
   supplierSku: z.string().max(50).nullable().optional(),
   leadTimeDays: nonNegativeIntSchema.nullable().optional(),
+  purchasePrice: positiveDecimalSchema,
   contractId: uuidSchema.nullable().optional(),
 });
 
@@ -19,6 +21,7 @@ export const createSupplierMedicationSchema = z.object({
   medication_variant_id: uuidSchema,
   supplier_sku: z.string().max(50).optional(),
   lead_time_days: nonNegativeIntSchema.optional(),
+  purchase_price: positiveDecimalSchema,
   contract_id: uuidSchema.optional(),
 });
 
