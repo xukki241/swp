@@ -4,6 +4,9 @@ export * from "./common/index.js";
 // Authentication endpoints
 export * from "./auth/index.js";
 
+// Audit log endpoints
+export * from "./audit/index.js";
+
 // User management endpoints
 export * from "./users/index.js";
 
