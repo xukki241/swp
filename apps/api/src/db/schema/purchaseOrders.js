@@ -11,15 +11,19 @@ import { purchaseOrderStatus } from "./enums.js";
 import { suppliers } from "./suppliers.js";
 import { users } from "./users.js";
 
-export const purchaseOrders = pgTable("purchase_orders", {
-  id: identityPrimaryKey(),
-  supplierId: foreignKey("supplier_id", suppliers.id).notNull(),
-  orderDate: createdAt("order_date"),
-  expectedDate: timestamp("expected_date"),
-  status: purchaseOrderStatus("status").notNull().default("pending"),
-  totalAmount: decimalColumn("total_amount").notNull().default(0),
-  createdBy: foreignKey("created_by", users.id),
-  searchVector: searchVector(),
-}, (table) => [
-  index("purchase_orders_search_vector_idx").using("gin", table.searchVector),
-]);
+export const purchaseOrders = pgTable(
+  "purchase_orders",
+  {
+    id: identityPrimaryKey(),
+    supplierId: foreignKey("supplier_id", suppliers.id).notNull(),
+    orderDate: createdAt("order_date"),
+    expectedDate: timestamp("expected_date"),
+    status: purchaseOrderStatus("status").notNull().default("pending"),
+    totalAmount: decimalColumn("total_amount").notNull().default(0),
+    createdBy: foreignKey("created_by", users.id),
+    searchVector: searchVector(),
+  },
+  (table) => [
+    index("purchase_orders_search_vector_idx").using("gin", table.searchVector),
+  ]
+);

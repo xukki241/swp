@@ -1,6 +1,13 @@
 import { index, pgTable, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 
-import { address, email, identityPrimaryKey, name, phone, searchVector } from "./common.js";
+import {
+  address,
+  email,
+  identityPrimaryKey,
+  name,
+  phone,
+  searchVector,
+} from "./common.js";
 import { supplierStatus } from "./enums.js";
 
 export const suppliers = pgTable(

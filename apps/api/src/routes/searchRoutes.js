@@ -70,4 +70,3 @@ searchRouter.get("/suggestions/:entityType", handleSearchSuggestions);
 searchRouter.get("/:entityType", handleEntitySearch);
 
 export default searchRouter;
-

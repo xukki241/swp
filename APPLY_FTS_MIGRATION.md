@@ -1,38 +1,44 @@
 # Apply Full-Text Search Migration
 
 ## Prerequisites
+
 - PostgreSQL database running (local Docker or Azure)
 - Database connection string in `.env` file
 
 ## Option 1: Local Docker Database
 
 1. **Start Docker database:**
+
    ```bash
    docker-compose up -d db
    ```
 
 2. **Create `.env` file in `apps/api/`** (if not exists):
+
    ```bash
    # Copy from example
    cp apps/api/.env.example apps/api/.env
    ```
 
 3. **Update DATABASE_URL in `.env`:**
+
    ```
    DATABASE_URL=postgresql://pharmaflow:pharmaflow_password@localhost:5432/pharmaflow_db
    ```
 
 4. **Apply schema changes:**
+
    ```bash
    cd apps/api
    npm run db:push
    ```
 
 5. **Run custom migration SQL:**
+
    ```bash
    # Option A: Using psql directly
    psql postgresql://pharmaflow:pharmaflow_password@localhost:5432/pharmaflow_db -f src/db/migrations/0002_add_full_text_search.sql
-   
+
    # Option B: Using Docker exec
    docker exec -i pharmaflow-db psql -U pharmaflow -d pharmaflow_db < src/db/migrations/0002_add_full_text_search.sql
    ```
@@ -42,11 +48,13 @@
 1. **Ensure VPN/network access to Azure database**
 
 2. **Verify DATABASE_URL in `.env`:**
+
    ```
    DATABASE_URL=postgresql://username:password@your-server.postgres.database.azure.com:5432/dbname?ssl=true
    ```
 
 3. **Apply schema changes:**
+
    ```bash
    cd apps/api
    npm run db:push
@@ -70,18 +78,18 @@ After applying the migration, verify it worked:
 
 ```sql
 -- Check if search_vector column exists
-SELECT column_name, data_type 
-FROM information_schema.columns 
+SELECT column_name, data_type
+FROM information_schema.columns
 WHERE table_name = 'users' AND column_name = 'search_vector';
 
 -- Check if GIN index exists
-SELECT indexname 
-FROM pg_indexes 
+SELECT indexname
+FROM pg_indexes
 WHERE tablename = 'users' AND indexname = 'users_search_vector_idx';
 
 -- Check if trigger exists
-SELECT trigger_name 
-FROM information_schema.triggers 
+SELECT trigger_name
+FROM information_schema.triggers
 WHERE trigger_name = 'users_search_vector_trigger';
 
 -- Test search functionality
@@ -113,16 +121,19 @@ curl -H "Authorization: Bearer YOUR_TOKEN" "http://localhost:3000/api/search/sug
 ## Troubleshooting
 
 ### Connection Timeout
+
 - Check if database is running: `docker ps` or check Azure portal
 - Verify network connectivity
 - Check DATABASE_URL in .env file
 
 ### Migration Errors
+
 - Ensure no conflicting columns exist
 - Check PostgreSQL version (requires 9.6+)
 - Review error logs for specific issues
 
 ### Search Not Working
+
 - Verify triggers are created: `\d+ users` in psql
 - Check if search_vector is populated: `SELECT search_vector FROM users LIMIT 1;`
 - Manually trigger update: `UPDATE users SET id = id;`
@@ -152,4 +163,3 @@ ALTER TABLE users DROP COLUMN IF EXISTS search_vector;
 ALTER TABLE customers DROP COLUMN IF EXISTS search_vector;
 -- ... (repeat for all tables)
 ```
-

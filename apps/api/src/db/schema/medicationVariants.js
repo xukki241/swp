@@ -28,6 +28,9 @@ export const medicationVariants = pgTable(
   (table) => [
     uniqueIndex("medication_variants_sku_unique").on(table.sku),
     uniqueIndex("medication_variants_barcode_unique").on(table.barcode),
-    index("medication_variants_search_vector_idx").using("gin", table.searchVector),
+    index("medication_variants_search_vector_idx").using(
+      "gin",
+      table.searchVector
+    ),
   ]
 );

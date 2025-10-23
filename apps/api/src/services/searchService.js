@@ -226,7 +226,12 @@ const SEARCH_ENTITIES = {
  * @param {number} minRank - Minimum rank score for results
  * @returns {Promise<Array>} Array of search results with rank scores
  */
-async function searchEntity(entityType, searchQuery, limit = 10, minRank = 0.01) {
+async function searchEntity(
+  entityType,
+  searchQuery,
+  limit = 10,
+  minRank = 0.01
+) {
   const config = SEARCH_ENTITIES[entityType];
   if (!config) {
     throw new Error(`Unknown entity type: ${entityType}`);
@@ -236,13 +241,15 @@ async function searchEntity(entityType, searchQuery, limit = 10, minRank = 0.01)
   const tsQuery = searchQuery
     .trim()
     .split(/\s+/)
-    .map(term => `${term}:*`)
+    .map((term) => `${term}:*`)
     .join(" & ");
 
   // Build the select fields including rank
   const selectFields = {
     ...config.selectFields,
-    rank: sql`ts_rank(${config.rankField}, to_tsquery('english', ${tsQuery}))`.as("rank"),
+    rank: sql`ts_rank(${config.rankField}, to_tsquery('english', ${tsQuery}))`.as(
+      "rank"
+    ),
   };
 
   // Add joined fields if any
@@ -253,10 +260,7 @@ async function searchEntity(entityType, searchQuery, limit = 10, minRank = 0.01)
   }
 
   // Build the query
-  let query = db
-    .select(selectFields)
-    .from(config.table)
-    .$dynamic();
+  let query = db.select(selectFields).from(config.table).$dynamic();
 
   // Add joins
   if (config.joins) {
@@ -270,10 +274,15 @@ async function searchEntity(entityType, searchQuery, limit = 10, minRank = 0.01)
     .where(
       and(
         sql`${config.rankField} @@ to_tsquery('english', ${tsQuery})`,
-        gt(sql`ts_rank(${config.rankField}, to_tsquery('english', ${tsQuery}))`, minRank)
+        gt(
+          sql`ts_rank(${config.rankField}, to_tsquery('english', ${tsQuery}))`,
+          minRank
+        )
       )
     )
-    .orderBy(desc(sql`ts_rank(${config.rankField}, to_tsquery('english', ${tsQuery}))`))
+    .orderBy(
+      desc(sql`ts_rank(${config.rankField}, to_tsquery('english', ${tsQuery}))`)
+    )
     .limit(limit);
 
   const results = await query;
@@ -294,11 +303,7 @@ async function searchEntity(entityType, searchQuery, limit = 10, minRank = 0.01)
  * @returns {Promise<Object>} Object with results grouped by entity type
  */
 export async function globalSearch(searchQuery, options = {}) {
-  const {
-    entities = null,
-    limit = 10,
-    minRank = 0.01,
-  } = options;
+  const { entities = null, limit = 10, minRank = 0.01 } = options;
 
   if (!searchQuery || searchQuery.trim().length === 0) {
     return {};
@@ -309,7 +314,12 @@ export async function globalSearch(searchQuery, options = {}) {
   // Search all entity types in parallel
   const searchPromises = entityTypes.map(async (entityType) => {
     try {
-      const results = await searchEntity(entityType, searchQuery, limit, minRank);
+      const results = await searchEntity(
+        entityType,
+        searchQuery,
+        limit,
+        minRank
+      );
       return { entityType, results };
     } catch (error) {
       console.error(`Error searching ${entityType}:`, error);
@@ -366,12 +376,14 @@ export async function getSearchSuggestions(entityType, searchQuery, limit = 5) {
   const tsQuery = searchQuery
     .trim()
     .split(/\s+/)
-    .map(term => `${term}:*`)
+    .map((term) => `${term}:*`)
     .join(" | "); // OR instead of AND for more results
 
   const selectFields = {
     id: config.table.id,
-    rank: sql`ts_rank(${config.rankField}, to_tsquery('english', ${tsQuery}))`.as("rank"),
+    rank: sql`ts_rank(${config.rankField}, to_tsquery('english', ${tsQuery}))`.as(
+      "rank"
+    ),
   };
 
   // Add primary display field (usually 'name')
@@ -389,7 +401,9 @@ export async function getSearchSuggestions(entityType, searchQuery, limit = 5) {
     .select(selectFields)
     .from(config.table)
     .where(sql`${config.rankField} @@ to_tsquery('english', ${tsQuery})`)
-    .orderBy(desc(sql`ts_rank(${config.rankField}, to_tsquery('english', ${tsQuery}))`))
+    .orderBy(
+      desc(sql`ts_rank(${config.rankField}, to_tsquery('english', ${tsQuery}))`)
+    )
     .limit(limit);
 
   return results;
@@ -436,4 +450,3 @@ export default {
   getAvailableEntityTypes,
   unifiedSearch,
 };
-

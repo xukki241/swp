@@ -36,13 +36,13 @@ This project implements PostgreSQL Full-Text Search (FTS) across all major datab
 Each searchable table includes:
 
 ```javascript
-searchVector: searchVector()  // tsvector column
+searchVector: searchVector(); // tsvector column
 ```
 
 With a GIN index:
 
 ```javascript
-index("table_name_search_vector_idx").using("gin", table.searchVector)
+index("table_name_search_vector_idx").using("gin", table.searchVector);
 ```
 
 ### Searchable Tables
@@ -107,12 +107,14 @@ GET /api/search?q=query&entities=users,medications&limit=10&minRank=0.01
 ```
 
 **Query Parameters:**
+
 - `q` (required) - Search query string
 - `entities` (optional) - Comma-separated list of entity types
 - `limit` (optional) - Results per entity type (default: 10)
 - `minRank` (optional) - Minimum relevance score (default: 0.01)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -145,6 +147,7 @@ GET /api/search/unified?q=query&globalLimit=20
 ```
 
 **Query Parameters:**
+
 - `q` (required) - Search query string
 - `entities` (optional) - Comma-separated list of entity types
 - `limit` (optional) - Results per entity type (default: 10)
@@ -152,6 +155,7 @@ GET /api/search/unified?q=query&globalLimit=20
 - `minRank` (optional) - Minimum relevance score (default: 0.01)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -187,14 +191,17 @@ GET /api/search/medications?q=aspirin&limit=50
 ```
 
 **Path Parameters:**
+
 - `entityType` - Entity type to search (users, customers, medications, etc.)
 
 **Query Parameters:**
+
 - `q` (required) - Search query string
 - `limit` (optional) - Maximum results (default: 50)
 - `minRank` (optional) - Minimum relevance score (default: 0.01)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -226,13 +233,16 @@ GET /api/search/suggestions/medications?q=asp&limit=5
 ```
 
 **Path Parameters:**
+
 - `entityType` - Entity type for suggestions
 
 **Query Parameters:**
+
 - `q` (required) - Search query string
 - `limit` (optional) - Number of suggestions (default: 5)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -260,6 +270,7 @@ GET /api/search/entities
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -291,8 +302,8 @@ GET /api/search/entities
 
 ```javascript
 // Search across all entities
-const searchResults = await fetch('/api/search?q=aspirin', {
-  headers: { 'Authorization': `Bearer ${token}` }
+const searchResults = await fetch("/api/search?q=aspirin", {
+  headers: { Authorization: `Bearer ${token}` },
 });
 
 const data = await searchResults.json();
@@ -306,7 +317,7 @@ console.log(data.data.results);
 const getSuggestions = async (query, entityType) => {
   const response = await fetch(
     `/api/search/suggestions/${entityType}?q=${encodeURIComponent(query)}&limit=5`,
-    { headers: { 'Authorization': `Bearer ${token}` }}
+    { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.json();
 };
@@ -314,7 +325,7 @@ const getSuggestions = async (query, entityType) => {
 // Usage in input handler
 const handleInputChange = debounce(async (value) => {
   if (value.length >= 2) {
-    const suggestions = await getSuggestions(value, 'medications');
+    const suggestions = await getSuggestions(value, "medications");
     displaySuggestions(suggestions.data.suggestions);
   }
 }, 300);
@@ -325,26 +336,26 @@ const handleInputChange = debounce(async (value) => {
 ```javascript
 // Search only specific entity types
 const response = await fetch(
-  '/api/search?q=john&entities=users,customers&limit=20',
-  { headers: { 'Authorization': `Bearer ${token}` }}
+  "/api/search?q=john&entities=users,customers&limit=20",
+  { headers: { Authorization: `Bearer ${token}` } }
 );
 ```
 
 ### Backend Integration
 
 ```javascript
-import { globalSearch, searchByEntity } from './services/searchService.js';
+import { globalSearch, searchByEntity } from "./services/searchService.js";
 
 // Search from another service
-const results = await searchByEntity('medications', 'aspirin', {
+const results = await searchByEntity("medications", "aspirin", {
   limit: 10,
-  minRank: 0.1
+  minRank: 0.1,
 });
 
 // Multi-entity search
-const allResults = await globalSearch('john doe', {
-  entities: ['users', 'customers'],
-  limit: 5
+const allResults = await globalSearch("john doe", {
+  entities: ["users", "customers"],
+  limit: 5,
 });
 ```
 
@@ -367,16 +378,16 @@ const allResults = await globalSearch('john doe', {
 
 ```javascript
 // ✅ Good - Specific search with reasonable limit
-await searchByEntity('medications', query, { limit: 20 });
+await searchByEntity("medications", query, { limit: 20 });
 
 // ✅ Good - Filtered global search
-await globalSearch(query, { entities: ['users', 'customers'], limit: 10 });
+await globalSearch(query, { entities: ["users", "customers"], limit: 10 });
 
 // ❌ Avoid - Unrestricted search
 await globalSearch(query, { limit: 1000 });
 
 // ❌ Avoid - Very low minRank
-await searchByEntity('users', query, { minRank: 0.0001, limit: 500 });
+await searchByEntity("users", query, { minRank: 0.0001, limit: 500 });
 ```
 
 ## Search Query Syntax
@@ -393,14 +404,14 @@ john doe         # Multiple words (AND)
 The service automatically converts queries to PostgreSQL tsquery format:
 
 - Spaces → AND operator
-- Words get prefix matching (word:*)
+- Words get prefix matching (word:\*)
 
 ### Examples
 
-| User Input | PostgreSQL tsquery | Description |
-|-----------|-------------------|-------------|
-| `aspirin` | `aspirin:*` | Prefix match |
-| `john doe` | `john:* & doe:*` | Both words must match |
+| User Input      | PostgreSQL tsquery    | Description             |
+| --------------- | --------------------- | ----------------------- |
+| `aspirin`       | `aspirin:*`           | Prefix match            |
+| `john doe`      | `john:* & doe:*`      | Both words must match   |
 | `bayer aspirin` | `bayer:* & aspirin:*` | Both words in any order |
 
 ## Extending Search
@@ -413,13 +424,17 @@ The service automatically converts queries to PostgreSQL tsquery format:
 import { index, pgTable } from "drizzle-orm/pg-core";
 import { identityPrimaryKey, name, searchVector } from "./common.js";
 
-export const newTable = pgTable("new_table", {
-  id: identityPrimaryKey(),
-  name: name(),
-  searchVector: searchVector(),
-}, (table) => [
-  index("new_table_search_vector_idx").using("gin", table.searchVector),
-]);
+export const newTable = pgTable(
+  "new_table",
+  {
+    id: identityPrimaryKey(),
+    name: name(),
+    searchVector: searchVector(),
+  },
+  (table) => [
+    index("new_table_search_vector_idx").using("gin", table.searchVector),
+  ]
+);
 ```
 
 2. **Create Migration SQL**:
@@ -527,18 +542,21 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 Create tests in `tests/unit/searchService.test.js`:
 
 ```javascript
-import { describe, it, expect } from 'vitest';
-import { globalSearch, searchByEntity } from '../../src/services/searchService.js';
+import { describe, it, expect } from "vitest";
+import {
+  globalSearch,
+  searchByEntity,
+} from "../../src/services/searchService.js";
 
-describe('Search Service', () => {
-  it('should search medications', async () => {
-    const results = await searchByEntity('medications', 'aspirin');
+describe("Search Service", () => {
+  it("should search medications", async () => {
+    const results = await searchByEntity("medications", "aspirin");
     expect(results).toBeInstanceOf(Array);
   });
 
-  it('should return global search results', async () => {
-    const results = await globalSearch('test', { limit: 5 });
-    expect(results).toHaveProperty('medications');
+  it("should return global search results", async () => {
+    const results = await globalSearch("test", { limit: 5 });
+    expect(results).toHaveProperty("medications");
   });
 });
 ```
@@ -566,4 +584,3 @@ describe('Search Service', () => {
 - [Drizzle ORM Documentation](https://orm.drizzle.team/)
 - [GIN Indexes](https://www.postgresql.org/docs/current/gin.html)
 - [ts_rank Function](https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-RANKING)
-

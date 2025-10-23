@@ -42,7 +42,9 @@ export const handleGlobalSearch = async (req, res, next) => {
       0
     );
 
-    logger.info(`Global search for "${searchQuery}" returned ${totalResults} results`);
+    logger.info(
+      `Global search for "${searchQuery}" returned ${totalResults} results`
+    );
 
     return res.status(200).json({
       success: true,
@@ -95,7 +97,9 @@ export const handleUnifiedSearch = async (req, res, next) => {
 
     const results = await unifiedSearch(searchQuery, options);
 
-    logger.info(`Unified search for "${searchQuery}" returned ${results.length} results`);
+    logger.info(
+      `Unified search for "${searchQuery}" returned ${results.length} results`
+    );
 
     return res.status(200).json({
       success: true,
@@ -137,7 +141,9 @@ export const handleEntitySearch = async (req, res, next) => {
 
     const results = await searchByEntity(entityType, searchQuery, options);
 
-    logger.info(`Entity search in ${entityType} for "${searchQuery}" returned ${results.length} results`);
+    logger.info(
+      `Entity search in ${entityType} for "${searchQuery}" returned ${results.length} results`
+    );
 
     return res.status(200).json({
       success: true,
@@ -204,7 +210,10 @@ export const handleSearchSuggestions = async (req, res, next) => {
         data: null,
       });
     }
-    logger.error(`Error getting suggestions (${req.params.entityType}):`, error);
+    logger.error(
+      `Error getting suggestions (${req.params.entityType}):`,
+      error
+    );
     next(error);
   }
 };
@@ -238,4 +247,3 @@ export default {
   handleSearchSuggestions,
   handleGetEntityTypes,
 };
-
