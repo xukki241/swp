@@ -335,7 +335,7 @@ deploy_azure_next:
 deploy_azure_production:
   stage: deploy
   extends: .azure_cli_base
-  needs: [build_api_azure, build_web_azure_prod]
+  needs: [build_api_azure, build_web_azure_production]
   script:
     - echo "Deploying to Azure App Service (Production Environment)..."
     - echo "Resource Group $AZURE_RESOURCE_GROUP"

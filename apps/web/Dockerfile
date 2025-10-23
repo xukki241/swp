@@ -32,15 +32,8 @@ RUN pnpm --filter @pharmaflow/web build
 # Production stage - using nginx to serve static files
 FROM nginx:alpine AS runner
 
-# Install envsubst for environment variable substitution
-RUN apk add --no-cache gettext
-
-# Copy custom nginx configuration as template
-COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf.template
-
-# Copy docker entrypoint script
-COPY apps/web/docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+# Copy custom nginx configuration
+COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built assets from builder stage
 COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
@@ -51,10 +44,6 @@ RUN chown -R nginx:nginx /usr/share/nginx/html && \
   chown -R nginx:nginx /var/log/nginx && \
   chmod -R 755 /usr/share/nginx/html
 
-# Environment variables (can be overridden at runtime)
-ENV API_URL=http://api:3000
-ENV ENVIRONMENT=production
-
 # Expose port 80
 EXPOSE 80
 
@@ -62,5 +51,5 @@ EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --quiet --tries=1 --spider http://localhost:80/ || exit 1
 
-# Use custom entrypoint
-ENTRYPOINT ["/docker-entrypoint.sh"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
