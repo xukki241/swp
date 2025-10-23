@@ -12,6 +12,7 @@ import {
 import express from "express";
 import { z } from "zod";
 
+import { createAuditLog } from "src/middleware/auditLog.js";
 import { supplierMedicationVariantController } from "../controllers/supplierMedicationVariantController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
@@ -66,6 +67,7 @@ supplierMedicationVariantRouter.post(
   authorize("owner"),
   validateParams(supplierIdParamSchema),
   validateBody(createSupplierMedicationsRequestSchema),
+  createAuditLog("CREATE", "supplier_medication_variant"),
   supplierMedicationVariantController.create
 );
 
@@ -79,6 +81,9 @@ supplierMedicationVariantRouter.patch(
   authorize("owner"),
   validateParams(supplierIdAndIdParamSchema),
   validateBody(updateSupplierMedicationRequestSchema),
+  createAuditLog("UPDATE", "supplier_medication_variant", {
+    getChanges: (req) => ({ supplierMedicationVariant: req.body }),
+  }),
   supplierMedicationVariantController.update
 );
 
@@ -91,6 +96,7 @@ supplierMedicationVariantRouter.delete(
   "/:id",
   authorize("owner"),
   validateParams(supplierIdAndIdParamSchema),
+  createAuditLog("DELETE", "supplier_medication_variant"),
   supplierMedicationVariantController.delete
 );
 

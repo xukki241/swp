@@ -1,5 +1,6 @@
 import { Router } from "express";
 
+import auditRouter from "./auditRoutes.js";
 import { authRouter } from "./authRoutes.js";
 import { customerRouter } from "./customerRoutes.js";
 import emailRouter from "./emailRoutes.js";
@@ -34,6 +35,7 @@ apiRouter.use("/inventory", inventoryRouter);
 apiRouter.use("/sales", salesOrderRouter);
 apiRouter.use("/reports", reportRouter);
 apiRouter.use("/search", searchRouter); // Full-text search routes
+apiRouter.use("/audit-logs", auditRouter); // Audit log routes
 apiRouter.use(emailRouter); // Email routes
 
 export default apiRouter;

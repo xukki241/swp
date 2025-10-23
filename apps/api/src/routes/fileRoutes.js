@@ -3,6 +3,7 @@ import { validateParams, validateQuery } from "@pharmaflow/dto/middleware";
 import express from "express";
 import { z } from "zod";
 
+import { createAuditLog } from "src/middleware/auditLog.js";
 import { fileController } from "../controllers/fileController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 import {
@@ -26,7 +27,13 @@ const idParamSchema = z.object({
  * @desc    Upload a single file
  * @access  Private (Authenticated)
  */
-fileRouter.post("/", uploadSingle, handleMulterError, fileController.upload);
+fileRouter.post(
+  "/",
+  uploadSingle,
+  handleMulterError,
+  createAuditLog("CREATE", "file"),
+  fileController.upload
+);
 
 /**
  * @route   POST /api/files/batch
@@ -37,6 +44,7 @@ fileRouter.post(
   "/batch",
   uploadMultiple,
   handleMulterError,
+  createAuditLog("CREATE", "file"),
   fileController.uploadMultiple
 );
 
@@ -81,6 +89,7 @@ fileRouter.delete(
   "/:id",
   authorize("owner"),
   validateParams(idParamSchema),
+  createAuditLog("DELETE", "file"),
   fileController.delete
 );
 

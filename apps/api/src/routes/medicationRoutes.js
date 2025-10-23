@@ -15,6 +15,7 @@ import { z } from "zod";
 
 import * as medicationController from "../controllers/medicationController.js";
 import * as medicationVariantController from "../controllers/medicationVariantController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 import { medicationVariantRouter } from "./medicationVariantRoutes.js";
@@ -138,6 +139,7 @@ medicationRouter.post(
   "/",
   authorize("owner"),
   validateBody(createMedicationsRequestSchema),
+  createAuditLog("CREATE", "medication"),
   medicationController.createMedication
 );
 
@@ -151,6 +153,7 @@ medicationRouter.patch(
   authorize("owner"),
   validateParams(idParamSchema),
   validateBody(updateMedicationRequestSchema),
+  createAuditLog("UPDATE", "medication"),
   medicationController.updateMedication
 );
 
@@ -163,6 +166,7 @@ medicationRouter.delete(
   "/:id",
   authorize("owner"),
   validateParams(idParamSchema),
+  createAuditLog("DELETE", "medication"),
   medicationController.deleteMedication
 );
 

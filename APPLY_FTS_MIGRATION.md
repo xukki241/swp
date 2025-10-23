@@ -3,6 +3,7 @@
 ## Overview
 
 The FTS migration now runs **automatically when the application starts**. The server will:
+
 1. Test database connection
 2. Run all pending migrations (including FTS migration 0004)
 3. Start the API server
@@ -27,6 +28,7 @@ npm run dev
 ```
 
 **Server logs will show:**
+
 ```
 [info] Database connection successful
 [info] Starting database migrations...
@@ -35,6 +37,7 @@ npm run dev
 ```
 
 **Migration 0004 includes:**
+
 - PostgreSQL extensions (pg_trgm, unaccent)
 - search_vector tsvector columns on 11 tables
 - GIN indexes for FTS performance
@@ -60,16 +63,19 @@ npm run db:push
 ### Option 2: Local Docker Database
 
 1. **Start Docker database:**
+
    ```bash
    docker-compose up -d db
    ```
 
 2. **Create `.env` file in `apps/api/`** (if not exists):
+
    ```bash
    cp apps/api/.env.example apps/api/.env
    ```
 
 3. **Update DATABASE_URL in `.env`:**
+
    ```
    DATABASE_URL=postgresql://pharmaflow:pharmaflow_password@localhost:5432/pharmaflow_db
    ```
@@ -85,6 +91,7 @@ npm run db:push
 1. **Ensure VPN/network access to Azure database**
 
 2. **Verify DATABASE_URL in `.env`:**
+
    ```
    DATABASE_URL=postgresql://username:password@your-server.postgres.database.azure.com:5432/dbname?ssl=true
    ```
@@ -115,7 +122,7 @@ After migration (automatic or manual), verify it worked:
 
 ```sql
 -- Check if extensions are installed
-SELECT extname, extversion FROM pg_extension 
+SELECT extname, extversion FROM pg_extension
 WHERE extname IN ('pg_trgm', 'unaccent');
 ```
 
@@ -123,18 +130,18 @@ WHERE extname IN ('pg_trgm', 'unaccent');
 
 ```sql
 -- Check if search_vector column exists
-SELECT column_name, data_type 
-FROM information_schema.columns 
+SELECT column_name, data_type
+FROM information_schema.columns
 WHERE table_name = 'users' AND column_name = 'search_vector';
 
 -- Check if GIN index exists
 SELECT indexname, indexdef
-FROM pg_indexes 
+FROM pg_indexes
 WHERE tablename = 'users' AND indexname = 'users_search_vector_idx';
 
 -- Check if trigger exists
 SELECT trigger_name, event_manipulation
-FROM information_schema.triggers 
+FROM information_schema.triggers
 WHERE trigger_name = 'users_search_vector_trigger';
 ```
 
@@ -190,6 +197,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 **Error:** `Failed to run migrations. Server will not start.`
 
 **Solution:**
+
 1. Check database connection: `psql "$DATABASE_URL" -c "SELECT 1;"`
 2. Check migration file exists: `ls apps/api/src/db/migrations/0004_cold_emma_frost.sql`
 3. Check for conflicting migrations in the database
@@ -200,6 +208,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 **Error:** `extension "pg_trgm" does not exist`
 
 **Solution:**
+
 ```sql
 -- Connect as superuser
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
@@ -207,6 +216,7 @@ CREATE EXTENSION IF NOT EXISTS unaccent;
 ```
 
 For Azure PostgreSQL:
+
 - Extensions may require admin privileges
 - Check Azure portal for extension management
 
@@ -215,6 +225,7 @@ For Azure PostgreSQL:
 **Problem:** Cannot connect to database
 
 **Solution:**
+
 - Check if database is running: `docker ps` or Azure portal
 - Verify network connectivity
 - Check DATABASE_URL format in .env file
@@ -225,12 +236,15 @@ For Azure PostgreSQL:
 **Problem:** Search returns no results
 
 **Solution:**
+
 1. Verify triggers are created:
+
    ```sql
    \d+ users  -- in psql
    ```
 
 2. Check if search_vector is populated:
+
    ```sql
    SELECT search_vector FROM users LIMIT 1;
    ```
@@ -246,7 +260,7 @@ The auto-migration is disabled when `NODE_ENV=test`. For manual control:
 
 ```javascript
 // In test setup
-import { runMigrations } from './src/db/migrate.js';
+import { runMigrations } from "./src/db/migrate.js";
 
 beforeAll(async () => {
   await runMigrations();
