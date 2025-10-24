@@ -1,7 +1,7 @@
 import express from "express";
-import { createAuditLog } from "src/middleware/auditLog.js";
 
 import { purchaseOrderItemController } from "../controllers/purchaseOrderItemController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 export const purchaseOrderItemRouter = express.Router();
