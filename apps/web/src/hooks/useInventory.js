@@ -1,11 +1,11 @@
 /* eslint-disable prettier/prettier */
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
+  adjustMedication,
+  getExpiring,
   getInventory,
   getLowStock,
-  getExpiring,
-  adjustMedication,
 } from "@/services/inventoryService";
 
 export const useInventory = () => {

@@ -1,24 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Plus, Eye, Settings2, Search } from "lucide-react";
-import { AppLayout } from "@/components/layouts/app-layout";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
+import { AppLayout } from "@/components/layouts/app-layout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useInventory } from "@/hooks/useInventory";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import { Eye, Plus, Search, Settings2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import AddStockDialog from "./components/AddStockDialog";
 import AddjustStockDialog from "./components/AdjustStockDialog";
 import StockDetailsDialog from "./components/StockDetailsDialog";
-import "bootstrap-icons/font/bootstrap-icons.css";
 
 export default function StockOverviewPage() {
   const { inventory, refetchInventory } = useInventory();

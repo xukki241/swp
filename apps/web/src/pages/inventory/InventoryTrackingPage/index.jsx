@@ -5,12 +5,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useInventory } from "@/hooks/useInventory";
 import MedicineCard from "./components/MedicineCard";
-import { Skeleton } from "@/components/ui/skeleton";
-import { AppLayout } from "@/components/layouts/app-layout";
-import { Card } from "@/components/ui/card";
-import { expiringItems, lowStockItems } from "@/hooks/useInventoryTracking";
 
 const InventoryTracking = () => {
   const {

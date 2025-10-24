@@ -1,3 +1,6 @@
+import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -6,10 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
 
 function calculateRemainingDays(expiryDateString) {
   const today = new Date();
