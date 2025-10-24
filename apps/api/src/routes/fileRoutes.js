@@ -4,8 +4,8 @@ import express from "express";
 import { z } from "zod";
 
 import { fileController } from "../controllers/fileController.js";
-import { authenticate, authorize } from "../middleware/checkAuth.js";
 import { createAuditLog } from "../middleware/auditLog.js";
+import { authenticate, authorize } from "../middleware/checkAuth.js";
 import {
   handleMulterError,
   uploadMultiple,

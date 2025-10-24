@@ -13,8 +13,8 @@ import express from "express";
 import { z } from "zod";
 
 import * as medicationVariantController from "../controllers/medicationVariantController.js";
-import { authenticate, authorize } from "../middleware/checkAuth.js";
 import { createAuditLog } from "../middleware/auditLog.js";
+import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 export const medicationVariantRouter = express.Router({ mergeParams: true });
 

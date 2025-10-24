@@ -1,8 +1,8 @@
 import express from "express";
 
 import * as registrationController from "../controllers/registrationController.js";
-import { authenticate, authorize } from "../middleware/checkAuth.js";
 import { createAuditLog } from "../middleware/auditLog.js";
+import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 export const registrationRouter = express.Router();
 

@@ -13,8 +13,8 @@ import express from "express";
 import { z } from "zod";
 
 import { supplierMedicationVariantController } from "../controllers/supplierMedicationVariantController.js";
-import { authenticate, authorize } from "../middleware/checkAuth.js";
 import { createAuditLog } from "../middleware/auditLog.js";
+import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 // Nested router for /api/suppliers/:supplierId/medications
 export const supplierMedicationVariantRouter = express.Router({
