@@ -164,6 +164,17 @@ export default function ShiftAssignmentPage() {
             return;
         }
 
+        // Validate: không cho phép assign ca trong quá khứ
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const assignedDate = new Date(formData.assignedDate);
+        assignedDate.setHours(0, 0, 0, 0);
+
+        if (assignedDate < today) {
+            toast.error("Cannot assign shifts for past dates");
+            return;
+        }
+
         setIsSubmitting(true);
         try {
             await shiftService.createShiftAssignment({
@@ -188,6 +199,17 @@ export default function ShiftAssignmentPage() {
 
         if (!batchData.userIds.length || !batchData.shiftId || !batchData.startDate || !batchData.endDate) {
             toast.error("Please fill in all required fields");
+            return;
+        }
+
+        // Validate: không cho phép assign ca trong quá khứ
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const startDate = new Date(batchData.startDate);
+        startDate.setHours(0, 0, 0, 0);
+
+        if (startDate < today) {
+            toast.error("Cannot assign shifts for past dates. Please select a date from today onwards.");
             return;
         }
 
@@ -432,11 +454,25 @@ export default function ShiftAssignmentPage() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
                                         <Label htmlFor="batch-start">From Date <span className="text-red-500">*</span></Label>
-                                        <Input id="batch-start" type="date" value={batchData.startDate} onChange={(e) => setBatchData({ ...batchData, startDate: e.target.value })} required />
+                                        <Input
+                                            id="batch-start"
+                                            type="date"
+                                            value={batchData.startDate}
+                                            onChange={(e) => setBatchData({ ...batchData, startDate: e.target.value })}
+                                            min={new Date().toISOString().split("T")[0]}
+                                            required
+                                        />
                                     </div>
                                     <div className="grid gap-2">
                                         <Label htmlFor="batch-end">To Date <span className="text-red-500">*</span></Label>
-                                        <Input id="batch-end" type="date" value={batchData.endDate} onChange={(e) => setBatchData({ ...batchData, endDate: e.target.value })} required />
+                                        <Input
+                                            id="batch-end"
+                                            type="date"
+                                            value={batchData.endDate}
+                                            onChange={(e) => setBatchData({ ...batchData, endDate: e.target.value })}
+                                            min={batchData.startDate || new Date().toISOString().split("T")[0]}
+                                            required
+                                        />
                                     </div>
                                 </div>
 
@@ -494,7 +530,14 @@ export default function ShiftAssignmentPage() {
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="assignedDate">Date <span className="text-red-500">*</span></Label>
-                                    <Input id="assignedDate" type="date" value={formData.assignedDate} onChange={(e) => setFormData({ ...formData, assignedDate: e.target.value })} required />
+                                    <Input
+                                        id="assignedDate"
+                                        type="date"
+                                        value={formData.assignedDate}
+                                        onChange={(e) => setFormData({ ...formData, assignedDate: e.target.value })}
+                                        min={new Date().toISOString().split("T")[0]}
+                                        required
+                                    />
                                 </div>
 
                                 <div className="grid gap-2">

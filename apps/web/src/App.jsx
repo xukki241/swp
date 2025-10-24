@@ -1,10 +1,10 @@
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import DashboardPage from "@/pages/Dashboard";
-import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
-import LoginPage from "@/pages/LoginPage";
+import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
+import LoginPage from "@/pages/auth/LoginPage";
 import NotFoundPage from "@/pages/NotFoundPage";
-import PolicyPage from "@/pages/PolicyPage";
-import RegisterPage from "@/pages/RegisterPage";
+import PolicyPage from "@/pages/auth/PolicyPage";
+import RegisterPage from "@/pages/auth/RegisterPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import UserListPage from "@/pages/UserListPage";
@@ -30,7 +30,7 @@ import MedicationFormPage from "@/pages/medications/MedicationFormPage";
 import MedicationListPage from "./pages/medications/MedicationListPage";
 import SalesOrderDetailPage from "./pages/sales/SalesOrderDetailPage";
 import SalesOrderListPage from "./pages/sales/SalesOrderListPage";
-import SalesPage from "./pages/sales/SalesPageV2"; // Using V2 with multi-order support
+import SalesPage from "./pages/sales/SalesPage";
 // Shift management imports
 import MySchedulePage from "./pages/shifts/MySchedulePage";
 import ShiftAssignmentPage from "./pages/shifts/ShiftAssignmentPage";

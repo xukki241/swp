@@ -1,428 +1,630 @@
-"use client";
+"use client"
 
-import { AppLayout } from "@/components/layouts/app-layout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { customerService } from "@/services/customerService";
-import { searchMedications } from "@/services/medicationsService";
-import { salesService } from "@/services/salesService";
-import { CheckCircle, Loader2, Plus, ShoppingCart, Trash2 } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
-import { toast } from "sonner";
-import CartSummary from "./components/CartSummary";
-import CustomerSelector from "./components/CustomerSelector";
-import MedicationSearch from "./components/MedicationSearch";
-import OrderSuccessModal from "./components/OrderSuccessModal";
-import PaymentMethodSelector from "./components/PaymentMethodSelector";
+import { AppLayout } from "@/components/layouts/app-layout"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { customerService } from "@/services/customerService"
+import { searchMedications } from "@/services/medicationsService"
+import { salesService } from "@/services/salesService"
+import { CheckCircle, Copy, FileText, Loader2, Plus, ShoppingCart, Trash2, X, Users } from "lucide-react"
+import { useCallback, useMemo, useState } from "react"
+import { toast } from "sonner"
+import CartSummary from "./components/CartSummary"
+import CustomerSelector from "./components/CustomerSelector"
+import MedicationSearch from "./components/MedicationSearch"
+import OrderSuccessModal from "./components/OrderSuccessModal"
+import PaymentMethodSelector from "./components/PaymentMethodSelector"
+import { VietQRPaymentDialog } from "./components/VietQRPaymentDialog"
+
+// Generate unique order ID
+const generateOrderId = () => `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
 export default function SalesPage() {
-  // Step 1: Customer Selection
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [showNewCustomerForm, setShowNewCustomerForm] = useState(false);
+  // Multi-order state
+  const [orders, setOrders] = useState([
+    {
+      id: generateOrderId(),
+      customer: null,
+      cart: [],
+      paymentMethod: "cash",
+      createdAt: new Date(),
+    },
+  ])
+  const [activeOrderId, setActiveOrderId] = useState(orders[0].id)
+
+  // UI state
+  const [showNewCustomerForm, setShowNewCustomerForm] = useState(false)
   const [newCustomerData, setNewCustomerData] = useState({
     name: "",
     email: "",
     phone: "",
-  });
-  const [isCreatingCustomer, setIsCreatingCustomer] = useState(false);
+  })
+  const [isCreatingCustomer, setIsCreatingCustomer] = useState(false)
+  const [searchResults, setSearchResults] = useState([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [successOrder, setSuccessOrder] = useState(null)
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null)
+  const [showCustomerPanel, setShowCustomerPanel] = useState(false)
+  const [showVietQRDialog, setShowVietQRDialog] = useState(false)
+  const [pendingOrderData, setPendingOrderData] = useState(null)
 
-  // Step 2: Add Products to Cart
-  const [cart, setCart] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
+  // Get active order
+  const activeOrder = useMemo(() => orders.find((o) => o.id === activeOrderId), [orders, activeOrderId])
 
-  // Step 4: Payment Method
-  const [paymentMethod, setPaymentMethod] = useState("cash");
-
-  // Step 5: Complete Order
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successOrder, setSuccessOrder] = useState(null);
-
-  // Calculate total
+  // Calculate total for active order
   const totalAmount = useMemo(
-    () => cart.reduce((sum, item) => sum + item.quantity * item.sellPrice, 0),
-    [cart]
-  );
+    () => activeOrder?.cart.reduce((sum, item) => sum + item.quantity * item.sellPrice, 0) || 0,
+    [activeOrder],
+  )
+
+  // ========== ORDER MANAGEMENT ==========
+
+  const createNewOrder = () => {
+    const newOrder = {
+      id: generateOrderId(),
+      customer: null,
+      cart: [],
+      paymentMethod: "cash",
+      createdAt: new Date(),
+    }
+    setOrders((prev) => [...prev, newOrder])
+    setActiveOrderId(newOrder.id)
+    toast.success("New order created")
+  }
+
+  const deleteOrder = (orderId) => {
+    if (orders.length === 1) {
+      toast.error("Must have at least 1 order")
+      return
+    }
+
+    setOrders((prev) => prev.filter((o) => o.id !== orderId))
+
+    // Switch to another order if deleting active one
+    if (activeOrderId === orderId) {
+      const remainingOrders = orders.filter((o) => o.id !== orderId)
+      setActiveOrderId(remainingOrders[0].id)
+    }
+
+    toast.success("Order deleted")
+    setDeleteConfirmId(null)
+  }
+
+  const duplicateOrder = (orderId) => {
+    const orderToDuplicate = orders.find((o) => o.id === orderId)
+    if (!orderToDuplicate) return
+
+    const newOrder = {
+      ...orderToDuplicate,
+      id: generateOrderId(),
+      createdAt: new Date(),
+      // Deep copy cart to avoid reference issues
+      cart: orderToDuplicate.cart.map((item) => ({ ...item })),
+    }
+
+    setOrders((prev) => [...prev, newOrder])
+    setActiveOrderId(newOrder.id)
+    toast.success("Order duplicated")
+  }
+
+  // ========== UPDATE ACTIVE ORDER ==========
+
+  const updateActiveOrder = (updates) => {
+    setOrders((prev) => prev.map((order) => (order.id === activeOrderId ? { ...order, ...updates } : order)))
+  }
+
+  const setCustomer = (customer) => {
+    updateActiveOrder({ customer })
+  }
+
+  const setPaymentMethod = (method) => {
+    updateActiveOrder({ paymentMethod: method })
+  }
+
+  const setCart = (cart) => {
+    updateActiveOrder({ cart })
+  }
+
+  // ========== CUSTOMER MANAGEMENT ==========
 
   const handleCreateCustomer = useCallback(async () => {
     if (!newCustomerData.name.trim()) {
-      toast.error("Please enter customer name");
-      return;
+      toast.error("Please enter customer name")
+      return
     }
 
-    // Validate phone if provided
-    if (
-      newCustomerData.phone.trim() &&
-      !/^\d{10}$/.test(newCustomerData.phone.trim())
-    ) {
-      toast.error("Phone must be exactly 10 digits");
-      return;
+    if (newCustomerData.phone.trim() && !/^\d{10}$/.test(newCustomerData.phone.trim())) {
+      toast.error("Phone number must be 10 digits")
+      return
     }
 
-    setIsCreatingCustomer(true);
+    setIsCreatingCustomer(true)
     try {
-      // Prepare data with null for empty optional fields
       const customerData = {
         name: newCustomerData.name.trim(),
         email: newCustomerData.email.trim() || null,
         phone: newCustomerData.phone.trim() || null,
         address: null,
-      };
-
-      const response = await customerService.createCustomer(customerData);
-      const createdCustomer = response.data || response;
-
-      if (!createdCustomer.id) {
-        throw new Error("Invalid customer response");
       }
 
-      setSelectedCustomer(createdCustomer);
-      setNewCustomerData({ name: "", email: "", phone: "" });
-      setShowNewCustomerForm(false);
-      toast.success("Customer created successfully");
+      const response = await customerService.createCustomer(customerData)
+      const createdCustomer = response.data || response
+
+      if (!createdCustomer.id) {
+        throw new Error("Invalid customer response")
+      }
+
+      setCustomer(createdCustomer)
+      setNewCustomerData({ name: "", email: "", phone: "" })
+      setShowNewCustomerForm(false)
+      toast.success("New customer created")
     } catch (error) {
-      console.error("[v0] Customer creation error:", error);
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Unable to create customer";
-      toast.error(message);
+      console.error("Customer creation error:", error)
+      const message = error?.response?.data?.message || error?.message || "Cannot create customer"
+      toast.error(message)
     } finally {
-      setIsCreatingCustomer(false);
+      setIsCreatingCustomer(false)
     }
-  }, [newCustomerData]);
+  }, [newCustomerData])
+
+  // ========== MEDICATION SEARCH ==========
 
   const handleSearchMedications = useCallback(async (searchTerm) => {
     if (!searchTerm.trim()) {
-      setSearchResults([]);
-      return;
+      setSearchResults([])
+      return
     }
 
-    setIsSearching(true);
+    setIsSearching(true)
     try {
-      const response = await searchMedications(searchTerm);
-      console.log("[DEBUG] Search response:", response);
+      const response = await searchMedications(searchTerm)
+      const medications = Array.isArray(response) ? response : response.data || []
 
-      const medications = Array.isArray(response)
-        ? response
-        : response.data || [];
-      console.log("[DEBUG] Medications array:", medications);
-      console.log("[DEBUG] First medication:", medications[0]);
-
-      // Normalize data: handle both camelCase and snake_case
       const normalizedMedications = medications.map((m) => ({
         ...m,
         availableQuantity: m.availableQuantity || m.available_quantity || 0,
         medicationName: m.medicationName || m.medication_name || m.name,
         variantName: m.variantName || m.variant_name || m.name,
         sellPrice: m.sellPrice || m.sell_price || 0,
-      }));
+      }))
 
-      // Filter medications that are available for sale and have stock
       const availableMedications = normalizedMedications.filter((m) => {
-        const qty = Number(m.availableQuantity) || 0;
-        console.log(`[DEBUG] ${m.medicationName} - availableQuantity: ${qty}`);
-        return qty > 0;
-      });
+        const qty = Number(m.availableQuantity) || 0
+        return qty > 0
+      })
 
-      console.log("[DEBUG] Available medications:", availableMedications);
-      setSearchResults(availableMedications);
+      setSearchResults(availableMedications)
 
       if (availableMedications.length === 0 && medications.length > 0) {
-        toast.info("Found products but none are in stock");
+        toast.info("Products found but out of stock")
       }
     } catch (error) {
-      console.error("[DEBUG] Medication search error:", error);
-      toast.error(
-        "Unable to search medications: " +
-          (error.response?.data?.message || error.message)
-      );
+      console.error("Medication search error:", error)
+      toast.error("Cannot search products")
     } finally {
-      setIsSearching(false);
+      setIsSearching(false)
     }
-  }, []);
+  }, [])
+
+  // ========== CART MANAGEMENT ==========
 
   const handleAddToCart = useCallback(
     (medication) => {
-      console.log("[DEBUG] Adding to cart:", medication);
-
-      // Validate medication data
       if (!medication.id || !medication.sellPrice) {
-        toast.error("Invalid product information");
-        console.error("[DEBUG] Invalid medication:", medication);
-        return;
+        toast.error("Invalid product information")
+        return
       }
 
-      // Check if available quantity exists and is a number
-      const availableQty = Number(medication.availableQuantity) || 0;
+      const availableQty = Number(medication.availableQuantity) || 0
       if (availableQty <= 0) {
-        toast.error("Product is out of stock");
-        console.error("[DEBUG] Out of stock:", medication);
-        return;
+        toast.error("Product out of stock")
+        return
       }
 
-      const existingItem = cart.find(
-        (item) => item.medication_variant_id === medication.id
-      );
+      const existingItem = activeOrder.cart.find((item) => item.medication_variant_id === medication.id)
 
       if (existingItem) {
-        const newQuantity = existingItem.quantity + 1;
+        const newQuantity = existingItem.quantity + 1
         if (newQuantity > availableQty) {
-          toast.error(`Cannot exceed available quantity (${availableQty})`);
-          return;
+          toast.error(`Cannot exceed stock quantity (${availableQty})`)
+          return
         }
-        // Update existing item quantity directly
-        setCart((prevCart) => {
-          const updated = [...prevCart];
-          const existingIndex = updated.findIndex(
-            (item) => item.medication_variant_id === medication.id
-          );
-          if (existingIndex !== -1) {
-            updated[existingIndex].quantity = newQuantity;
-          }
-          return updated;
-        });
-        toast.success(`Increased quantity to ${newQuantity}`);
+
+        const updatedCart = activeOrder.cart.map((item) =>
+          item.medication_variant_id === medication.id ? { ...item, quantity: newQuantity } : item,
+        )
+        setCart(updatedCart)
+        toast.success(`Increased quantity to ${newQuantity}`)
       } else {
-        setCart((prevCart) => [
-          ...prevCart,
-          {
-            medication_variant_id: medication.id,
-            medicationName: medication.medicationName || medication.name,
-            variantName: medication.variantName || "",
-            sellPrice: Number(medication.sellPrice),
-            availableQuantity: availableQty,
-            quantity: 1,
-          },
-        ]);
-        toast.success(
-          `${medication.medicationName || medication.name} added to cart`
-        );
+        const newItem = {
+          medication_variant_id: medication.id,
+          medicationName: medication.medicationName || medication.name,
+          variantName: medication.variantName || "",
+          sellPrice: Number(medication.sellPrice),
+          availableQuantity: availableQty,
+          quantity: 1,
+        }
+        setCart([...activeOrder.cart, newItem])
+        toast.success(`Added ${medication.medicationName || medication.name}`)
       }
-      setSearchResults([]);
+      setSearchResults([])
     },
-    [cart]
-  );
+    [activeOrder],
+  )
 
   const updateCartItem = useCallback(
     (index, quantity) => {
       if (quantity <= 0) {
-        removeCartItem(index);
-        return;
+        removeCartItem(index)
+        return
       }
 
-      const item = cart[index];
+      const item = activeOrder.cart[index]
       if (quantity > item.availableQuantity) {
-        toast.error(
-          `Cannot exceed available quantity (${item.availableQuantity})`
-        );
-        return;
+        toast.error(`Cannot exceed stock quantity (${item.availableQuantity})`)
+        return
       }
 
-      setCart((prevCart) => {
-        const updated = [...prevCart];
-        updated[index].quantity = quantity;
-        return updated;
-      });
+      const updatedCart = [...activeOrder.cart]
+      updatedCart[index] = { ...updatedCart[index], quantity }
+      setCart(updatedCart)
     },
-    [cart]
-  );
+    [activeOrder],
+  )
 
-  const removeCartItem = useCallback((index) => {
-    setCart((prevCart) => {
-      const item = prevCart[index];
-      const newCart = prevCart.filter((_, i) => i !== index);
-      toast.success(`${item.medicationName} removed from cart`);
-      return newCart;
-    });
-  }, []);
+  const removeCartItem = useCallback(
+    (index) => {
+      const item = activeOrder.cart[index]
+      const newCart = activeOrder.cart.filter((_, i) => i !== index)
+      setCart(newCart)
+      toast.success(`Removed ${item.medicationName}`)
+    },
+    [activeOrder],
+  )
+
+  // ========== COMPLETE ORDER ==========
 
   const handleCompleteOrder = useCallback(async () => {
-    console.log("[DEBUG] Starting order creation...");
-    console.log("[DEBUG] Selected customer:", selectedCustomer);
-    console.log("[DEBUG] Cart:", cart);
-    console.log("[DEBUG] Payment method:", paymentMethod);
-
-    // Validation
-    if (!selectedCustomer) {
-      toast.error("Please select a customer");
-      return;
+    if (!activeOrder.customer) {
+      toast.error("Please select a customer")
+      return
     }
 
-    if (cart.length === 0) {
-      toast.error("Cart is empty");
-      return;
+    if (activeOrder.cart.length === 0) {
+      toast.error("Cart is empty")
+      return
     }
 
-    // Validate cart items have valid data
-    const invalidItems = cart.filter(
-      (item) => !item.medication_variant_id || item.quantity <= 0
-    );
+    const invalidItems = activeOrder.cart.filter((item) => !item.medication_variant_id || item.quantity <= 0)
     if (invalidItems.length > 0) {
-      console.error("[DEBUG] Invalid items:", invalidItems);
-      toast.error("Cart contains invalid items");
-      return;
+      toast.error("Cart has invalid items")
+      return
     }
 
-    setIsSubmitting(true);
-
-    try {
-      // Prepare order data according to API spec
-      const orderData = {
-        customer_id: selectedCustomer.id,
-        payment_method: paymentMethod,
-        items: cart.map((item) => ({
+    // If payment method is VietQR, show QR dialog first
+    if (activeOrder.paymentMethod === "mobile_payment") {
+      setPendingOrderData({
+        id: generateOrderId(),
+        customer_id: activeOrder.customer.id,
+        payment_method: activeOrder.paymentMethod,
+        total: totalAmount,
+        items: activeOrder.cart.map((item) => ({
           medication_variant_id: item.medication_variant_id,
           quantity: item.quantity,
         })),
-      };
+      })
+      setShowVietQRDialog(true)
+      return
+    }
 
-      console.log("[DEBUG] Creating order with data:", orderData);
+    // For cash payment, proceed directly
+    await submitOrder()
+  }, [activeOrder, totalAmount])
 
-      const response = await salesService.createSalesOrder(orderData);
-      const createdOrder = response.data || response;
+  const submitOrder = useCallback(async () => {
+    setIsSubmitting(true)
 
-      console.log("[DEBUG] Order created successfully:", createdOrder);
+    try {
+      const orderData = pendingOrderData || {
+        customer_id: activeOrder.customer.id,
+        payment_method: activeOrder.paymentMethod,
+        items: activeOrder.cart.map((item) => ({
+          medication_variant_id: item.medication_variant_id,
+          quantity: item.quantity,
+        })),
+      }
 
-      // Merge cart info with order items for display
+      const response = await salesService.createSalesOrder(orderData)
+      const createdOrder = response.data || response
+
       const enrichedOrder = {
         ...createdOrder,
         items:
           createdOrder.items?.map((orderItem) => {
-            const cartItem = cart.find(
-              (c) => c.medication_variant_id === orderItem.medicationVariantId
-            );
+            const cartItem = activeOrder.cart.find((c) => c.medication_variant_id === orderItem.medicationVariantId)
             return {
               ...orderItem,
               medicationName: cartItem?.medicationName || "Unknown",
               variantName: cartItem?.variantName || "",
               sellPrice: orderItem.sellPrice || cartItem?.sellPrice || 0,
-            };
+            }
           }) || [],
-      };
+      }
 
-      // Show success modal with order details
-      setSuccessOrder(enrichedOrder);
-      toast.success("Order created successfully!");
+      setSuccessOrder(enrichedOrder)
+      toast.success("Order created successfully!")
+      setPendingOrderData(null)
+      setShowVietQRDialog(false)
 
-      // Reset form after a delay
+      // Remove completed order from list
       setTimeout(() => {
-        setCart([]);
-        setSelectedCustomer(null);
-        setPaymentMethod("cash");
-        setSearchResults([]);
-      }, 1500);
+        setOrders((prev) => {
+          const filtered = prev.filter((o) => o.id !== activeOrderId)
+          // Create new order if this was the last one
+          if (filtered.length === 0) {
+            const newOrder = {
+              id: generateOrderId(),
+              customer: null,
+              cart: [],
+              paymentMethod: "cash",
+              createdAt: new Date(),
+            }
+            setActiveOrderId(newOrder.id)
+            return [newOrder]
+          }
+          setActiveOrderId(filtered[0].id)
+          return filtered
+        })
+      }, 1500)
     } catch (error) {
-      console.error("[DEBUG] Order creation error:", error);
-      console.error("[DEBUG] Error response:", error?.response);
-      console.error("[DEBUG] Error data:", error?.response?.data);
-
-      // Handle specific error messages from API
-      let message = "Unable to create order";
+      console.error("Order creation error:", error)
+      let message = "Cannot create order"
 
       if (error?.response?.data?.error) {
-        const errorData = error.response.data.error;
-        // Check if error is an object with message property
+        const errorData = error.response.data.error
         if (typeof errorData === "object" && errorData.message) {
-          message = errorData.message;
+          message = errorData.message
         } else if (typeof errorData === "string") {
-          message = errorData;
+          message = errorData
         }
       } else if (error?.response?.data?.message) {
-        message = error.response.data.message;
+        message = error.response.data.message
       } else if (error?.message) {
-        message = error.message;
+        message = error.message
       }
 
-      console.error("[DEBUG] Final error message:", message);
-
-      // Check for specific inventory errors
-      if (
-        typeof message === "string" &&
-        (message.includes("Insufficient inventory") ||
-          message.includes("insufficient"))
-      ) {
-        toast.error(`Out of stock: ${message}`);
-      } else if (
-        typeof message === "string" &&
-        message.includes("not available for sale")
-      ) {
-        toast.error("Some products are not available for sale");
-      } else {
-        toast.error(
-          typeof message === "string" ? message : "Unable to create order"
-        );
-      }
+      toast.error(typeof message === "string" ? message : "Cannot create order")
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  }, [selectedCustomer, cart, paymentMethod]);
+  }, [activeOrder, activeOrderId, pendingOrderData])
 
   const handleCloseSuccessModal = useCallback(() => {
-    setSuccessOrder(null);
-  }, []);
+    setSuccessOrder(null)
+  }, [])
+
+  // ========== ORDER COUNT BADGE ==========
+  const getOrderBadgeText = (order) => {
+    const itemCount = order.cart.length
+    if (itemCount === 0) return "Empty"
+    return `${itemCount} item${itemCount > 1 ? 's' : ''}`
+  }
+
+  if (!activeOrder) return null
 
   return (
     <AppLayout>
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <ShoppingCart className="w-8 h-8 text-gray-700" />
-            <h1 className="text-3xl font-bold text-gray-900">Point of Sale</h1>
+      <div className="h-screen flex flex-col bg-background">
+        {/* Header */}
+        <div className="border-b border-border bg-card px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <ShoppingCart className="w-6 h-6 text-primary" />
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Sales</h1>
+                <p className="text-sm text-muted-foreground">Manage multiple orders simultaneously</p>
+              </div>
+            </div>
+            <Button onClick={createNewOrder} className="bg-primary hover:bg-primary/90">
+              <Plus className="mr-2 h-4 w-4" />
+              New Order
+            </Button>
           </div>
-          <p className="text-gray-600">
-            Complete the 5 steps below to create a sales order
-          </p>
+
+          {/* Order Tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto mt-4 pb-2">
+            {orders.map((order, index) => {
+              const isActive = order.id === activeOrderId
+              return (
+                <div
+                  key={order.id}
+                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${isActive
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-border bg-card hover:border-primary/50 text-muted-foreground"
+                    }`}
+                  onClick={() => setActiveOrderId(order.id)}
+                >
+                  <FileText className="h-4 w-4" />
+                  <span className="font-medium">Order #{index + 1}</span>
+                  <Badge variant={isActive ? "default" : "outline"} className="ml-1">
+                    {getOrderBadgeText(order)}
+                  </Badge>
+
+                  {/* Order Actions */}
+                  <div className="flex items-center gap-1 ml-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-5 w-5"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        duplicateOrder(order.id)
+                      }}
+                      title="Duplicate order"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                    {orders.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 text-destructive hover:text-destructive"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setDeleteConfirmId(order.id)
+                        }}
+                        title="Delete order"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Step 1: Customer Selection */}
-            <Card className="border border-gray-200 bg-gray-50">
-              <CardHeader className="bg-gray-50 border-b border-gray-200">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold">
-                    1
+        {/* Main Content */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Left: Product Search & Cart */}
+          <div className="flex-1 flex flex-col overflow-hidden border-r border-border">
+            {/* Product Search */}
+            <div className="flex-1 flex flex-col overflow-hidden p-6 space-y-4">
+              <div>
+                <h2 className="text-lg font-semibold text-foreground mb-3">Search Products</h2>
+                <MedicationSearch
+                  onSearch={handleSearchMedications}
+                  isSearching={isSearching}
+                  results={searchResults}
+                  onSelectMedication={handleAddToCart}
+                />
+              </div>
+
+              {/* Cart Items */}
+              {activeOrder.cart.length > 0 && (
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  <h2 className="text-lg font-semibold text-foreground mb-3">Cart ({activeOrder.cart.length})</h2>
+                  <div className="flex-1 overflow-y-auto space-y-2 pr-2">
+                    {activeOrder.cart.map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-foreground truncate">{item.medicationName}</p>
+                          <p className="text-xs text-muted-foreground truncate">{item.variantName}</p>
+                          <p className="text-sm text-foreground mt-1">
+                            {item.sellPrice.toLocaleString("vi-VN")} đ × {item.quantity}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 ml-2">
+                          <Input
+                            type="number"
+                            min="1"
+                            max={item.availableQuantity}
+                            value={item.quantity}
+                            onChange={(e) => updateCartItem(index, Number.parseInt(e.target.value) || 1)}
+                            className="w-12 text-center text-sm"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeCartItem(index)}
+                            className="text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <CardTitle className="text-lg">Select Customer</CardTitle>
                 </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                {selectedCustomer ? (
-                  <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <div>
-                      <p className="font-semibold text-gray-900">
-                        {selectedCustomer.name}
-                      </p>
-                      {selectedCustomer.phone && (
-                        <p className="text-sm text-gray-600">
-                          {selectedCustomer.phone}
-                        </p>
-                      )}
+              )}
+            </div>
+
+            {/* Payment & Complete */}
+            {activeOrder.cart.length > 0 && (
+              <div className="border-t border-border p-6 space-y-4">
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground mb-3">Payment Method</h3>
+                  <PaymentMethodSelector value={activeOrder.paymentMethod} onChange={setPaymentMethod} />
+                </div>
+                <Button
+                  onClick={handleCompleteOrder}
+                  disabled={!activeOrder.customer || isSubmitting}
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-base"
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Processing...
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSelectedCustomer(null)}
-                    >
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      Complete Order
+                    </div>
+                  )}
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Right Sidebar: Customer & Summary */}
+          <div className="w-80 flex flex-col overflow-hidden border-l border-border bg-card">
+            {/* Customer Section */}
+            <div className="flex-1 flex flex-col overflow-hidden border-b border-border">
+              <div className="p-4 border-b border-border">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-primary" />
+                    <h3 className="font-semibold text-foreground">Customer</h3>
+                  </div>
+                  {activeOrder.customer && (
+                    <Button variant="ghost" size="sm" onClick={() => setCustomer(null)} className="text-xs">
                       Change
                     </Button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4">
+                {activeOrder.customer ? (
+                  <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+                    <p className="font-semibold text-foreground">{activeOrder.customer.name}</p>
+                    {activeOrder.customer.phone && (
+                      <p className="text-sm text-muted-foreground mt-1">{activeOrder.customer.phone}</p>
+                    )}
+                    {activeOrder.customer.email && (
+                      <p className="text-sm text-muted-foreground">{activeOrder.customer.email}</p>
+                    )}
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    <CustomerSelector onSelectCustomer={setSelectedCustomer} />
+                  <div className="space-y-3">
+                    <CustomerSelector onSelectCustomer={setCustomer} />
                     <div className="relative">
                       <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300"></div>
+                        <div className="w-full border-t border-border"></div>
                       </div>
-                      <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">or</span>
+                      <div className="relative flex justify-center text-xs">
+                        <span className="px-2 bg-card text-muted-foreground">or</span>
                       </div>
                     </div>
                     {showNewCustomerForm ? (
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         <Input
                           placeholder="Customer name"
                           value={newCustomerData.name}
@@ -432,6 +634,7 @@ export default function SalesPage() {
                               name: e.target.value,
                             })
                           }
+                          className="text-sm"
                         />
                         <Input
                           placeholder="Email (optional)"
@@ -443,9 +646,10 @@ export default function SalesPage() {
                               email: e.target.value,
                             })
                           }
+                          className="text-sm"
                         />
                         <Input
-                          placeholder="Phone - 10 digits (optional)"
+                          placeholder="Phone (optional)"
                           value={newCustomerData.phone}
                           onChange={(e) =>
                             setNewCustomerData({
@@ -453,25 +657,28 @@ export default function SalesPage() {
                               phone: e.target.value,
                             })
                           }
+                          className="text-sm"
                         />
                         <div className="flex gap-2">
                           <Button
                             onClick={handleCreateCustomer}
                             disabled={isCreatingCustomer}
-                            className="flex-1 bg-blue-600 hover:bg-blue-700"
+                            size="sm"
+                            className="flex-1 bg-primary hover:bg-primary/90"
                           >
                             {isCreatingCustomer ? (
                               <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
                                 Creating...
                               </>
                             ) : (
-                              "Create Customer"
+                              "Create"
                             )}
                           </Button>
                           <Button
                             variant="outline"
                             onClick={() => setShowNewCustomerForm(false)}
+                            size="sm"
                             className="flex-1"
                           >
                             Cancel
@@ -479,172 +686,62 @@ export default function SalesPage() {
                         </div>
                       </div>
                     ) : (
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowNewCustomerForm(true)}
-                        className="w-full"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Create New Customer
+                      <Button variant="outline" onClick={() => setShowNewCustomerForm(true)} className="w-full text-sm">
+                        <Plus className="w-3 h-3 mr-2" />
+                        New Customer
                       </Button>
                     )}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            {/* Step 2: Add Products */}
-            <Card className="border border-gray-200 bg-gray-50">
-              <CardHeader className="bg-gray-50 border-b border-gray-200">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold">
-                    2
-                  </div>
-                  <CardTitle className="text-lg">Add Products</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <MedicationSearch
-                  onSearch={handleSearchMedications}
-                  isSearching={isSearching}
-                  results={searchResults}
-                  onSelectMedication={handleAddToCart}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Step 3: Manage Cart */}
-            {cart.length > 0 && (
-              <Card className="border border-gray-200 bg-gray-50">
-                <CardHeader className="bg-gray-50 border-b border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold">
-                      3
-                    </div>
-                    <CardTitle className="text-lg">Manage Cart</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="space-y-3">
-                    {cart.map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200"
-                      >
-                        <div className="flex-1">
-                          <p className="font-semibold text-gray-900">
-                            {item.medicationName}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {item.variantName}
-                          </p>
-                          <p className="text-sm text-gray-500 mt-1">
-                            ${item.sellPrice.toFixed(2)} × {item.quantity}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="number"
-                            min="1"
-                            max={item.availableQuantity}
-                            value={item.quantity}
-                            onChange={(e) =>
-                              updateCartItem(
-                                index,
-                                Number.parseInt(e.target.value) || 1
-                              )
-                            }
-                            className="w-16 text-center"
-                          />
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeCartItem(index)}
-                            className="text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Step 4: Payment Method */}
-            {cart.length > 0 && (
-              <Card className="border border-gray-200 bg-gray-50">
-                <CardHeader className="bg-gray-50 border-b border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold">
-                      4
-                    </div>
-                    <CardTitle className="text-lg">Payment Method</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <PaymentMethodSelector
-                    value={paymentMethod}
-                    onChange={setPaymentMethod}
-                  />
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Step 5: Complete Order */}
-            {cart.length > 0 && (
-              <Card className="border border-green-200 bg-green-50">
-                <CardHeader className="bg-green-100 border-b border-green-200">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-600 text-white font-bold">
-                      5
-                    </div>
-                    <CardTitle className="text-lg">Complete Order</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <Button
-                    onClick={handleCompleteOrder}
-                    disabled={!selectedCustomer || isSubmitting}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-6 text-lg"
-                  >
-                    {isSubmitting ? (
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Processing...
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5" />
-                        Complete Order
-                      </div>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Sidebar: Order Summary */}
-          <div className="lg:col-span-1">
-            <CartSummary
-              cart={cart}
-              totalAmount={totalAmount}
-              selectedCustomer={selectedCustomer}
-              paymentMethod={paymentMethod}
-            />
+            {/* Order Summary */}
+            <div className="flex-1 flex flex-col overflow-hidden border-t border-border">
+              <CartSummary
+                cart={activeOrder.cart}
+                totalAmount={totalAmount}
+                selectedCustomer={activeOrder.customer}
+                paymentMethod={activeOrder.paymentMethod}
+              />
+            </div>
           </div>
         </div>
       </div>
 
       {/* Success Modal */}
-      {successOrder && (
-        <OrderSuccessModal
-          order={successOrder}
-          onClose={handleCloseSuccessModal}
+      {successOrder && <OrderSuccessModal order={successOrder} onClose={handleCloseSuccessModal} />}
+
+      {/* VietQR Payment Dialog */}
+      {showVietQRDialog && pendingOrderData && (
+        <VietQRPaymentDialog
+          open={showVietQRDialog}
+          onOpenChange={setShowVietQRDialog}
+          orderData={pendingOrderData}
+          onPaymentConfirmed={submitOrder}
         />
       )}
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={deleteConfirmId !== null} onOpenChange={() => setDeleteConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Delete Order</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this order? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteOrder(deleteConfirmId)}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
-  );
+  )
 }
