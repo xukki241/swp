@@ -284,14 +284,14 @@
 
 **Note**: Quản lý định nghĩa ca làm việc (shift templates)
 
-| Method | Endpoint | Access | Mô tả |
-|--------|----------|--------|-------|
-| GET | `/` | Private | Lấy tất cả shifts (định nghĩa ca làm việc) |
-| GET | `/:id` | Private | Lấy thông tin shift theo ID |
-| GET | `/:shiftId/staff` | Private | Lấy danh sách nhân viên làm việc trong ca này vào ngày cụ thể (query: date) |
-| POST | `/` | Owner | Tạo shift mới |
-| PATCH | `/:id` | Owner | Cập nhật thông tin shift |
-| DELETE | `/:id` | Owner | Xóa shift |
+| Method | Endpoint          | Access  | Mô tả                                                                       |
+| ------ | ----------------- | ------- | --------------------------------------------------------------------------- |
+| GET    | `/`               | Private | Lấy tất cả shifts (định nghĩa ca làm việc)                                  |
+| GET    | `/:id`            | Private | Lấy thông tin shift theo ID                                                 |
+| GET    | `/:shiftId/staff` | Private | Lấy danh sách nhân viên làm việc trong ca này vào ngày cụ thể (query: date) |
+| POST   | `/`               | Owner   | Tạo shift mới                                                               |
+| PATCH  | `/:id`            | Owner   | Cập nhật thông tin shift                                                    |
+| DELETE | `/:id`            | Owner   | Xóa shift                                                                   |
 
 ---
 
@@ -301,15 +301,15 @@
 
 **Note**: Quản lý phân ca cho nhân viên theo ngày
 
-| Method | Endpoint | Access | Mô tả |
-|--------|----------|--------|-------|
-| GET | `/` | Private | Lấy tất cả shift assignments (filter: userId, shiftId, startDate, endDate, status) |
-| GET | `/:id` | Private | Lấy thông tin shift assignment theo ID |
-| POST | `/` | Owner | Tạo shift assignment (hỗ trợ single hoặc batch) |
-| PATCH | `/:id` | Owner | Cập nhật shift assignment (status, notes) |
-| POST | `/:id/check-in` | Private | Check-in vào ca làm việc (bắt đầu làm) |
-| POST | `/:id/check-out` | Private | Check-out khỏi ca làm việc (kết thúc) |
-| DELETE | `/:id` | Owner | Xóa shift assignment |
+| Method | Endpoint         | Access  | Mô tả                                                                              |
+| ------ | ---------------- | ------- | ---------------------------------------------------------------------------------- |
+| GET    | `/`              | Private | Lấy tất cả shift assignments (filter: userId, shiftId, startDate, endDate, status) |
+| GET    | `/:id`           | Private | Lấy thông tin shift assignment theo ID                                             |
+| POST   | `/`              | Owner   | Tạo shift assignment (hỗ trợ single hoặc batch)                                    |
+| PATCH  | `/:id`           | Owner   | Cập nhật shift assignment (status, notes)                                          |
+| POST   | `/:id/check-in`  | Private | Check-in vào ca làm việc (bắt đầu làm)                                             |
+| POST   | `/:id/check-out` | Private | Check-out khỏi ca làm việc (kết thúc)                                              |
+| DELETE | `/:id`           | Owner   | Xóa shift assignment                                                               |
 
 ---
 

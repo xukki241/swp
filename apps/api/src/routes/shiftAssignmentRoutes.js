@@ -39,9 +39,9 @@ shiftAssignmentRouter.get("/:id", shiftController.getShiftAssignmentById);
  * @access  Owner only
  */
 shiftAssignmentRouter.post(
-    "/",
-    authorize("owner"),
-    shiftController.createShiftAssignment
+  "/",
+  authorize("owner"),
+  shiftController.createShiftAssignment
 );
 
 /**
@@ -50,9 +50,9 @@ shiftAssignmentRouter.post(
  * @access  Owner only
  */
 shiftAssignmentRouter.patch(
-    "/:id",
-    authorize("owner"),
-    shiftController.updateShiftAssignment
+  "/:id",
+  authorize("owner"),
+  shiftController.updateShiftAssignment
 );
 
 /**
@@ -75,9 +75,9 @@ shiftAssignmentRouter.post("/:id/check-out", shiftController.checkOutShift);
  * @access  Owner only
  */
 shiftAssignmentRouter.delete(
-    "/:id",
-    authorize("owner"),
-    shiftController.deleteShiftAssignment
+  "/:id",
+  authorize("owner"),
+  shiftController.deleteShiftAssignment
 );
 
 export default shiftAssignmentRouter;

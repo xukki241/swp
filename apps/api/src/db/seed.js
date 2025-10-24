@@ -1496,12 +1496,8 @@ async function seed() {
         shiftId: morningShift.id,
         assignedDate: today,
         status: "completed",
-        checkInTime: new Date(
-          today.setHours(6, 5, 0, 0)
-        ),
-        checkOutTime: new Date(
-          today.setHours(14, 2, 0, 0)
-        ),
+        checkInTime: new Date(today.setHours(6, 5, 0, 0)),
+        checkOutTime: new Date(today.setHours(14, 2, 0, 0)),
         createdBy: owner.id,
       },
       {
@@ -1509,9 +1505,7 @@ async function seed() {
         shiftId: afternoonShift.id,
         assignedDate: today,
         status: "in_progress",
-        checkInTime: new Date(
-          today.setHours(14, 3, 0, 0)
-        ),
+        checkInTime: new Date(today.setHours(14, 3, 0, 0)),
         createdBy: owner.id,
       },
       {

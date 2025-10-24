@@ -42,16 +42,21 @@ export default function SalesOrderDetailPage() {
         customerName: orderData.customer?.name || "N/A",
         customerPhone: orderData.customer?.phone || "",
         customerEmail: orderData.customer?.email || "",
-        salespersonName: orderData.salesperson?.name || orderData.salesperson?.email || "N/A",
+        salespersonName:
+          orderData.salesperson?.name || orderData.salesperson?.email || "N/A",
         // Transform items to include medication info
-        items: orderData.items?.map(item => ({
-          ...item,
-          medicationName: item.medicationVariant?.medication?.name || item.medicationVariant?.name || "Unknown",
-          variantName: item.medicationVariant?.name || "",
-          sellPrice: item.unitPrice, // unitPrice from salesOrderItems table
-          quantity: item.quantity,
-          totalPrice: item.totalPrice,
-        })) || [],
+        items:
+          orderData.items?.map((item) => ({
+            ...item,
+            medicationName:
+              item.medicationVariant?.medication?.name ||
+              item.medicationVariant?.name ||
+              "Unknown",
+            variantName: item.medicationVariant?.name || "",
+            sellPrice: item.unitPrice, // unitPrice from salesOrderItems table
+            quantity: item.quantity,
+            totalPrice: item.totalPrice,
+          })) || [],
       };
 
       setOrder(transformedOrder);

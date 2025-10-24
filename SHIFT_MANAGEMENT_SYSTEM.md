@@ -15,18 +15,19 @@ Hệ thống quản lý ca làm việc cho nhân viên trong hệ thống Pharma
 
 **Table**: `shifts`
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | UUID | Primary key |
-| name | VARCHAR(100) | Tên ca (ví dụ: "Ca sáng", "Ca chiều") |
-| shift_type | ENUM | Loại ca: `morning`, `afternoon`, `night`, `full_day` |
-| start_time | TIME | Giờ bắt đầu (HH:MM:SS) |
-| end_time | TIME | Giờ kết thúc (HH:MM:SS) |
-| description | TEXT | Mô tả ca làm việc |
-| created_at | TIMESTAMP | Thời gian tạo |
-| updated_at | TIMESTAMP | Thời gian cập nhật |
+| Column      | Type         | Description                                          |
+| ----------- | ------------ | ---------------------------------------------------- |
+| id          | UUID         | Primary key                                          |
+| name        | VARCHAR(100) | Tên ca (ví dụ: "Ca sáng", "Ca chiều")                |
+| shift_type  | ENUM         | Loại ca: `morning`, `afternoon`, `night`, `full_day` |
+| start_time  | TIME         | Giờ bắt đầu (HH:MM:SS)                               |
+| end_time    | TIME         | Giờ kết thúc (HH:MM:SS)                              |
+| description | TEXT         | Mô tả ca làm việc                                    |
+| created_at  | TIMESTAMP    | Thời gian tạo                                        |
+| updated_at  | TIMESTAMP    | Thời gian cập nhật                                   |
 
 **Shift Types**:
+
 - `morning` - Ca sáng (6:00 - 14:00)
 - `afternoon` - Ca chiều (14:00 - 22:00)
 - `night` - Ca đêm (22:00 - 6:00)
@@ -38,21 +39,22 @@ Hệ thống quản lý ca làm việc cho nhân viên trong hệ thống Pharma
 
 **Table**: `shift_assignments`
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | UUID | Primary key |
-| user_id | UUID | Foreign key → users.id (nhân viên) |
-| shift_id | UUID | Foreign key → shifts.id (ca làm việc) |
-| assigned_date | TIMESTAMP | Ngày làm việc |
-| status | ENUM | Trạng thái ca làm |
-| check_in_time | TIMESTAMP | Giờ check-in thực tế |
-| check_out_time | TIMESTAMP | Giờ check-out thực tế |
-| notes | TEXT | Ghi chú |
-| created_by | UUID | Foreign key → users.id (người tạo lịch) |
-| created_at | TIMESTAMP | Thời gian tạo |
-| updated_at | TIMESTAMP | Thời gian cập nhật |
+| Column         | Type      | Description                             |
+| -------------- | --------- | --------------------------------------- |
+| id             | UUID      | Primary key                             |
+| user_id        | UUID      | Foreign key → users.id (nhân viên)      |
+| shift_id       | UUID      | Foreign key → shifts.id (ca làm việc)   |
+| assigned_date  | TIMESTAMP | Ngày làm việc                           |
+| status         | ENUM      | Trạng thái ca làm                       |
+| check_in_time  | TIMESTAMP | Giờ check-in thực tế                    |
+| check_out_time | TIMESTAMP | Giờ check-out thực tế                   |
+| notes          | TEXT      | Ghi chú                                 |
+| created_by     | UUID      | Foreign key → users.id (người tạo lịch) |
+| created_at     | TIMESTAMP | Thời gian tạo                           |
+| updated_at     | TIMESTAMP | Thời gian cập nhật                      |
 
 **Status Values**:
+
 - `scheduled` - Đã lên lịch
 - `confirmed` - Nhân viên đã xác nhận
 - `in_progress` - Đang làm việc
@@ -61,6 +63,7 @@ Hệ thống quản lý ca làm việc cho nhân viên trong hệ thống Pharma
 - `absent` - Vắng mặt
 
 **Constraints**:
+
 - Unique index trên `(user_id, assigned_date)` - Một nhân viên không thể có nhiều ca trong cùng 1 ngày
 
 ---
@@ -87,6 +90,7 @@ POST /api/shifts
 **Owner** phân ca cho nhân viên (có thể phân đơn lẻ hoặc batch):
 
 **Single Assignment**:
+
 ```
 POST /api/shift-assignments
 {
@@ -97,6 +101,7 @@ POST /api/shift-assignments
 ```
 
 **Batch Assignment** (phân ca cho nhiều nhân viên cùng lúc):
+
 ```
 POST /api/shift-assignments
 [
@@ -124,20 +129,25 @@ GET /api/users/{userId}/schedule?startDate=2025-10-20&endDate=2025-10-27
 ### 4. Check-in/Check-out
 
 **Staff** check-in khi bắt đầu ca:
+
 ```
 POST /api/shift-assignments/{assignmentId}/check-in
 ```
+
 → Status chuyển sang `in_progress`, lưu `check_in_time`
 
 **Staff** check-out khi kết thúc ca:
+
 ```
 POST /api/shift-assignments/{assignmentId}/check-out
 ```
+
 → Status chuyển sang `completed`, lưu `check_out_time`
 
 ### 5. Quản lý ca làm việc
 
 **Owner** có thể:
+
 - Xem ai đang làm việc trong ca nào:
   ```
   GET /api/shifts/{shiftId}/staff?date=2025-10-25
@@ -159,32 +169,32 @@ POST /api/shift-assignments/{assignmentId}/check-out
 
 ### Shift Management
 
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| GET | `/api/shifts` | Private | Lấy tất cả shifts (định nghĩa ca) |
-| GET | `/api/shifts/:id` | Private | Lấy shift theo ID |
-| POST | `/api/shifts` | Owner | Tạo shift mới |
-| PATCH | `/api/shifts/:id` | Owner | Cập nhật shift |
-| DELETE | `/api/shifts/:id` | Owner | Xóa shift |
-| GET | `/api/shifts/:shiftId/staff` | Private | Lấy danh sách nhân viên làm ca này vào ngày cụ thể (query: `date`) |
+| Method | Endpoint                     | Access  | Description                                                        |
+| ------ | ---------------------------- | ------- | ------------------------------------------------------------------ |
+| GET    | `/api/shifts`                | Private | Lấy tất cả shifts (định nghĩa ca)                                  |
+| GET    | `/api/shifts/:id`            | Private | Lấy shift theo ID                                                  |
+| POST   | `/api/shifts`                | Owner   | Tạo shift mới                                                      |
+| PATCH  | `/api/shifts/:id`            | Owner   | Cập nhật shift                                                     |
+| DELETE | `/api/shifts/:id`            | Owner   | Xóa shift                                                          |
+| GET    | `/api/shifts/:shiftId/staff` | Private | Lấy danh sách nhân viên làm ca này vào ngày cụ thể (query: `date`) |
 
 ### Shift Assignment Management
 
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| GET | `/api/shift-assignments` | Private | Lấy tất cả assignments (có filter: userId, shiftId, startDate, endDate, status) |
-| GET | `/api/shift-assignments/:id` | Private | Lấy assignment theo ID |
-| POST | `/api/shift-assignments` | Owner | Tạo assignment(s) - hỗ trợ single hoặc batch |
-| PATCH | `/api/shift-assignments/:id` | Owner | Cập nhật assignment (status, notes) |
-| DELETE | `/api/shift-assignments/:id` | Owner | Xóa assignment |
-| POST | `/api/shift-assignments/:id/check-in` | Private | Check-in vào ca |
-| POST | `/api/shift-assignments/:id/check-out` | Private | Check-out khỏi ca |
+| Method | Endpoint                               | Access  | Description                                                                     |
+| ------ | -------------------------------------- | ------- | ------------------------------------------------------------------------------- |
+| GET    | `/api/shift-assignments`               | Private | Lấy tất cả assignments (có filter: userId, shiftId, startDate, endDate, status) |
+| GET    | `/api/shift-assignments/:id`           | Private | Lấy assignment theo ID                                                          |
+| POST   | `/api/shift-assignments`               | Owner   | Tạo assignment(s) - hỗ trợ single hoặc batch                                    |
+| PATCH  | `/api/shift-assignments/:id`           | Owner   | Cập nhật assignment (status, notes)                                             |
+| DELETE | `/api/shift-assignments/:id`           | Owner   | Xóa assignment                                                                  |
+| POST   | `/api/shift-assignments/:id/check-in`  | Private | Check-in vào ca                                                                 |
+| POST   | `/api/shift-assignments/:id/check-out` | Private | Check-out khỏi ca                                                               |
 
 ### User Schedule
 
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| GET | `/api/users/:userId/schedule` | Private | Lấy lịch làm việc của user (query: `startDate`, `endDate` - required) |
+| Method | Endpoint                      | Access  | Description                                                           |
+| ------ | ----------------------------- | ------- | --------------------------------------------------------------------- |
+| GET    | `/api/users/:userId/schedule` | Private | Lấy lịch làm việc của user (query: `startDate`, `endDate` - required) |
 
 ---
 
@@ -193,6 +203,7 @@ POST /api/shift-assignments/{assignmentId}/check-out
 ### UC1: Owner tạo các ca làm việc mặc định
 
 **Steps**:
+
 1. Owner đăng nhập
 2. Tạo ca sáng (6:00-14:00)
 3. Tạo ca chiều (14:00-22:00)
@@ -205,6 +216,7 @@ POST /api/shift-assignments/{assignmentId}/check-out
 ### UC2: Owner phân ca tuần cho team
 
 **Steps**:
+
 1. Owner chọn tuần cần phân ca
 2. Chọn nhân viên và ca tương ứng cho mỗi ngày
 3. Sử dụng batch API để tạo nhiều assignments cùng lúc
@@ -216,6 +228,7 @@ POST /api/shift-assignments/{assignmentId}/check-out
 ### UC3: Staff xem lịch làm việc tuần
 
 **Steps**:
+
 1. Staff đăng nhập
 2. Xem lịch làm việc của mình trong tuần
 3. Biết được sẽ làm ca nào, ngày nào
@@ -225,11 +238,13 @@ POST /api/shift-assignments/{assignmentId}/check-out
 ### UC4: Staff check-in/check-out
 
 **Steps**:
+
 1. Staff đến làm việc
 2. Check-in qua app/web → ghi lại giờ check-in thực tế
 3. Kết thúc ca, check-out → ghi lại giờ check-out thực tế
 
-**Benefits**: 
+**Benefits**:
+
 - Theo dõi giờ làm việc thực tế
 - Tính lương chính xác
 - Audit trail
@@ -239,6 +254,7 @@ POST /api/shift-assignments/{assignmentId}/check-out
 ### UC5: Owner xem ai đang làm việc
 
 **Steps**:
+
 1. Owner muốn biết hôm nay ca sáng có ai
 2. Gọi API với shiftId và date
 3. Nhận danh sách nhân viên
@@ -250,6 +266,7 @@ POST /api/shift-assignments/{assignmentId}/check-out
 ### UC6: Xử lý vắng mặt/thay ca
 
 **Steps**:
+
 1. Nhân viên A báo nghỉ
 2. Owner cập nhật status assignment của A thành `absent`
 3. Owner tạo assignment mới cho nhân viên B thay thế
@@ -272,7 +289,7 @@ POST /api/shift-assignments/{assignmentId}/check-out
    - Chỉ Owner mới tạo/sửa/xóa shifts và assignments
    - Staff chỉ xem lịch của mình và check-in/out
 
-5. **Time validation**: 
+5. **Time validation**:
    - `end_time` phải sau `start_time` (except night shifts spanning midnight)
    - `assigned_date` phải là ngày trong tương lai hoặc hôm nay
 
@@ -280,14 +297,14 @@ POST /api/shift-assignments/{assignmentId}/check-out
 
 ## 🔐 Access Control
 
-| Action | Owner | Staff |
-|--------|-------|-------|
-| Create/Update/Delete Shifts | ✅ | ❌ |
-| View Shifts | ✅ | ✅ |
-| Create/Update/Delete Assignments | ✅ | ❌ |
-| View All Assignments | ✅ | ❌ |
-| View Own Schedule | ✅ | ✅ |
-| Check-in/Check-out | ✅ | ✅ (own only) |
+| Action                           | Owner | Staff         |
+| -------------------------------- | ----- | ------------- |
+| Create/Update/Delete Shifts      | ✅    | ❌            |
+| View Shifts                      | ✅    | ✅            |
+| Create/Update/Delete Assignments | ✅    | ❌            |
+| View All Assignments             | ✅    | ❌            |
+| View Own Schedule                | ✅    | ✅            |
+| Check-in/Check-out               | ✅    | ✅ (own only) |
 
 ---
 
@@ -305,6 +322,7 @@ Có thể mở rộng để tạo báo cáo:
 ## 🚀 Migration Steps
 
 1. Chạy migration để tạo enums:
+
    ```sql
    CREATE TYPE shift_type AS ENUM ('morning', 'afternoon', 'night', 'full_day');
    CREATE TYPE shift_assignment_status AS ENUM ('scheduled', 'confirmed', 'in_progress', 'completed', 'cancelled', 'absent');
@@ -321,6 +339,7 @@ Có thể mở rộng để tạo báo cáo:
 ## 📝 Example Data
 
 **Shifts**:
+
 ```json
 [
   {
@@ -341,6 +360,7 @@ Có thể mở rộng để tạo báo cáo:
 ```
 
 **Shift Assignment**:
+
 ```json
 {
   "id": "assignment-uuid",

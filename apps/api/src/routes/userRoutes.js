@@ -85,7 +85,11 @@ userRouter.get("/:id", authenticate, userController.getUserById);
  * @query   endDate - Required (YYYY-MM-DD)
  * @access  Private (Owner, or self)
  */
-userRouter.get("/:userId/schedule", authenticate, shiftController.getUserSchedule);
+userRouter.get(
+  "/:userId/schedule",
+  authenticate,
+  shiftController.getUserSchedule
+);
 
 /**
  * @route   POST /api/users

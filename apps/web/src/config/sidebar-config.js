@@ -70,9 +70,21 @@ export const sidebarConfig = [
     icon: Calendar,
     roles: ["owner", "manager", "staff"],
     children: [
-      { label: "Shift Management", path: "/shifts/management", roles: ["owner", "manager"] },
-      { label: "Shift Assignments", path: "/shifts/assignments", roles: ["owner", "manager"] },
-      { label: "My Schedule", path: "/shifts/my-schedule", roles: ["owner", "manager", "staff"] },
+      {
+        label: "Shift Management",
+        path: "/shifts/management",
+        roles: ["owner", "manager"],
+      },
+      {
+        label: "Shift Assignments",
+        path: "/shifts/assignments",
+        roles: ["owner", "manager"],
+      },
+      {
+        label: "My Schedule",
+        path: "/shifts/my-schedule",
+        roles: ["owner", "manager", "staff"],
+      },
     ],
   },
 ];

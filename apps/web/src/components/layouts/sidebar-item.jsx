@@ -40,10 +40,10 @@ export function SidebarItem({ item, collapsed }) {
   // Filter children by role
   const accessibleChildren = hasChildren
     ? item.children.filter((child) => {
-      if (!child.roles || child.roles.length === 0) return true;
-      if (!userRole) return false;
-      return child.roles.includes(userRole);
-    })
+        if (!child.roles || child.roles.length === 0) return true;
+        if (!userRole) return false;
+        return child.roles.includes(userRole);
+      })
     : [];
 
   const isActive = item.path ? pathname === item.path : false;

@@ -1,13 +1,18 @@
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CreditCard, ShoppingCart, User } from "lucide-react"
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CreditCard, ShoppingCart, User } from "lucide-react";
 
-export default function CartSummary({ cart, totalAmount, selectedCustomer, paymentMethod }) {
+export default function CartSummary({
+  cart,
+  totalAmount,
+  selectedCustomer,
+  paymentMethod,
+}) {
   const paymentMethodLabels = {
     cash: "Tiền mặt",
     credit_card: "Thẻ tín dụng",
     bank_transfer: "Chuyển khoản",
     mobile_payment: "Ví điện tử",
-  }
+  };
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -22,10 +27,14 @@ export default function CartSummary({ cart, totalAmount, selectedCustomer, payme
         <div>
           <div className="flex items-center gap-2 mb-2">
             <User className="w-4 h-4 text-muted-foreground" />
-            <p className="text-xs font-semibold text-muted-foreground uppercase">Khách hàng</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase">
+              Khách hàng
+            </p>
           </div>
           {selectedCustomer ? (
-            <p className="text-sm font-semibold text-foreground">{selectedCustomer.name}</p>
+            <p className="text-sm font-semibold text-foreground">
+              {selectedCustomer.name}
+            </p>
           ) : (
             <p className="text-sm text-muted-foreground">Chưa chọn</p>
           )}
@@ -33,18 +42,26 @@ export default function CartSummary({ cart, totalAmount, selectedCustomer, payme
 
         {/* Cart Items */}
         <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Sản phẩm ({cart.length})</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">
+            Sản phẩm ({cart.length})
+          </p>
           <div className="space-y-1 max-h-32 overflow-y-auto">
             {cart.length === 0 ? (
               <p className="text-xs text-muted-foreground">Giỏ trống</p>
             ) : (
               cart.map((item, index) => (
-                <div key={index} className="flex justify-between text-xs p-2 bg-muted rounded">
+                <div
+                  key={index}
+                  className="flex justify-between text-xs p-2 bg-muted rounded"
+                >
                   <span className="text-foreground truncate">
                     {item.medicationName} × {item.quantity}
                   </span>
                   <span className="font-semibold text-foreground whitespace-nowrap ml-2">
-                    {Number(item.quantity * item.sellPrice).toLocaleString("vi-VN")}đ
+                    {Number(item.quantity * item.sellPrice).toLocaleString(
+                      "vi-VN"
+                    )}
+                    đ
                   </span>
                 </div>
               ))
@@ -57,9 +74,13 @@ export default function CartSummary({ cart, totalAmount, selectedCustomer, payme
           <div>
             <div className="flex items-center gap-2 mb-2">
               <CreditCard className="w-4 h-4 text-muted-foreground" />
-              <p className="text-xs font-semibold text-muted-foreground uppercase">Thanh toán</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase">
+                Thanh toán
+              </p>
             </div>
-            <p className="text-sm text-foreground">{paymentMethodLabels[paymentMethod]}</p>
+            <p className="text-sm text-foreground">
+              {paymentMethodLabels[paymentMethod]}
+            </p>
           </div>
         )}
 
@@ -67,12 +88,16 @@ export default function CartSummary({ cart, totalAmount, selectedCustomer, payme
         {cart.length > 0 && (
           <div className="border-t border-border pt-3 mt-auto">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-semibold text-muted-foreground">Tổng cộng:</span>
-              <span className="text-xl font-bold text-primary">{Number(totalAmount).toLocaleString("vi-VN")}đ</span>
+              <span className="text-sm font-semibold text-muted-foreground">
+                Tổng cộng:
+              </span>
+              <span className="text-xl font-bold text-primary">
+                {Number(totalAmount).toLocaleString("vi-VN")}đ
+              </span>
             </div>
           </div>
         )}
       </CardContent>
     </div>
-  )
+  );
 }

@@ -28,10 +28,11 @@ export default function PaymentMethodSelector({ value, onChange }) {
             key={method.id}
             variant={value === method.id ? "default" : "outline"}
             onClick={() => onChange(method.id)}
-            className={`h-auto py-4 flex flex-col items-center gap-2 ${value === method.id
-              ? "bg-blue-600 hover:bg-blue-700 text-white"
-              : ""
-              }`}
+            className={`h-auto py-4 flex flex-col items-center gap-2 ${
+              value === method.id
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
+                : ""
+            }`}
           >
             <Icon className="w-5 h-5" />
             <span className="text-sm font-semibold">{method.label}</span>

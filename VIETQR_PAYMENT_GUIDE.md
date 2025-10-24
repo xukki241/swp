@@ -1,11 +1,13 @@
 # VietQR Payment Integration Guide
 
 ## Overview
+
 VietQR payment has been integrated into the Sales page, allowing customers to pay via bank transfer by scanning a QR code.
 
 ## Features Implemented
 
 ### 1. **VietQR Payment Dialog Component**
+
 - Location: `apps/web/src/pages/sales/components/VietQRPaymentDialog.jsx`
 - Displays QR code for payment
 - Shows bank account details
@@ -13,6 +15,7 @@ VietQR payment has been integrated into the Sales page, allowing customers to pa
 - Copy-to-clipboard functionality for account details
 
 ### 2. **Payment Flow**
+
 1. Staff selects **VietQR** as payment method
 2. Staff clicks "Complete Order"
 3. QR payment dialog appears with:
@@ -26,6 +29,7 @@ VietQR payment has been integrated into the Sales page, allowing customers to pa
 7. Order is created and saved to database
 
 ### 3. **Sales Page Updates**
+
 - All text converted to **English**
 - VietQR payment method added to payment selector
 - Conditional flow: Cash → direct order creation, VietQR → QR dialog first
@@ -34,41 +38,46 @@ VietQR payment has been integrated into the Sales page, allowing customers to pa
 ## Configuration
 
 ### Bank Information
+
 Edit `apps/web/src/pages/sales/components/VietQRPaymentDialog.jsx`:
 
 ```javascript
 const BANK_INFO = {
-  bankId: "970422",              // MB Bank - Change to your bank ID
-  accountNo: "0123456789",        // Change to your account number
+  bankId: "970422", // MB Bank - Change to your bank ID
+  accountNo: "0123456789", // Change to your account number
   accountName: "CONG TY PHARMAFLOW", // Change to your account name
 };
 ```
 
 ### Supported Bank IDs (VietQR Standard)
-| Bank | Bank ID |
-|------|---------|
-| Vietcombank | 970436 |
-| BIDV | 970418 |
-| Vietinbank | 970415 |
-| Agribank | 970405 |
-| MB Bank | 970422 |
-| Techcombank | 970407 |
-| ACB | 970416 |
-| VPBank | 970432 |
-| TPBank | 970423 |
-| Sacombank | 970403 |
+
+| Bank        | Bank ID |
+| ----------- | ------- |
+| Vietcombank | 970436  |
+| BIDV        | 970418  |
+| Vietinbank  | 970415  |
+| Agribank    | 970405  |
+| MB Bank     | 970422  |
+| Techcombank | 970407  |
+| ACB         | 970416  |
+| VPBank      | 970432  |
+| TPBank      | 970423  |
+| Sacombank   | 970403  |
 
 [Full list available at VietQR documentation]
 
 ## QR Code Generation
 
 ### VietQR API
+
 The component uses **VietQR's free image API**:
+
 ```
 https://img.vietqr.io/image/{BANK_ID}-{ACCOUNT_NO}-{TEMPLATE}.png?amount={AMOUNT}&addInfo={MESSAGE}&accountName={NAME}
 ```
 
 **Parameters:**
+
 - `BANK_ID`: Bank identifier (e.g., 970422 for MB Bank)
 - `ACCOUNT_NO`: Bank account number
 - `TEMPLATE`: QR code template (`compact` is used)
@@ -79,6 +88,7 @@ https://img.vietqr.io/image/{BANK_ID}-{ACCOUNT_NO}-{TEMPLATE}.png?amount={AMOUNT
 **Fallback:** If image fails to load, component uses `qrcode.react` library to generate QR locally.
 
 ## Transfer Content Format
+
 Order reference is generated as: `PF {ORDER_ID_SHORT}`
 
 Example: `PF A1B2C3D4` (first 8 characters of order ID)
@@ -88,11 +98,13 @@ This helps identify payments when reconciling bank statements.
 ## User Interface
 
 ### Payment Method Selector
+
 - **VietQR** button added alongside Cash, Credit Card, Bank Transfer, Mobile Payment
 - Icon: QR Code icon from lucide-react
 - Description: "Scan QR to pay"
 
 ### QR Dialog Features
+
 - Large QR code (256x256px)
 - Copy buttons for:
   - Account number
@@ -105,14 +117,18 @@ This helps identify payments when reconciling bank statements.
 ## Important Notes
 
 ### Manual Confirmation
+
 ⚠️ **This is NOT automatic payment verification**
+
 - Staff must manually confirm payment
 - No webhook or API callback from bank
 - Relies on staff checking banking app/statement
 - Suitable for in-person transactions with trusted staff
 
 ### For Automatic Verification
+
 If you need automatic payment verification, you would need:
+
 1. Bank API integration (requires business account)
 2. Payment gateway service (VNPay, ZaloPay, etc.)
 3. Webhook endpoint to receive payment notifications
@@ -121,6 +137,7 @@ If you need automatic payment verification, you would need:
 ## Testing
 
 ### Test Flow
+
 1. Go to Sales page
 2. Add products to cart
 3. Select a customer
@@ -135,6 +152,7 @@ If you need automatic payment verification, you would need:
 8. Verify order is created successfully
 
 ### QR Code Testing
+
 - Scan with any Vietnamese banking app
 - Verify auto-filled fields:
   - Account number
@@ -152,6 +170,7 @@ If you need automatic payment verification, you would need:
 ## Future Enhancements
 
 ### Recommended Improvements
+
 1. **Admin Settings Panel**
    - Configure bank details via UI
    - Store in database instead of hardcoded
@@ -179,6 +198,7 @@ If you need automatic payment verification, you would need:
 ## Translation Updates
 
 All Sales page text converted to English:
+
 - ✅ Headers and titles
 - ✅ Button labels
 - ✅ Form placeholders
@@ -191,6 +211,7 @@ All Sales page text converted to English:
 ## Dependencies
 
 ### New Package
+
 ```json
 {
   "qrcode.react": "^4.2.0"
@@ -202,16 +223,19 @@ All Sales page text converted to English:
 ## Troubleshooting
 
 ### QR Code Not Showing
+
 - Check BANK_INFO configuration
 - Verify internet connection (loads from VietQR API)
 - Check browser console for errors
 
 ### Payment Not Creating Order
+
 - Verify submitOrder function is called
 - Check browser console for API errors
 - Ensure backend /sales endpoint is working
 
 ### Wrong Amount in QR
+
 - Check totalAmount calculation
 - Verify Math.round() is removing decimals
 - Test with different cart totals
@@ -221,6 +245,7 @@ All Sales page text converted to English:
 For VietQR API documentation: https://www.vietqr.io/
 
 For issues with this implementation, check:
+
 1. Browser console errors
 2. Network tab for API calls
 3. Backend logs for order creation errors

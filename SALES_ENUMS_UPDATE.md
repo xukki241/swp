@@ -1,6 +1,7 @@
 # Sales Enums Update - October 24, 2025
 
 ## Summary
+
 Updated sales order enums to only support the required payment methods and statuses.
 
 ## Changes Made
@@ -8,6 +9,7 @@ Updated sales order enums to only support the required payment methods and statu
 ### 1. Payment Methods (Reduced from 4 to 2)
 
 **Before:**
+
 ```javascript
 salesOrderPaymentMethodEnum = z.enum([
   "cash",
@@ -18,6 +20,7 @@ salesOrderPaymentMethodEnum = z.enum([
 ```
 
 **After:**
+
 ```javascript
 salesOrderPaymentMethodEnum = z.enum([
   "cash",
@@ -28,57 +31,54 @@ salesOrderPaymentMethodEnum = z.enum([
 ### 2. Order Status (Reduced from 4 to 3)
 
 **Before:**
+
 ```javascript
-salesOrderStatusEnum = z.enum([
-  "pending",
-  "paid",
-  "delivered",
-  "cancelled",
-]);
+salesOrderStatusEnum = z.enum(["pending", "paid", "delivered", "cancelled"]);
 ```
 
 **After:**
+
 ```javascript
-salesOrderStatusEnum = z.enum([
-  "pending",
-  "paid",
-  "cancelled",
-]);
+salesOrderStatusEnum = z.enum(["pending", "paid", "cancelled"]);
 ```
 
 ## Files Modified
 
 ### Backend
+
 - ✅ `packages/dto/src/core/common/enums.js` - Updated Zod enum schemas
 
 ### Frontend
+
 - ✅ `apps/web/src/pages/sales/components/PaymentMethodSelector.jsx` - Display only Cash and VietQR
 - ✅ `apps/web/src/pages/sales/SalesOrderDetailPage.jsx` - Removed `delivered` status handling
 - ✅ `apps/web/src/pages/sales/SalesOrderListPage.jsx` - Removed `delivered` status handling
 
 ## Payment Method Mapping
 
-| Enum Value | Display Label | Icon | Description |
-|------------|---------------|------|-------------|
-| `cash` | Cash | Banknote | Pay with cash |
-| `mobile_payment` | VietQR | QrCode | Scan QR to pay |
+| Enum Value       | Display Label | Icon     | Description    |
+| ---------------- | ------------- | -------- | -------------- |
+| `cash`           | Cash          | Banknote | Pay with cash  |
+| `mobile_payment` | VietQR        | QrCode   | Scan QR to pay |
 
 ## Status Mapping
 
-| Enum Value | Display Label | Color | Icon |
-|------------|---------------|-------|------|
-| `pending` | Pending | Yellow | Clock |
-| `paid` | Paid | Green | CheckCircle |
-| `cancelled` | Cancelled | Red | XCircle |
+| Enum Value  | Display Label | Color  | Icon        |
+| ----------- | ------------- | ------ | ----------- |
+| `pending`   | Pending       | Yellow | Clock       |
+| `paid`      | Paid          | Green  | CheckCircle |
+| `cancelled` | Cancelled     | Red    | XCircle     |
 
 ## Database Note
 
 ⚠️ **Important:** The PostgreSQL enum types in the database still contain the old values (`bank_transfer`, `credit_card`, `delivered`). These values are:
+
 - Still present in the database schema
 - **NOT used** by the application
 - Can be safely ignored
 
 To fully remove them would require:
+
 1. Creating a new enum type
 2. Migrating all existing data
 3. Dropping the old enum
@@ -89,6 +89,7 @@ This is not necessary as the DTO validation layer prevents their use.
 ## Validation
 
 All API endpoints now validate against the new enums:
+
 - `POST /api/sales` - Only accepts `cash` or `mobile_payment`
 - `PATCH /api/sales/:id` - Only accepts `pending`, `paid`, or `cancelled`
 - Frontend prevents selection of invalid values
@@ -106,6 +107,7 @@ All API endpoints now validate against the new enums:
 ## Impact
 
 ✅ **No Breaking Changes** for existing data:
+
 - Orders with `bank_transfer`, `credit_card` will still display correctly (fallback to gray badge)
 - Orders with `delivered` status will display correctly (fallback to gray badge)
 - New orders can only use the 2 payment methods and 3 statuses
@@ -120,12 +122,12 @@ CREATE TYPE sales_order_payment_method_new AS ENUM ('cash', 'mobile_payment');
 CREATE TYPE sales_order_status_new AS ENUM ('pending', 'paid', 'cancelled');
 
 -- 2. Update table column types
-ALTER TABLE sales_orders 
-  ALTER COLUMN payment_method TYPE sales_order_payment_method_new 
+ALTER TABLE sales_orders
+  ALTER COLUMN payment_method TYPE sales_order_payment_method_new
   USING payment_method::text::sales_order_payment_method_new;
 
-ALTER TABLE sales_orders 
-  ALTER COLUMN status TYPE sales_order_status_new 
+ALTER TABLE sales_orders
+  ALTER COLUMN status TYPE sales_order_status_new
   USING status::text::sales_order_status_new;
 
 -- 3. Drop old enum types

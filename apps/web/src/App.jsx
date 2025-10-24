@@ -1,10 +1,10 @@
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
-import DashboardPage from "@/pages/Dashboard";
 import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
 import LoginPage from "@/pages/auth/LoginPage";
-import NotFoundPage from "@/pages/NotFoundPage";
 import PolicyPage from "@/pages/auth/PolicyPage";
 import RegisterPage from "@/pages/auth/RegisterPage";
+import DashboardPage from "@/pages/Dashboard";
+import NotFoundPage from "@/pages/NotFoundPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import UserListPage from "@/pages/UserListPage";
