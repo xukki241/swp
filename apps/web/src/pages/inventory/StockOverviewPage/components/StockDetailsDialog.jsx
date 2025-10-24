@@ -7,9 +7,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
 
 function calculateRemainingDays(expiryDateString) {
   const today = new Date();
@@ -25,8 +25,6 @@ export default function StockDetailsDialog({
   open,
   onOpenChange,
 }) {
-  console.log(medicationItem);
-
   function getExpiryBadge(daysRemaining) {
     if (daysRemaining < 30) {
       return (
@@ -46,6 +44,16 @@ export default function StockDetailsDialog({
         Good
       </Badge>
     );
+  }
+
+  function getLowStockBadge() {
+    if (medicationItem.quantity < 10) {
+      return (
+        <Badge className="bg-red-100 text-red-700 hover:bg-red-100">
+          Low-stock
+        </Badge>
+      );
+    }
   }
 
   return (
@@ -72,8 +80,11 @@ export default function StockDetailsDialog({
                 <p className="text-muted-foreground mt-1">
                   SKU: {medicationItem?.medicationVariant?.sku}
                 </p>
-                <div className="mt-3">
-                  {getExpiryBadge(medicationItem.daysRemaining)}
+                <div className="mt-3 flex gap-3">
+                  {getExpiryBadge(
+                    calculateRemainingDays(medicationItem.expiryDate)
+                  )}
+                  {getLowStockBadge()}
                 </div>
               </div>
             </div>
@@ -87,14 +98,17 @@ export default function StockDetailsDialog({
               </div>
               <div className="space-y-1">
                 <Label className="text-muted-foreground">Unit</Label>
-                <p className="text-lg font-semibold">
+                <p className="text-lg font-semibold capitalize">
                   {medicationItem?.medicationVariant?.unit}
                 </p>
               </div>
               <div className="space-y-1">
                 <Label className="text-muted-foreground">Selling Price</Label>
                 <p className="text-lg font-semibold">
-                  {medicationItem?.medicationVariant?.sellPrice} VND
+                  {Number(
+                    medicationItem?.medicationVariant?.sellPrice
+                  ).toLocaleString("vi-VN")}{" "}
+                  VND
                 </p>
               </div>
               <div className="space-y-1">
@@ -160,11 +174,17 @@ export default function StockDetailsDialog({
                   {medicationItem?.medicationVariant?.medication?.brand}
                 </p>
               </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Supplier</Label>
+                <p className="text-lg font-semibold">
+                  {medicationItem?.supplier?.name || "N/A"}
+                </p>
+              </div>
             </div>
           </div>
         )}
         <DialogFooter>
-          <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>
         </DialogFooter>

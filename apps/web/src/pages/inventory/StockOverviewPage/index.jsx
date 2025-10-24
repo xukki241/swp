@@ -17,9 +17,10 @@ import { useInventory } from "@/hooks/useInventory";
 import AddStockDialog from "./components/AddStockDialog";
 import AddjustStockDialog from "./components/AdjustStockDialog";
 import StockDetailsDialog from "./components/StockDetailsDialog";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 export default function StockOverviewPage() {
-  const { inventory, loading, error } = useInventory();
+  const { inventory, refetchInventory } = useInventory();
   const [medications, setMedications] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [currentMedication, setCurrentMedication] = useState({});
@@ -31,6 +32,7 @@ export default function StockOverviewPage() {
     setMedications(inventory);
   }, [inventory]);
 
+  // Handle search debounce (300ms)
   useEffect(() => {
     let timerId = null;
     if (searchValue.length === 0) {
@@ -47,34 +49,32 @@ export default function StockOverviewPage() {
         setMedications(searchedMedications);
       }, 300);
     }
-
     return () => clearTimeout(timerId);
   }, [searchValue]);
 
-  function handleShowStockDetails(medication) {
+  // Handle show dialogs
+  function handleShowDialog(type, medication = null) {
     setCurrentMedication(medication);
-    setShowDetailsDialog(true);
-  }
-
-  function handleAdjustQuantity(medicine) {
-    setSelectedMedicine(medicine);
-    setAdjustQuantity(medicine.quantity);
-    setShowAdjustDialog(true);
+    if (type === "view") {
+      setShowDetailsDialog(true);
+    } else if (type === "adjust") {
+      setShowAdjustDialog(true);
+    } else if (type === "add") {
+      setShowAddStockDialog(true);
+    }
   }
 
   return (
     <AppLayout>
       {/* Main Layout of Page */}
       <div className="space-y-6">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900">Stock Overview</h2>
+          <p className="text-muted-foreground mt-1">
+            Browse and manage all medicines in stock
+          </p>
+        </div>
         <Card className="shadow-md rounded-xl border-0">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              Stock Overview
-            </CardTitle>
-            <CardDescription className="text-muted-foreground mt-1">
-              Browse and manage all medicines in stock
-            </CardDescription>
-          </CardHeader>
           <CardContent>
             <div className="mb-6 flex items-center justify-between">
               <div className="relative w-2/3">
@@ -88,7 +88,7 @@ export default function StockOverviewPage() {
               </div>
               <Button
                 className="bg-primary hover:bg-primary/90"
-                // onClick={() => setShowAddStockDialog(true)}
+                onClick={() => handleShowDialog("add")}
               >
                 <Plus className="h-4 w-4" />
                 Add Stock
@@ -116,7 +116,11 @@ export default function StockOverviewPage() {
                           Stock: {medication.quantity}
                         </p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Price: {medication.medicationVariant.sellPrice} VND
+                          Price:{" "}
+                          {Number(
+                            medication.medicationVariant.sellPrice
+                          ).toLocaleString("vi-VN")}{" "}
+                          VND
                         </p>
                       </div>
                     </div>
@@ -125,7 +129,7 @@ export default function StockOverviewPage() {
                         size="sm"
                         variant="outline"
                         className="flex-1 bg-transparent"
-                        onClick={() => handleShowStockDetails(medication)}
+                        onClick={() => handleShowDialog("view", medication)}
                       >
                         <Eye className="h-4 w-4 mr-1" />
                         View
@@ -134,7 +138,7 @@ export default function StockOverviewPage() {
                         size="sm"
                         variant="outline"
                         className="flex-1 bg-transparent"
-                        // onClick={() => handleAdjustQuantity(medication)}
+                        onClick={() => handleShowDialog("adjust", medication)}
                       >
                         <Settings2 className="h-4 w-4 mr-1" />
                         Adjust
@@ -165,8 +169,19 @@ export default function StockOverviewPage() {
         open={showDetailsDialog}
         onOpenChange={setShowDetailsDialog}
       />
-      {/* <AddjustStockDialog medication={currentMedication} />
-      <AddStockDialog medication={currentMedication} /> */}
+
+      <AddjustStockDialog
+        medication={currentMedication}
+        open={showAdjustDialog}
+        onOpenChange={setShowAdjustDialog}
+        refetchInventory={refetchInventory}
+      />
+
+      <AddStockDialog
+        medication={currentMedication}
+        open={showAddStockDialog}
+        onOpenChange={setShowAddStockDialog}
+      />
     </AppLayout>
   );
 }

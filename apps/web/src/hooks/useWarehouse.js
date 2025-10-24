@@ -12,7 +12,7 @@ import {
   getBinsByRack,
   updateBin,
   deleteBin,
-} from "../services/inventoryService";
+} from "../services/warehouseService";
 
 /**
  * Custom hook for warehouse management

@@ -1,9 +1,11 @@
+/* eslint-disable prettier/prettier */
 import { useState, useEffect, useCallback } from "react";
 
 import {
   getInventory,
   getLowStock,
   getExpiring,
+  adjustMedication,
 } from "@/services/inventoryService";
 
 export const useInventory = () => {
@@ -14,11 +16,13 @@ export const useInventory = () => {
     inventory: false,
     lowStock: false,
     expiring: false,
+    adjustStock: false,
   });
   const [error, setError] = useState({
     inventory: false,
     lowStock: null,
     expiring: null,
+    adjustStock: null,
   });
 
   const fetchInventory = useCallback(async () => {
@@ -60,6 +64,23 @@ export const useInventory = () => {
     }
   }, []);
 
+  const fetchAdjustStock = useCallback(async (id, newQuantity, reason = "") => {
+    setLoading((prev) => ({ ...prev, adjustStock: true }));
+    setError((prev) => ({ ...prev, adjustStock: null }));
+    try {
+      const responseData = await adjustMedication(id, { newQuantity, reason });
+      return responseData;
+    } catch (err) {
+      setError((prev) => ({
+        ...prev,
+        adjustStock: err.message || "Failed to adjust stock",
+      }));
+      throw err;
+    } finally {
+      setLoading((prev) => ({ ...prev, adjustStock: false }));
+    }
+  }, []);
+
   useEffect(() => {
     fetchInventory();
     fetchLowStock();
@@ -75,5 +96,6 @@ export const useInventory = () => {
     refetchLowStock: fetchLowStock,
     refetchExpiring: fetchExpiring,
     refetchInventory: fetchInventory,
+    fetchAdjustStock,
   };
 };

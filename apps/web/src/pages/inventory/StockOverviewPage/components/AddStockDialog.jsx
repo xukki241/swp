@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,12 +8,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-export default function AddStockDialog({ medication }) {
-  const [selectedMedication, setSelectedMedication] = useState(null);
+export default function AddStockDialog({ medication, open, onOpenChange }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [stockFormData, setStockFormData] = useState({
-    medication: "",
+    medication: medication?.name || "",
     batchNumber: "",
     manufactureDate: "",
     expiryDate: "",
@@ -24,28 +26,15 @@ export default function AddStockDialog({ medication }) {
     columnNumber: "",
     rowNumber: "",
   });
-  const addStockSearchMedicine = useRef(null);
   const [searchResults, setSearchResults] = useState([]);
 
   function handleFormChange(e) {
     const { name, value } = e.target;
     setStockFormData({ ...stockFormData, [name]: value });
-    if (name === "medication") {
-      const results = medicines.filter((m) =>
-        m.name.toLowerCase().includes(value.toLowerCase())
-      );
-      setSearchResults(results);
-    }
-  }
-
-  function handleSelectMedicine(med) {
-    // store medication name string instead of whole object to avoid rendering objects in JSX
-    setStockFormData({ ...stockFormData, medication: med.name || med });
-    setSearchResults([]);
   }
 
   function validateForm() {
-    const required = [
+    const requiredFields = [
       "medication",
       "batchNumber",
       "manufactureDate",
@@ -54,16 +43,19 @@ export default function AddStockDialog({ medication }) {
       "price",
       "zone",
     ];
-    for (const field of required) {
+
+    for (const field of requiredFields) {
       if (!stockFormData[field]) {
         toast.error(`Please fill in ${field}`);
         return false;
       }
     }
+
     if (Number(stockFormData.quantity) <= 0) {
       toast.error("Quantity must be greater than 0");
       return false;
     }
+
     if (
       new Date(stockFormData.expiryDate) <=
       new Date(stockFormData.manufactureDate)
@@ -71,6 +63,7 @@ export default function AddStockDialog({ medication }) {
       toast.error("Expiry date must be after manufacture date");
       return false;
     }
+
     return true;
   }
 
@@ -81,11 +74,11 @@ export default function AddStockDialog({ medication }) {
     try {
       setIsSubmitting(true);
       // Simulate API call delay
-      await new Promise((r) => setTimeout(r, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       console.log("Stock added:", stockFormData);
       toast.success("Stock added successfully!");
-      setShowAddStockDialog(false);
+      onOpenChange(false);
       setStockFormData({
         medication: "",
         batchNumber: "",
@@ -97,9 +90,8 @@ export default function AddStockDialog({ medication }) {
         zone: "",
         columnNumber: "",
         rowNumber: "",
-        note: "",
       });
-    } catch (err) {
+    } catch {
       toast.error("Failed to add stock. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -107,7 +99,7 @@ export default function AddStockDialog({ medication }) {
   }
 
   return (
-    <Dialog open={showAddStockDialog} onOpenChange={setShowAddStockDialog}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Add Stock</DialogTitle>
@@ -126,7 +118,7 @@ export default function AddStockDialog({ medication }) {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-            <div className="relative">
+            <div>
               <Label className="mb-2" htmlFor="medication">
                 Medication
               </Label>
@@ -134,29 +126,10 @@ export default function AddStockDialog({ medication }) {
                 required
                 id="medication"
                 name="medication"
-                placeholder="Search medicine..."
+                placeholder="Enter medication name"
                 value={stockFormData.medication}
                 onChange={handleFormChange}
-                autoComplete="off"
               />
-
-              {/* Medicine search result */}
-              {searchResults.length > 0 && (
-                <div
-                  ref={addStockSearchMedicine}
-                  className="absolute bg-white border rounded-md shadow-md mt-1 z-10 w-full max-h-80 overflow-y-auto"
-                >
-                  {searchResults.map((result) => (
-                    <div
-                      key={result.id}
-                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleSelectMedicine(result)}
-                    >
-                      {result.name}
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             <div>
@@ -216,19 +189,6 @@ export default function AddStockDialog({ medication }) {
             </div>
 
             <div>
-              <Label className="mb-2" htmlFor="quantityReserved">
-                Quantity Reserved
-              </Label>
-              <Input
-                required
-                id="quantityReserved"
-                name="quantityReserved"
-                value={stockFormData.quantityReserved}
-                onChange={handleFormChange}
-              />
-            </div>
-
-            <div>
               <Label className="mb-2" htmlFor="price">
                 Price
               </Label>
@@ -256,34 +216,6 @@ export default function AddStockDialog({ medication }) {
                 onChange={handleFormChange}
               />
             </div>
-
-            <div>
-              <Label className="mb-2" htmlFor="columnNumber">
-                Column Number
-              </Label>
-              <Input
-                required
-                type="number"
-                id="columnNumber"
-                name="columnNumber"
-                value={stockFormData.columnNumber}
-                onChange={handleFormChange}
-              />
-            </div>
-
-            <div>
-              <Label className="mb-2" htmlFor="rowNumber">
-                Row Number
-              </Label>
-              <Input
-                required
-                type="number"
-                id="rowNumber"
-                name="rowNumber"
-                value={stockFormData.rowNumber}
-                onChange={handleFormChange}
-              />
-            </div>
           </div>
 
           <DialogFooter>
@@ -291,7 +223,7 @@ export default function AddStockDialog({ medication }) {
               variant="outline"
               type="button"
               disabled={isSubmitting}
-              onClick={() => setShowAddStockDialog(false)}
+              onClick={() => onOpenChange(false)}
             >
               Cancel
             </Button>
