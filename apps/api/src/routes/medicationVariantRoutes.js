@@ -10,11 +10,11 @@ import {
   validateQuery,
 } from "@pharmaflow/dto/middleware";
 import express from "express";
-import { createAuditLog } from "src/middleware/auditLog.js";
 import { z } from "zod";
 
 import * as medicationVariantController from "../controllers/medicationVariantController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 
 export const medicationVariantRouter = express.Router({ mergeParams: true });
 

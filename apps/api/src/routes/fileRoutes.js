@@ -1,11 +1,11 @@
 import { listFilesQuerySchema, uuidSchema } from "@pharmaflow/dto";
 import { validateParams, validateQuery } from "@pharmaflow/dto/middleware";
 import express from "express";
-import { createAuditLog } from "src/middleware/auditLog.js";
 import { z } from "zod";
 
 import { fileController } from "../controllers/fileController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import {
   handleMulterError,
   uploadMultiple,
