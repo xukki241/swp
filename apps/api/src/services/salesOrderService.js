@@ -83,7 +83,7 @@ export const salesOrderService = {
         if (totalAvailable < quantity) {
           throw new Error(
             `Insufficient inventory for ${variant.name} (${variant.sku}). ` +
-              `Requested: ${quantity}, Available: ${totalAvailable}`
+            `Requested: ${quantity}, Available: ${totalAvailable}`
           );
         }
 
@@ -145,8 +145,17 @@ export const salesOrderService = {
         )
         .returning();
 
+      // Query the order again with relations to get customer and salesperson info
+      const orderWithRelations = await tx.query.salesOrders.findFirst({
+        where: eq(salesOrders.id, order.id),
+        with: {
+          customer: true,
+          salesperson: true,
+        },
+      });
+
       return {
-        ...order,
+        ...orderWithRelations,
         items: createdItems,
       };
     });
