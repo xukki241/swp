@@ -2,6 +2,7 @@ import express from "express";
 
 import * as shiftController from "../controllers/shiftController.js";
 import * as userController from "../controllers/userController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 export const userRouter = express.Router();
@@ -96,6 +97,7 @@ userRouter.post(
   "/",
   authenticate,
   authorize("owner"),
+  createAuditLog("CREATE", "user"),
   userController.createUser
 );
 
@@ -109,6 +111,7 @@ userRouter.put(
   "/:id",
   authenticate,
   authorize("owner"),
+  createAuditLog("UPDATE", "user"),
   userController.updateUser
 );
 
@@ -121,6 +124,7 @@ userRouter.delete(
   "/:id",
   authenticate,
   authorize("owner"),
+  createAuditLog("DELETE", "user"),
   userController.deleteUser
 );
 

@@ -9,6 +9,7 @@ import express from "express";
 
 import { warehouseBinController } from "../../controllers/warehouse/warehouseBinController.js";
 import { warehouseRackController } from "../../controllers/warehouse/warehouseRackController.js";
+import { createAuditLog } from "../../middleware/auditLog.js";
 import { authorize } from "../../middleware/checkAuth.js";
 import { validateBody } from "../../middleware/validate.js";
 
@@ -27,6 +28,7 @@ warehouseRacksRouter.post(
     req.body.zoneId = req.params.zoneId;
     next();
   },
+  createAuditLog("CREATE", "warehouse_rack"),
   warehouseRackController.create
 );
 
@@ -35,6 +37,7 @@ warehouseRacksRouter.post(
   "/zones/:zoneId/racks/batch",
   authorize("owner"),
   validateBody(batchCreateRacksRequestSchema),
+  createAuditLog("CREATE", "warehouse_rack"),
   warehouseRackController.createBatch
 );
 
@@ -52,6 +55,7 @@ warehouseRacksRouter.patch(
   "/racks/:id",
   authorize("owner"),
   validateBody(updateWarehouseRackSchema),
+  createAuditLog("UPDATE", "warehouse_rack"),
   warehouseRackController.update
 );
 
@@ -59,6 +63,7 @@ warehouseRacksRouter.patch(
 warehouseRacksRouter.delete(
   "/racks/:id",
   authorize("owner"),
+  createAuditLog("DELETE", "warehouse_rack"),
   warehouseRackController.delete
 );
 
@@ -72,6 +77,7 @@ warehouseRacksRouter.post(
     req.body.rackId = req.params.rackId;
     next();
   },
+  createAuditLog("CREATE", "warehouse_bin"),
   warehouseBinController.create
 );
 
@@ -80,6 +86,7 @@ warehouseRacksRouter.post(
   "/racks/:rackId/bins/batch",
   authorize("owner"),
   validateBody(batchCreateBinsRequestSchema),
+  createAuditLog("CREATE", "warehouse_bin"),
   warehouseBinController.createBatch
 );
 

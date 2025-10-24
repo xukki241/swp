@@ -1,4 +1,4 @@
-import { pgTable, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+import { index, pgTable, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 
 import {
   decimalColumn,
@@ -6,6 +6,7 @@ import {
   identityPrimaryKey,
   isActive,
   name,
+  searchVector,
 } from "./common.js";
 import { medications } from "./medications.js";
 
@@ -22,9 +23,14 @@ export const medicationVariants = pgTable(
     sellPrice: decimalColumn("sell_price").notNull(),
     isActive: isActive(),
     isForSale: isActive("is_for_sale").default(false),
+    searchVector: searchVector(),
   },
   (table) => [
     uniqueIndex("medication_variants_sku_unique").on(table.sku),
     uniqueIndex("medication_variants_barcode_unique").on(table.barcode),
+    index("medication_variants_search_vector_idx").using(
+      "gin",
+      table.searchVector
+    ),
   ]
 );

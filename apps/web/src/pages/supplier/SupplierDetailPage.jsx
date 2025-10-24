@@ -56,6 +56,13 @@ export default function SupplierDetailPage() {
     );
   }
 
+  function formatVND(value) {
+    if (value === null || value === undefined || value === "") return "N/A";
+    const num = Number(value);
+    if (Number.isNaN(num)) return "N/A";
+    return new Intl.NumberFormat("vi-VN").format(Math.round(num)) + "₫";
+  }
+
   if (isLoading) {
     return (
       <AppLayout>
@@ -198,6 +205,7 @@ export default function SupplierDetailPage() {
                       <TableHead>Variant</TableHead>
                       <TableHead>Supplier SKU</TableHead>
                       <TableHead>Lead Time (days)</TableHead>
+                      <TableHead>Purchase Price</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -209,6 +217,9 @@ export default function SupplierDetailPage() {
                         <TableCell>{m.variantName || "N/A"}</TableCell>
                         <TableCell>{m.supplierSku || "N/A"}</TableCell>
                         <TableCell>{m.leadTimeDays || "N/A"}</TableCell>
+                        <TableCell className="font-semibold text-primary">
+                          {formatVND(m.purchasePrice)}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

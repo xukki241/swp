@@ -6,6 +6,7 @@ import {
 import express from "express";
 
 import { warehouseZoneController } from "../../controllers/warehouse/warehouseZoneController.js";
+import { createAuditLog } from "../../middleware/auditLog.js";
 import { authorize } from "../../middleware/checkAuth.js";
 import { validateBody } from "../../middleware/validate.js";
 
@@ -20,6 +21,7 @@ warehouseZonesRouter.post(
   "/zones",
   authorize("owner"),
   validateBody(createWarehouseZoneSchema),
+  createAuditLog("CREATE", "warehouse_zone"),
   warehouseZoneController.create
 );
 
@@ -28,6 +30,7 @@ warehouseZonesRouter.post(
   "/zones/batch",
   authorize("owner"),
   validateBody(batchCreateZonesRequestSchema),
+  createAuditLog("CREATE", "warehouse_zone"),
   warehouseZoneController.createBatch
 );
 
@@ -39,6 +42,7 @@ warehouseZonesRouter.patch(
   "/zones/:id",
   authorize("owner"),
   validateBody(updateWarehouseZoneSchema),
+  createAuditLog("UPDATE", "warehouse_zone"),
   warehouseZoneController.update
 );
 
@@ -46,6 +50,7 @@ warehouseZonesRouter.patch(
 warehouseZonesRouter.delete(
   "/zones/:id",
   authorize("owner"),
+  createAuditLog("DELETE", "warehouse_zone"),
   warehouseZoneController.delete
 );
 

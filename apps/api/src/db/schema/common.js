@@ -68,6 +68,16 @@ const bytea = customType({
 
 export const blobColumn = (columnName) => bytea(columnName);
 
+// Custom tsvector type for PostgreSQL Full-Text Search
+const tsvector = customType({
+  dataType() {
+    return "tsvector";
+  },
+});
+
+export const searchVector = (columnName = "search_vector") =>
+  tsvector(columnName);
+
 export const basicInfo = {
   name,
   email,

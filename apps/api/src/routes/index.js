@@ -1,5 +1,6 @@
 import { Router } from "express";
 
+import auditRouter from "./auditRoutes.js";
 import { authRouter } from "./authRoutes.js";
 import { customerRouter } from "./customerRoutes.js";
 import emailRouter from "./emailRoutes.js";
@@ -14,6 +15,7 @@ import { reportRouter } from "./reportRoutes.js";
 import { salesOrderRouter } from "./salesOrderRoutes.js";
 import { shiftAssignmentRouter } from "./shiftAssignmentRoutes.js";
 import { shiftRouter } from "./shiftRoutes.js";
+import { searchRouter } from "./searchRoutes.js";
 import { supplierRouter } from "./supplierRoutes.js";
 import { userRouter } from "./userRoutes.js";
 import { warehouseRouter } from "./warehouse/index.js";
@@ -36,6 +38,8 @@ apiRouter.use("/sales", salesOrderRouter);
 apiRouter.use("/reports", reportRouter);
 apiRouter.use("/shifts", shiftRouter); // Shift management
 apiRouter.use("/shift-assignments", shiftAssignmentRouter); // Shift assignments
+apiRouter.use("/search", searchRouter); // Full-text search routes
+apiRouter.use("/audit-logs", auditRouter); // Audit log routes
 apiRouter.use(emailRouter); // Email routes
 
 export default apiRouter;

@@ -13,6 +13,7 @@ import express from "express";
 import { z } from "zod";
 
 import { purchaseOrderController } from "../controllers/purchaseOrderController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 import {
@@ -67,6 +68,7 @@ purchaseOrderRouter.post(
   "/",
   authorize("owner"),
   validateBody(createPurchaseOrdersRequestSchema),
+  createAuditLog("CREATE", "purchase_order"),
   purchaseOrderController.create
 );
 
@@ -80,6 +82,7 @@ purchaseOrderRouter.patch(
   authorize("owner"),
   validateParams(idParamSchema),
   validateBody(updatePurchaseOrderRequestSchema),
+  createAuditLog("UPDATE", "purchase_order"),
   purchaseOrderController.update
 );
 
@@ -92,6 +95,7 @@ purchaseOrderRouter.delete(
   "/:id",
   authorize("owner"),
   validateParams(idParamSchema),
+  createAuditLog("DELETE", "purchase_order"),
   purchaseOrderController.delete
 );
 
