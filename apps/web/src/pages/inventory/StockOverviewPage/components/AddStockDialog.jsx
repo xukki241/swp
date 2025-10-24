@@ -122,6 +122,7 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
               <Label className="mb-2" htmlFor="medication">
                 Medication
               </Label>
+
               <Input
                 required
                 id="medication"
