@@ -100,7 +100,6 @@ export default function SalesOrderDetailPage() {
   const getStatusColor = (status) => {
     switch (status) {
       case "paid":
-      case "delivered":
         return "bg-green-100 text-green-800 border-green-300";
       case "pending":
         return "bg-yellow-100 text-yellow-800 border-yellow-300";
@@ -114,7 +113,6 @@ export default function SalesOrderDetailPage() {
   const getStatusIcon = (status) => {
     switch (status) {
       case "paid":
-      case "delivered":
         return <CheckCircle className="w-5 h-5" />;
       case "cancelled":
         return <XCircle className="w-5 h-5" />;
@@ -125,9 +123,7 @@ export default function SalesOrderDetailPage() {
 
   const paymentMethodLabels = {
     cash: "Cash",
-    credit_card: "Credit Card",
-    bank_transfer: "Bank Transfer",
-    mobile_payment: "Mobile Payment",
+    mobile_payment: "VietQR",
   };
 
   if (isLoading) {

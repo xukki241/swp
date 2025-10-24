@@ -26,7 +26,10 @@ export function VietQRPaymentDialog({
 }) {
     const [isConfirming, setIsConfirming] = useState(false);
 
-    if (!orderData) return null;
+    // Don't render if no order data
+    if (!orderData) {
+        return null;
+    }
 
     // Format số tiền (VND không có phần thập phân)
     const amount = Math.round(orderData.total);

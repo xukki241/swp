@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Banknote, Building2, CreditCard, Smartphone, QrCode } from "lucide-react";
+import { Banknote, QrCode } from "lucide-react";
 
 export default function PaymentMethodSelector({ value, onChange }) {
   const methods = [
