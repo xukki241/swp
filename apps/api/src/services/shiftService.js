@@ -201,6 +201,16 @@ export const createShiftAssignment = async (assignmentData) => {
             ? new Date(assignmentData.assignedDate)
             : assignmentData.assignedDate;
 
+        // Validate: không cho phép assign ca trong quá khứ
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const assignedDateOnly = new Date(assignedDate);
+        assignedDateOnly.setHours(0, 0, 0, 0);
+
+        if (assignedDateOnly < today) {
+            throw new Error("Cannot assign shifts for past dates");
+        }
+
         // Kiểm tra user đã có ca trong ngày này chưa
         const existingAssignment = await db
             .select()
@@ -243,6 +253,20 @@ export const createBatchShiftAssignments = async (assignments) => {
                 ? new Date(item.assignedDate)
                 : item.assignedDate
         }));
+
+        // Validate: không cho phép assign ca trong quá khứ
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const hasPastDate = processedAssignments.some(item => {
+            const assignedDateOnly = new Date(item.assignedDate);
+            assignedDateOnly.setHours(0, 0, 0, 0);
+            return assignedDateOnly < today;
+        });
+
+        if (hasPastDate) {
+            throw new Error("Cannot assign shifts for past dates");
+        }
 
         const result = await db
             .insert(shiftAssignments)
