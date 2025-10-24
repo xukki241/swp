@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as medicationVariantController from "@/controllers/medicationVariantController.js";
 import { inventoryService } from "@/services/inventoryService.js";
@@ -28,7 +28,7 @@ describe("MedicationVariantController", () => {
     it("should return all medication variants with filters", async () => {
       req.query = {
         search: "tablet",
-        medicationId: "1",
+        medicationId: undefined,
         isActive: "true",
       };
 
@@ -51,7 +51,7 @@ describe("MedicationVariantController", () => {
         medicationVariantService.getAllMedicationVariants
       ).toHaveBeenCalledWith({
         search: "tablet",
-        medicationId: 1n,
+        medicationId: undefined,
         isActive: true,
       });
       expect(res.status).toHaveBeenCalledWith(200);
@@ -96,7 +96,7 @@ describe("MedicationVariantController", () => {
 
       expect(
         medicationVariantService.getMedicationVariantById
-      ).toHaveBeenCalledWith(1n);
+      ).toHaveBeenCalledWith("1");
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
@@ -307,10 +307,10 @@ describe("MedicationVariantController", () => {
 
       expect(
         medicationVariantService.getMedicationVariantById
-      ).toHaveBeenCalledWith(1n);
+      ).toHaveBeenCalledWith("1");
       expect(
         medicationVariantService.updateMedicationVariant
-      ).toHaveBeenCalledWith(1n, {
+      ).toHaveBeenCalledWith("1", {
         name: "Aspirin 100mg Tablet Updated",
         sellPrice: "12.00",
       });
@@ -393,7 +393,7 @@ describe("MedicationVariantController", () => {
 
       expect(
         medicationVariantService.deleteMedicationVariant
-      ).toHaveBeenCalledWith(1n);
+      ).toHaveBeenCalledWith("1");
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,

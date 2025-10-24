@@ -1,17 +1,18 @@
 import {
   createSalesOrderRequestSchema,
-  updateSalesOrderRequestSchema,
   listSalesOrdersQuerySchema,
   salesOrderIdParamSchema,
+  updateSalesOrderRequestSchema,
 } from "@pharmaflow/dto";
 import express from "express";
 
 import { salesOrderController } from "../controllers/salesOrderController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 import {
   validateBody,
-  validateQuery,
   validateParams,
+  validateQuery,
 } from "../middleware/validate.js";
 
 export const salesOrderRouter = express.Router();
@@ -37,6 +38,7 @@ salesOrderRouter.get(
 salesOrderRouter.post(
   "/",
   validateBody(createSalesOrderRequestSchema),
+  createAuditLog("CREATE", "sale"),
   salesOrderController.create
 );
 
@@ -45,6 +47,7 @@ salesOrderRouter.patch(
   "/:id",
   validateParams(salesOrderIdParamSchema),
   validateBody(updateSalesOrderRequestSchema),
+  createAuditLog("UPDATE", "sale"),
   salesOrderController.update
 );
 
@@ -53,6 +56,7 @@ salesOrderRouter.delete(
   "/:id",
   validateParams(salesOrderIdParamSchema),
   authorize("owner"),
+  createAuditLog("DELETE", "sale"),
   salesOrderController.delete
 );
 

@@ -1,10 +1,10 @@
 import { z } from "zod";
 import {
-  uuidSchema,
-  nameSchema,
   booleanSchema,
-  positiveDecimalSchema,
+  nameSchema,
   paginationSchema,
+  positiveDecimalSchema,
+  uuidSchema,
 } from "../common/index.js";
 
 // Medication variant schema

@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
 pnpm-lock.yaml
+.pnpm-store/
 
 # Build outputs
 dist/
@@ -30,3 +31,5 @@ logs
 # Misc
 .DS_Store
 
+# Database
+src/db/migrations/

@@ -1,12 +1,13 @@
 import { sql } from "drizzle-orm";
 import {
-  varchar,
   boolean,
-  timestamp,
-  text,
+  customType,
   doublePrecision,
-  uuid,
   integer,
+  text,
+  timestamp,
+  uuid,
+  varchar,
 } from "drizzle-orm/pg-core";
 
 export const id = uuid("id").primaryKey().defaultRandom();
@@ -54,6 +55,28 @@ export const foreignKey = (columnName, references, actions) =>
 export const int = (columnName) => integer(columnName);
 
 export const decimalColumn = (columnName) => doublePrecision(columnName);
+
+// Custom bytea type for storing binary data (blobs)
+const bytea = customType({
+  dataType() {
+    return "bytea";
+  },
+  toDriver(value) {
+    return value; // Buffer stays as Buffer
+  },
+});
+
+export const blobColumn = (columnName) => bytea(columnName);
+
+// Custom tsvector type for PostgreSQL Full-Text Search
+const tsvector = customType({
+  dataType() {
+    return "tsvector";
+  },
+});
+
+export const searchVector = (columnName = "search_vector") =>
+  tsvector(columnName);
 
 export const basicInfo = {
   name,

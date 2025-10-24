@@ -1,7 +1,7 @@
+import { cn } from "@/lib/utils";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export function SidebarItem({ item, collapsed }) {
   const location = useLocation();
@@ -9,17 +9,55 @@ export function SidebarItem({ item, collapsed }) {
   const [isOpen, setIsOpen] = useState(false);
   const Icon = item.icon;
 
+  // Get user role from localStorage
+  const getUserRole = () => {
+    const userInfo = localStorage.getItem("user"); // Fixed: key is "user" not "userInfo"
+    if (userInfo) {
+      const parsed = JSON.parse(userInfo);
+      return parsed.role;
+    }
+    return null;
+  };
+
+  const userRole = getUserRole();
+
+  // Check if user has access to this item
+  // If no user role (not logged in), hide items with role restrictions
+  // If item has no roles defined, show to all users
+  if (item.roles && item.roles.length > 0) {
+    // If user not logged in, hide all restricted items
+    if (!userRole) {
+      return null;
+    }
+    // If logged in but role doesn't match, hide
+    if (!item.roles.includes(userRole)) {
+      return null;
+    }
+  }
+
   const hasChildren = item.children && item.children.length > 0;
+
+  // Filter children by role
+  const accessibleChildren = hasChildren
+    ? item.children.filter((child) => {
+        if (!child.roles || child.roles.length === 0) return true;
+        if (!userRole) return false;
+        return child.roles.includes(userRole);
+      })
+    : [];
+
   const isActive = item.path ? pathname === item.path : false;
   const hasActiveChild =
-    hasChildren && item.children?.some((child) => pathname === child.path);
+    accessibleChildren.length > 0 &&
+    accessibleChildren.some((child) => pathname === child.path);
 
   const handleClick = () => {
-    if (hasChildren && !collapsed) {
+    if (accessibleChildren.length > 0 && !collapsed) {
       setIsOpen(!isOpen);
     }
   };
 
+  // Single menu item (no children)
   if (!hasChildren && item.path) {
     return (
       <Link
@@ -39,6 +77,7 @@ export function SidebarItem({ item, collapsed }) {
     );
   }
 
+  // Menu with children
   return (
     <div>
       <button
@@ -56,7 +95,7 @@ export function SidebarItem({ item, collapsed }) {
         {!collapsed && (
           <>
             <span className="flex-1 text-left">{item.title}</span>
-            {hasChildren && (
+            {accessibleChildren.length > 0 && (
               <span className="transition-transform duration-200">
                 {isOpen ? (
                   <ChevronDown className="h-4 w-4" />
@@ -69,7 +108,7 @@ export function SidebarItem({ item, collapsed }) {
         )}
       </button>
 
-      {hasChildren && !collapsed && (
+      {accessibleChildren.length > 0 && !collapsed && (
         <div
           className={cn(
             "overflow-hidden transition-all duration-200 ease-in-out",
@@ -77,7 +116,7 @@ export function SidebarItem({ item, collapsed }) {
           )}
         >
           <div className="space-y-1 py-1">
-            {item.children?.map((child) => {
+            {accessibleChildren.map((child) => {
               const isChildActive = pathname === child.path;
               return (
                 <Link

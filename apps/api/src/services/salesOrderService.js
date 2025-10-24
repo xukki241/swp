@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, sql, desc } from "drizzle-orm";
+import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import { inventory } from "../db/schema/inventory.js";
@@ -129,6 +129,7 @@ export const salesOrderService = {
           totalAmount: totalAmount,
           status: "pending",
           salespersonId: userId || null,
+          prescriptionId: soData.prescription_id || null,
           orderDate: new Date(),
         })
         .returning();
@@ -144,8 +145,17 @@ export const salesOrderService = {
         )
         .returning();
 
+      // Query the order again with relations to get customer and salesperson info
+      const orderWithRelations = await tx.query.salesOrders.findFirst({
+        where: eq(salesOrders.id, order.id),
+        with: {
+          customer: true,
+          salesperson: true,
+        },
+      });
+
       return {
-        ...order,
+        ...orderWithRelations,
         items: createdItems,
       };
     });

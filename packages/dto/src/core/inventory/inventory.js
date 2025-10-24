@@ -1,12 +1,11 @@
 import { z } from "zod";
 import {
-  uuidSchema,
   dateSchema,
-  positiveDecimalSchema,
-  positiveIntSchema,
   paginationSchema,
+  positiveDecimalSchema,
   sortBySchema,
   sortOrderSchema,
+  uuidSchema,
 } from "../common/index.js";
 
 // Inventory schema

@@ -6,6 +6,7 @@ import {
 import express from "express";
 
 import { customerController } from "../controllers/customerController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 import { validateBody } from "../middleware/validate.js";
 
@@ -25,6 +26,7 @@ customerRouter.get("/:id", customerController.getById);
 customerRouter.post(
   "/",
   validateBody(createCustomerSchema.or(createCustomersRequestSchema)),
+  createAuditLog("CREATE", "customer"),
   customerController.create
 );
 
@@ -32,10 +34,16 @@ customerRouter.post(
 customerRouter.patch(
   "/:id",
   validateBody(updateCustomerRequestSchema),
+  createAuditLog("UPDATE", "customer"),
   customerController.update
 );
 
 // DELETE /api/customers/:id - Delete customer
-customerRouter.delete("/:id", authorize("owner"), customerController.delete);
+customerRouter.delete(
+  "/:id",
+  authorize("owner"),
+  createAuditLog("DELETE", "customer"),
+  customerController.delete
+);
 
 export default customerRouter;

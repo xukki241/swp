@@ -3,30 +3,31 @@
 
 import { db } from "./connection.js";
 import {
-  users,
-  userCredentials,
-  userRegistrations,
+  auditLogs,
   customers,
-  suppliers,
+  files,
+  inventory,
   medications,
   medicationVariants,
-  supplierMedicationVariants,
-  warehouseZones,
-  warehouseRacks,
-  warehouseBins,
-  purchaseOrders,
-  purchaseOrderItems,
-  purchaseOrderReceipts,
-  purchaseOrderReceiptItems,
-  inventory,
-  salesOrders,
-  salesOrderItems,
-  files,
-  fileAttachments,
   notifications,
-  auditLogs,
+  purchaseOrderItems,
+  purchaseOrderReceiptItems,
+  purchaseOrderReceipts,
+  purchaseOrders,
   reports,
+  salesOrderItems,
+  salesOrders,
   settings,
+  shiftAssignments,
+  shifts,
+  supplierMedicationVariants,
+  suppliers,
+  userCredentials,
+  userRegistrations,
+  users,
+  warehouseBins,
+  warehouseRacks,
+  warehouseZones,
 } from "./schema/index.js";
 
 async function seed() {
@@ -37,7 +38,6 @@ async function seed() {
     console.log("🧹 Clearing existing data...");
     await db.delete(auditLogs);
     await db.delete(notifications);
-    await db.delete(fileAttachments);
     await db.delete(files);
     await db.delete(salesOrderItems);
     await db.delete(salesOrders);
@@ -54,6 +54,8 @@ async function seed() {
     await db.delete(warehouseZones);
     await db.delete(suppliers);
     await db.delete(customers);
+    await db.delete(shiftAssignments);
+    await db.delete(shifts);
     await db.delete(userCredentials);
     await db.delete(userRegistrations);
     await db.delete(users);
@@ -828,24 +830,28 @@ async function seed() {
         medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
         supplierSku: "VP-PAR500",
         leadTimeDays: 5,
+        purchasePrice: "40000.00",
       },
       {
         supplierId: supplier1.id,
         medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
         supplierSku: "VP-AMX500",
         leadTimeDays: 7,
+        purchasePrice: "75000.00",
       },
       {
         supplierId: supplier1.id,
         medicationVariantId: medicationVariantsResults[13].id, // Atorvastatin 20mg
         supplierSku: "VP-ATO20",
         leadTimeDays: 10,
+        purchasePrice: "200000.00",
       },
       {
         supplierId: supplier1.id,
         medicationVariantId: medicationVariantsResults[15].id, // Amlodipine 10mg
         supplierSku: "VP-AML10",
         leadTimeDays: 7,
+        purchasePrice: "97500.00",
       },
 
       // Supplier 2 (Saigon MediSupply)
@@ -854,24 +860,28 @@ async function seed() {
         medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
         supplierSku: "SGM-IBU400",
         leadTimeDays: 4,
+        purchasePrice: "45000.00",
       },
       {
         supplierId: supplier2.id,
         medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
         supplierSku: "SGM-OME20",
         leadTimeDays: 6,
+        purchasePrice: "90000.00",
       },
       {
         supplierId: supplier2.id,
         medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
         supplierSku: "SGM-CET10",
         leadTimeDays: 5,
+        purchasePrice: "35000.00",
       },
       {
         supplierId: supplier2.id,
         medicationVariantId: medicationVariantsResults[21].id, // Azithromycin 500mg
         supplierSku: "SGM-AZI500",
         leadTimeDays: 8,
+        purchasePrice: "65000.00",
       },
 
       // Supplier 3 (Global BioMed)
@@ -880,18 +890,21 @@ async function seed() {
         medicationVariantId: medicationVariantsResults[11].id, // Metformin 500mg
         supplierSku: "GBM-MET500",
         leadTimeDays: 12,
+        purchasePrice: "60000.00",
       },
       {
         supplierId: supplier3.id,
         medicationVariantId: medicationVariantsResults[17].id, // Salbutamol Inhaler
         supplierSku: "GBM-SAL-INH",
         leadTimeDays: 14,
+        purchasePrice: "75000.00",
       },
       {
         supplierId: supplier3.id,
         medicationVariantId: medicationVariantsResults[19].id, // Vitamin D3 1000IU
         supplierSku: "GBM-VID1000",
         leadTimeDays: 10,
+        purchasePrice: "50000.00",
       },
 
       // Supplier 4 (Asia Pacific Pharmaceuticals)
@@ -900,18 +913,21 @@ async function seed() {
         medicationVariantId: medicationVariantsResults[23].id, // Tramadol 50mg
         supplierSku: "APP-TRA50",
         leadTimeDays: 15,
+        purchasePrice: "200000.00",
       },
       {
         supplierId: supplier4.id,
         medicationVariantId: medicationVariantsResults[1].id, // Paracetamol 650mg
         supplierSku: "APP-PAR650",
         leadTimeDays: 6,
+        purchasePrice: "28000.00",
       },
       {
         supplierId: supplier4.id,
         medicationVariantId: medicationVariantsResults[6].id, // Ibuprofen 200mg
         supplierSku: "APP-IBU200",
         leadTimeDays: 5,
+        purchasePrice: "32000.00",
       },
     ];
 
@@ -1263,7 +1279,7 @@ async function seed() {
           fileType: "pdf",
           mimeType: "application/pdf",
           fileSize: 2048576, // 2MB
-          storagePath: "/uploads/contracts/supplier_contract_pharmacorp.pdf",
+          blob: Buffer.from("Sample PDF file content"),
           uploadedBy: owner.id,
           uploadedAt: new Date("2024-01-01"),
         },
@@ -1272,8 +1288,7 @@ async function seed() {
           fileType: "jpg",
           mimeType: "image/jpeg",
           fileSize: 1024768, // 1MB
-          storagePath:
-            "/uploads/certificates/medication_certificate_amoxicillin.jpg",
+          blob: Buffer.from("Sample JPEG file content"),
           uploadedBy: staff1.id,
           uploadedAt: new Date("2024-01-15"),
         },
@@ -1283,37 +1298,14 @@ async function seed() {
           mimeType:
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           fileSize: 512345, // 0.5MB
-          storagePath: "/uploads/reports/monthly_sales_report_may_2024.xlsx",
+          blob: Buffer.from("Sample Excel file content"),
           uploadedBy: owner.id,
           uploadedAt: new Date("2024-06-01"),
         },
       ])
       .returning();
 
-    // 20. Seed File Attachments
-    console.log("🔗 Seeding file attachments...");
-
-    // 🔧 Fix: entityId là integer và NOT NULL → gán tạm giá trị mô phỏng (1, 2, 3)
-    await db.insert(fileAttachments).values([
-      {
-        fileId: file1.id,
-        entityType: "supplier",
-        entityId: 1, // placeholder ID
-      },
-      {
-        fileId: file2.id,
-        entityType: "medication",
-        entityId: 2, // placeholder ID
-      },
-      {
-        fileId: file3.id,
-        entityType: "report",
-        entityId: 3, // placeholder ID
-      },
-    ]);
-
-    console.log("✅ File attachments seeded successfully.");
-    // 21. Seed Notifications
+    // 20. Seed Notifications
     console.log("🔔 Seeding notifications...");
     await db.insert(notifications).values([
       {
@@ -1453,7 +1445,116 @@ async function seed() {
       },
     ]);
 
-    // 24. Seed Settings
+    // 24. Seed Shifts
+    console.log("⏰ Seeding shifts...");
+    const [morningShift, afternoonShift, nightShift, fullDayShift] = await db
+      .insert(shifts)
+      .values([
+        {
+          name: "Ca sáng",
+          shiftType: "morning",
+          startTime: "06:00:00",
+          endTime: "14:00:00",
+          description: "Ca làm việc buổi sáng từ 6:00 đến 14:00",
+        },
+        {
+          name: "Ca chiều",
+          shiftType: "afternoon",
+          startTime: "14:00:00",
+          endTime: "22:00:00",
+          description: "Ca làm việc buổi chiều từ 14:00 đến 22:00",
+        },
+        {
+          name: "Ca tối",
+          shiftType: "night",
+          startTime: "22:00:00",
+          endTime: "06:00:00",
+          description: "Ca làm việc ban đêm từ 22:00 đến 6:00 sáng hôm sau",
+        },
+        {
+          name: "Ca hành chính",
+          shiftType: "full_day",
+          startTime: "08:00:00",
+          endTime: "17:00:00",
+          description: "Ca hành chính toàn thời gian từ 8:00 đến 17:00",
+        },
+      ])
+      .returning();
+
+    // 25. Seed Shift Assignments
+    console.log("📅 Seeding shift assignments...");
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dayAfter = new Date(today);
+    dayAfter.setDate(dayAfter.getDate() + 2);
+
+    await db.insert(shiftAssignments).values([
+      // Hôm nay
+      {
+        userId: staff1.id,
+        shiftId: morningShift.id,
+        assignedDate: today,
+        status: "completed",
+        checkInTime: new Date(today.setHours(6, 5, 0, 0)),
+        checkOutTime: new Date(today.setHours(14, 2, 0, 0)),
+        createdBy: owner.id,
+      },
+      {
+        userId: staff2.id,
+        shiftId: afternoonShift.id,
+        assignedDate: today,
+        status: "in_progress",
+        checkInTime: new Date(today.setHours(14, 3, 0, 0)),
+        createdBy: owner.id,
+      },
+      {
+        userId: staff3.id,
+        shiftId: nightShift.id,
+        assignedDate: today,
+        status: "scheduled",
+        createdBy: owner.id,
+      },
+      // Ngày mai
+      {
+        userId: staff1.id,
+        shiftId: afternoonShift.id,
+        assignedDate: tomorrow,
+        status: "scheduled",
+        createdBy: owner.id,
+      },
+      {
+        userId: staff2.id,
+        shiftId: morningShift.id,
+        assignedDate: tomorrow,
+        status: "confirmed",
+        createdBy: owner.id,
+      },
+      {
+        userId: staff3.id,
+        shiftId: fullDayShift.id,
+        assignedDate: tomorrow,
+        status: "scheduled",
+        createdBy: owner.id,
+      },
+      // Ngày kia
+      {
+        userId: staff1.id,
+        shiftId: fullDayShift.id,
+        assignedDate: dayAfter,
+        status: "scheduled",
+        createdBy: owner.id,
+      },
+      {
+        userId: staff2.id,
+        shiftId: nightShift.id,
+        assignedDate: dayAfter,
+        status: "scheduled",
+        createdBy: owner.id,
+      },
+    ]);
+
+    // 26. Seed Settings
     console.log("⚙️ Seeding settings...");
     await db.insert(settings).values([
       {
@@ -1560,6 +1661,8 @@ async function seed() {
     - Notifications: 5
     - Audit Logs: 5
     - Reports: 4
+    - Shifts: 4
+    - Shift Assignments: 8
     - Settings: 10
         `);
   } catch (error) {

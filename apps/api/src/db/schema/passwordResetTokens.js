@@ -1,12 +1,12 @@
 import {
-  pgTable,
-  varchar,
-  timestamp,
   boolean,
   pgEnum,
+  pgTable,
+  timestamp,
+  varchar,
 } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey, foreignKey } from "./common.js";
+import { foreignKey, identityPrimaryKey } from "./common.js";
 import { users } from "./users.js";
 
 export const resetMethod = pgEnum("reset_method", ["email", "sms"]);

@@ -1,9 +1,7 @@
 // src/pages/medications/MedicationDetailPage.jsx
-import { useMemo } from "react";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useMedicationDetail } from "@/hooks/useMedications";
 import {
   Table,
   TableBody,
@@ -12,6 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useMedicationDetail } from "@/hooks/useMedications";
+import { useMemo } from "react";
 
 function useIdFromUrl() {
   return useMemo(() => {

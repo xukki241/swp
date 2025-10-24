@@ -1,9 +1,9 @@
 import { z } from "zod";
 import {
-  nameSchema,
-  emailSchema,
-  phoneSchema,
   addressSchema,
+  emailSchema,
+  nameSchema,
+  phoneSchema,
   successResponseSchema,
 } from "../common/index.js";
 

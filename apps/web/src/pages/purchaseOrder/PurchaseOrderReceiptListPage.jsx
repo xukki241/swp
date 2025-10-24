@@ -1,31 +1,24 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useNavigate } from "react-router";
-import {
-  usePurchaseOrderReceipts,
-  useDeletePurchaseOrderReceipt,
-} from "@/hooks/usePurchaseOrders";
 import { AppLayout } from "@/components/layouts/app-layout";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -34,22 +27,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Search,
-  Eye,
-  Trash2,
-  PlusCircle,
-  Calendar,
-  Package,
-  ArrowUpDown,
-} from "lucide-react";
-import { toast } from "sonner";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  useDeletePurchaseOrderReceipt,
+  usePurchaseOrderReceipts,
+} from "@/hooks/usePurchaseOrders";
+import {
+  ArrowUpDown,
+  Calendar,
+  Eye,
+  Package,
+  Search,
+  Trash2,
+} from "lucide-react";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 export default function PurchaseOrderReceiptListPage() {
   const navigate = useNavigate();
@@ -59,32 +58,16 @@ export default function PurchaseOrderReceiptListPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
-  const { data: receipts = [], isLoading } = usePurchaseOrderReceipts();
+  // Build filters for API
+  const filters = useMemo(() => {
+    const params = {};
+    if (searchQuery) params.search = searchQuery;
+    params.sortOrder = sortOrder;
+    return params;
+  }, [searchQuery, sortOrder]);
+
+  const { data: receipts = [], isLoading } = usePurchaseOrderReceipts(filters);
   const { mutate: deleteReceipt } = useDeletePurchaseOrderReceipt();
-
-  const filteredReceipts = useMemo(() => {
-    let items = [...receipts];
-
-    // Filter by search query
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      items = items.filter(
-        (r) =>
-          (r.supplierName || "").toLowerCase().includes(q) ||
-          (r.receivedByName || "").toLowerCase().includes(q) ||
-          (r.poStatus || "").toLowerCase().includes(q)
-      );
-    }
-
-    // Sort by received date
-    items.sort((a, b) => {
-      const dateA = new Date(a.receivedDate);
-      const dateB = new Date(b.receivedDate);
-      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
-    });
-
-    return items;
-  }, [receipts, searchQuery, sortOrder]);
 
   const handleDelete = (id) => {
     setSelectedId(id);
@@ -223,14 +206,15 @@ export default function PurchaseOrderReceiptListPage() {
                     <TableHead>Received Date</TableHead>
                     <TableHead>Received By</TableHead>
                     <TableHead>Order Status</TableHead>
+                    <TableHead className="text-right">Total Amount</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredReceipts.length === 0 ? (
+                  {receipts.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={5}
+                        colSpan={6}
                         className="text-center py-8 text-muted-foreground"
                       >
                         <div className="flex flex-col items-center gap-2">
@@ -245,7 +229,7 @@ export default function PurchaseOrderReceiptListPage() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredReceipts.map((r) => (
+                    receipts.map((r) => (
                       <TableRow key={r.id}>
                         <TableCell className="font-medium">
                           {r.supplierName || "N/A"}
@@ -260,6 +244,14 @@ export default function PurchaseOrderReceiptListPage() {
                         </TableCell>
                         <TableCell>{r.receivedByName || "N/A"}</TableCell>
                         <TableCell>{getStatusBadge(r.poStatus)}</TableCell>
+                        <TableCell className="text-right font-semibold text-primary">
+                          {r.totalAmount
+                            ? new Intl.NumberFormat("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              }).format(r.totalAmount)
+                            : "N/A"}
+                        </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Button

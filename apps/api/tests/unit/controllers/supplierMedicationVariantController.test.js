@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { supplierMedicationVariantController } from "@/controllers/supplierMedicationVariantController.js";
 import { supplierMedicationVariantService } from "@/services/supplierMedicationVariantService.js";
@@ -18,7 +18,7 @@ describe("SupplierMedicationVariantController", () => {
 
   describe("create", () => {
     it("should create supplier medication variant", async () => {
-      req.body = { supplierId: 1, medicationVariantId: 1, price: 100 };
+      req.body = { supplierId: "1", medicationVariantId: 1, price: 100 };
       supplierMedicationVariantService.create.mockResolvedValue({
         id: 1,
         ...req.body,
@@ -51,8 +51,8 @@ describe("SupplierMedicationVariantController", () => {
       await supplierMedicationVariantController.getAll(req, res);
 
       expect(supplierMedicationVariantService.getAll).toHaveBeenCalledWith({
-        supplierId: 1,
-        medicationVariantId: 2,
+        supplierId: "1",
+        medicationVariantId: "2",
         limit: 100,
         offset: 0,
       });

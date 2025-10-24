@@ -1,16 +1,14 @@
 import { z } from "zod";
 import {
-  uuidSchema,
-  timestampSchema,
+  paginationSchema,
   positiveDecimalSchema,
   positiveIntSchema,
-  paginationSchema,
+  salesOrderPaymentMethodEnum,
+  salesOrderStatusEnum,
   sortBySchema,
   sortOrderSchema,
-} from "../common/index.js";
-import {
-  salesOrderStatusEnum,
-  salesOrderPaymentMethodEnum,
+  timestampSchema,
+  uuidSchema,
 } from "../common/index.js";
 
 // Sales order schema
@@ -22,6 +20,7 @@ export const salesOrderSchema = z.object({
   status: salesOrderStatusEnum,
   paymentMethod: salesOrderPaymentMethodEnum,
   salespersonId: uuidSchema.nullable().optional(),
+  prescriptionId: uuidSchema.nullable().optional(),
 });
 
 // Sales order item schema
@@ -48,6 +47,7 @@ export const createSalesOrderItemSchema = z.object({
 export const createSalesOrderRequestSchema = z.object({
   customer_id: uuidSchema,
   payment_method: salesOrderPaymentMethodEnum.default("cash").optional(),
+  prescription_id: uuidSchema.optional(),
   items: z.array(createSalesOrderItemSchema).min(1),
 });
 

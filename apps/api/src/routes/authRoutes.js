@@ -1,6 +1,11 @@
 import express from "express";
 
 import * as authController from "../controllers/authController.js";
+import {
+  auditLogin,
+  auditLogout,
+  auditPasswordChange,
+} from "../middleware/auditLog.js";
 import { authenticate } from "../middleware/checkAuth.js";
 
 export const authRouter = express.Router();
@@ -19,14 +24,14 @@ authRouter.post("/register", authController.register);
  * @access  Public
  * @body    { email, password }
  */
-authRouter.post("/login", authController.login);
+authRouter.post("/login", auditLogin, authController.login);
 
 /**
  * @route   POST /api/auth/logout
  * @desc    Logout user (client-side token removal)
  * @access  Public
  */
-authRouter.post("/logout", authController.logout);
+authRouter.post("/logout", authenticate, auditLogout, authController.logout);
 
 /**
  * @route   POST /api/auth/reset-password
@@ -45,6 +50,7 @@ authRouter.post("/reset-password", authController.resetPassword);
 authRouter.post(
   "/change-password",
   authenticate,
+  auditPasswordChange,
   authController.changePassword
 );
 
@@ -69,6 +75,10 @@ authRouter.post("/forgot-password", authController.requestPasswordReset);
  * @access  Public
  * @body    { identifier, otp, newPassword, method }
  */
-authRouter.post("/verify-reset-otp", authController.verifyOTPAndResetPassword);
+authRouter.post(
+  "/verify-reset-otp",
+  auditPasswordChange,
+  authController.verifyOTPAndResetPassword
+);
 
 export default authRouter;

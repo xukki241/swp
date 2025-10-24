@@ -15,6 +15,7 @@ import { z } from "zod";
 
 import * as medicationController from "../controllers/medicationController.js";
 import * as medicationVariantController from "../controllers/medicationVariantController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 import { medicationVariantRouter } from "./medicationVariantRoutes.js";
@@ -44,7 +45,16 @@ medicationRouter.get(
   medicationController.getAllMedications
 );
 /**
- * @route   GET /api/medications/:medicationId/variants/all
+ * @route   GET /api/medications/variants/search-for-sale
+ * @desc    Search variants for POS/Sales with inventory data
+ * @access  Private (Authenticated)
+ */
+medicationRouter.get(
+  "/variants/search-for-sale",
+  medicationVariantController.searchVariantsForSale
+);
+/**
+ * @route   GET /api/medications/variants/all
  * @desc    Get all variants for a medication
  * @access  Private (Authenticated)
  */
@@ -129,6 +139,7 @@ medicationRouter.post(
   "/",
   authorize("owner"),
   validateBody(createMedicationsRequestSchema),
+  createAuditLog("CREATE", "medication"),
   medicationController.createMedication
 );
 
@@ -142,6 +153,7 @@ medicationRouter.patch(
   authorize("owner"),
   validateParams(idParamSchema),
   validateBody(updateMedicationRequestSchema),
+  createAuditLog("UPDATE", "medication"),
   medicationController.updateMedication
 );
 
@@ -154,6 +166,7 @@ medicationRouter.delete(
   "/:id",
   authorize("owner"),
   validateParams(idParamSchema),
+  createAuditLog("DELETE", "medication"),
   medicationController.deleteMedication
 );
 

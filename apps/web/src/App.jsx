@@ -1,33 +1,40 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
+import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
+import LoginPage from "@/pages/auth/LoginPage";
+import PolicyPage from "@/pages/auth/PolicyPage";
+import RegisterPage from "@/pages/auth/RegisterPage";
 import DashboardPage from "@/pages/Dashboard";
-import LoginPage from "@/pages/LoginPage";
-import RegisterPage from "@/pages/RegisterPage";
-import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
-import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import UserListPage from "@/pages/UserListPage";
-import POSPage from "@/pages/POSPage";
-import PolicyPage from "@/pages/PolicyPage";
+import UserProfilePage from "@/pages/UserProfilePage";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 // Supplier & Purchase Order imports
-import SupplierListPage from "./pages/supplier/SupplierListPage";
+import PurchaseOrderCreatePage from "./pages/purchaseOrder/PurchaseOrderCreatePage";
+import PurchaseOrderDetailPage from "./pages/purchaseOrder/PurchaseOrderDetailPage";
+import PurchaseOrderListPage from "./pages/purchaseOrder/PurchaseOrderListPage";
+import PurchaseOrderReceiptCreatePage from "./pages/purchaseOrder/PurchaseOrderReceiptCreatePage";
+import PurchaseOrderReceiptDetailPage from "./pages/purchaseOrder/PurchaseOrderReceiptDetailPage";
+import PurchaseOrderReceiptListPage from "./pages/purchaseOrder/PurchaseOrderReceiptListPage";
 import SupplierCreatePage from "./pages/supplier/SupplierCreatePage";
 import SupplierDetailPage from "./pages/supplier/SupplierDetailPage";
 import SupplierEditPage from "./pages/supplier/SupplierEditPage";
-import PurchaseOrderListPage from "./pages/purchaseOrder/PurchaseOrderListPage";
-import PurchaseOrderCreatePage from "./pages/purchaseOrder/PurchaseOrderCreatePage";
-import PurchaseOrderDetailPage from "./pages/purchaseOrder/PurchaseOrderDetailPage";
-import PurchaseOrderReceiptListPage from "./pages/purchaseOrder/PurchaseOrderReceiptListPage";
-import PurchaseOrderReceiptDetailPage from "./pages/purchaseOrder/PurchaseOrderReceiptDetailPage";
-import PurchaseOrderReceiptCreatePage from "./pages/purchaseOrder/PurchaseOrderReceiptCreatePage";
+import SupplierListPage from "./pages/supplier/SupplierListPage";
 // Inventory imports
+import InventoryTrackingPage from "@/pages/inventory/InventoryTrackingPage";
 import StockOverviewPage from "@/pages/inventory/StockOverviewPage";
 import WarehousePage from "@/pages/inventory/WarehousePage";
-import InventoryTrackingPage from "@/pages/inventory/InventoryTrackingPage";
-import MedicationListPage from "@/pages/medications/MedicationListPage";
 import MedicationDetailPage from "@/pages/medications/MedicationDetailPage";
 import MedicationFormPage from "@/pages/medications/MedicationFormPage";
+import MedicationListPage from "./pages/medications/MedicationListPage";
+import SalesOrderDetailPage from "./pages/sales/SalesOrderDetailPage";
+import SalesOrderListPage from "./pages/sales/SalesOrderListPage";
+import SalesPage from "./pages/sales/SalesPage";
+// Shift management imports
+import MySchedulePage from "./pages/shifts/MySchedulePage";
+import ShiftAssignmentPage from "./pages/shifts/ShiftAssignmentPage";
+import ShiftManagementPage from "./pages/shifts/ShiftManagementPage";
 
 function App() {
   return (
@@ -53,14 +60,6 @@ function App() {
           }
         />
         <Route
-          path="/pos"
-          element={
-            <ProtectedRoute>
-              <POSPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/users/list"
           element={
             <ProtectedRoute>
@@ -73,6 +72,14 @@ function App() {
           element={
             <ProtectedRoute>
               <RegistrationRequestsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user-profile"
+          element={
+            <ProtectedRoute>
+              <UserProfilePage />
             </ProtectedRoute>
           }
         />
@@ -183,6 +190,59 @@ function App() {
           element={
             <ProtectedRoute>
               <InventoryTrackingPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/sales"
+          element={
+            <ProtectedRoute>
+              <SalesPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/sales/orders"
+          element={
+            <ProtectedRoute>
+              <SalesOrderListPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/sales/orders/:id"
+          element={
+            <ProtectedRoute>
+              <SalesOrderDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Shift Management Routes */}
+        <Route
+          path="/shifts/management"
+          element={
+            <ProtectedRoute>
+              <ShiftManagementPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/shifts/assignments"
+          element={
+            <ProtectedRoute>
+              <ShiftAssignmentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/shifts/my-schedule"
+          element={
+            <ProtectedRoute>
+              <MySchedulePage />
             </ProtectedRoute>
           }
         />

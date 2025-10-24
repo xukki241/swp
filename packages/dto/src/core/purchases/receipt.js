@@ -1,10 +1,9 @@
 import { z } from "zod";
 import {
-  uuidSchema,
-  timestampSchema,
-  dateSchema,
-  positiveIntSchema,
   paginationSchema,
+  positiveIntSchema,
+  timestampSchema,
+  uuidSchema,
 } from "../common/index.js";
 
 // Purchase order receipt schema
@@ -30,7 +29,10 @@ export const createReceiptItemSchema = z.object({
 });
 
 export const createReceiptRequestSchema = z.object({
-  receivedDate: dateSchema.optional(),
+  receivedDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   receivedBy: uuidSchema.optional(),
   items: z.array(createReceiptItemSchema).min(1),
 });

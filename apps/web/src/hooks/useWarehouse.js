@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import {
+  deleteBin,
   getAllZones,
-  getZoneById,
-  updateZone,
+  getBinsByRack,
   getRacksByZone,
+  getZoneById,
+  updateBin,
   updateRack,
   getBinsByRack,
   updateBin,

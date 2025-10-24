@@ -2,7 +2,6 @@ import { relations } from "drizzle-orm";
 
 import { auditLogs } from "./auditLogs.js";
 import { customers } from "./customers.js";
-import { fileAttachments } from "./fileAttachments.js";
 import { files } from "./files.js";
 import { inventory } from "./inventory.js";
 import { medications } from "./medications.js";
@@ -14,6 +13,8 @@ import { purchaseOrderReceipts } from "./purchaseOrderReceipts.js";
 import { purchaseOrders } from "./purchaseOrders.js";
 import { salesOrderItems } from "./salesOrderItems.js";
 import { salesOrders } from "./salesOrders.js";
+import { shiftAssignments } from "./shiftAssignments.js";
+import { shifts } from "./shifts.js";
 import { supplierMedicationVariants } from "./supplierMedicationVariants.js";
 import { suppliers } from "./suppliers.js";
 import { userCredentials } from "./userCredentials.js";
@@ -30,6 +31,10 @@ export const usersRelations = relations(users, ({ many }) => ({
   uploadedFiles: many(files),
   notifications: many(notifications),
   auditLogs: many(auditLogs),
+  shiftAssignments: many(shiftAssignments, { relationName: "userShifts" }),
+  createdShiftAssignments: many(shiftAssignments, {
+    relationName: "createdShifts",
+  }),
 }));
 
 export const userCredentialsRelations = relations(
@@ -42,8 +47,12 @@ export const userCredentialsRelations = relations(
   })
 );
 
-export const medicationsRelations = relations(medications, ({ many }) => ({
+export const medicationsRelations = relations(medications, ({ one, many }) => ({
   variants: many(medicationVariants),
+  image: one(files, {
+    fields: [medications.imageId],
+    references: [files.id],
+  }),
 }));
 
 export const medicationVariantsRelations = relations(
@@ -77,6 +86,10 @@ export const supplierMedicationVariantsRelations = relations(
       references: [medicationVariants.id],
     }),
     purchaseOrderItems: many(purchaseOrderItems),
+    contract: one(files, {
+      fields: [supplierMedicationVariants.contractId],
+      references: [files.id],
+    }),
   })
 );
 
@@ -199,6 +212,10 @@ export const salesOrdersRelations = relations(salesOrders, ({ one, many }) => ({
     references: [users.id],
   }),
   items: many(salesOrderItems),
+  prescription: one(files, {
+    fields: [salesOrders.prescriptionId],
+    references: [files.id],
+  }),
 }));
 
 export const salesOrderItemsRelations = relations(
@@ -220,18 +237,10 @@ export const filesRelations = relations(files, ({ one, many }) => ({
     fields: [files.uploadedBy],
     references: [users.id],
   }),
-  attachments: many(fileAttachments),
+  medicationImages: many(medications),
+  supplierContracts: many(supplierMedicationVariants),
+  salesOrderPrescriptions: many(salesOrders),
 }));
-
-export const fileAttachmentsRelations = relations(
-  fileAttachments,
-  ({ one }) => ({
-    file: one(files, {
-      fields: [fileAttachments.fileId],
-      references: [files.id],
-    }),
-  })
-);
 
 export const notificationsRelations = relations(notifications, ({ one }) => ({
   user: one(users, {
@@ -246,3 +255,27 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export const shiftsRelations = relations(shifts, ({ many }) => ({
+  assignments: many(shiftAssignments),
+}));
+
+export const shiftAssignmentsRelations = relations(
+  shiftAssignments,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [shiftAssignments.userId],
+      references: [users.id],
+      relationName: "userShifts",
+    }),
+    shift: one(shifts, {
+      fields: [shiftAssignments.shiftId],
+      references: [shifts.id],
+    }),
+    creator: one(users, {
+      fields: [shiftAssignments.createdBy],
+      references: [users.id],
+      relationName: "createdShifts",
+    }),
+  })
+);

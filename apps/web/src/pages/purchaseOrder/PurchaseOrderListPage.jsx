@@ -1,32 +1,24 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useNavigate } from "react-router";
-import {
-  usePurchaseOrders,
-  useDeletePurchaseOrder,
-  useUpdatePurchaseOrderStatus,
-} from "@/hooks/usePurchaseOrders";
 import { AppLayout } from "@/components/layouts/app-layout";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -35,22 +27,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Search,
-  Eye,
-  Trash2,
-  PlusCircle,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  useDeletePurchaseOrder,
+  usePurchaseOrders,
+  useUpdatePurchaseOrderStatus,
+} from "@/hooks/usePurchaseOrders";
+import {
+  ArrowUpDown,
   Calendar,
   Edit,
-  ArrowUpDown,
+  Eye,
+  PlusCircle,
+  Search,
+  Trash2,
 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 
 export default function PurchaseOrderListPage() {
   const navigate = useNavigate();
@@ -63,38 +63,19 @@ export default function PurchaseOrderListPage() {
   const [selectedId, setSelectedId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
 
-  const { data: purchaseOrders = [], isLoading } = usePurchaseOrders();
+  // Build filters for API
+  const filters = useMemo(() => {
+    const params = {};
+    if (searchQuery) params.search = searchQuery;
+    if (statusFilter !== "all") params.status = statusFilter;
+    params.sortOrder = sortOrder;
+    return params;
+  }, [searchQuery, statusFilter, sortOrder]);
+
+  const { data: purchaseOrders = [], isLoading } = usePurchaseOrders(filters);
   const { mutate: deletePurchaseOrder } = useDeletePurchaseOrder();
   const { mutate: updateStatus, isPending: isUpdatingStatus } =
     useUpdatePurchaseOrderStatus();
-
-  const filteredOrders = useMemo(() => {
-    let orders = [...purchaseOrders];
-
-    // Filter by status
-    if (statusFilter !== "all") {
-      orders = orders.filter((o) => o.status === statusFilter);
-    }
-
-    // Filter by search query
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      orders = orders.filter(
-        (o) =>
-          (o.supplierName || "").toLowerCase().includes(q) ||
-          (o.status || "").toLowerCase().includes(q)
-      );
-    }
-
-    // Sort by order date
-    orders.sort((a, b) => {
-      const dateA = new Date(a.orderDate);
-      const dateB = new Date(b.orderDate);
-      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
-    });
-
-    return orders;
-  }, [purchaseOrders, searchQuery, statusFilter, sortOrder]);
 
   const handleDelete = (id) => {
     setSelectedId(id);
@@ -272,7 +253,7 @@ export default function PurchaseOrderListPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredOrders.length === 0 ? (
+                  {purchaseOrders.length === 0 ? (
                     <TableRow>
                       <TableCell
                         colSpan={6}
@@ -292,7 +273,7 @@ export default function PurchaseOrderListPage() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredOrders.map((o) => (
+                    purchaseOrders.map((o) => (
                       <TableRow key={o.id}>
                         <TableCell>{o.supplierName || o.supplierId}</TableCell>
                         <TableCell>{getStatusBadge(o.status)}</TableCell>

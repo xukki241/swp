@@ -1,4 +1,5 @@
 import express from "express";
+import { createAuditLog } from "src/middleware/auditLog.js";
 
 import * as registrationController from "../controllers/registrationController.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
@@ -42,6 +43,7 @@ registrationRouter.post(
   "/:id/approve",
   authenticate,
   authorize("owner"),
+  createAuditLog("APPROVE", "registration_request"),
   registrationController.approveRegistration
 );
 
@@ -54,6 +56,7 @@ registrationRouter.post(
   "/:id/reject",
   authenticate,
   authorize("owner"),
+  createAuditLog("REJECT", "registration_request"),
   registrationController.rejectRegistration
 );
 
@@ -66,6 +69,7 @@ registrationRouter.delete(
   "/:id",
   authenticate,
   authorize("owner"),
+  createAuditLog("DELETE", "registration_request"),
   registrationController.deleteRegistration
 );
 

@@ -1,13 +1,13 @@
 import { z } from "zod";
 import {
-  uuidSchema,
   codeSchema,
-  nameSchema,
   descriptionSchema,
+  nameSchema,
   paginationSchema,
   positiveIntSchema,
+  uuidSchema,
+  warehouseZoneTypeEnum,
 } from "../common/index.js";
-import { warehouseZoneTypeEnum } from "../common/index.js";
 
 // Zone schema
 export const warehouseZoneSchema = z.object({

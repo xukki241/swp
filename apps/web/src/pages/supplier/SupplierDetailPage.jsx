@@ -1,8 +1,15 @@
 "use client";
 
-import { useParams, useNavigate } from "react-router";
 import { AppLayout } from "@/components/layouts/app-layout";
-import { useSupplier, useSupplierMedications } from "@/hooks/useSuppliers";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -11,16 +18,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Pencil, CheckCircle, XCircle, Ban } from "lucide-react";
+import { useSupplier, useSupplierMedications } from "@/hooks/useSuppliers";
+import { ArrowLeft, Ban, CheckCircle, Pencil, XCircle } from "lucide-react";
+import { useNavigate, useParams } from "react-router";
 
 export default function SupplierDetailPage() {
   const { id } = useParams();
@@ -54,6 +54,13 @@ export default function SupplierDetailPage() {
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </Badge>
     );
+  }
+
+  function formatVND(value) {
+    if (value === null || value === undefined || value === "") return "N/A";
+    const num = Number(value);
+    if (Number.isNaN(num)) return "N/A";
+    return new Intl.NumberFormat("vi-VN").format(Math.round(num)) + "₫";
   }
 
   if (isLoading) {
@@ -198,6 +205,7 @@ export default function SupplierDetailPage() {
                       <TableHead>Variant</TableHead>
                       <TableHead>Supplier SKU</TableHead>
                       <TableHead>Lead Time (days)</TableHead>
+                      <TableHead>Purchase Price</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -209,6 +217,9 @@ export default function SupplierDetailPage() {
                         <TableCell>{m.variantName || "N/A"}</TableCell>
                         <TableCell>{m.supplierSku || "N/A"}</TableCell>
                         <TableCell>{m.leadTimeDays || "N/A"}</TableCell>
+                        <TableCell className="font-semibold text-primary">
+                          {formatVND(m.purchasePrice)}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

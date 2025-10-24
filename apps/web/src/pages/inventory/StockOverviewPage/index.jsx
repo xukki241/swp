@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Eye, Settings2, Search } from "lucide-react";
 import { AppLayout } from "@/components/layouts/app-layout";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {

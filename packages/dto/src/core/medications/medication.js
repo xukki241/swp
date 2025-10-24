@@ -1,12 +1,12 @@
 import { z } from "zod";
 import {
-  uuidSchema,
-  nameSchema,
-  descriptionSchema,
   booleanSchema,
+  descriptionSchema,
+  medicationStatusEnum,
+  nameSchema,
   paginationSchema,
+  uuidSchema,
 } from "../common/index.js";
-import { medicationStatusEnum } from "../common/index.js";
 
 // Medication schema
 export const medicationSchema = z.object({
@@ -17,6 +17,7 @@ export const medicationSchema = z.object({
   isPrescriptionRequired: booleanSchema,
   isControlledSubstance: booleanSchema,
   status: medicationStatusEnum,
+  imageId: uuidSchema.nullable().optional(),
 });
 
 // POST /api/medications (batch)
@@ -27,6 +28,7 @@ export const createMedicationSchema = z.object({
   is_prescription_required: booleanSchema.default(false),
   is_controlled_substance: booleanSchema.default(false),
   status: medicationStatusEnum.default("active"),
+  image_id: uuidSchema.optional(),
 });
 
 export const createMedicationsRequestSchema = z.array(createMedicationSchema);

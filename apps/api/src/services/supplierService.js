@@ -1,4 +1,4 @@
-import { eq, ilike, or, and, ne } from "drizzle-orm";
+import { and, eq, ilike, ne, or } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import { medications } from "../db/schema/medications.js";
@@ -22,7 +22,7 @@ export const supplierService = {
         phone,
         address,
         status,
-        medicationVariants,
+        medicationVariants: supplierMedicationVariants,
       } = supplierData;
 
       // Validate only if field is provided
@@ -42,8 +42,11 @@ export const supplierService = {
       if (address !== undefined && !address.trim()) {
         validationErrors.push("Address is required.");
       }
-      if (medicationVariants && Array.isArray(medicationVariants)) {
-        for (const [vIndex, variant] of medicationVariants.entries()) {
+      if (
+        supplierMedicationVariants &&
+        Array.isArray(supplierMedicationVariants)
+      ) {
+        for (const [vIndex, variant] of supplierMedicationVariants.entries()) {
           if (
             variant.medication_variant_id !== undefined &&
             !variant.medication_variant_id
@@ -173,6 +176,7 @@ export const supplierService = {
           supplierSku: supplierMedicationVariants.supplierSku,
           leadTimeDays: supplierMedicationVariants.leadTimeDays,
           medicationName: medications.name,
+          purchasePrice: supplierMedicationVariants.purchasePrice,
           variantName: medicationVariants.name,
         })
         .from(supplierMedicationVariants)

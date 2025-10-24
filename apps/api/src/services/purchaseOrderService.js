@@ -1,4 +1,4 @@
-import { eq, and, gte, lte } from "drizzle-orm";
+import { and, eq, gte, lte } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import { medications } from "../db/schema/medications.js";
@@ -59,19 +59,6 @@ export const purchaseOrderService = {
         };
 
         const parsedExpectedDate = parseExpectedDate(expected_date);
-
-        // --- Debug logging (xem trước khi insert) ---
-        console.log("Creating PO =>", {
-          supplier_id,
-          expected_date_raw: expected_date,
-          expected_date_parsed: parsedExpectedDate,
-          orderDate: new Date().toISOString(),
-          status: "pending",
-          totalAmount,
-          createdBy: userId,
-          itemsCount: items.length,
-        });
-        // ------------------------------------------------
 
         // ✅ Tạo purchase order
         const [po] = await tx

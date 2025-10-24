@@ -1,6 +1,6 @@
-import { pgTable, text, boolean } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text } from "drizzle-orm/pg-core";
 
-import { identityPrimaryKey, foreignKey } from "./common.js";
+import { foreignKey, identityPrimaryKey } from "./common.js";
 import { users } from "./users.js";
 
 export const notifications = pgTable("notifications", {

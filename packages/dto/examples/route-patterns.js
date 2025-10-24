@@ -3,16 +3,16 @@
  */
 
 import { Router } from "express";
+import { z } from "zod";
 import {
-  validate,
-  validateBody,
-  validateQuery,
-  validateParams,
-  users,
   auth,
   medications,
+  users,
+  validate,
+  validateBody,
+  validateParams,
+  validateQuery,
 } from "../src/core";
-import { z } from "zod";
 
 // ============================================================================
 // Pattern 1: Standard CRUD Routes
@@ -334,4 +334,4 @@ const variantRouter = createNestedRoutes("medications", "variants", {
 // Create auth routes
 const authRouter = createAuthRoutes();
 
-export { userRouter, variantRouter, authRouter };
+export { authRouter, userRouter, variantRouter };

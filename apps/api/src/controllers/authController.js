@@ -5,7 +5,7 @@ import logger from "../utils/logger.js";
  * Register new user (User Story 1)
  * @route POST /api/auth/register
  */
-export const register = async (req, res, next) => {
+export const register = async (req, res, _next) => {
   try {
     const { name, email, phone, address, password } = req.body;
 
@@ -65,7 +65,7 @@ export const register = async (req, res, next) => {
  * Login user (User Story 3)
  * @route POST /api/auth/login
  */
-export const login = async (req, res, next) => {
+export const login = async (req, res, _next) => {
   try {
     const { email, password } = req.body;
 
@@ -111,7 +111,7 @@ export const logout = async (req, res, next) => {
  * Reset password (User Story 5)
  * @route POST /api/auth/reset-password
  */
-export const resetPassword = async (req, res, next) => {
+export const resetPassword = async (req, res, _next) => {
   try {
     const { email, newPassword } = req.body;
 
@@ -147,7 +147,7 @@ export const resetPassword = async (req, res, next) => {
  * Change password (for logged-in users)
  * @route POST /api/auth/change-password
  */
-export const changePassword = async (req, res, next) => {
+export const changePassword = async (req, res, _next) => {
   try {
     const { oldPassword, newPassword } = req.body;
     const userId = req.user?.userId; // From auth middleware
@@ -205,7 +205,7 @@ export const getCurrentUser = async (req, res, next) => {
  * Request password reset OTP (Forgot Password Step 1)
  * @route POST /api/auth/forgot-password
  */
-export const requestPasswordReset = async (req, res, next) => {
+export const requestPasswordReset = async (req, res, _next) => {
   try {
     const { identifier } = req.body;
 
@@ -234,9 +234,9 @@ export const requestPasswordReset = async (req, res, next) => {
  * Verify OTP and reset password (Forgot Password Step 2)
  * @route POST /api/auth/verify-reset-otp
  */
-export const verifyOTPAndResetPassword = async (req, res, next) => {
+export const verifyOTPAndResetPassword = async (req, res, _next) => {
   try {
-    const { identifier, otp, newPassword, method } = req.body;
+    const { identifier, otp, newPassword } = req.body;
 
     // Validation
     if (!identifier || !otp || !newPassword) {

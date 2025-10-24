@@ -1,17 +1,15 @@
 "use client";
 
-import { useParams, useNavigate } from "react-router";
-import { usePurchaseOrderReceipt } from "@/hooks/usePurchaseOrders";
 import { AppLayout } from "@/components/layouts/app-layout";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   Table,
@@ -21,14 +19,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { usePurchaseOrderReceipt } from "@/hooks/usePurchaseOrders";
 import {
   ArrowLeft,
-  Calendar,
-  User,
   Building2,
-  Package,
+  Calendar,
   FileText,
+  Package,
+  User,
 } from "lucide-react";
+import { useNavigate, useParams } from "react-router";
 
 export default function PurchaseOrderReceiptDetailPage() {
   const { id } = useParams();
@@ -289,6 +289,23 @@ export default function PurchaseOrderReceiptDetailPage() {
                         className="text-center py-8 text-muted-foreground"
                       >
                         No items found in this receipt
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {receipt.items && receipt.items.length > 0 && (
+                    <TableRow className="bg-muted/50">
+                      <TableCell colSpan={6} className="text-right font-bold">
+                        Total Received Value:
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-primary text-lg">
+                        {formatCurrency(
+                          receipt.items.reduce(
+                            (sum, item) =>
+                              sum +
+                              (item.unitPrice || 0) * (item.quantity || 0),
+                            0
+                          )
+                        )}
                       </TableCell>
                     </TableRow>
                   )}

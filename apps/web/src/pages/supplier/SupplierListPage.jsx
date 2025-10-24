@@ -1,27 +1,23 @@
 "use client";
 
-import { useState, useMemo } from "react"; // <-- THAY ĐỔI: Thêm useMemo
-import { useNavigate } from "react-router";
-import { useSuppliers, useDeleteSupplier } from "@/hooks/useSuppliers";
 import { AppLayout } from "@/components/layouts/app-layout";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -30,23 +26,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  PlusCircle,
-  Edit,
-  Trash2,
-  CheckCircle,
-  XCircle,
-  Ban,
-  Search,
-} from "lucide-react";
-import { toast } from "sonner";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useDeleteSupplier, useSuppliers } from "@/hooks/useSuppliers";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Eye } from "lucide-react";
+  Ban,
+  CheckCircle,
+  Eye,
+  PlusCircle,
+  Search,
+  Trash2,
+  XCircle,
+} from "lucide-react";
+import { useMemo, useState } from "react"; // <-- THAY ĐỔI: Thêm useMemo
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 export default function SupplierListPage() {
   const navigate = useNavigate();
@@ -57,34 +56,16 @@ export default function SupplierListPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
-  const { data: allSuppliers = [], isLoading } = useSuppliers();
+  // Build filters for API
+  const filters = useMemo(() => {
+    const params = {};
+    if (searchQuery) params.search = searchQuery;
+    if (statusFilter !== "all") params.status = statusFilter;
+    return params;
+  }, [searchQuery, statusFilter]);
+
+  const { data: allSuppliers = [], isLoading } = useSuppliers(filters);
   const { mutate: deleteSupplier } = useDeleteSupplier();
-
-  const filteredSuppliers = useMemo(() => {
-    let suppliers = [...allSuppliers];
-
-    if (statusFilter !== "all") {
-      suppliers = suppliers.filter((s) => s.status === statusFilter);
-    }
-
-    if (searchQuery) {
-      const lowercasedQuery = searchQuery.toLowerCase();
-      suppliers = suppliers.filter((s) => {
-        const nameMatch = (s.name || "")
-          .toLowerCase()
-          .includes(lowercasedQuery);
-        const emailMatch = (s.email || "")
-          .toLowerCase()
-          .includes(lowercasedQuery);
-        const phoneMatch = (s.phone || "")
-          .toLowerCase()
-          .includes(lowercasedQuery);
-        return nameMatch || emailMatch || phoneMatch;
-      });
-    }
-
-    return suppliers;
-  }, [allSuppliers, searchQuery, statusFilter]);
 
   const handleDelete = (id) => {
     setSelectedId(id);
@@ -249,7 +230,7 @@ export default function SupplierListPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredSuppliers.length === 0 ? (
+                  {allSuppliers.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-12">
                         <div className="flex flex-col items-center gap-2">
@@ -266,7 +247,7 @@ export default function SupplierListPage() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredSuppliers.map((s) => (
+                    allSuppliers.map((s) => (
                       <TableRow key={s.id}>
                         <TableCell className="font-medium">{s.name}</TableCell>
                         <TableCell>{s.email || "N/A"}</TableCell>

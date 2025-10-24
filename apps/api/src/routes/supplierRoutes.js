@@ -13,6 +13,7 @@ import express from "express";
 import { z } from "zod";
 
 import { supplierController } from "../controllers/supplierController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 import { supplierMedicationVariantRouter } from "./supplierMedicationVariantRoutes.js";
@@ -61,6 +62,7 @@ supplierRouter.post(
   "/",
   authorize("owner"),
   validateBody(createSuppliersRequestSchema),
+  createAuditLog("CREATE", "supplier"),
   supplierController.create
 );
 
@@ -74,6 +76,7 @@ supplierRouter.patch(
   authorize("owner"),
   validateParams(idParamSchema),
   validateBody(updateSupplierRequestSchema),
+  createAuditLog("UPDATE", "supplier"),
   supplierController.update
 );
 
@@ -86,6 +89,7 @@ supplierRouter.delete(
   "/:id",
   authorize("owner"),
   validateParams(idParamSchema),
+  createAuditLog("DELETE", "supplier"),
   supplierController.delete
 );
 

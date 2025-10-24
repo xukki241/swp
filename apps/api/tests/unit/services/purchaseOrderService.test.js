@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { db } from "@/db/index.js";
 import { purchaseOrderService } from "@/services/purchaseOrderService.js";
@@ -6,28 +6,24 @@ import { purchaseOrderService } from "@/services/purchaseOrderService.js";
 describe("PurchaseOrderService", () => {
   describe("create", () => {
     it("should create purchase order with items", async () => {
-      const poData = {
-        supplierId: 1,
-        orderDate: "2025-10-09",
-        expectedDate: "2025-10-16",
-        status: "pending",
-        totalAmount: 1000,
-        createdBy: 1,
-        items: [
-          {
-            supplierMedicationVariantId: 1,
-            quantity: 10,
-            unitPrice: 50,
-            totalPrice: 500,
-          },
-          {
-            supplierMedicationVariantId: 2,
-            quantity: 10,
-            unitPrice: 50,
-            totalPrice: 500,
-          },
-        ],
-      };
+      const poData = [
+        {
+          supplier_id: 1,
+          expected_date: "2025-10-16",
+          items: [
+            {
+              supplier_medication_variant_id: 1,
+              quantity: 10,
+              unit_price: 50,
+            },
+            {
+              supplier_medication_variant_id: 2,
+              quantity: 10,
+              unit_price: 50,
+            },
+          ],
+        },
+      ];
 
       const mockPO = {
         id: 1,
@@ -53,35 +49,24 @@ describe("PurchaseOrderService", () => {
         return callback(tx);
       });
 
-      const result = await purchaseOrderService.create(poData);
+      const result = await purchaseOrderService.create(poData, 1);
 
-      expect(result.id).toBe(1);
-      expect(result.items).toHaveLength(2);
+      expect(result[0].id).toBe(1);
+      expect(result[0].items).toHaveLength(2);
     });
 
-    it("should create purchase order without items", async () => {
-      const poData = {
-        supplierId: 1,
-        orderDate: "2025-10-09",
-        status: "pending",
-        createdBy: 1,
-      };
+    it("should reject purchase order without items", async () => {
+      const poData = [
+        {
+          supplier_id: 1,
+          expected_date: "2025-10-16",
+          items: [],
+        },
+      ];
 
-      const mockPO = { id: 1, supplierId: 1, status: "pending" };
-
-      db.transaction.mockImplementation(async (callback) => {
-        const tx = {
-          insert: vi.fn().mockReturnThis(),
-          values: vi.fn().mockReturnThis(),
-          returning: vi.fn().mockResolvedValue([mockPO]),
-        };
-        return callback(tx);
-      });
-
-      const result = await purchaseOrderService.create(poData);
-
-      expect(result.id).toBe(1);
-      expect(result.items).toEqual([]);
+      await expect(purchaseOrderService.create(poData, 1)).rejects.toThrow(
+        "items must be a non-empty array"
+      );
     });
   });
 

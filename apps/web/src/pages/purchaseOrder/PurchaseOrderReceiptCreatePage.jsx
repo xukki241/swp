@@ -1,21 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
-import {
-  usePurchaseOrder,
-  useCreatePurchaseOrderReceipt,
-} from "@/hooks/usePurchaseOrders";
-import { useCurrentUser } from "@/hooks/useAuth";
 import { AppLayout } from "@/components/layouts/app-layout";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -26,24 +20,39 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useCurrentUser } from "@/hooks/useAuth";
 import {
-  ArrowLeft,
-  Package,
-  Save,
+  useCreatePurchaseOrderReceipt,
+  usePurchaseOrder,
+} from "@/hooks/usePurchaseOrders";
+import {
   AlertCircle,
+  ArrowLeft,
   Building2,
   Calendar,
+  Package,
+  Save,
   X,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function PurchaseOrderReceiptCreatePage() {
   const { purchaseOrderId } = useParams();
   const navigate = useNavigate();
   const { data: order, isLoading } = usePurchaseOrder(purchaseOrderId);
   const { mutate: createReceipt, isPending } = useCreatePurchaseOrderReceipt();
-  const { data: currentUser } = useCurrentUser();
+  const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser();
+
+  // Debug logging
+  console.log("Current user data:", {
+    currentUser,
+    isLoadingUser,
+    hasUser: !!currentUser?.user,
+    userId: currentUser?.user?.userId,
+    userStructure: currentUser,
+  });
 
   const [receivedDate, setReceivedDate] = useState(
     new Date().toISOString().split("T")[0]
@@ -98,9 +107,19 @@ export default function PurchaseOrderReceiptCreatePage() {
       return;
     }
 
+    if (!currentUser?.user?.userId) {
+      console.error("User authentication check failed:", {
+        currentUser,
+        isLoadingUser,
+        hasToken: !!localStorage.getItem("token"),
+      });
+      toast.error("User not authenticated. Please login again.");
+      return;
+    }
+
     const payload = {
       receivedDate,
-      receivedBy: currentUser?.user?.id,
+      receivedBy: currentUser.user.userId,
       items: items
         .filter((item) => item.quantity > 0)
         .map((item) => ({
@@ -109,14 +128,28 @@ export default function PurchaseOrderReceiptCreatePage() {
         })),
     };
 
+    console.log("Creating receipt with payload:", {
+      payload,
+      receivedDateType: typeof receivedDate,
+      receivedDateValue: receivedDate,
+      receivedByType: typeof currentUser?.user?.userId,
+      receivedByValue: currentUser?.user?.userId,
+      itemsCount: payload.items.length,
+    });
+
     createReceipt(
       { purchaseOrderId, payload },
       {
         onSuccess: () => {
           toast.success("Receipt created successfully!");
-          navigate(`/purchase-orders/${purchaseOrderId}`);
+          navigate("/procurement/receipts");
         },
         onError: (error) => {
+          console.error("Failed to create receipt:", {
+            error,
+            response: error?.response,
+            data: error?.response?.data,
+          });
           toast.error("Failed to create receipt!", {
             description: error?.response?.data?.error || error.message,
           });

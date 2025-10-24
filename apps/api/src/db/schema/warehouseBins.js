@@ -1,12 +1,13 @@
-import { pgTable, uniqueIndex } from "drizzle-orm/pg-core";
+import { index, pgTable, uniqueIndex } from "drizzle-orm/pg-core";
 
 import {
-  identityPrimaryKey,
-  foreignKey,
   code,
-  name,
   description,
+  foreignKey,
+  identityPrimaryKey,
   int,
+  name,
+  searchVector,
 } from "./common.js";
 import { warehouseRacks } from "./warehouseRacks.js";
 
@@ -20,6 +21,7 @@ export const warehouseBins = pgTable(
     level: int("level").notNull(),
     number: int("number").notNull(),
     description: description(),
+    searchVector: searchVector(),
   },
   (table) => [
     uniqueIndex("warehouse_bins_rack_id_code_unique").on(
@@ -31,5 +33,6 @@ export const warehouseBins = pgTable(
       table.level,
       table.number
     ),
+    index("warehouse_bins_search_vector_idx").using("gin", table.searchVector),
   ]
 );

@@ -1,14 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router";
 import { AppLayout } from "@/components/layouts/app-layout";
-import { useSupplier, useUpdateSupplier } from "@/hooks/useSuppliers";
-import { useMedications, useMedicationsVariants } from "@/hooks/useMedications";
+import { MedicationRow } from "@/components/MedicationRow";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -16,8 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useMedications, useMedicationsVariants } from "@/hooks/useMedications";
+import { useSupplier, useUpdateSupplier } from "@/hooks/useSuppliers";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
-import { MedicationRow } from "@/components/MedicationRow";
 
 export default function SupplierEditPage() {
   const { id } = useParams();

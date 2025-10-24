@@ -1,14 +1,14 @@
-import { Link } from "react-router";
-import { Pill } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { sidebarConfig } from "@/config/sidebar-config";
+import { cn } from "@/lib/utils";
+import { Pill } from "lucide-react";
+import { Link } from "react-router";
 import { SidebarItem } from "./sidebar-item";
 
 export function Sidebar({ collapsed, onToggle }) {
   return (
     <aside
       className={cn(
-        "relative flex h-screen flex-col b`order-r border-sidebar-border bg-sidebar transition-all duration-300",
+        "relative flex h-screen flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300",
         collapsed ? "w-16" : "w-64"
       )}
     >

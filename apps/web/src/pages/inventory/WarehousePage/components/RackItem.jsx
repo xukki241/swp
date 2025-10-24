@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader } from "../../../../components/ui/card";
+import { ChevronDown, ChevronUp, Edit2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "../../../../components/ui/button";
+import { Card, CardContent, CardHeader } from "../../../../components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +17,6 @@ import { Label } from "../../../../components/ui/label";
 import { Textarea } from "../../../../components/ui/textarea";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
 import { BinGrid } from "./BinGrid";
-import { ChevronDown, ChevronUp, Edit2 } from "lucide-react";
 
 export function RackItem({ rack, isExpanded, onToggle }) {
   const { bins, updateRackData } = useWarehouse();

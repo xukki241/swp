@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import { medications } from "../db/schema/medications.js";
@@ -33,6 +33,7 @@ export const supplierMedicationVariantService = {
         supplierSku: supplierMedicationVariants.supplierSku,
         leadTimeDays: supplierMedicationVariants.leadTimeDays,
         supplierName: suppliers.name,
+        purchasePrice: supplierMedicationVariants.purchasePrice,
         medicationName: medications.name,
         variantName: medicationVariants.name,
       })
@@ -83,6 +84,7 @@ export const supplierMedicationVariantService = {
         supplierSku: supplierMedicationVariants.supplierSku,
         leadTimeDays: supplierMedicationVariants.leadTimeDays,
         supplierName: suppliers.name,
+        purchasePrice: supplierMedicationVariants.purchasePrice,
         medicationName: medications.name,
         variantName: medicationVariants.name,
       })

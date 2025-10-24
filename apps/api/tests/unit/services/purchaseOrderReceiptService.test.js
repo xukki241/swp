@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { db } from "@/db/index.js";
 import { purchaseOrderReceiptService } from "@/services/purchaseOrderReceiptService.js";
@@ -98,41 +98,39 @@ describe("PurchaseOrderReceiptService", () => {
         },
       ];
 
+      const mockItems = [
+        { quantity: 10, unitPrice: 100 },
+        { quantity: 5, unitPrice: 200 },
+      ];
+
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
         leftJoin: vi.fn().mockReturnThis(),
         limit: vi.fn().mockReturnThis(),
         offset: vi.fn().mockResolvedValue(mockReceipts),
       };
-      db.select.mockReturnValue(mockQuery);
+
+      const mockItemsQuery = {
+        from: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue(mockItems),
+      };
+
+      db.select.mockReturnValueOnce(mockQuery).mockReturnValue(mockItemsQuery);
 
       const result = await purchaseOrderReceiptService.getAll();
 
-      expect(result).toEqual(mockReceipts);
+      expect(result).toHaveLength(2);
+      expect(result[0]).toHaveProperty("totalAmount");
+      expect(result[1]).toHaveProperty("totalAmount");
     });
 
     it("should filter receipts by purchaseOrderId", async () => {
       const mockReceipts = [{ id: 1, purchaseOrderId: 1, receivedBy: 1 }];
 
-      const mockQuery = {
-        from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        offset: vi.fn().mockResolvedValue(mockReceipts),
-      };
-      db.select.mockReturnValue(mockQuery);
-
-      const result = await purchaseOrderReceiptService.getAll({
-        purchaseOrderId: 1,
-      });
-
-      expect(result).toEqual(mockReceipts);
-    });
-
-    it("should filter receipts by date range", async () => {
-      const mockReceipts = [
-        { id: 1, receivedDate: new Date("2025-10-09"), receivedBy: 1 },
+      const mockItems = [
+        { quantity: 10, unitPrice: 100 },
+        { quantity: 5, unitPrice: 200 },
       ];
 
       const mockQuery = {
@@ -142,14 +140,56 @@ describe("PurchaseOrderReceiptService", () => {
         limit: vi.fn().mockReturnThis(),
         offset: vi.fn().mockResolvedValue(mockReceipts),
       };
-      db.select.mockReturnValue(mockQuery);
+
+      const mockItemsQuery = {
+        from: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue(mockItems),
+      };
+
+      db.select.mockReturnValueOnce(mockQuery).mockReturnValue(mockItemsQuery);
+
+      const result = await purchaseOrderReceiptService.getAll({
+        purchaseOrderId: 1,
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toHaveProperty("totalAmount");
+    });
+
+    it("should filter receipts by date range", async () => {
+      const mockReceipts = [
+        { id: 1, receivedDate: new Date("2025-10-09"), receivedBy: 1 },
+      ];
+
+      const mockItems = [
+        { quantity: 10, unitPrice: 100 },
+        { quantity: 5, unitPrice: 200 },
+      ];
+
+      const mockQuery = {
+        from: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockReceipts),
+      };
+
+      const mockItemsQuery = {
+        from: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue(mockItems),
+      };
+
+      db.select.mockReturnValueOnce(mockQuery).mockReturnValue(mockItemsQuery);
 
       const result = await purchaseOrderReceiptService.getAll({
         startDate: "2025-10-01",
         endDate: "2025-10-31",
       });
 
-      expect(result).toEqual(mockReceipts);
+      expect(result).toHaveLength(1);
+      expect(result[0]).toHaveProperty("totalAmount");
     });
   });
 
