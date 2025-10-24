@@ -42,7 +42,21 @@ export default function SalesOrderDetailPage() {
         customerName: orderData.customer?.name || "N/A",
         customerPhone: orderData.customer?.phone || "",
         customerEmail: orderData.customer?.email || "",
-        salespersonName: orderData.salesperson?.name || "N/A",
+        salespersonName:
+          orderData.salesperson?.name || orderData.salesperson?.email || "N/A",
+        // Transform items to include medication info
+        items:
+          orderData.items?.map((item) => ({
+            ...item,
+            medicationName:
+              item.medicationVariant?.medication?.name ||
+              item.medicationVariant?.name ||
+              "Unknown",
+            variantName: item.medicationVariant?.name || "",
+            sellPrice: item.unitPrice, // unitPrice from salesOrderItems table
+            quantity: item.quantity,
+            totalPrice: item.totalPrice,
+          })) || [],
       };
 
       setOrder(transformedOrder);
@@ -91,7 +105,6 @@ export default function SalesOrderDetailPage() {
   const getStatusColor = (status) => {
     switch (status) {
       case "paid":
-      case "delivered":
         return "bg-green-100 text-green-800 border-green-300";
       case "pending":
         return "bg-yellow-100 text-yellow-800 border-yellow-300";
@@ -105,7 +118,6 @@ export default function SalesOrderDetailPage() {
   const getStatusIcon = (status) => {
     switch (status) {
       case "paid":
-      case "delivered":
         return <CheckCircle className="w-5 h-5" />;
       case "cancelled":
         return <XCircle className="w-5 h-5" />;
@@ -116,9 +128,7 @@ export default function SalesOrderDetailPage() {
 
   const paymentMethodLabels = {
     cash: "Cash",
-    credit_card: "Credit Card",
-    bank_transfer: "Bank Transfer",
-    mobile_payment: "Mobile Payment",
+    mobile_payment: "VietQR",
   };
 
   if (isLoading) {

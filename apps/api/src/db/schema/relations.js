@@ -13,6 +13,8 @@ import { purchaseOrderReceipts } from "./purchaseOrderReceipts.js";
 import { purchaseOrders } from "./purchaseOrders.js";
 import { salesOrderItems } from "./salesOrderItems.js";
 import { salesOrders } from "./salesOrders.js";
+import { shiftAssignments } from "./shiftAssignments.js";
+import { shifts } from "./shifts.js";
 import { supplierMedicationVariants } from "./supplierMedicationVariants.js";
 import { suppliers } from "./suppliers.js";
 import { userCredentials } from "./userCredentials.js";
@@ -29,6 +31,10 @@ export const usersRelations = relations(users, ({ many }) => ({
   uploadedFiles: many(files),
   notifications: many(notifications),
   auditLogs: many(auditLogs),
+  shiftAssignments: many(shiftAssignments, { relationName: "userShifts" }),
+  createdShiftAssignments: many(shiftAssignments, {
+    relationName: "createdShifts",
+  }),
 }));
 
 export const userCredentialsRelations = relations(
@@ -249,3 +255,27 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export const shiftsRelations = relations(shifts, ({ many }) => ({
+  assignments: many(shiftAssignments),
+}));
+
+export const shiftAssignmentsRelations = relations(
+  shiftAssignments,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [shiftAssignments.userId],
+      references: [users.id],
+      relationName: "userShifts",
+    }),
+    shift: one(shifts, {
+      fields: [shiftAssignments.shiftId],
+      references: [shifts.id],
+    }),
+    creator: one(users, {
+      fields: [shiftAssignments.createdBy],
+      references: [users.id],
+      relationName: "createdShifts",
+    }),
+  })
+);

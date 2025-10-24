@@ -47,6 +47,14 @@ export default function OrderSuccessModal({ order, onClose }) {
                 {order.paymentMethod}
               </span>
             </div>
+            {order.salesperson && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">Salesperson:</span>
+                <span className="font-semibold text-gray-900">
+                  {order.salesperson.name || order.salesperson.email}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-gray-600">Total Amount:</span>
               <span className="font-bold text-lg text-green-600">

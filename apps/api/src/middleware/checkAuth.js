@@ -47,7 +47,8 @@ export const authenticate = async (req, res, next) => {
 
     // Attach user info to request
     req.user = {
-      userId: user.id, // UUID is already a string
+      id: user.id, // UUID is already a string (for consistency with other parts)
+      userId: user.id, // Keep for backward compatibility
       email: user.email,
       role: user.role,
       name: user.name,
@@ -122,7 +123,8 @@ export const optionalAuth = async (req, res, next) => {
 
       if (user && user.status === "active") {
         req.user = {
-          userId: user.id, // UUID is already a string
+          id: user.id, // UUID is already a string (for consistency)
+          userId: user.id, // Keep for backward compatibility
           email: user.email,
           role: user.role,
           name: user.name,
