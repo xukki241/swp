@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useInventory } from "@/hooks/useInventory";
 import MedicineCard from "./components/MedicineCard";
+import { Button } from "@/components/ui/button";
 
 const InventoryTracking = () => {
   const {
@@ -99,11 +100,11 @@ const InventoryTracking = () => {
             className="w-full"
           >
             <AccordionItem value="low-stock">
-              <AccordionTrigger>Low Stock Tracking</AccordionTrigger>
+              <AccordionTrigger className="text-lg">Low Stock Tracking</AccordionTrigger>
               <AccordionContent>{renderLowStock()}</AccordionContent>
             </AccordionItem>
             <AccordionItem value="expiry-tracking">
-              <AccordionTrigger>Expiry Tracking</AccordionTrigger>
+              <AccordionTrigger className="text-lg">Expiry Tracking</AccordionTrigger>
               <AccordionContent>{renderExpiring()}</AccordionContent>
             </AccordionItem>
           </Accordion>

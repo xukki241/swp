@@ -80,13 +80,6 @@ export default function StockOverviewPage() {
                   className="pl-10 w-full"
                 />
               </div>
-              <Button
-                className="bg-primary hover:bg-primary/90"
-                onClick={() => handleShowDialog("add")}
-              >
-                <Plus className="h-4 w-4" />
-                Add Stock
-              </Button>
             </div>
 
             <div>
