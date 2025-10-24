@@ -10,10 +10,10 @@ import {
   validateQuery,
 } from "@pharmaflow/dto/middleware";
 import express from "express";
-import { createAuditLog } from "src/middleware/auditLog.js";
 import { z } from "zod";
 
 import { supplierMedicationVariantController } from "../controllers/supplierMedicationVariantController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 // Nested router for /api/suppliers/:supplierId/medications
