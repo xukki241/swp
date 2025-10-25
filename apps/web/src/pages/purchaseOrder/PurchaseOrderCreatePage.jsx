@@ -14,13 +14,15 @@ import {
 } from "@/components/ui/select";
 import { useSupplier, useSuppliers } from "@/hooks/useSuppliers";
 import { instance } from "@/lib/axios";
+import { useQueryClient } from "@tanstack/react-query";
 import { Building2, Loader2, Package, Plus, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
 export default function PurchaseOrderCreatePage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data: suppliersData, isLoading: loadingSuppliers } = useSuppliers();
   const [supplierId, setSupplierId] = useState("");
   const { data: supplierDetail, isLoading: loadingSupplierDetail } =
@@ -39,6 +41,23 @@ export default function PurchaseOrderCreatePage() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Debug: Log supplier medication variants when loaded
+  useEffect(() => {
+    if (supplierDetail?.medicationVariants) {
+      console.log(
+        "🔍 Supplier medication variants loaded:",
+        supplierDetail.medicationVariants.map((v) => ({
+          id: v.id,
+          name: v.medicationName,
+          variant: v.variantName,
+          leadTimeDays: v.leadTimeDays,
+          purchasePrice: v.purchasePrice,
+          type: typeof v.purchasePrice,
+        }))
+      );
+    }
+  }, [supplierDetail]);
+
   const expectedDeliveryDate = useMemo(() => {
     // Chỉ tính khi đã có items được chọn với medication và lead time
     const itemsWithLeadTime = selectedItems
@@ -48,7 +67,7 @@ export default function PurchaseOrderCreatePage() {
       })
       .filter((days) => days > 0);
 
-    if (itemsWithLeadTime.length === 0) return "";
+    if (itemsWithLeadTime.length === 0) return null;
 
     const maxLeadTime = Math.max(...itemsWithLeadTime);
 
@@ -87,6 +106,28 @@ export default function PurchaseOrderCreatePage() {
   const handleChangeItem = (index, field, value) => {
     const updated = [...selectedItems];
     updated[index][field] = value;
+
+    // Auto-fill unit price when medication is selected
+    if (field === "supplierMedicationVariantId") {
+      const selectedMed = meds.find((m) => m.id === value);
+      console.log("📋 Selected medication:", {
+        id: value,
+        medication: selectedMed,
+        purchasePrice: selectedMed?.purchasePrice,
+        type: typeof selectedMed?.purchasePrice,
+      });
+
+      if (selectedMed?.purchasePrice) {
+        // Parse to number if it's a string
+        const price =
+          typeof selectedMed.purchasePrice === "string"
+            ? parseFloat(selectedMed.purchasePrice)
+            : selectedMed.purchasePrice;
+        updated[index].unitPrice = price;
+        console.log("💰 Auto-filled unit price:", price);
+      }
+    }
+
     setSelectedItems(updated);
   };
 
@@ -132,7 +173,7 @@ export default function PurchaseOrderCreatePage() {
       const payload = [
         {
           supplier_id: supplierId,
-          expected_date: expectedDeliveryDate,
+          expected_date: expectedDeliveryDate || null,
           items: selectedItems.map((i) => ({
             supplier_medication_variant_id: i.supplierMedicationVariantId,
             quantity: Number(i.quantity),
@@ -142,6 +183,20 @@ export default function PurchaseOrderCreatePage() {
       ];
 
       console.log("📦 Payload sent:", payload);
+      console.log("📅 Expected Delivery Date:", expectedDeliveryDate);
+      console.log(
+        "🔢 Items with lead time:",
+        selectedItems.map((item) => {
+          const med = meds.find(
+            (m) => m.id === item.supplierMedicationVariantId
+          );
+          return {
+            medication: med?.medicationName,
+            leadTime: med?.leadTimeDays,
+            purchasePrice: med?.purchasePrice,
+          };
+        })
+      );
 
       const response = await instance.post("/purchases", payload);
       const createdOrder = response.data?.data?.[0] || response.data;
@@ -169,14 +224,13 @@ export default function PurchaseOrderCreatePage() {
           };
         }),
         totalAmount,
-        expectedDeliveryDate: new Date(expectedDeliveryDate).toLocaleDateString(
-          "en-US",
-          {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          }
-        ),
+        expectedDeliveryDate: expectedDeliveryDate
+          ? new Date(expectedDeliveryDate).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
+          : "Not specified",
         orderNumber: createdOrder?.id || `PO-${Date.now()}`,
         orderDate: new Date().toLocaleDateString("en-US", {
           year: "numeric",
@@ -193,6 +247,9 @@ export default function PurchaseOrderCreatePage() {
         console.error("⚠️ Email sending failed:", emailError);
         toast.warning("Purchase order created, but email notification failed.");
       }
+
+      // Invalidate purchase orders query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ["purchaseOrders"] });
 
       navigate("/procurement/purchase-orders");
     } catch (error) {

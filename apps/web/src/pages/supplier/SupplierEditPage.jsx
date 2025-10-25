@@ -90,6 +90,10 @@ export default function SupplierEditPage() {
           supplierSku: v.supplierSku || v.supplier_sku || "",
           leadTimeDays:
             v.leadTimeDays?.toString() || v.lead_time_days?.toString() || "",
+          purchasePrice:
+            v.purchasePrice?.toString() || v.purchase_price?.toString() || "",
+          contractId: v.contractId || v.contract_id || null,
+          contractFilename: v.contractFilename || v.contract_filename || null,
         };
 
         return result;
@@ -109,6 +113,9 @@ export default function SupplierEditPage() {
         variantName: "",
         supplierSku: "",
         leadTimeDays: "",
+        purchasePrice: "",
+        contractId: null,
+        contractFilename: null,
       },
     ]);
 
@@ -140,7 +147,7 @@ export default function SupplierEditPage() {
     }
 
     meds.forEach((med, index) => {
-      if (med.medicationId || med.supplierSku.trim()) {
+      if (med.medicationId || med.supplierSku.trim() || med.purchasePrice) {
         if (!med.medicationVariantId) {
           validationErrors.push(
             `Medication #${index + 1}: Medication Variant must be selected.`
@@ -149,6 +156,11 @@ export default function SupplierEditPage() {
         if (!med.supplierSku.trim()) {
           validationErrors.push(
             `Medication #${index + 1}: Supplier SKU is required.`
+          );
+        }
+        if (!med.purchasePrice || Number(med.purchasePrice) <= 0) {
+          validationErrors.push(
+            `Medication #${index + 1}: Purchase Price must be greater than 0.`
           );
         }
       }
@@ -167,13 +179,21 @@ export default function SupplierEditPage() {
 
     try {
       const variants = meds
-        .filter((m) => m.medicationVariantId && m.supplierSku.trim())
+        .filter(
+          (m) =>
+            m.medicationVariantId &&
+            m.supplierSku.trim() &&
+            m.purchasePrice &&
+            Number(m.purchasePrice) > 0
+        )
         .map((m) => ({
           medication_variant_id: m.medicationVariantId,
           supplier_sku: m.supplierSku.trim(),
           lead_time_days: m.leadTimeDays
             ? Number.parseInt(m.leadTimeDays, 10)
             : null,
+          purchase_price: Number(m.purchasePrice),
+          contract_id: m.contractId || null,
         }));
 
       const payload = {

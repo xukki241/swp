@@ -18,9 +18,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useDownloadFile } from "@/hooks/useFiles";
 import { useSupplier, useSupplierMedications } from "@/hooks/useSuppliers";
-import { ArrowLeft, Ban, CheckCircle, Pencil, XCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Ban,
+  CheckCircle,
+  Download,
+  Pencil,
+  XCircle,
+} from "lucide-react";
 import { useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 export default function SupplierDetailPage() {
   const { id } = useParams();
@@ -28,6 +37,7 @@ export default function SupplierDetailPage() {
   const { data: supplier, isLoading } = useSupplier(id);
   const { data: medications = [], isLoading: isLoadingMedications } =
     useSupplierMedications(id);
+  const downloadFile = useDownloadFile();
 
   function getStatusBadge(status) {
     const variants = {
@@ -62,6 +72,21 @@ export default function SupplierDetailPage() {
     if (Number.isNaN(num)) return "N/A";
     return new Intl.NumberFormat("vi-VN").format(Math.round(num)) + "₫";
   }
+
+  const handleDownloadContract = async (contractId, supplierSku) => {
+    if (!contractId) return;
+
+    try {
+      await downloadFile.mutateAsync({
+        fileId: contractId,
+        filename: `contract-${supplierSku || "document"}.pdf`,
+      });
+      toast.success("Contract downloaded successfully!");
+    } catch (error) {
+      console.error("Error downloading contract:", error);
+      toast.error("Failed to download contract file");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -206,6 +231,7 @@ export default function SupplierDetailPage() {
                       <TableHead>Supplier SKU</TableHead>
                       <TableHead>Lead Time (days)</TableHead>
                       <TableHead>Purchase Price</TableHead>
+                      <TableHead className="text-center">Contract</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -219,6 +245,28 @@ export default function SupplierDetailPage() {
                         <TableCell>{m.leadTimeDays || "N/A"}</TableCell>
                         <TableCell className="font-semibold text-primary">
                           {formatVND(m.purchasePrice)}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {m.contractId ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                handleDownloadContract(
+                                  m.contractId,
+                                  m.supplierSku
+                                )
+                              }
+                              className="flex items-center gap-2 mx-auto"
+                            >
+                              <Download className="w-4 h-4" />
+                              Download
+                            </Button>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">
+                              No contract
+                            </span>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}

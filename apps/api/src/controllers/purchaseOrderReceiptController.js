@@ -87,6 +87,50 @@ export const purchaseOrderReceiptController = {
       res.status(500).json({ error: error.message });
     }
   },
+
+  // Get inventory allocations for a receipt
+  async getAllocations(req, res) {
+    try {
+      const { inventoryAllocationService } = await import(
+        "../services/inventoryAllocationService.js"
+      );
+      const allocations =
+        await inventoryAllocationService.getReceiptAllocations(req.params.id);
+      res.json({
+        success: true,
+        data: allocations,
+      });
+    } catch (error) {
+      logger.error("Error getting receipt allocations:", error);
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  // Find available bins for receipt items with selected zones
+  async findAvailableBins(req, res) {
+    try {
+      const { items } = req.body;
+      if (!items || !Array.isArray(items)) {
+        return res.status(400).json({
+          error: "Items array is required",
+        });
+      }
+
+      const { warehouseAllocationService } = await import(
+        "../services/warehouseAllocationService.js"
+      );
+
+      const results = await warehouseAllocationService.findBinsForItems(items);
+
+      res.json({
+        success: true,
+        data: results,
+      });
+    } catch (error) {
+      logger.error("Error finding available bins:", error);
+      res.status(500).json({ error: error.message });
+    }
+  },
   // Update purchase order receipt
   async update(req, res) {
     try {

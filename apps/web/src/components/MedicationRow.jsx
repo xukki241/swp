@@ -1,5 +1,6 @@
 "use client";
 
+import { useUploadFile } from "@/hooks/useFiles";
 import { useMedicationVariants } from "@/hooks/useMedications";
 import { FileText, Upload, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -25,12 +26,12 @@ export function MedicationRow({
   const [selectedMedId, setSelectedMedId] = useState(
     rowData.medicationId || ""
   );
-  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
 
   const { data: variantsData, isLoading: isLoadingVariants } =
     useMedicationVariants(selectedMedId || undefined);
   const availableVariants = variantsData?.data || [];
+  const uploadFile = useUploadFile();
 
   const medicationOptions = useMemo(
     () =>
@@ -126,26 +127,8 @@ export function MedicationRow({
       return;
     }
 
-    setUploading(true);
-
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/files", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Upload failed");
-      }
-
-      const result = await response.json();
+      const result = await uploadFile.mutateAsync(file);
 
       // Update rowData with contract ID and filename
       onChange(index, {
@@ -163,7 +146,6 @@ export function MedicationRow({
         description: error.message || "Could not upload contract file.",
       });
     } finally {
-      setUploading(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -308,10 +290,10 @@ export function MedicationRow({
               type="button"
               variant="outline"
               onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
+              disabled={uploadFile.isPending}
               className="w-full md:w-auto"
             >
-              {uploading ? (
+              {uploadFile.isPending ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />
                   Uploading...

@@ -3,6 +3,20 @@ import { describe, expect, it, vi } from "vitest";
 import { db } from "@/db/index.js";
 import { purchaseOrderReceiptService } from "@/services/purchaseOrderReceiptService.js";
 
+// Mock inventory allocation service
+vi.mock("@/services/inventoryAllocationService.js", () => ({
+  inventoryAllocationService: {
+    allocateInventory: vi.fn().mockResolvedValue([
+      {
+        id: "inv-1",
+        binId: "bin-1",
+        binCode: "R-A-001-L1-B01",
+        quantity: 10,
+      },
+    ]),
+  },
+}));
+
 describe("PurchaseOrderReceiptService", () => {
   describe("create", () => {
     it("should create purchase order receipt with items", async () => {
@@ -39,13 +53,32 @@ describe("PurchaseOrderReceiptService", () => {
       ];
 
       db.transaction.mockImplementation(async (callback) => {
+        // Mock select queries (for PO items and supplier medication variants)
+        const selectQuery = {
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockImplementation(() => {
+            // First query returns purchase order item with supplier med variant ID
+            // Second query returns supplier med variant with medication variant ID
+            return Promise.resolve([
+              {
+                supplierMedicationVariantId: "var-1",
+                medicationVariantId: "med-1",
+              },
+            ]);
+          }),
+        };
+
         const tx = {
           insert: vi.fn().mockReturnThis(),
           values: vi.fn().mockReturnThis(),
+          select: vi.fn(() => selectQuery),
+          update: vi.fn().mockReturnThis(),
+          set: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
           returning: vi
             .fn()
-            .mockResolvedValueOnce([mockReceipt])
-            .mockResolvedValueOnce(mockItems),
+            .mockResolvedValueOnce([mockReceipt]) // For receipt insert
+            .mockResolvedValueOnce(mockItems), // For items insert
         };
         return callback(tx);
       });
@@ -69,6 +102,9 @@ describe("PurchaseOrderReceiptService", () => {
         const tx = {
           insert: vi.fn().mockReturnThis(),
           values: vi.fn().mockReturnThis(),
+          update: vi.fn().mockReturnThis(),
+          set: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
           returning: vi.fn().mockResolvedValue([mockReceipt]),
         };
         return callback(tx);
@@ -281,11 +317,16 @@ describe("PurchaseOrderReceiptService", () => {
     it("should delete purchase order receipt", async () => {
       const mockReceipt = { id: 1, purchaseOrderId: 1, receivedBy: 1 };
 
-      const mockQuery = {
-        where: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([mockReceipt]),
-      };
-      db.delete.mockReturnValue(mockQuery);
+      db.transaction.mockImplementation(async (callback) => {
+        const tx = {
+          delete: vi.fn().mockReturnThis(),
+          select: vi.fn().mockReturnThis(),
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          returning: vi.fn().mockResolvedValue([mockReceipt]),
+        };
+        return callback(tx);
+      });
 
       const result = await purchaseOrderReceiptService.delete(1);
 

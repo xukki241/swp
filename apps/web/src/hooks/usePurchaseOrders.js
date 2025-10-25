@@ -5,9 +5,11 @@ import {
   createPurchaseOrderReceipt,
   deletePurchaseOrder,
   deletePurchaseOrderReceipt,
+  findAvailableBinsForItems,
   getAllPurchaseOrderReceipts,
   getAllPurchaseOrders,
   getPurchaseOrderById,
+  getPurchaseOrderReceiptAllocations,
   getPurchaseOrderReceiptById,
   getPurchaseOrderReceipts,
   updatePurchaseOrderStatus,
@@ -148,5 +150,26 @@ export const useDeletePurchaseOrderReceipt = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["purchaseOrderReceipts"] });
     },
+  });
+};
+
+/**
+ * Hook lấy warehouse allocations của receipt
+ */
+export const usePurchaseOrderReceiptAllocations = (receiptId) => {
+  return useQuery({
+    queryKey: ["purchaseOrderReceiptAllocations", receiptId],
+    queryFn: () => getPurchaseOrderReceiptAllocations(receiptId),
+    enabled: !!receiptId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+/**
+ * Hook tìm bins trống cho items với zones đã chọn
+ */
+export const useFindAvailableBins = () => {
+  return useMutation({
+    mutationFn: findAvailableBinsForItems,
   });
 };

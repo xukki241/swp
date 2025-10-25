@@ -10,8 +10,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -23,15 +38,20 @@ import {
 import { useCurrentUser } from "@/hooks/useAuth";
 import {
   useCreatePurchaseOrderReceipt,
+  useFindAvailableBins,
   usePurchaseOrder,
 } from "@/hooks/usePurchaseOrders";
+import { useWarehouse } from "@/hooks/useWarehouse";
 import {
   AlertCircle,
   ArrowLeft,
   Building2,
   Calendar,
+  CheckCircle,
+  MapPin,
   Package,
   Save,
+  Warehouse,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -43,33 +63,33 @@ export default function PurchaseOrderReceiptCreatePage() {
   const navigate = useNavigate();
   const { data: order, isLoading } = usePurchaseOrder(purchaseOrderId);
   const { mutate: createReceipt, isPending } = useCreatePurchaseOrderReceipt();
+  const { mutate: findBins, isPending: isFindingBins } = useFindAvailableBins();
   const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser();
-
-  // Debug logging
-  console.log("Current user data:", {
-    currentUser,
-    isLoadingUser,
-    hasUser: !!currentUser?.user,
-    userId: currentUser?.user?.userId,
-    userStructure: currentUser,
-  });
+  const { zones, loading: loadingZones } = useWarehouse();
 
   const [receivedDate, setReceivedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
   const [items, setItems] = useState([]);
+  const [showZoneDialog, setShowZoneDialog] = useState(false);
+  const [selectedZones, setSelectedZones] = useState({});
+  const [allocatedBins, setAllocatedBins] = useState([]);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   useEffect(() => {
     if (order?.items) {
-      // Initialize items with ordered quantities
       setItems(
         order.items.map((item) => ({
           purchaseOrderItemId: item.id,
+          medicationVariantId: item.medicationVariantId,
           quantity: item.quantity,
           orderedQuantity: item.quantity,
           medicationName: item.medicationName,
           variantName: item.variantName,
           unitPrice: item.unitPrice,
+          batchNumber: "",
+          manufactureDate: "",
+          expiryDate: "",
         }))
       );
     }
@@ -82,13 +102,26 @@ export default function PurchaseOrderReceiptCreatePage() {
     setItems(newItems);
   };
 
+  const handleBatchFieldChange = (index, field, value) => {
+    const newItems = [...items];
+    newItems[index][field] = value;
+    setItems(newItems);
+  };
+
   const handleRemoveItem = (index) => {
     const newItems = items.filter((_, i) => i !== index);
     setItems(newItems);
     toast.info("Item removed from receipt");
   };
 
-  const handleSubmit = (e) => {
+  const handleZoneChange = (itemId, zoneId) => {
+    setSelectedZones((prev) => ({
+      ...prev,
+      [itemId]: zoneId,
+    }));
+  };
+
+  const handleCreateReceipt = (e) => {
     e.preventDefault();
 
     // Validation
@@ -107,49 +140,89 @@ export default function PurchaseOrderReceiptCreatePage() {
       return;
     }
 
+    // Show zone selection dialog
+    setShowZoneDialog(true);
+  };
+
+  const handleFindBins = () => {
+    // Validate all items have zones selected
+    const activeItems = items.filter((item) => item.quantity > 0);
+    const missingZones = activeItems.some(
+      (item) => !selectedZones[item.purchaseOrderItemId]
+    );
+
+    if (missingZones) {
+      toast.error("Please select a zone for all items");
+      return;
+    }
+
+    // Prepare data for finding bins
+    const itemsWithZones = activeItems.map((item) => ({
+      purchaseOrderItemId: item.purchaseOrderItemId,
+      medicationVariantId: item.medicationVariantId,
+      quantity: item.quantity,
+      zoneId: selectedZones[item.purchaseOrderItemId],
+      batchNumber: item.batchNumber,
+      manufactureDate: item.manufactureDate,
+      expiryDate: item.expiryDate,
+      medicationName: item.medicationName,
+      variantName: item.variantName,
+    }));
+
+    findBins(itemsWithZones, {
+      onSuccess: (response) => {
+        const results = response.data;
+        setAllocatedBins(results);
+        setShowZoneDialog(false);
+        setShowConfirmDialog(true);
+      },
+      onError: (error) => {
+        toast.error("Failed to find bins", {
+          description: error?.response?.data?.error || error.message,
+        });
+      },
+    });
+  };
+
+  const handleConfirmCreate = () => {
     if (!currentUser?.user?.userId) {
-      console.error("User authentication check failed:", {
-        currentUser,
-        isLoadingUser,
-        hasToken: !!localStorage.getItem("token"),
-      });
       toast.error("User not authenticated. Please login again.");
+      return;
+    }
+
+    // Check if any items have errors
+    const hasErrors = allocatedBins.some((item) => item.error);
+    if (hasErrors) {
+      toast.error("Cannot create receipt. Some items have no available bins.");
       return;
     }
 
     const payload = {
       receivedDate,
       receivedBy: currentUser.user.userId,
-      items: items
-        .filter((item) => item.quantity > 0)
-        .map((item) => ({
-          purchaseOrderItemId: item.purchaseOrderItemId,
-          quantity: Number(item.quantity),
-        })),
+      items: allocatedBins.map((item) => ({
+        purchaseOrderItemId: item.purchaseOrderItemId,
+        quantity: Number(item.quantity),
+        batchNumber: item.batchNumber || undefined,
+        manufactureDate: item.manufactureDate || undefined,
+        expiryDate: item.expiryDate || undefined,
+        binId: item.bin?.binId, // Send the selected bin ID
+      })),
     };
-
-    console.log("Creating receipt with payload:", {
-      payload,
-      receivedDateType: typeof receivedDate,
-      receivedDateValue: receivedDate,
-      receivedByType: typeof currentUser?.user?.userId,
-      receivedByValue: currentUser?.user?.userId,
-      itemsCount: payload.items.length,
-    });
 
     createReceipt(
       { purchaseOrderId, payload },
       {
-        onSuccess: () => {
+        onSuccess: (data) => {
           toast.success("Receipt created successfully!");
-          navigate("/procurement/receipts");
+          setShowConfirmDialog(false);
+          if (data?.id) {
+            navigate(`/procurement/receipts/${data.id}`);
+          } else {
+            navigate("/procurement/receipts");
+          }
         },
         onError: (error) => {
-          console.error("Failed to create receipt:", {
-            error,
-            response: error?.response,
-            data: error?.response?.data,
-          });
           toast.error("Failed to create receipt!", {
             description: error?.response?.data?.error || error.message,
           });
@@ -163,10 +236,6 @@ export default function PurchaseOrderReceiptCreatePage() {
       style: "currency",
       currency: "VND",
     }).format(amount);
-  };
-
-  const calculateTotal = () => {
-    return items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   };
 
   if (isLoading) {
@@ -257,7 +326,7 @@ export default function PurchaseOrderReceiptCreatePage() {
         </Card>
 
         {/* Form */}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleCreateReceipt}>
           <Card className="shadow-md border-0">
             <CardHeader>
               <CardTitle>Receipt Details</CardTitle>
@@ -266,7 +335,6 @@ export default function PurchaseOrderReceiptCreatePage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Received Date */}
               <div className="max-w-sm">
                 <Label htmlFor="receivedDate">Received Date *</Label>
                 <Input
@@ -279,7 +347,6 @@ export default function PurchaseOrderReceiptCreatePage() {
                 />
               </div>
 
-              {/* Items Table */}
               <div>
                 <Label className="mb-3 block">Received Items</Label>
                 <Alert className="mb-4">
@@ -290,13 +357,16 @@ export default function PurchaseOrderReceiptCreatePage() {
                   </AlertDescription>
                 </Alert>
 
-                <div className="rounded-lg border">
+                <div className="rounded-lg border overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-[50px]">#</TableHead>
                         <TableHead>Medication</TableHead>
                         <TableHead>Variant</TableHead>
+                        <TableHead>Batch Number</TableHead>
+                        <TableHead>Manufacture Date</TableHead>
+                        <TableHead>Expiry Date</TableHead>
                         <TableHead className="text-right">
                           Ordered Qty
                         </TableHead>
@@ -320,8 +390,51 @@ export default function PurchaseOrderReceiptCreatePage() {
                           <TableCell className="text-muted-foreground">
                             {item.variantName}
                           </TableCell>
+                          <TableCell>
+                            <Input
+                              type="text"
+                              value={item.batchNumber}
+                              onChange={(e) =>
+                                handleBatchFieldChange(
+                                  index,
+                                  "batchNumber",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Batch #"
+                              className="w-32"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              type="date"
+                              value={item.manufactureDate}
+                              onChange={(e) =>
+                                handleBatchFieldChange(
+                                  index,
+                                  "manufactureDate",
+                                  e.target.value
+                                )
+                              }
+                              className="w-40"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              type="date"
+                              value={item.expiryDate}
+                              onChange={(e) =>
+                                handleBatchFieldChange(
+                                  index,
+                                  "expiryDate",
+                                  e.target.value
+                                )
+                              }
+                              className="w-40"
+                            />
+                          </TableCell>
                           <TableCell className="text-right">
-                            {item.orderedQuantity.toLocaleString()}
+                            {item.orderedQuantity}
                           </TableCell>
                           <TableCell className="text-right">
                             <Input
@@ -332,7 +445,7 @@ export default function PurchaseOrderReceiptCreatePage() {
                               onChange={(e) =>
                                 handleQuantityChange(index, e.target.value)
                               }
-                              className="w-24 ml-auto"
+                              className="w-24 text-right"
                               required
                             />
                           </TableCell>
@@ -342,69 +455,298 @@ export default function PurchaseOrderReceiptCreatePage() {
                           <TableCell className="text-right font-semibold">
                             {formatCurrency(item.quantity * item.unitPrice)}
                           </TableCell>
-                          <TableCell className="text-center">
+                          <TableCell>
                             <Button
                               type="button"
                               variant="ghost"
                               size="icon"
                               onClick={() => handleRemoveItem(index)}
-                              className="h-8 w-8 text-destructive hover:text-destructive"
+                              className="h-8 w-8"
                             >
-                              <X className="h-4 w-4" />
+                              <X className="w-4 h-4" />
                             </Button>
                           </TableCell>
                         </TableRow>
                       ))}
-                      <TableRow>
-                        <TableCell colSpan={7} className="text-right font-bold">
-                          Total Received Value:
-                        </TableCell>
-                        <TableCell className="text-right font-bold text-primary">
-                          {formatCurrency(calculateTotal())}
-                        </TableCell>
-                      </TableRow>
                     </TableBody>
                   </Table>
                 </div>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Actions */}
-          <Card className="shadow-md border-0 mt-6">
-            <CardContent className="py-6">
-              <div className="flex justify-end gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() =>
-                    navigate(`/purchase-orders/${purchaseOrderId}`)
-                  }
-                  disabled={isPending}
-                >
-                  Cancel
-                </Button>
+              <div className="flex justify-end pt-4 border-t">
                 <Button
                   type="submit"
-                  disabled={isPending}
-                  className="min-w-[120px]"
+                  disabled={isPending || items.length === 0}
+                  size="lg"
+                  className="gap-2"
                 >
-                  {isPending ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 mr-2" />
-                      Create Receipt
-                    </>
-                  )}
+                  <Save className="w-4 h-4" />
+                  Create Receipt
                 </Button>
               </div>
             </CardContent>
           </Card>
         </form>
+
+        {/* Zone Selection Dialog */}
+        <Dialog open={showZoneDialog} onOpenChange={setShowZoneDialog}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Warehouse className="w-5 h-5" />
+                Select Warehouse Zones
+              </DialogTitle>
+              <DialogDescription>
+                Choose a zone for each item to allocate to the nearest available
+                bin
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              {loadingZones ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {items
+                    .filter((item) => item.quantity > 0)
+                    .map((item, index) => (
+                      <div
+                        key={item.purchaseOrderItemId}
+                        className="p-4 border rounded-lg space-y-3"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <p className="font-semibold text-sm">
+                              {index + 1}. {item.medicationName}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {item.variantName} • Qty: {item.quantity}
+                            </p>
+                            {item.batchNumber && (
+                              <p className="text-xs text-muted-foreground">
+                                Batch: {item.batchNumber}
+                              </p>
+                            )}
+                          </div>
+                          <div className="w-64">
+                            <Label className="text-xs mb-1 block">
+                              Select Zone *
+                            </Label>
+                            <Select
+                              value={selectedZones[item.purchaseOrderItemId]}
+                              onValueChange={(value) =>
+                                handleZoneChange(
+                                  item.purchaseOrderItemId,
+                                  value
+                                )
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Choose zone..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {zones.map((zone) => (
+                                  <SelectItem key={zone.id} value={zone.id}>
+                                    <div className="flex items-center gap-2">
+                                      <MapPin className="w-3 h-3" />
+                                      <span>
+                                        {zone.code} - {zone.name}
+                                      </span>
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setShowZoneDialog(false)}
+                disabled={isFindingBins}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleFindBins} disabled={isFindingBins}>
+                {isFindingBins ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Finding Bins...
+                  </>
+                ) : (
+                  <>
+                    <MapPin className="w-4 h-4 mr-2" />
+                    Find Available Bins
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Confirmation Dialog */}
+        <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+          <DialogContent
+            className="max-w-[90vw] w-[90vw] max-h-[90vh] sm:max-w-[98vw]"
+            style={{ maxWidth: "90vw", width: "90vw" }}
+          >
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                Confirm Receipt and Allocations
+              </DialogTitle>
+              <DialogDescription>
+                Review the allocated bins and confirm to create the receipt
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="py-4 max-h-[calc(90vh-200px)] overflow-y-auto">
+              {allocatedBins.some((item) => item.error) && (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Some items could not be allocated. Please check the errors
+                    below.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <div className="rounded-lg border overflow-x-auto">
+                <Table className="min-w-[1400px]">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[40px]">#</TableHead>
+                      <TableHead className="min-w-[150px]">
+                        Medication
+                      </TableHead>
+                      <TableHead className="min-w-[120px]">Variant</TableHead>
+                      <TableHead className="w-[60px]">Qty</TableHead>
+                      <TableHead className="w-[100px]">Batch</TableHead>
+                      <TableHead className="w-[120px]">Zone</TableHead>
+                      <TableHead className="w-[120px]">Rack</TableHead>
+                      <TableHead className="w-[120px]">Bin</TableHead>
+                      <TableHead className="w-[80px]">Level</TableHead>
+                      <TableHead className="w-[80px]">Pos</TableHead>
+                      <TableHead className="w-[60px]">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {allocatedBins.map((item, index) => (
+                      <TableRow
+                        key={index}
+                        className={item.error ? "bg-red-50" : "bg-green-50"}
+                      >
+                        <TableCell className="font-medium text-xs">
+                          {index + 1}
+                        </TableCell>
+                        <TableCell className="font-semibold text-sm">
+                          {item.medicationName}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-xs">
+                          {item.variantName}
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {item.quantity}
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {item.batchNumber || "-"}
+                        </TableCell>
+                        {item.error ? (
+                          <TableCell
+                            colSpan={6}
+                            className="text-red-600 text-sm"
+                          >
+                            {item.error}
+                          </TableCell>
+                        ) : (
+                          <>
+                            <TableCell>
+                              <div className="text-xs">
+                                <div className="font-semibold">
+                                  {item.bin.zoneCode}
+                                </div>
+                                <div className="text-muted-foreground text-[10px] truncate max-w-[100px]">
+                                  {item.bin.zoneName}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-xs">
+                                <div className="font-semibold">
+                                  {item.bin.rackCode}
+                                </div>
+                                <div className="text-muted-foreground text-[10px] truncate max-w-[100px]">
+                                  {item.bin.rackName}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-xs">
+                                <div className="font-semibold">
+                                  {item.bin.binCode}
+                                </div>
+                                <div className="text-muted-foreground text-[10px] truncate max-w-[100px]">
+                                  {item.bin.binName}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-800">
+                                L{item.bin.binLevel}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-100 text-purple-800">
+                                #{item.bin.binNumber}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <CheckCircle className="w-4 h-4 text-green-600 mx-auto" />
+                            </TableCell>
+                          </>
+                        )}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setShowConfirmDialog(false)}
+                disabled={isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmCreate}
+                disabled={isPending || allocatedBins.some((item) => item.error)}
+              >
+                {isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Confirm and Create Receipt
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppLayout>
   );

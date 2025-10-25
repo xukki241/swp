@@ -131,7 +131,7 @@ describe("MedicationController", () => {
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
-        message: "Medication created successfully",
+        message: "1 medication(s) created successfully",
         data: mockMedication,
       });
     });
@@ -144,7 +144,8 @@ describe("MedicationController", () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        message: "Medication name is required",
+        message: "Validation failed",
+        errors: ["Medication at index 0: name is required"],
       });
     });
 

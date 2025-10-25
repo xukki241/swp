@@ -22,7 +22,7 @@ export const supplierService = {
         phone,
         address,
         status,
-        medicationVariants: supplierMedicationVariants,
+        medicationVariants: variantsToCreate,
       } = supplierData;
 
       // Validate only if field is provided
@@ -42,11 +42,8 @@ export const supplierService = {
       if (address !== undefined && !address.trim()) {
         validationErrors.push("Address is required.");
       }
-      if (
-        supplierMedicationVariants &&
-        Array.isArray(supplierMedicationVariants)
-      ) {
-        for (const [vIndex, variant] of supplierMedicationVariants.entries()) {
+      if (variantsToCreate && Array.isArray(variantsToCreate)) {
+        for (const [vIndex, variant] of variantsToCreate.entries()) {
           if (
             variant.medication_variant_id !== undefined &&
             !variant.medication_variant_id
@@ -103,15 +100,17 @@ export const supplierService = {
 
         // Create medication variants if any
         if (
-          medicationVariants &&
-          Array.isArray(medicationVariants) &&
-          medicationVariants.length > 0
+          variantsToCreate &&
+          Array.isArray(variantsToCreate) &&
+          variantsToCreate.length > 0
         ) {
-          const variantsToInsert = medicationVariants.map((variant) => ({
+          const variantsToInsert = variantsToCreate.map((variant) => ({
             supplierId: newSupplier.id,
             medicationVariantId: variant.medication_variant_id,
             supplierSku: variant.supplier_sku?.trim(),
             leadTimeDays: variant.lead_time_days ?? null,
+            purchasePrice: variant.purchase_price,
+            contractId: variant.contract_id ?? null,
           }));
           await db.insert(supplierMedicationVariants).values(variantsToInsert);
         }
@@ -177,6 +176,7 @@ export const supplierService = {
           leadTimeDays: supplierMedicationVariants.leadTimeDays,
           medicationName: medications.name,
           purchasePrice: supplierMedicationVariants.purchasePrice,
+          contractId: supplierMedicationVariants.contractId,
           variantName: medicationVariants.name,
         })
         .from(supplierMedicationVariants)
@@ -205,8 +205,14 @@ export const supplierService = {
 
   async update(id, supplierData) {
     const validationErrors = [];
-    const { name, email, phone, address, status, medicationVariants } =
-      supplierData;
+    const {
+      name,
+      email,
+      phone,
+      address,
+      status,
+      medicationVariants: variantsToUpdate,
+    } = supplierData;
 
     // Validate chỉ khi trường được truyền lên
     if (name !== undefined && !name.trim()) {
@@ -294,16 +300,18 @@ export const supplierService = {
         .returning();
 
       // Update medication variants: xóa hết cũ, thêm mới
-      if (medicationVariants && Array.isArray(medicationVariants)) {
+      if (variantsToUpdate && Array.isArray(variantsToUpdate)) {
         await db
           .delete(supplierMedicationVariants)
           .where(eq(supplierMedicationVariants.supplierId, id));
-        if (medicationVariants.length > 0) {
-          const variantsToInsert = medicationVariants.map((variant) => ({
+        if (variantsToUpdate.length > 0) {
+          const variantsToInsert = variantsToUpdate.map((variant) => ({
             supplierId: id,
             medicationVariantId: variant.medication_variant_id,
             supplierSku: variant.supplier_sku?.trim(),
             leadTimeDays: variant.lead_time_days ?? null,
+            purchasePrice: variant.purchase_price,
+            contractId: variant.contract_id ?? null,
           }));
           await db.insert(supplierMedicationVariants).values(variantsToInsert);
         }
