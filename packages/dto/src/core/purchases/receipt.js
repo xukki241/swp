@@ -26,6 +26,18 @@ export const purchaseOrderReceiptItemSchema = z.object({
 export const createReceiptItemSchema = z.object({
   purchaseOrderItemId: uuidSchema,
   quantity: positiveIntSchema,
+  batchNumber: z.string().max(100).optional(),
+  manufactureDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional()
+    .nullable(),
+  expiryDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional()
+    .nullable(),
+  binId: uuidSchema.optional(), // Preferred bin ID for allocation
 });
 
 export const createReceiptRequestSchema = z.object({

@@ -74,3 +74,17 @@ export const deletePurchaseOrderReceipt = async (id) => {
   const response = await instance.delete(`/purchases/receipts/${id}`);
   return response.data;
 };
+
+// Lấy warehouse allocations của receipt
+export const getPurchaseOrderReceiptAllocations = async (id) => {
+  const response = await instance.get(`/purchases/receipts/${id}/allocations`);
+  return response.data;
+};
+
+// Tìm bins trống cho items với zones đã chọn
+export const findAvailableBinsForItems = async (items) => {
+  const response = await instance.post("/purchases/receipts/find-bins", {
+    items,
+  });
+  return response.data;
+};

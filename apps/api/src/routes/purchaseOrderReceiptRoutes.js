@@ -98,4 +98,37 @@ standaloneReceiptRouter.get(
   purchaseOrderReceiptController.getById
 );
 
+/**
+ * @route   GET /api/purchases/receipts/:id/allocations
+ * @desc    Get inventory allocations for a receipt
+ * @access  Private (Authenticated)
+ */
+standaloneReceiptRouter.get(
+  "/:id/allocations",
+  validateParams(receiptIdParamSchema),
+  purchaseOrderReceiptController.getAllocations
+);
+
+/**
+ * @route   POST /api/purchases/receipts/find-bins
+ * @desc    Find available bins for receipt items with selected zones
+ * @access  Private (Authenticated)
+ */
+standaloneReceiptRouter.post(
+  "/find-bins",
+  purchaseOrderReceiptController.findAvailableBins
+);
+
+/**
+ * @route   DELETE /api/purchases/receipts/:id
+ * @desc    Delete a receipt by ID
+ * @access  Private (Owner only)
+ */
+standaloneReceiptRouter.delete(
+  "/:id",
+  authorize("owner"),
+  validateParams(receiptIdParamSchema),
+  purchaseOrderReceiptController.delete
+);
+
 export default nestedReceiptRouter;

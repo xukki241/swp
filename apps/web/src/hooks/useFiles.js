@@ -1,5 +1,6 @@
-import * as api from "@/services/filesService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import * as api from "@/services/filesService";
 
 /**
  * Hook: Upload file
