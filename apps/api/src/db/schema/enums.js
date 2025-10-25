@@ -67,3 +67,19 @@ export const salesOrderPaymentMethod = pgEnum("sales_order_payment_method", [
   "credit_card",
   "mobile_payment",
 ]);
+
+export const shiftType = pgEnum("shift_type", [
+  "morning", // Ca sáng (6:00 - 14:00)
+  "afternoon", // Ca chiều (14:00 - 22:00)
+  "night", // Ca đêm (22:00 - 6:00)
+  "full_day", // Ca full (8:00 - 17:00)
+]);
+
+export const shiftAssignmentStatus = pgEnum("shift_assignment_status", [
+  "scheduled", // Đã lên lịch
+  "confirmed", // Nhân viên đã xác nhận
+  "in_progress", // Đang làm việc
+  "completed", // Đã hoàn thành
+  "cancelled", // Đã hủy
+  "absent", // Vắng mặt
+]);

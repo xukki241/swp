@@ -1,6 +1,7 @@
 import express from "express";
 
 import { purchaseOrderItemController } from "../controllers/purchaseOrderItemController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 export const purchaseOrderItemRouter = express.Router();
@@ -16,16 +17,21 @@ purchaseOrderItemRouter.get("/:id", purchaseOrderItemController.getById);
 purchaseOrderItemRouter.post(
   "/",
   authorize("owner"),
+  createAuditLog("CREATE", "purchase_order_item"),
   purchaseOrderItemController.create
 );
 purchaseOrderItemRouter.put(
   "/:id",
   authorize("owner"),
+  createAuditLog("UPDATE", "purchase_order_item", {
+    getChanges: (req) => ({ purchaseOrderItem: req.body }),
+  }),
   purchaseOrderItemController.update
 );
 purchaseOrderItemRouter.delete(
   "/:id",
   authorize("owner"),
+  createAuditLog("DELETE", "purchase_order_item"),
   purchaseOrderItemController.delete
 );
 

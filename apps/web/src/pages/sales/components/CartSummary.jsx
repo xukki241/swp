@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreditCard, ShoppingCart, User } from "lucide-react";
 
 export default function CartSummary({
@@ -8,65 +8,60 @@ export default function CartSummary({
   paymentMethod,
 }) {
   const paymentMethodLabels = {
-    cash: "Cash",
-    credit_card: "Credit Card",
-    bank_transfer: "Bank Transfer",
-    mobile_payment: "Mobile Payment",
+    cash: "Tiền mặt",
+    credit_card: "Thẻ tín dụng",
+    bank_transfer: "Chuyển khoản",
+    mobile_payment: "Ví điện tử",
   };
 
   return (
-    <Card className="border border-gray-200 sticky top-8 bg-gray-50">
-      <CardHeader className="bg-gray-50 border-b border-gray-200">
+    <div className="flex flex-col h-full overflow-hidden">
+      <CardHeader className="border-b border-border p-4">
         <div className="flex items-center gap-2">
-          <ShoppingCart className="w-5 h-5" />
-          <CardTitle>Order Summary</CardTitle>
+          <ShoppingCart className="w-5 h-5 text-primary" />
+          <CardTitle className="text-base">Tóm tắt đơn hàng</CardTitle>
         </div>
       </CardHeader>
-      <CardContent className="p-6 space-y-6">
+      <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* Customer Info */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <User className="w-4 h-4 text-gray-600" />
-            <p className="text-sm font-semibold text-gray-700">Customer</p>
+            <User className="w-4 h-4 text-muted-foreground" />
+            <p className="text-xs font-semibold text-muted-foreground uppercase">
+              Khách hàng
+            </p>
           </div>
           {selectedCustomer ? (
-            <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="font-semibold text-gray-900">
-                {selectedCustomer.name}
-              </p>
-              {selectedCustomer.phone && (
-                <p className="text-xs text-gray-600">
-                  {selectedCustomer.phone}
-                </p>
-              )}
-            </div>
+            <p className="text-sm font-semibold text-foreground">
+              {selectedCustomer.name}
+            </p>
           ) : (
-            <p className="text-sm text-gray-500">Not selected</p>
+            <p className="text-sm text-muted-foreground">Chưa chọn</p>
           )}
         </div>
 
         {/* Cart Items */}
         <div>
-          <p className="text-sm font-semibold text-gray-700 mb-3">
-            Products ({cart.length})
+          <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">
+            Sản phẩm ({cart.length})
           </p>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
+          <div className="space-y-1 max-h-32 overflow-y-auto">
             {cart.length === 0 ? (
-              <p className="text-sm text-gray-500">Cart is empty</p>
+              <p className="text-xs text-muted-foreground">Giỏ trống</p>
             ) : (
               cart.map((item, index) => (
                 <div
                   key={index}
-                  className="flex justify-between text-sm p-2 bg-gray-50 rounded"
+                  className="flex justify-between text-xs p-2 bg-muted rounded"
                 >
-                  <span className="text-gray-700">
+                  <span className="text-foreground truncate">
                     {item.medicationName} × {item.quantity}
                   </span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-foreground whitespace-nowrap ml-2">
                     {Number(item.quantity * item.sellPrice).toLocaleString(
                       "vi-VN"
-                    )}{" "}
-                    VNĐ
+                    )}
+                    đ
                   </span>
                 </div>
               ))
@@ -78,12 +73,12 @@ export default function CartSummary({
         {cart.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <CreditCard className="w-4 h-4 text-gray-600" />
-              <p className="text-sm font-semibold text-gray-700">
-                Payment Method
+              <CreditCard className="w-4 h-4 text-muted-foreground" />
+              <p className="text-xs font-semibold text-muted-foreground uppercase">
+                Thanh toán
               </p>
             </div>
-            <p className="text-sm text-gray-900">
+            <p className="text-sm text-foreground">
               {paymentMethodLabels[paymentMethod]}
             </p>
           </div>
@@ -91,16 +86,18 @@ export default function CartSummary({
 
         {/* Total */}
         {cart.length > 0 && (
-          <div className="border-t border-gray-200 pt-4">
+          <div className="border-t border-border pt-3 mt-auto">
             <div className="flex justify-between items-center">
-              <span className="text-gray-700 font-semibold">Total:</span>
-              <span className="text-2xl font-bold text-gray-900">
-                {Number(totalAmount).toLocaleString("vi-VN")} VNĐ
+              <span className="text-sm font-semibold text-muted-foreground">
+                Tổng cộng:
+              </span>
+              <span className="text-xl font-bold text-primary">
+                {Number(totalAmount).toLocaleString("vi-VN")}đ
               </span>
             </div>
           </div>
         )}
       </CardContent>
-    </Card>
+    </div>
   );
 }

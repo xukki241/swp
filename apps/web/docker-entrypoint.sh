@@ -10,6 +10,10 @@ echo "📡 API URL: $API_URL"
 # Replace environment variables in nginx config
 envsubst '${API_URL}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
 
+# Show the proxy configuration for debugging
+echo "🔍 Nginx proxy configuration:"
+grep -A 2 "proxy_pass" /etc/nginx/conf.d/default.conf || echo "No proxy_pass found"
+
 # Replace environment variables in JavaScript files
 # This allows runtime configuration without rebuilding
 if [ -d "/usr/share/nginx/html/assets" ]; then

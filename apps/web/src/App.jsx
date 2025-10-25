@@ -1,10 +1,10 @@
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
+import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
+import LoginPage from "@/pages/auth/LoginPage";
+import PolicyPage from "@/pages/auth/PolicyPage";
+import RegisterPage from "@/pages/auth/RegisterPage";
 import DashboardPage from "@/pages/Dashboard";
-import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
-import LoginPage from "@/pages/LoginPage";
 import NotFoundPage from "@/pages/NotFoundPage";
-import PolicyPage from "@/pages/PolicyPage";
-import RegisterPage from "@/pages/RegisterPage";
 import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import UserListPage from "@/pages/UserListPage";
@@ -31,6 +31,10 @@ import MedicationListPage from "./pages/medications/MedicationListPage";
 import SalesOrderDetailPage from "./pages/sales/SalesOrderDetailPage";
 import SalesOrderListPage from "./pages/sales/SalesOrderListPage";
 import SalesPage from "./pages/sales/SalesPage";
+// Shift management imports
+import MySchedulePage from "./pages/shifts/MySchedulePage";
+import ShiftAssignmentPage from "./pages/shifts/ShiftAssignmentPage";
+import ShiftManagementPage from "./pages/shifts/ShiftManagementPage";
 
 function App() {
   return (
@@ -213,6 +217,32 @@ function App() {
           element={
             <ProtectedRoute>
               <SalesOrderDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Shift Management Routes */}
+        <Route
+          path="/shifts/management"
+          element={
+            <ProtectedRoute>
+              <ShiftManagementPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/shifts/assignments"
+          element={
+            <ProtectedRoute>
+              <ShiftAssignmentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/shifts/my-schedule"
+          element={
+            <ProtectedRoute>
+              <MySchedulePage />
             </ProtectedRoute>
           }
         />

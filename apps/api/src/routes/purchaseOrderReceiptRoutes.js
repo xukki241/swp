@@ -12,6 +12,7 @@ import express from "express";
 import { z } from "zod";
 
 import { purchaseOrderReceiptController } from "../controllers/purchaseOrderReceiptController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authorize } from "../middleware/checkAuth.js";
 
 // Nested router for /api/purchases/:purchaseOrderId/receipts
@@ -71,6 +72,7 @@ nestedReceiptRouter.post(
   authorize("owner"),
   validateParams(purchaseOrderIdParamSchema),
   validateBody(createReceiptRequestSchema),
+  createAuditLog("CREATE", "purchase_receipt"),
   purchaseOrderReceiptController.create
 );
 

@@ -1,6 +1,8 @@
 import express from "express";
 
+import * as shiftController from "../controllers/shiftController.js";
 import * as userController from "../controllers/userController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 export const userRouter = express.Router();
@@ -77,6 +79,19 @@ userRouter.get(
 userRouter.get("/:id", authenticate, userController.getUserById);
 
 /**
+ * @route   GET /api/users/:userId/schedule
+ * @desc    Get user's shift schedule
+ * @query   startDate - Required (YYYY-MM-DD)
+ * @query   endDate - Required (YYYY-MM-DD)
+ * @access  Private (Owner, or self)
+ */
+userRouter.get(
+  "/:userId/schedule",
+  authenticate,
+  shiftController.getUserSchedule
+);
+
+/**
  * @route   POST /api/users
  * @desc    Create a new user (owner only)
  * @access  Private (Owner)
@@ -86,6 +101,7 @@ userRouter.post(
   "/",
   authenticate,
   authorize("owner"),
+  createAuditLog("CREATE", "user"),
   userController.createUser
 );
 
@@ -99,6 +115,7 @@ userRouter.put(
   "/:id",
   authenticate,
   authorize("owner"),
+  createAuditLog("UPDATE", "user"),
   userController.updateUser
 );
 
@@ -111,6 +128,7 @@ userRouter.delete(
   "/:id",
   authenticate,
   authorize("owner"),
+  createAuditLog("DELETE", "user"),
   userController.deleteUser
 );
 

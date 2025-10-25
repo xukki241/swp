@@ -17,6 +17,8 @@ export * from "./reports.js";
 export * from "./salesOrderItems.js";
 export * from "./salesOrders.js";
 export * from "./settings.js";
+export * from "./shiftAssignments.js";
+export * from "./shifts.js";
 export * from "./supplierMedicationVariants.js";
 export * from "./suppliers.js";
 export * from "./userCredentials.js";

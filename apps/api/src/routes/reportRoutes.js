@@ -5,6 +5,7 @@ import {
 import express from "express";
 
 import { reportController } from "../controllers/reportController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 import { validateBody, validateQuery } from "../middleware/validate.js";
 
@@ -17,6 +18,7 @@ reportRouter.use(authenticate);
 reportRouter.post(
   "/",
   validateBody(createReportRequestSchema),
+  createAuditLog("EXPORT", "report"),
   reportController.create
 );
 
@@ -40,6 +42,11 @@ reportRouter.get("/monthly", reportController.generateMonthly);
 reportRouter.get("/:id", reportController.getById);
 
 // DELETE /api/reports/:id - Delete a report
-reportRouter.delete("/:id", authorize(["owner"]), reportController.delete);
+reportRouter.delete(
+  "/:id",
+  authorize(["owner"]),
+  createAuditLog("DELETE", "report"),
+  reportController.delete
+);
 
 export default reportRouter;

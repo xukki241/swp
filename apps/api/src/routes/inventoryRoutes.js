@@ -11,6 +11,7 @@ import {
 import express from "express";
 
 import { inventoryController } from "../controllers/inventoryController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 import {
   validateBody,
@@ -64,6 +65,7 @@ inventoryRouter.patch(
   validateParams(inventoryBatchIdParamSchema),
   authorize("owner"),
   validateBody(updateInventorySchema),
+  createAuditLog("UPDATE", "inventory"),
   inventoryController.update
 );
 
@@ -73,6 +75,9 @@ inventoryRouter.patch(
   validateParams(inventoryBatchIdParamSchema),
   authorize("owner"),
   validateBody(adjustInventoryRequestSchema),
+  createAuditLog("UPDATE", "inventory", {
+    getChanges: (req) => ({ adjustment: req.body }),
+  }),
   inventoryController.adjust
 );
 
@@ -81,6 +86,9 @@ inventoryRouter.post(
   "/move",
   authorize("owner"),
   validateBody(moveInventoryRequestSchema),
+  createAuditLog("UPDATE", "inventory", {
+    getChanges: (req) => ({ movement: req.body }),
+  }),
   inventoryController.move
 );
 

@@ -13,6 +13,7 @@ import express from "express";
 import { z } from "zod";
 
 import { supplierMedicationVariantController } from "../controllers/supplierMedicationVariantController.js";
+import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
 
 // Nested router for /api/suppliers/:supplierId/medications
@@ -66,6 +67,7 @@ supplierMedicationVariantRouter.post(
   authorize("owner"),
   validateParams(supplierIdParamSchema),
   validateBody(createSupplierMedicationsRequestSchema),
+  createAuditLog("CREATE", "supplier_medication_variant"),
   supplierMedicationVariantController.create
 );
 
@@ -79,6 +81,9 @@ supplierMedicationVariantRouter.patch(
   authorize("owner"),
   validateParams(supplierIdAndIdParamSchema),
   validateBody(updateSupplierMedicationRequestSchema),
+  createAuditLog("UPDATE", "supplier_medication_variant", {
+    getChanges: (req) => ({ supplierMedicationVariant: req.body }),
+  }),
   supplierMedicationVariantController.update
 );
 
@@ -91,6 +96,7 @@ supplierMedicationVariantRouter.delete(
   "/:id",
   authorize("owner"),
   validateParams(supplierIdAndIdParamSchema),
+  createAuditLog("DELETE", "supplier_medication_variant"),
   supplierMedicationVariantController.delete
 );
 

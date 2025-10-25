@@ -1,6 +1,7 @@
 ALTER TABLE "file_attachments" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
 DROP TABLE "file_attachments" CASCADE;--> statement-breakpoint
 ALTER TABLE "files" RENAME COLUMN "storage_path" TO "blob";--> statement-breakpoint
+ALTER TABLE "files" ALTER COLUMN "blob" SET DATA TYPE bytea USING blob::bytea;--> statement-breakpoint
 ALTER TABLE "medications" ADD COLUMN "image_id" uuid;--> statement-breakpoint
 ALTER TABLE "sales_orders" ADD COLUMN "prescription_id" uuid;--> statement-breakpoint
 ALTER TABLE "supplier_medication_variants" ADD COLUMN "contract_id" uuid;--> statement-breakpoint

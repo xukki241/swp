@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Banknote, Building2, CreditCard, Smartphone } from "lucide-react";
+import { Banknote, QrCode } from "lucide-react";
 
 export default function PaymentMethodSelector({ value, onChange }) {
   const methods = [
@@ -12,22 +12,10 @@ export default function PaymentMethodSelector({ value, onChange }) {
       description: "Pay with cash",
     },
     {
-      id: "credit_card",
-      label: "Credit Card",
-      icon: CreditCard,
-      description: "Pay with card",
-    },
-    {
-      id: "bank_transfer",
-      label: "Bank Transfer",
-      icon: Building2,
-      description: "Bank transfer",
-    },
-    {
       id: "mobile_payment",
-      label: "Mobile Payment",
-      icon: Smartphone,
-      description: "Digital wallet",
+      label: "VietQR",
+      icon: QrCode,
+      description: "Scan QR to pay",
     },
   ];
 

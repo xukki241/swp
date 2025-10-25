@@ -4,6 +4,7 @@ import "module-alias/register.js";
 import app from "./app.js";
 import config from "./config/environment.js";
 import { closeConnection, testConnection } from "./db/connection.js";
+import { runMigrations } from "./db/migrate.js";
 import logger from "./utils/logger.js";
 import { initializeScheduler } from "./utils/scheduler.js";
 
@@ -22,7 +23,19 @@ async function startServer() {
     logger.debug("CORS Credentials:", config.corsCredentials);
   }
 
+  // Test database connection
   await testConnection();
+
+  // Run database migrations
+  if (config.nodeEnv !== "test") {
+    try {
+      await runMigrations();
+    } catch (error) {
+      logger.error("Failed to run migrations. Server will not start.");
+      /* eslint-disable-next-line n/no-process-exit */
+      process.exit(1);
+    }
+  }
 
   // Initialize scheduled report jobs
   initializeScheduler();

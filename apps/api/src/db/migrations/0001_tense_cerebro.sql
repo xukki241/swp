@@ -1,1 +1,0 @@
-ALTER TABLE "file_attachments" ALTER COLUMN "entity_id" SET DATA TYPE uuid;

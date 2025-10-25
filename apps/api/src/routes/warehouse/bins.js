@@ -2,6 +2,7 @@ import { updateWarehouseBinSchema } from "@pharmaflow/dto";
 import express from "express";
 
 import { warehouseBinController } from "../../controllers/warehouse/warehouseBinController.js";
+import { createAuditLog } from "../../middleware/auditLog.js";
 import { authorize } from "../../middleware/checkAuth.js";
 import { validateBody } from "../../middleware/validate.js";
 
@@ -24,6 +25,7 @@ warehouseBinsRouter.patch(
   "/bins/:id",
   authorize("owner"),
   validateBody(updateWarehouseBinSchema),
+  createAuditLog("UPDATE", "warehouse_bin"),
   warehouseBinController.update
 );
 
@@ -31,6 +33,7 @@ warehouseBinsRouter.patch(
 warehouseBinsRouter.delete(
   "/bins/:id",
   authorize("owner"),
+  createAuditLog("DELETE", "warehouse_bin"),
   warehouseBinController.delete
 );
 
