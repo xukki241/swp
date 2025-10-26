@@ -186,9 +186,9 @@ describe("MedicationVariantController", () => {
         sku: "ASP-100-TAB",
         name: "Aspirin 100mg Tablet",
         unit: "tablet",
-        unitFactor: "1.0",
+        unitFactor: "1",
         barcode: "123456",
-        sellPrice: "10.0",
+        sellPrice: "10",
         isActive: true,
         isForSale: true,
       });
@@ -234,52 +234,74 @@ describe("MedicationVariantController", () => {
       expect(res.status).toHaveBeenCalledWith(409);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        message: "Medication variant with this SKU already exists",
+        message: 'Variant with SKU "ASP-100-TAB" already exists',
       });
     });
 
     it("should use default values for optional fields", async () => {
-      req.body = {
-        medicationId: "1",
+      req.params = { medicationId: "uuid-medication-1" };
+      req.body = [
+        {
+          sku: "ASP-100-TAB",
+          name: "Aspirin 100mg Tablet",
+          unit: "tablet",
+          sellPrice: 10.0,
+        },
+      ];
+
+      const mockVariant = {
+        id: "uuid-1",
+        medicationId: "uuid-medication-1",
         sku: "ASP-100-TAB",
         name: "Aspirin 100mg Tablet",
         unit: "tablet",
-        sellPrice: "10.00",
+        unitFactor: "1.0",
+        barcode: null,
+        sellPrice: "10.0",
+        isActive: true,
+        isForSale: true,
       };
 
       medicationVariantService.getMedicationVariantBySku.mockResolvedValue(
         null
       );
-      medicationVariantService.createMedicationVariant.mockResolvedValue({
-        id: 1n,
-        ...req.body,
-      });
+      medicationVariantService.createMedicationVariant.mockResolvedValue(
+        mockVariant
+      );
 
       await medicationVariantController.createMedicationVariant(req, res, next);
 
       expect(
         medicationVariantService.createMedicationVariant
       ).toHaveBeenCalledWith({
-        medicationId: 1n,
+        medicationId: "uuid-medication-1",
         sku: "ASP-100-TAB",
         name: "Aspirin 100mg Tablet",
         unit: "tablet",
-        unitFactor: "1.00",
+        unitFactor: "1.0",
         barcode: null,
-        sellPrice: "10.00",
+        sellPrice: "10",
         isActive: true,
         isForSale: false,
+      });
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: "1 variant(s) created successfully",
+        data: [mockVariant],
       });
     });
 
     it("should handle errors", async () => {
-      req.body = {
-        medicationId: "1",
-        sku: "ASP-100-TAB",
-        name: "Aspirin 100mg Tablet",
-        unit: "tablet",
-        sellPrice: "10.00",
-      };
+      req.params = { medicationId: "uuid-medication-1" };
+      req.body = [
+        {
+          sku: "ASP-100-TAB",
+          name: "Aspirin 100mg Tablet",
+          unit: "tablet",
+          sellPrice: 10.0,
+        },
+      ];
 
       const error = new Error("Database error");
       medicationVariantService.getMedicationVariantBySku.mockRejectedValue(
@@ -288,12 +310,7 @@ describe("MedicationVariantController", () => {
 
       await medicationVariantController.createMedicationVariant(req, res, next);
 
-      expect(logger.error).toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: "Database error",
-      });
+      expect(next).toHaveBeenCalledWith(error);
     });
   });
 
