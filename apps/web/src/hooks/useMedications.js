@@ -144,14 +144,8 @@ export const useMedicationsVariants = () =>
 export const useCreateVariant = (medicationId) => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload) => {
-      if (typeof api.createVariant === "function") {
-        return api.createVariant({ medicationId, ...payload });
-      }
-      return instance
-        .post(`/medications/${medicationId}/variants`, payload)
-        .then((r) => r.data);
-    },
+    // payload là object; service sẽ tự wrap thành mảng khi POST
+    mutationFn: (payload) => api.createVariant(medicationId, payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["medication", medicationId] });
       qc.invalidateQueries({ queryKey: ["medicationVariants", medicationId] });
@@ -163,18 +157,16 @@ export const useCreateVariant = (medicationId) => {
 export const useUpdateVariant = (medicationId) => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ variantId, payload }) => {
-      if (typeof api.updateVariant === "function") {
-        return api.updateVariant(variantId, payload);
-      }
-      return instance
-        .patch(`/medications/variants/${variantId}`, payload)
-        .then((r) => r.data);
-    },
-    onSuccess: () => {
+    // BẮT BUỘC truyền { variantId, payload }
+    mutationFn: ({ variantId, payload }) =>
+      api.updateVariant(medicationId, variantId, payload),
+    onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["medication", medicationId] });
       qc.invalidateQueries({ queryKey: ["medicationVariants", medicationId] });
       qc.invalidateQueries({ queryKey: ["medicationVariantsAll"] });
+      if (vars?.variantId) {
+        // nếu có trang detail variant thì có thể invalid thêm ở đây
+      }
     },
   });
 };
@@ -182,14 +174,8 @@ export const useUpdateVariant = (medicationId) => {
 export const useDeleteVariant = (medicationId) => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (variantId) => {
-      if (typeof api.deleteVariant === "function") {
-        return api.deleteVariant(variantId);
-      }
-      return instance
-        .delete(`/medications/variants/${variantId}`)
-        .then((r) => r.data);
-    },
+    // BẮT BUỘC truyền variantId
+    mutationFn: (variantId) => api.deleteVariant(medicationId, variantId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["medication", medicationId] });
       qc.invalidateQueries({ queryKey: ["medicationVariants", medicationId] });

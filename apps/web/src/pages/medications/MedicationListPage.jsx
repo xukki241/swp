@@ -192,11 +192,12 @@ export default function MedicationListPage() {
     const exact = list.filter((v) => String(v.barcode) === String(barcode));
     return exact.every((v) => String(v.id) === String(currentId || ""));
   };
-
+  // ...
   const saveVariant = async (form) => {
     try {
       if (!medId) return;
 
+      // check barcode trùng (giữ nguyên logic của bạn)
       const ok = await validateBarcodeUnique(form.barcode, editingVar?.id);
       if (!ok) {
         setVarError("barcode", {
@@ -207,16 +208,47 @@ export default function MedicationListPage() {
         return;
       }
 
+      // ÉP KIỂU trước khi gửi
+      const payload = {
+        sku: (form.sku || "").trim(),
+        name: (form.name || "").trim(),
+        unit: (form.unit || "").trim(),
+        unitFactor:
+          form.unitFactor === "" || form.unitFactor == null
+            ? 1
+            : Number(form.unitFactor),
+        barcode: (form.barcode || "").trim() || null,
+        sellPrice:
+          form.sellPrice === "" || form.sellPrice == null
+            ? undefined
+            : Number(form.sellPrice),
+        isActive: !!form.isActive,
+        isForSale: !!form.isForSale,
+      };
+
+      // CREATE: validate required
+      if (!editingVar) {
+        if (!payload.sku || !payload.name || !payload.unit || !payload.sellPrice) {
+          toast.error("Please fill in SKU, Name, Unit and Sell Price.");
+          return;
+        }
+        if (Number.isNaN(payload.sellPrice)) {
+          toast.error("Sell Price must be a number.");
+          return;
+        }
+      }
+
       if (editingVar) {
         await updateVar.mutateAsync({
           variantId: editingVar.id,
-          payload: { ...form },
+          payload,
         });
         toast.success("Variant updated");
       } else {
-        await createVar.mutateAsync({ ...form }); // hook auto-adds medicationId & wrap mảng
+        await createVar.mutateAsync(payload); // service tự wrap => [payload]
         toast.success("Variant created");
       }
+
       setEditingVar(null);
       resetVar({
         sku: "",
@@ -238,7 +270,7 @@ export default function MedicationListPage() {
   const handleDeleteVariant = async (variantId) => {
     if (!medId) return;
     if (confirm("Delete this variant?")) {
-      await deleteVar.mutateAsync(variantId);
+      await deleteVar.mutateAsync(variantId); // <-- chỉ truyền variantId
       toast.success("Deleted variant");
     }
   };
