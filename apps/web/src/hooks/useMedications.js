@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
 import { instance } from "@/lib/axios";
 import * as api from "@/services/medicationsService";
 
@@ -11,11 +10,9 @@ const FIVE_MIN = 5 * 60 * 1000;
  */
 export const getAllMedications = async (filters) => {
   if (filters && Object.keys(filters).length) {
-    // If filters provided, prefer service getMedications (if it exists).
     if (typeof api.getMedications === "function") {
       return api.getMedications(filters);
     }
-    // fallback to instance with query params
     const res = await instance.get("/medications", { params: filters });
     return res.data;
   }
@@ -25,7 +22,6 @@ export const getAllMedications = async (filters) => {
   }
 
   if (typeof api.getMedications === "function") {
-    // call without filters
     return api.getMedications({});
   }
 
@@ -81,9 +77,8 @@ export const useUpdateMedication = () => {
     mutationFn: ({ id, payload }) =>
       typeof api.updateMedication === "function"
         ? api.updateMedication(id, payload)
-        : instance.put(`/medications/${id}`, payload).then((r) => r.data),
+        : instance.patch(`/medications/${id}`, payload).then((r) => r.data),
     onSuccess: (_, vars) => {
-      // ensure both list & detail refresh
       qc.invalidateQueries({ queryKey: ["medications"] });
       if (vars && vars.id) {
         qc.invalidateQueries({ queryKey: ["medication", vars.id] });
@@ -105,27 +100,19 @@ export const useDeleteMedication = () => {
 
 /**
  * VARIANTS
- *
- * - useMedicationVariants: returns variants for a specific medication.
- *   Tries service helpers first, then falls back to reading the medication and returning its variants,
- *   then to an explicit endpoint /medications/:id/variants if available.
- *
- * - useMedicationsVariants: reads all variants across medications (endpoint /medications/variants/all).
  */
 export const useMedicationVariants = (medicationId) =>
   useQuery({
     queryKey: ["medicationVariants", medicationId],
     queryFn: async () => {
-      if (!medicationId) {
-        return { data: [] };
-      }
-
-      // 1) api.getMedicationVariants(medicationId) - returns full response with data property
+      if (!medicationId) return [];
       if (typeof api.getMedicationVariants === "function") {
         return api.getMedicationVariants(medicationId);
       }
-
-      // 2) fallback axios endpoint
+      if (typeof api.getMedicationById === "function") {
+        const med = await api.getMedicationById(medicationId);
+        return med?.variants ?? [];
+      }
       const res = await instance.get(`/medications/${medicationId}/variants`);
       return res.data;
     },
@@ -138,7 +125,6 @@ export const getAllMedicationsVariants = async () => {
     return api.getAllMedicationsVariants();
   }
   if (typeof api.getAllMedicationVariants === "function") {
-    // attempt alternate naming
     return api.getAllMedicationVariants();
   }
   const res = await instance.get("/medications/variants/all");
@@ -182,7 +168,7 @@ export const useUpdateVariant = (medicationId) => {
         return api.updateVariant(variantId, payload);
       }
       return instance
-        .put(`/medications/variants/${variantId}`, payload)
+        .patch(`/medications/variants/${variantId}`, payload)
         .then((r) => r.data);
     },
     onSuccess: () => {

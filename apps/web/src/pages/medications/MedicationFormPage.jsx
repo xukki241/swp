@@ -27,7 +27,7 @@ export default function MedicationFormPage() {
   const addMutation = useCreateMedication();
   const updateMutation = useUpdateMedication();
 
-  const { register, handleSubmit, reset, control, watch } = useForm({
+  const { register, handleSubmit, reset, control } = useForm({
     defaultValues: {
       name: "",
       brand: "",

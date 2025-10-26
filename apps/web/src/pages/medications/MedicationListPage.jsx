@@ -39,7 +39,8 @@ import {
   useUpdateVariant,
 } from "@/hooks/useMedications";
 import { findVariantsByBarcode } from "@/services/medicationsService";
-import { Edit, Package, PlusCircle, Trash2 } from "lucide-react";
+import MedicationViewModal from "./MedicationViewModal";
+import { Edit, Package, PlusCircle, Trash2, Eye, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -63,6 +64,7 @@ export default function MedicationListPage() {
   const [editing, setEditing] = useState(null);
 
   const [manageMed, setManageMed] = useState(null);
+  const [viewMed, setViewMed] = useState(null);
   const medId = manageMed?.id;
 
   const {
@@ -212,7 +214,7 @@ export default function MedicationListPage() {
         });
         toast.success("Variant updated");
       } else {
-        await createVar.mutateAsync({ ...form }); // hook auto-adds medicationId
+        await createVar.mutateAsync({ ...form }); // hook auto-adds medicationId & wrap mảng
         toast.success("Variant created");
       }
       setEditingVar(null);
@@ -241,6 +243,8 @@ export default function MedicationListPage() {
     }
   };
 
+  const resetSearch = () => setSearch("");
+
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -254,6 +258,14 @@ export default function MedicationListPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-64"
               />
+              {search && (
+                <Button variant="outline" onClick={resetSearch}>
+                  <X className="w-4 h-4 mr-1" /> Reset
+                </Button>
+              )}
+              <Button onClick={() => refetch()}>
+                <Search className="w-4 h-4 mr-1" /> Search
+              </Button>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Filter status" />
@@ -309,6 +321,13 @@ export default function MedicationListPage() {
                         <Button
                           size="sm"
                           variant="outline"
+                          onClick={() => setViewMed(m)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
                           onClick={() => handleEdit(m)}
                         >
                           <Edit className="w-4 h-4" />
@@ -345,6 +364,13 @@ export default function MedicationListPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Medication View (👁) */}
+        <MedicationViewModal
+          open={!!viewMed}
+          onClose={() => setViewMed(null)}
+          medication={viewMed}
+        />
 
         {/* Medication Form (single close X) */}
         <Dialog open={medFormOpen} onOpenChange={setMedFormOpen}>
