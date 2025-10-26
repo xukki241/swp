@@ -1107,65 +1107,39 @@ async function seed() {
       .insert(purchaseOrderReceiptItems)
       .values(receiptItemData)
       .returning();
-    // 16. Seed Inventory
+
+    // 16. Seed Inventory (ONLY from received purchase order receipts)
     console.log("📊 Seeding inventory...");
     const inventoryData = [
-      // Inventory from PO1 (có thật trong receipt)
+      // Inventory from PO1 Receipt - Item 1: Paracetamol 500mg (200 boxes)
       {
-        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        medicationVariantId: medicationVariantsResults[0].id,
         purchaseOrderReceiptItemsId: receiptItemsResults[0].id,
-        binId: warehouseBinsResults[0].id, // Rack A-001, Bin 1
+        binId: warehouseBinsResults[0].id, // Zone A - Rack A-001, Level 1, Bin 01
         batchNumber: "P2405001",
         manufactureDate: new Date("2024-01-10"),
         expiryDate: new Date("2027-01-09"),
         quantity: 200,
       },
+      // Inventory from PO1 Receipt - Item 2: Amoxicillin 500mg (100 boxes)
       {
-        medicationVariantId: medicationVariantsResults[1].id, // Amoxicillin 500mg
+        medicationVariantId: medicationVariantsResults[3].id,
         purchaseOrderReceiptItemsId: receiptItemsResults[1].id,
-        binId: warehouseBinsResults[1].id, // Rack A-001, Bin 2
+        binId: warehouseBinsResults[1].id, // Zone A - Rack A-001, Level 1, Bin 02
         batchNumber: "A2405002",
         manufactureDate: new Date("2024-02-15"),
         expiryDate: new Date("2026-02-14"),
         quantity: 100,
       },
+      // Inventory from PO1 Receipt - Item 3: Atorvastatin 20mg (50 boxes)
       {
-        medicationVariantId: medicationVariantsResults[2].id, // Atorvastatin 20mg
+        medicationVariantId: medicationVariantsResults[13].id,
         purchaseOrderReceiptItemsId: receiptItemsResults[2].id,
-        binId: warehouseBinsResults[2].id, // Rack A-001, Bin 3
+        binId: warehouseBinsResults[2].id, // Zone A - Rack A-001, Level 1, Bin 03
         batchNumber: "T2405003",
         manufactureDate: new Date("2023-12-20"),
         expiryDate: new Date("2025-12-19"),
         quantity: 50,
-      },
-
-      // ✅ Sửa lại 3 dòng bị lỗi (giờ có receiptItemsResults thay vì null)
-      {
-        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
-        purchaseOrderReceiptItemsId: receiptItemsResults[0].id,
-        binId: warehouseBinsResults[24].id, // Rack B-001, Bin 1
-        batchNumber: "I2312010",
-        manufactureDate: new Date("2023-12-01"),
-        expiryDate: new Date("2026-11-30"),
-        quantity: 120,
-      },
-      {
-        medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
-        purchaseOrderReceiptItemsId: receiptItemsResults[1].id,
-        binId: warehouseBinsResults[25].id, // Rack B-001, Bin 2
-        batchNumber: "O2401015",
-        manufactureDate: new Date("2024-01-15"),
-        expiryDate: new Date("2026-01-14"),
-        quantity: 80,
-      },
-      {
-        medicationVariantId: medicationVariantsResults[23].id, // Tramadol 50mg (Controlled)
-        purchaseOrderReceiptItemsId: receiptItemsResults[2].id,
-        binId: warehouseBinsResults[168].id, // Rack D-001, Bin 1
-        batchNumber: "T2403005",
-        manufactureDate: new Date("2024-03-01"),
-        expiryDate: new Date("2027-02-28"),
-        quantity: 30,
       },
     ];
 
@@ -1653,7 +1627,7 @@ async function seed() {
     - Purchase Order Items: 11
     - Purchase Order Receipts: 1
     - Receipt Items: 3
-    - Inventory Entries: 6
+    - Inventory Entries: 3 (matches receipt items - strict 1:1 relationship)
     - Sales Orders: 5
     - Sales Order Items: 9
     - Files: 3

@@ -43,7 +43,36 @@ export const inventoryAllocationService = {
       preferredBinId,
     });
 
-    // Get all bins with their current inventory status
+    // If preferredBinId is provided, get its zone to filter bins
+    let preferredZoneId = null;
+    if (preferredBinId) {
+      const preferredBinInfo = await tx
+        .select({
+          zoneId: warehouseZones.id,
+          zoneCode: warehouseZones.code,
+          zoneName: warehouseZones.name,
+        })
+        .from(warehouseBins)
+        .innerJoin(warehouseRacks, eq(warehouseBins.rackId, warehouseRacks.id))
+        .innerJoin(warehouseZones, eq(warehouseRacks.zoneId, warehouseZones.id))
+        .where(eq(warehouseBins.id, preferredBinId))
+        .limit(1);
+
+      if (preferredBinInfo.length > 0) {
+        preferredZoneId = preferredBinInfo[0].zoneId;
+        logger.info(
+          `Preferred bin is in zone ${preferredBinInfo[0].zoneCode} - will only allocate within this zone`
+        );
+      }
+    }
+
+    // Build query conditions
+    const queryConditions = [];
+    if (preferredZoneId) {
+      queryConditions.push(eq(warehouseZones.id, preferredZoneId));
+    }
+
+    // Get all bins with their current inventory status (filtered by zone if preferredBinId exists)
     const binsWithInventory = await tx
       .select({
         binId: warehouseBins.id,
@@ -63,6 +92,7 @@ export const inventoryAllocationService = {
       .innerJoin(warehouseRacks, eq(warehouseBins.rackId, warehouseRacks.id))
       .innerJoin(warehouseZones, eq(warehouseRacks.zoneId, warehouseZones.id))
       .leftJoin(inventory, eq(warehouseBins.id, inventory.binId))
+      .where(queryConditions.length > 0 ? and(...queryConditions) : undefined)
       .groupBy(
         warehouseBins.id,
         warehouseBins.code,
@@ -88,7 +118,7 @@ export const inventoryAllocationService = {
     const occupiedBins = binsWithInventory.filter((bin) => bin.hasInventory);
 
     logger.info(
-      `Found ${emptyBins.length} empty bins and ${occupiedBins.length} occupied bins`
+      `Found ${emptyBins.length} empty bins and ${occupiedBins.length} occupied bins${preferredZoneId ? " in selected zone" : ""}`
     );
 
     if (emptyBins.length === 0 && occupiedBins.length === 0) {
@@ -172,14 +202,35 @@ export const inventoryAllocationService = {
             `Using preferred empty bin ${targetBin.binCode} in zone ${targetBin.zoneCode}`
           );
         } else {
-          logger.warn(
-            `Preferred bin ${preferredBinId} is not empty or not found, falling back to FIFO empty bin`
-          );
+          // Check if there are any empty bins in the zone
           if (emptyBins.length === 0) {
+            const zoneInfo = await tx
+              .select({
+                zoneCode: warehouseZones.code,
+                zoneName: warehouseZones.name,
+              })
+              .from(warehouseBins)
+              .innerJoin(
+                warehouseRacks,
+                eq(warehouseBins.rackId, warehouseRacks.id)
+              )
+              .innerJoin(
+                warehouseZones,
+                eq(warehouseRacks.zoneId, warehouseZones.id)
+              )
+              .where(eq(warehouseBins.id, preferredBinId))
+              .limit(1);
+
+            const zoneName =
+              zoneInfo.length > 0 ? zoneInfo[0].zoneCode : "selected";
             throw new Error(
-              "No empty bins available. Cannot allocate new batch to occupied bin."
+              `Không còn chỗ trống trong khu ${zoneName}. Vui lòng chọn khu khác hoặc giải phóng chỗ trống.`
             );
           }
+
+          logger.warn(
+            `Preferred bin ${preferredBinId} is not empty, using first available empty bin in same zone`
+          );
           targetBin = emptyBins[0];
         }
       } else {
