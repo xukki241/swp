@@ -140,6 +140,70 @@ export default function PurchaseOrderReceiptCreatePage() {
       return;
     }
 
+    // Validate batch information for all items with quantity > 0
+    const activeItems = items.filter((item) => item.quantity > 0);
+    const missingBatchInfo = [];
+
+    activeItems.forEach((item, index) => {
+      const itemNumber = items.indexOf(item) + 1;
+      if (!item.batchNumber || item.batchNumber.trim() === "") {
+        missingBatchInfo.push(`Item #${itemNumber}: Batch Number is required`);
+      }
+      if (!item.manufactureDate) {
+        missingBatchInfo.push(
+          `Item #${itemNumber}: Manufacture Date is required`
+        );
+      }
+      if (!item.expiryDate) {
+        missingBatchInfo.push(`Item #${itemNumber}: Expiry Date is required`);
+      }
+    });
+
+    if (missingBatchInfo.length > 0) {
+      toast.error("Missing batch information", {
+        description: (
+          <div className="mt-2">
+            {missingBatchInfo.map((msg, idx) => (
+              <div key={idx} className="text-sm">
+                • {msg}
+              </div>
+            ))}
+          </div>
+        ),
+      });
+      return;
+    }
+
+    // Validate expiry date is after manufacture date
+    const invalidDates = [];
+    activeItems.forEach((item, index) => {
+      const itemNumber = items.indexOf(item) + 1;
+      if (item.manufactureDate && item.expiryDate) {
+        const mfgDate = new Date(item.manufactureDate);
+        const expDate = new Date(item.expiryDate);
+        if (expDate <= mfgDate) {
+          invalidDates.push(
+            `Item #${itemNumber}: Expiry Date must be after Manufacture Date`
+          );
+        }
+      }
+    });
+
+    if (invalidDates.length > 0) {
+      toast.error("Invalid dates", {
+        description: (
+          <div className="mt-2">
+            {invalidDates.map((msg, idx) => (
+              <div key={idx} className="text-sm">
+                • {msg}
+              </div>
+            ))}
+          </div>
+        ),
+      });
+      return;
+    }
+
     // Show zone selection dialog
     setShowZoneDialog(true);
   };
@@ -352,8 +416,8 @@ export default function PurchaseOrderReceiptCreatePage() {
                 <Alert className="mb-4">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    Adjust the received quantity for each item. Default is the
-                    full ordered quantity.
+                    All fields marked with (*) are required. Please enter batch
+                    information for all items before creating the receipt.
                   </AlertDescription>
                 </Alert>
 
@@ -364,9 +428,9 @@ export default function PurchaseOrderReceiptCreatePage() {
                         <TableHead className="w-[50px]">#</TableHead>
                         <TableHead>Medication</TableHead>
                         <TableHead>Variant</TableHead>
-                        <TableHead>Batch Number</TableHead>
-                        <TableHead>Manufacture Date</TableHead>
-                        <TableHead>Expiry Date</TableHead>
+                        <TableHead>Batch Number *</TableHead>
+                        <TableHead>Manufacture Date *</TableHead>
+                        <TableHead>Expiry Date *</TableHead>
                         <TableHead className="text-right">
                           Ordered Qty
                         </TableHead>
@@ -401,8 +465,9 @@ export default function PurchaseOrderReceiptCreatePage() {
                                   e.target.value
                                 )
                               }
-                              placeholder="Batch #"
+                              placeholder="Batch # *"
                               className="w-32"
+                              required
                             />
                           </TableCell>
                           <TableCell>
@@ -417,6 +482,7 @@ export default function PurchaseOrderReceiptCreatePage() {
                                 )
                               }
                               className="w-40"
+                              required
                             />
                           </TableCell>
                           <TableCell>
@@ -431,6 +497,7 @@ export default function PurchaseOrderReceiptCreatePage() {
                                 )
                               }
                               className="w-40"
+                              required
                             />
                           </TableCell>
                           <TableCell className="text-right">
