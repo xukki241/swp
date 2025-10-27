@@ -49,6 +49,7 @@ export default function SalesPage() {
       customer: null,
       cart: [],
       paymentMethod: "cash",
+      cashReceived: "", // Amount received from customer
       createdAt: new Date(),
     },
   ]);
@@ -87,6 +88,15 @@ export default function SalesPage() {
     [activeOrder]
   );
 
+  // Calculate change amount for cash payment
+  const changeAmount = useMemo(() => {
+    if (activeOrder?.paymentMethod !== "cash" || !activeOrder?.cashReceived) {
+      return 0;
+    }
+    const received = Number(activeOrder.cashReceived) || 0;
+    return Math.max(0, received - totalAmount);
+  }, [activeOrder, totalAmount]);
+
   // ========== ORDER MANAGEMENT ==========
 
   const createNewOrder = () => {
@@ -95,6 +105,7 @@ export default function SalesPage() {
       customer: null,
       cart: [],
       paymentMethod: "cash",
+      cashReceived: "",
       createdAt: new Date(),
     };
     setOrders((prev) => [...prev, newOrder]);
@@ -152,7 +163,12 @@ export default function SalesPage() {
   };
 
   const setPaymentMethod = (method) => {
-    updateActiveOrder({ paymentMethod: method });
+    // Reset cashReceived when switching to non-cash payment
+    const updates = { paymentMethod: method };
+    if (method !== "cash") {
+      updates.cashReceived = "";
+    }
+    updateActiveOrder(updates);
   };
 
   const setCart = (cart) => {
@@ -630,9 +646,65 @@ export default function SalesPage() {
                     onChange={setPaymentMethod}
                   />
                 </div>
+
+                {/* Cash Payment Details */}
+                {activeOrder.paymentMethod === "cash" && (
+                  <div className="space-y-3 p-4 bg-muted rounded-lg border">
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-2 block">
+                        Cash Received
+                      </label>
+                      <Input
+                        type="number"
+                        placeholder="Enter amount received"
+                        value={activeOrder.cashReceived}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          updateActiveOrder({ cashReceived: value });
+                        }}
+                        className="text-lg"
+                        min="0"
+                        step="1000"
+                      />
+                    </div>
+
+                    {activeOrder.cashReceived && (
+                      <div className="space-y-2 pt-2 border-t">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Total:</span>
+                          <span className="font-semibold">
+                            {totalAmount.toLocaleString("vi-VN")} VNĐ
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Received:</span>
+                          <span className="font-semibold">
+                            {Number(activeOrder.cashReceived || 0).toLocaleString("vi-VN")} VNĐ
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-base pt-2 border-t">
+                          <span className="font-semibold">Change:</span>
+                          <span className={`font-bold text-lg ${changeAmount < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                            {changeAmount.toLocaleString("vi-VN")} VNĐ
+                          </span>
+                        </div>
+                        {changeAmount < 0 && (
+                          <p className="text-xs text-red-600 mt-1">
+                            Insufficient payment! Need {Math.abs(changeAmount).toLocaleString("vi-VN")} VNĐ more
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <Button
                   onClick={handleCompleteOrder}
-                  disabled={!activeOrder.customer || isSubmitting}
+                  disabled={
+                    !activeOrder.customer || 
+                    isSubmitting || 
+                    (activeOrder.paymentMethod === "cash" && (!activeOrder.cashReceived || changeAmount < 0))
+                  }
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-base"
                 >
                   {isSubmitting ? (
