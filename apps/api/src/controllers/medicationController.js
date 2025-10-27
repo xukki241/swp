@@ -84,8 +84,8 @@ export const createMedication = async (req, res, next) => {
       name: med.name,
       brand: med.brand || null,
       description: med.description || null,
-      isPrescriptionRequired: med.isPrescriptionRequired || false,
-      isControlledSubstance: med.isControlledSubstance || false,
+      isPrescriptionRequired: med.is_prescription_required || false,
+      isControlledSubstance: med.is_controlled_substance || false,
       status: med.status || "active",
       variants: med.variants || [],
     }));
@@ -120,8 +120,8 @@ export const updateMedication = async (req, res, next) => {
       name,
       brand,
       description,
-      isPrescriptionRequired,
-      isControlledSubstance,
+      is_prescription_required,
+      is_controlled_substance,
       status,
       variants,
     } = req.body;
@@ -145,11 +145,11 @@ export const updateMedication = async (req, res, next) => {
     if (description !== undefined) {
       medicationData.description = description;
     }
-    if (isPrescriptionRequired !== undefined) {
-      medicationData.isPrescriptionRequired = isPrescriptionRequired;
+    if (is_prescription_required !== undefined) {
+      medicationData.isPrescriptionRequired = is_prescription_required;
     }
-    if (isControlledSubstance !== undefined) {
-      medicationData.isControlledSubstance = isControlledSubstance;
+    if (is_controlled_substance !== undefined) {
+      medicationData.isControlledSubstance = is_controlled_substance;
     }
     if (status !== undefined) {
       medicationData.status = status;
