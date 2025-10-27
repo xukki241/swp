@@ -511,11 +511,10 @@ export default function SalesPage() {
               return (
                 <div
                   key={order.id}
-                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${
-                    isActive
+                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${isActive
                       ? "border-primary bg-primary/10 text-foreground"
                       : "border-border bg-card hover:border-primary/50 text-muted-foreground"
-                  }`}
+                    }`}
                   onClick={() => setActiveOrderId(order.id)}
                 >
                   <FileText className="h-4 w-4" />
@@ -701,8 +700,8 @@ export default function SalesPage() {
                 <Button
                   onClick={handleCompleteOrder}
                   disabled={
-                    !activeOrder.customer || 
-                    isSubmitting || 
+                    !activeOrder.customer ||
+                    isSubmitting ||
                     (activeOrder.paymentMethod === "cash" && (!activeOrder.cashReceived || changeAmount < 0))
                   }
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-base"
