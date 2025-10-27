@@ -9,14 +9,14 @@ import logger from "./logger.js";
  * Configure with your email service credentials
  */
 const createTransporter = () => {
-  // For development: Use ethereal email (fake SMTP)
-  // For production: Use real SMTP service (Gmail, SendGrid, AWS SES)
+  // Try to send real emails if credentials are configured
+  // Works in both development and production if SMTP is set up
+  const hasValidCredentials = config.smtpUser &&
+    config.smtpPass &&
+    config.smtpUser.trim() !== '' &&
+    config.smtpPass.trim() !== '';
 
-  // TESTING: Send real email even in development
-  // Change back to: if (config.nodeEnv === "production") after testing
-  const shouldSendRealEmail = true; // Set to false to go back to console logging
-
-  if (shouldSendRealEmail || config.nodeEnv === "production") {
+  if (hasValidCredentials) {
     return nodemailer.createTransport({
       host: config.smtpHost || "smtp.gmail.com",
       port: config.smtpPort || 587,
@@ -28,7 +28,8 @@ const createTransporter = () => {
     });
   }
 
-  // Development: Log to console instead of sending real email
+  // Fallback if no credentials - log to console instead of sending real email
+  logger.warn("📧 [Email Config] No SMTP credentials found - emails will be logged only");
   return {
     sendMail: async (mailOptions) => {
       logger.info("📧 [DEV MODE] Email would be sent:", {
@@ -36,7 +37,7 @@ const createTransporter = () => {
         subject: mailOptions.subject,
         text: mailOptions.text,
       });
-      return { messageId: "dev-mode-email" };
+      return { messageId: "dev-mode-email-" + Date.now() };
     },
   };
 };

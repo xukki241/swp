@@ -83,7 +83,7 @@ export const salesOrderService = {
         if (totalAvailable < quantity) {
           throw new Error(
             `Insufficient inventory for ${variant.name} (${variant.sku}). ` +
-              `Requested: ${quantity}, Available: ${totalAvailable}`
+            `Requested: ${quantity}, Available: ${totalAvailable}`
           );
         }
 
@@ -390,7 +390,35 @@ export const salesOrderService = {
         .where(eq(salesOrders.id, id))
         .returning();
 
-      return updatedOrder;
+      // Query order with relations for complete data (needed for email)
+      const orderWithRelations = await tx.query.salesOrders.findFirst({
+        where: eq(salesOrders.id, id),
+        with: {
+          customer: true,
+          salesperson: true,
+          items: {
+            with: {
+              medicationVariant: {
+                with: {
+                  medication: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      // Enrich items with medication names
+      if (orderWithRelations?.items) {
+        orderWithRelations.items = orderWithRelations.items.map((item) => ({
+          ...item,
+          medicationName: item.medicationVariant?.medication?.name || "Unknown",
+          variantName: item.medicationVariant?.name || "",
+          sellPrice: item.unitPrice,
+        }));
+      }
+
+      return orderWithRelations || updatedOrder;
     });
   },
 

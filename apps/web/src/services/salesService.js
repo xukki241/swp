@@ -30,4 +30,10 @@ export const salesService = {
     const response = await instance.delete(`/sales/${id}`);
     return response.data;
   },
+
+  // Send sales invoice email
+  async sendInvoiceEmail(invoiceData) {
+    const response = await instance.post("/send-sales-invoice-email", invoiceData);
+    return response.data;
+  },
 };

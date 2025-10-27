@@ -1,6 +1,8 @@
 import asyncHandler from "express-async-handler";
 
 import { salesOrderService } from "../services/salesOrderService.js";
+import { sendSalesInvoiceEmail } from "../utils/salesInvoiceEmail.js";
+import logger from "../utils/logger.js";
 
 export const salesOrderController = {
   // POST /api/sales - Create a new sales order
@@ -75,6 +77,54 @@ export const salesOrderController = {
         success: false,
         message: "Sales order not found",
       });
+    }
+
+    // Send invoice email if order is marked as paid and customer has email
+    if (req.body.status === 'paid' && order.customer?.email) {
+      try {
+        // Format date safely
+        let formattedDate = 'N/A';
+        try {
+          const orderDate = new Date(order.orderDate || order.createdAt);
+          if (!isNaN(orderDate.getTime())) {
+            formattedDate = orderDate.toLocaleDateString('vi-VN', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+          }
+        } catch (dateError) {
+          logger.warn('Failed to format order date:', dateError);
+        }
+
+        const invoiceData = {
+          customerEmail: order.customer.email,
+          customerName: order.customer.name,
+          salespersonName: order.salesperson?.name || "Staff",
+          items: order.items.map(item => ({
+            medicationName: item.medicationName,
+            variantName: item.variantName,
+            quantity: item.quantity,
+            sellingPrice: item.sellPrice,
+          })),
+          totalAmount: order.totalAmount, // Fixed: use totalAmount instead of total
+          paymentMethod: order.paymentMethod,
+          orderNumber: order.id,
+          orderDate: formattedDate,
+        };
+
+        // Send email asynchronously (don't wait for it)
+        sendSalesInvoiceEmail(invoiceData).catch(err => {
+          logger.error('Failed to send invoice email after marking as paid:', err);
+        });
+
+        logger.info(`📧 Invoice email queued for order ${order.id}`);
+      } catch (emailError) {
+        // Log but don't fail the update
+        logger.error('Error preparing invoice email:', emailError);
+      }
     }
 
     res.json({

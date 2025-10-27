@@ -93,7 +93,8 @@ export default function SalesPage() {
     if (activeOrder?.paymentMethod !== "cash" || !activeOrder?.cashReceived) {
       return 0;
     }
-    const received = Number(activeOrder.cashReceived) || 0;
+    // cashReceived is in thousands (nghìn đồng), multiply by 1000
+    const received = Number(activeOrder.cashReceived) * 1000 || 0;
     return Math.max(0, received - totalAmount);
   }, [activeOrder, totalAmount]);
 
@@ -419,6 +420,9 @@ export default function SalesPage() {
 
       setSuccessOrder(enrichedOrder);
       toast.success("Order created successfully!");
+
+      // Note: Invoice email will be sent automatically when order is marked as "paid"
+
       setPendingOrderData(null);
       setShowVietQRDialog(false);
 
@@ -433,6 +437,7 @@ export default function SalesPage() {
               customer: null,
               cart: [],
               paymentMethod: "cash",
+              cashReceived: "",
               createdAt: new Date(),
             };
             setActiveOrderId(newOrder.id);
@@ -465,7 +470,7 @@ export default function SalesPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [activeOrder, activeOrderId, pendingOrderData]);
+  }, [activeOrder, activeOrderId, pendingOrderData, changeAmount]);
 
   const handleCloseSuccessModal = useCallback(() => {
     setSuccessOrder(null);
@@ -512,8 +517,8 @@ export default function SalesPage() {
                 <div
                   key={order.id}
                   className={`relative flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${isActive
-                      ? "border-primary bg-primary/10 text-foreground"
-                      : "border-border bg-card hover:border-primary/50 text-muted-foreground"
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-border bg-card hover:border-primary/50 text-muted-foreground"
                     }`}
                   onClick={() => setActiveOrderId(order.id)}
                 >
@@ -651,20 +656,28 @@ export default function SalesPage() {
                   <div className="space-y-3 p-4 bg-muted rounded-lg border">
                     <div>
                       <label className="text-sm font-medium text-foreground mb-2 block">
-                        Cash Received
+                        Cash Received (in thousands VNĐ)
                       </label>
-                      <Input
-                        type="number"
-                        placeholder="Enter amount received"
-                        value={activeOrder.cashReceived}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          updateActiveOrder({ cashReceived: value });
-                        }}
-                        className="text-lg"
-                        min="0"
-                        step="1000"
-                      />
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          placeholder="Enter amount (e.g., 100 = 100,000 VNĐ)"
+                          value={activeOrder.cashReceived}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            updateActiveOrder({ cashReceived: value });
+                          }}
+                          className="text-lg pr-16"
+                          min="0"
+                          step="1"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
+                          × 1,000
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Example: Enter "100" for 100,000 VNĐ
+                      </p>
                     </div>
 
                     {activeOrder.cashReceived && (
@@ -678,7 +691,7 @@ export default function SalesPage() {
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Received:</span>
                           <span className="font-semibold">
-                            {Number(activeOrder.cashReceived || 0).toLocaleString("vi-VN")} VNĐ
+                            {(Number(activeOrder.cashReceived || 0) * 1000).toLocaleString("vi-VN")} VNĐ
                           </span>
                         </div>
                         <div className="flex justify-between text-base pt-2 border-t">

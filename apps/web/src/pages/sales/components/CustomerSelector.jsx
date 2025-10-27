@@ -3,20 +3,23 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { customerService } from "@/services/customerService";
-import { Loader2, Search } from "lucide-react";
+import { Edit, Loader2, Search } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import EditCustomerForm from "./EditCustomerForm";
 
 export default function CustomerSelector({ onSelectCustomer }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [customers, setCustomers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [editingCustomerId, setEditingCustomerId] = useState(null);
 
   const handleSearch = async (term) => {
     setSearchTerm(term);
 
     if (!term.trim()) {
       setCustomers([]);
+      setEditingCustomerId(null);
       return;
     }
 
@@ -42,6 +45,22 @@ export default function CustomerSelector({ onSelectCustomer }) {
     }
   };
 
+  const handleEditClick = (e, customerId) => {
+    e.stopPropagation();
+    setEditingCustomerId(customerId);
+  };
+
+  const handleEditSuccess = (updatedCustomer) => {
+    // Update customer in the list
+    setCustomers((prev) =>
+      prev.map((c) => (c.id === updatedCustomer.id ? updatedCustomer : c))
+    );
+  };
+
+  const handleEditCancel = () => {
+    setEditingCustomerId(null);
+  };
+
   return (
     <div className="space-y-3">
       <div className="relative">
@@ -63,19 +82,48 @@ export default function CustomerSelector({ onSelectCustomer }) {
       {customers.length > 0 && (
         <div className="space-y-2 max-h-64 overflow-y-auto">
           {customers.map((customer) => (
-            <Button
-              key={customer.id}
-              variant="outline"
-              onClick={() => onSelectCustomer(customer)}
-              className="w-full justify-start text-left h-auto py-3"
-            >
-              <div>
-                <p className="font-semibold text-gray-900">{customer.name}</p>
-                {customer.phone && (
-                  <p className="text-xs text-gray-600">{customer.phone}</p>
-                )}
-              </div>
-            </Button>
+            <div key={customer.id} className="space-y-2">
+              {editingCustomerId === customer.id ? (
+                <EditCustomerForm
+                  customer={customer}
+                  onClose={handleEditCancel}
+                  onSuccess={handleEditSuccess}
+                />
+              ) : (
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => onSelectCustomer(customer)}
+                    className="flex-1 justify-start text-left h-auto py-3"
+                  >
+                    <div>
+                      <p className="font-semibold text-gray-900">
+                        {customer.name}
+                      </p>
+                      {customer.phone && (
+                        <p className="text-xs text-gray-600">
+                          {customer.phone}
+                        </p>
+                      )}
+                      {customer.email && (
+                        <p className="text-xs text-blue-600">
+                          {customer.email}
+                        </p>
+                      )}
+                    </div>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => handleEditClick(e, customer.id)}
+                    className="shrink-0 h-auto"
+                    title="Edit customer"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
           ))}
         </div>
       )}

@@ -8,9 +8,13 @@ import logger from "./logger.js";
  * Create email transporter
  */
 const createTransporter = () => {
-  const shouldSendRealEmail = true;
+  // Try to send real emails if credentials are configured
+  const hasValidCredentials = config.smtpUser &&
+    config.smtpPass &&
+    config.smtpUser.trim() !== '' &&
+    config.smtpPass.trim() !== '';
 
-  if (shouldSendRealEmail || config.nodeEnv === "production") {
+  if (hasValidCredentials) {
     return nodemailer.createTransport({
       host: config.smtpHost || "smtp.gmail.com",
       port: config.smtpPort || 587,
@@ -22,14 +26,15 @@ const createTransporter = () => {
     });
   }
 
-  // Development fallback
+  // Fallback if no credentials - log instead of sending
+  logger.warn("📧 [Email Config] No SMTP credentials found - emails will be logged only");
   return {
     sendMail: async (mailOptions) => {
       logger.info("📧 [DEV MODE] Email would be sent:", {
         to: mailOptions.to,
         subject: mailOptions.subject,
       });
-      return { messageId: "dev-mode-email" };
+      return { messageId: "dev-mode-email-" + Date.now() };
     },
   };
 };
