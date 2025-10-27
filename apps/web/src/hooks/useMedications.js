@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { instance } from "@/lib/axios";
 import * as api from "@/services/medicationsService";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const FIVE_MIN = 5 * 60 * 1000;
 

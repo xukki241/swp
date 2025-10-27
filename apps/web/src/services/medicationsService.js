@@ -108,7 +108,10 @@ export async function getMedicationVariant(medicationId, variantId) {
 // POST /api/medications/:medicationId/variants (batch)
 export async function createVariant(medicationId, payload) {
   const body = Array.isArray(payload) ? payload : [payload];
-  const res = await instance.post(`/medications/${medicationId}/variants`, body);
+  const res = await instance.post(
+    `/medications/${medicationId}/variants`,
+    body
+  );
   return res.data?.data ?? res.data;
 }
 

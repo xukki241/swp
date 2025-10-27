@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+// apps/web/src/pages/medications/MedicationViewModal.jsx
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-  DialogClose,
-  DialogDescription,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -18,53 +18,79 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  getSuppliersByMedication,
-  getPurchasesByMedication,
-  getSalesByMedication,
+  getMedicationImageLocal,
+  getMedicationImageUrl,
+} from "@/lib/mockImages";
+import {
   getInventorySummary,
   getMedicationVariants,
+  getPurchasesByMedication,
+  getSalesByMedication,
+  getSuppliersByMedication,
 } from "@/services/medicationsService";
-import { getMedicationImageUrl } from "@/lib/mockImages";
+import { useEffect, useMemo, useState } from "react";
 
-/* Ảnh thuốc có fallback; re-mount theo src */
-function MedImage({ id, alt, className = "h-20 w-20" }) {
-  const [src, setSrc] = useState(() => getMedicationImageUrl(id));
+function PillPlaceholder({ className = "h-20 w-20" }) {
+  return (
+    <div
+      className={`rounded-xl border bg-muted/30 flex items-center justify-center ${className}`}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        className="h-10 w-10 opacity-60"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      >
+        <path d="M4 14a5 5 0 0 0 7.07 7.07l6.86-6.86a5 5 0 0 0-7.07-7.07L4 14Z" />
+        <path d="M8.5 8.5l7 7" />
+      </svg>
+    </div>
+  );
+}
+
+function MedImageInModal({ medicationId, alt = "", version = 0, onClick }) {
   const [errored, setErrored] = useState(false);
 
-  useEffect(() => {
-    const url = getMedicationImageUrl(id);
-    setSrc(url);
-    setErrored(false);
-  }, [id]);
+  const src = useMemo(() => {
+    if (!medicationId) return null;
+    const local = getMedicationImageLocal(medicationId);
+    if (local) return local;
+    const base = getMedicationImageUrl(medicationId);
+    return base.includes("?v=") ? base : `${base}?v=${version}`;
+  }, [medicationId, version]);
 
-  if (errored) {
-    return (
-      <div className={`rounded-xl border bg-muted/30 flex items-center justify-center ${className}`}>
-        <svg viewBox="0 0 24 24" className="h-10 w-10 opacity-60" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M4 14a5 5 0 0 0 7.07 7.07l6.86-6.86a5 5 0 0 0-7.07-7.07L4 14Z" />
-          <path d="M8.5 8.5l7 7" />
-        </svg>
-      </div>
-    );
-  }
+  useEffect(() => setErrored(false), [src]);
 
+  if (!src || errored) return <PillPlaceholder />;
   return (
     <img
-      key={src}
       src={src}
       alt={alt}
-      className={`rounded-xl object-cover border ${className}`}
+      className="h-20 w-20 rounded-xl object-cover border cursor-zoom-in"
       onError={() => setErrored(true)}
+      onClick={() => onClick?.(src, alt)}
     />
   );
 }
 
-export default function MedicationViewModal({ open, onClose, medication, withVariants = false }) {
+export default function MedicationViewModal({
+  open,
+  onClose,
+  medication,
+  withVariants = false,
+  imageVersion = 0,
+}) {
   const [suppliers, setSuppliers] = useState([]);
   const [purchases, setPurchases] = useState([]);
   const [sales, setSales] = useState([]);
   const [inventory, setInventory] = useState([]);
   const [variants, setVariants] = useState([]);
+
+  // Lightbox
+  const [lightbox, setLightbox] = useState({ open: false, src: "", alt: "" });
+  const openLightbox = (src, alt) => setLightbox({ open: true, src, alt });
+  const closeLightbox = () => setLightbox({ open: false, src: "", alt: "" });
 
   useEffect(() => {
     if (!open || !medication) return;
@@ -84,9 +110,7 @@ export default function MedicationViewModal({ open, onClose, medication, withVar
           const v = await getMedicationVariants(medication.id);
           setVariants(Array.isArray(v) ? v : v?.data || []);
         }
-      } catch {
-        // ignore
-      }
+      } catch {}
     })();
   }, [open, medication, withVariants]);
 
@@ -94,11 +118,11 @@ export default function MedicationViewModal({ open, onClose, medication, withVar
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl">
+      <DialogContent className="max-w-5xl" aria-describedby="med-view-desc">
         <DialogHeader>
           <DialogTitle>Medication • {medication.name}</DialogTitle>
-          <DialogDescription className="sr-only">
-            View full information of a medication.
+          <DialogDescription id="med-view-desc" className="sr-only">
+            Medication details view
           </DialogDescription>
         </DialogHeader>
 
@@ -106,15 +130,32 @@ export default function MedicationViewModal({ open, onClose, medication, withVar
           {/* Header info + image */}
           <div className="flex items-start gap-4">
             <div className="shrink-0">
-              <MedImage id={medication.id} alt={medication.name} className="h-20 w-20" />
+              <MedImageInModal
+                medicationId={medication.id}
+                alt={medication.name}
+                version={imageVersion}
+                onClick={openLightbox}
+              />
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm flex-1">
-              <div><b>Brand:</b> {medication.brand || "-"}</div>
-              <div><b>Status:</b> {medication.status || "-"}</div>
-              <div><b>Prescription:</b> {medication.isPrescriptionRequired ? "Yes" : "No"}</div>
-              <div><b>Controlled:</b> {medication.isControlledSubstance ? "Yes" : "No"}</div>
-              <div className="col-span-2 md:col-span-4"><b>Description:</b> {medication.description || "-"}</div>
+              <div>
+                <b>Brand:</b> {medication.brand || "-"}
+              </div>
+              <div>
+                <b>Status:</b> {medication.status || "-"}
+              </div>
+              <div>
+                <b>Prescription:</b>{" "}
+                {medication.isPrescriptionRequired ? "Yes" : "No"}
+              </div>
+              <div>
+                <b>Controlled:</b>{" "}
+                {medication.isControlledSubstance ? "Yes" : "No"}
+              </div>
+              <div className="col-span-2 md:col-span-4">
+                <b>Description:</b> {medication.description || "-"}
+              </div>
             </div>
           </div>
 
@@ -142,14 +183,25 @@ export default function MedicationViewModal({ open, onClose, medication, withVar
                       <TableCell>{v.unit}</TableCell>
                       <TableCell>{v.unitFactor}</TableCell>
                       <TableCell>{v.barcode || "-"}</TableCell>
-                      <TableCell>{typeof v.sellPrice === "number" ? v.sellPrice.toLocaleString() : v.sellPrice}</TableCell>
-                      <TableCell>{v.isActive ? "Active" : "Inactive"}</TableCell>
+                      <TableCell>
+                        {typeof v.sellPrice === "number"
+                          ? v.sellPrice.toLocaleString()
+                          : v.sellPrice}
+                      </TableCell>
+                      <TableCell>
+                        {v.isActive ? "Active" : "Inactive"}
+                      </TableCell>
                       <TableCell>{v.isForSale ? "Yes" : "No"}</TableCell>
                     </TableRow>
                   ))}
                   {variants.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center text-muted-foreground">No variants found</TableCell>
+                      <TableCell
+                        colSpan={8}
+                        className="text-center text-muted-foreground"
+                      >
+                        No variants found
+                      </TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -180,7 +232,12 @@ export default function MedicationViewModal({ open, onClose, medication, withVar
                 ))}
                 {suppliers.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground">No suppliers found</TableCell>
+                    <TableCell
+                      colSpan={4}
+                      className="text-center text-muted-foreground"
+                    >
+                      No suppliers found
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -204,15 +261,24 @@ export default function MedicationViewModal({ open, onClose, medication, withVar
                 {purchases.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell>{p.supplierName}</TableCell>
-                    <TableCell>{new Date(p.orderDate).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(p.expectedDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {new Date(p.orderDate).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(p.expectedDate).toLocaleDateString()}
+                    </TableCell>
                     <TableCell>{p.status}</TableCell>
                     <TableCell>{p.totalAmount}</TableCell>
                   </TableRow>
                 ))}
                 {purchases.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">No purchases found</TableCell>
+                    <TableCell
+                      colSpan={5}
+                      className="text-center text-muted-foreground"
+                    >
+                      No purchases found
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -236,7 +302,9 @@ export default function MedicationViewModal({ open, onClose, medication, withVar
                 {sales.map((s) => (
                   <TableRow key={s.id}>
                     <TableCell>{s.customerId}</TableCell>
-                    <TableCell>{new Date(s.orderDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {new Date(s.orderDate).toLocaleDateString()}
+                    </TableCell>
                     <TableCell>{s.status}</TableCell>
                     <TableCell>{s.paymentMethod}</TableCell>
                     <TableCell>{s.totalAmount}</TableCell>
@@ -244,7 +312,12 @@ export default function MedicationViewModal({ open, onClose, medication, withVar
                 ))}
                 {sales.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">No sales found</TableCell>
+                    <TableCell
+                      colSpan={5}
+                      className="text-center text-muted-foreground"
+                    >
+                      No sales found
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -274,7 +347,12 @@ export default function MedicationViewModal({ open, onClose, medication, withVar
                 ))}
                 {inventory.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground">No inventory found</TableCell>
+                    <TableCell
+                      colSpan={4}
+                      className="text-center text-muted-foreground"
+                    >
+                      No inventory found
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -288,6 +366,32 @@ export default function MedicationViewModal({ open, onClose, medication, withVar
           </DialogClose>
         </DialogFooter>
       </DialogContent>
+
+      {/* 🔎 Lightbox chỉ có ảnh – đã thêm Title & Description ẩn để hết cảnh báo */}
+      <Dialog open={lightbox.open} onOpenChange={(o) => !o && closeLightbox()}>
+        <DialogContent className="max-w-3xl" aria-describedby="lightbox-desc">
+          <DialogHeader>
+            <DialogTitle className="sr-only">
+              Medication image preview
+            </DialogTitle>
+            <DialogDescription id="lightbox-desc" className="sr-only">
+              Enlarged medication image preview
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center justify-center">
+            <img
+              src={lightbox.src}
+              alt={lightbox.alt || "Medication image"}
+              className="max-h-[80vh] w-auto rounded-md object-contain"
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Close</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
