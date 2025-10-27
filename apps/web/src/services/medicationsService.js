@@ -166,7 +166,9 @@ export async function searchMedications(search) {
 }
 
 export async function findVariantsByBarcode(barcode) {
-  if (!barcode) return [];
+  if (!barcode) {
+    return [];
+  }
   const res = await instance.get("/medications/variants/all", {
     params: { search: barcode },
   });

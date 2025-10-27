@@ -3,7 +3,9 @@
 // Chuyển File -> dataURL để preview/lưu mock
 export function fileToDataURL(file) {
   return new Promise((resolve) => {
-    if (!file) return resolve(null);
+    if (!file) {
+      return resolve(null);
+    }
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
     reader.onerror = () => resolve(null);
@@ -14,7 +16,9 @@ export function fileToDataURL(file) {
 const LS_KEY = (id) => `med-img:${id}`;
 
 export function setMedicationImage(id, dataUrl) {
-  if (!id || !dataUrl) return;
+  if (!id || !dataUrl) {
+    return;
+  }
   try {
     localStorage.setItem(LS_KEY(id), dataUrl);
   } catch {
@@ -47,6 +51,8 @@ export function clearMedicationImage(id) {
  */
 export function getMedicationImageUrl(id) {
   const local = getMedicationImageLocal(id);
-  if (local) return local;
+  if (local) {
+    return local;
+  }
   return `/images/medications/${id}.jpg`;
 }
