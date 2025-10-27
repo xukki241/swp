@@ -11,10 +11,11 @@ import logger from "./logger.js";
 const createTransporter = () => {
   // Try to send real emails if credentials are configured
   // Works in both development and production if SMTP is set up
-  const hasValidCredentials = config.smtpUser &&
+  const hasValidCredentials =
+    config.smtpUser &&
     config.smtpPass &&
-    config.smtpUser.trim() !== '' &&
-    config.smtpPass.trim() !== '';
+    config.smtpUser.trim() !== "" &&
+    config.smtpPass.trim() !== "";
 
   if (hasValidCredentials) {
     return nodemailer.createTransport({
@@ -29,7 +30,9 @@ const createTransporter = () => {
   }
 
   // Fallback if no credentials - log to console instead of sending real email
-  logger.warn("📧 [Email Config] No SMTP credentials found - emails will be logged only");
+  logger.warn(
+    "📧 [Email Config] No SMTP credentials found - emails will be logged only"
+  );
   return {
     sendMail: async (mailOptions) => {
       logger.info("📧 [DEV MODE] Email would be sent:", {

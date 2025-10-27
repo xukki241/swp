@@ -8,37 +8,40 @@ import logger from "./logger.js";
  * Create email transporter
  */
 const createTransporter = () => {
-    // Try to send real emails if credentials are configured
-    // This matches the behavior of email.js for OTP emails
-    const hasValidCredentials = config.smtpUser &&
-        config.smtpPass &&
-        config.smtpUser.trim() !== '' &&
-        config.smtpPass.trim() !== '';
+  // Try to send real emails if credentials are configured
+  // This matches the behavior of email.js for OTP emails
+  const hasValidCredentials =
+    config.smtpUser &&
+    config.smtpPass &&
+    config.smtpUser.trim() !== "" &&
+    config.smtpPass.trim() !== "";
 
-    if (hasValidCredentials) {
-        return nodemailer.createTransport({
-            host: config.smtpHost || "smtp.gmail.com",
-            port: config.smtpPort || 587,
-            secure: false,
-            auth: {
-                user: config.smtpUser,
-                pass: config.smtpPass,
-            },
-        });
-    }
+  if (hasValidCredentials) {
+    return nodemailer.createTransport({
+      host: config.smtpHost || "smtp.gmail.com",
+      port: config.smtpPort || 587,
+      secure: false,
+      auth: {
+        user: config.smtpUser,
+        pass: config.smtpPass,
+      },
+    });
+  }
 
-    // Fallback if no credentials - log instead of sending
-    logger.warn("📧 [Email Config] No SMTP credentials found - emails will be logged only");
-    return {
-        sendMail: async (mailOptions) => {
-            logger.info("📧 [DEV MODE] Email would be sent:", {
-                to: mailOptions.to,
-                subject: mailOptions.subject,
-                from: mailOptions.from,
-            });
-            return { messageId: "dev-mode-email-" + Date.now() };
-        },
-    };
+  // Fallback if no credentials - log instead of sending
+  logger.warn(
+    "📧 [Email Config] No SMTP credentials found - emails will be logged only"
+  );
+  return {
+    sendMail: async (mailOptions) => {
+      logger.info("📧 [DEV MODE] Email would be sent:", {
+        to: mailOptions.to,
+        subject: mailOptions.subject,
+        from: mailOptions.from,
+      });
+      return { messageId: "dev-mode-email-" + Date.now() };
+    },
+  };
 };
 
 /**
@@ -47,50 +50,53 @@ const createTransporter = () => {
  * @returns {Promise<boolean>} Success status
  */
 export const sendSalesInvoiceEmail = async (invoiceData) => {
-    // Extract key fields outside try block for error logging
-    const customerEmail = invoiceData.customerEmail;
-    const orderNumber = invoiceData.orderNumber;
+  // Extract key fields outside try block for error logging
+  const customerEmail = invoiceData.customerEmail;
+  const orderNumber = invoiceData.orderNumber;
 
-    try {
-        // Log received data for debugging
-        logger.info("📧 Preparing to send sales invoice email:", {
-            customerEmail,
-            orderNumber,
-            hasItems: !!invoiceData.items,
-            itemsCount: invoiceData.items?.length,
-            totalAmount: invoiceData.totalAmount,
-            paymentMethod: invoiceData.paymentMethod
-        });
+  try {
+    // Log received data for debugging
+    logger.info("📧 Preparing to send sales invoice email:", {
+      customerEmail,
+      orderNumber,
+      hasItems: !!invoiceData.items,
+      itemsCount: invoiceData.items?.length,
+      totalAmount: invoiceData.totalAmount,
+      paymentMethod: invoiceData.paymentMethod,
+    });
 
-        // Validate required fields
-        if (!customerEmail || !invoiceData.items || !Array.isArray(invoiceData.items)) {
-            throw new Error("Missing required fields: customerEmail or items");
-        }
+    // Validate required fields
+    if (
+      !customerEmail ||
+      !invoiceData.items ||
+      !Array.isArray(invoiceData.items)
+    ) {
+      throw new Error("Missing required fields: customerEmail or items");
+    }
 
-        const {
-            customerName,
-            salespersonName,
-            items,
-            totalAmount,
-            paymentMethod,
-            orderDate,
-            cashReceived,
-            changeAmount,
-        } = invoiceData;
+    const {
+      customerName,
+      salespersonName,
+      items,
+      totalAmount,
+      paymentMethod,
+      orderDate,
+      cashReceived,
+      changeAmount,
+    } = invoiceData;
 
-        const transporter = createTransporter();
+    const transporter = createTransporter();
 
-        // Generate items table HTML with safe access
-        const itemsTableRows = items
-            .map(
-                (item, index) => {
-                    const medicationName = item.medicationName || "Unknown Product";
-                    const variantName = item.variantName || "";
-                    const quantity = Number(item.quantity) || 0;
-                    const sellingPrice = Number(item.sellingPrice) || 0;
-                    const subtotal = quantity * sellingPrice;
+    // Generate items table HTML with safe access
+    const itemsTableRows = items
+      .map((item, index) => {
+        const medicationName = item.medicationName || "Unknown Product";
+        const variantName = item.variantName || "";
+        const quantity = Number(item.quantity) || 0;
+        const sellingPrice = Number(item.sellingPrice) || 0;
+        const subtotal = quantity * sellingPrice;
 
-                    return `
+        return `
         <tr style="border-bottom: 1px solid #e5e7eb;">
           <td style="padding: 12px; text-align: center;">${index + 1}</td>
           <td style="padding: 12px;">
@@ -102,25 +108,24 @@ export const sendSalesInvoiceEmail = async (invoiceData) => {
           <td style="padding: 12px; text-align: right; font-weight: 600;">${subtotal.toLocaleString()} ₫</td>
         </tr>
       `;
-                }
-            )
-            .join("");
+      })
+      .join("");
 
-        // Payment method display
-        const paymentMethodDisplay =
-            paymentMethod === "cash"
-                ? "💵 Cash Payment"
-                : "📱 Mobile Payment (VietQR)";
+    // Payment method display
+    const paymentMethodDisplay =
+      paymentMethod === "cash"
+        ? "💵 Cash Payment"
+        : "📱 Mobile Payment (VietQR)";
 
-        // Safe number formatting
-        const safeTotal = Number(totalAmount) || 0;
-        const safeCashReceived = Number(cashReceived) || 0;
-        const safeChangeAmount = Number(changeAmount) || 0;
+    // Safe number formatting
+    const safeTotal = Number(totalAmount) || 0;
+    const safeCashReceived = Number(cashReceived) || 0;
+    const safeChangeAmount = Number(changeAmount) || 0;
 
-        // Cash payment details (if applicable)
-        const cashPaymentDetails =
-            paymentMethod === "cash" && cashReceived
-                ? `
+    // Cash payment details (if applicable)
+    const cashPaymentDetails =
+      paymentMethod === "cash" && cashReceived
+        ? `
       <tr>
         <td style="padding: 0 30px 20px 30px;">
           <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; overflow: hidden;">
@@ -143,13 +148,13 @@ export const sendSalesInvoiceEmail = async (invoiceData) => {
         </td>
       </tr>
     `
-                : "";
+        : "";
 
-        const mailOptions = {
-            from: config.smtpFrom || "noreply@pharmaflow.com",
-            to: customerEmail,
-            subject: `Invoice #${orderNumber} - Thank you for your purchase!`,
-            html: `
+    const mailOptions = {
+      from: config.smtpFrom || "noreply@pharmaflow.com",
+      to: customerEmail,
+      subject: `Invoice #${orderNumber} - Thank you for your purchase!`,
+      html: `
         <!DOCTYPE html>
         <html>
         <head>
@@ -285,23 +290,23 @@ export const sendSalesInvoiceEmail = async (invoiceData) => {
         </body>
         </html>
       `,
-        };
+    };
 
-        const info = await transporter.sendMail(mailOptions);
-        logger.info(`Sales Invoice email sent to ${customerEmail}`, {
-            messageId: info.messageId,
-            orderNumber,
-        });
-        return true;
-    } catch (error) {
-        logger.error("Error sending Sales Invoice email:", {
-            errorMessage: error.message,
-            errorCode: error.code,
-            errorCommand: error.command,
-            errorResponse: error.response,
-            customerEmail,
-            orderNumber,
-        });
-        throw new Error(`Failed to send Sales Invoice email: ${error.message}`);
-    }
+    const info = await transporter.sendMail(mailOptions);
+    logger.info(`Sales Invoice email sent to ${customerEmail}`, {
+      messageId: info.messageId,
+      orderNumber,
+    });
+    return true;
+  } catch (error) {
+    logger.error("Error sending Sales Invoice email:", {
+      errorMessage: error.message,
+      errorCode: error.code,
+      errorCommand: error.command,
+      errorResponse: error.response,
+      customerEmail,
+      orderNumber,
+    });
+    throw new Error(`Failed to send Sales Invoice email: ${error.message}`);
+  }
 };

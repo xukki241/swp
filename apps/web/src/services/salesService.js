@@ -33,7 +33,10 @@ export const salesService = {
 
   // Send sales invoice email
   async sendInvoiceEmail(invoiceData) {
-    const response = await instance.post("/send-sales-invoice-email", invoiceData);
+    const response = await instance.post(
+      "/send-sales-invoice-email",
+      invoiceData
+    );
     return response.data;
   },
 };

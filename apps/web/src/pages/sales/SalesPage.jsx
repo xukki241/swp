@@ -516,10 +516,11 @@ export default function SalesPage() {
               return (
                 <div
                   key={order.id}
-                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${isActive
-                    ? "border-primary bg-primary/10 text-foreground"
-                    : "border-border bg-card hover:border-primary/50 text-muted-foreground"
-                    }`}
+                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${
+                    isActive
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border bg-card hover:border-primary/50 text-muted-foreground"
+                  }`}
                   onClick={() => setActiveOrderId(order.id)}
                 >
                   <FileText className="h-4 w-4" />
@@ -689,20 +690,29 @@ export default function SalesPage() {
                           </span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Received:</span>
+                          <span className="text-muted-foreground">
+                            Received:
+                          </span>
                           <span className="font-semibold">
-                            {(Number(activeOrder.cashReceived || 0) * 1000).toLocaleString("vi-VN")} VNĐ
+                            {(
+                              Number(activeOrder.cashReceived || 0) * 1000
+                            ).toLocaleString("vi-VN")}{" "}
+                            VNĐ
                           </span>
                         </div>
                         <div className="flex justify-between text-base pt-2 border-t">
                           <span className="font-semibold">Change:</span>
-                          <span className={`font-bold text-lg ${changeAmount < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                          <span
+                            className={`font-bold text-lg ${changeAmount < 0 ? "text-red-600" : "text-green-600"}`}
+                          >
                             {changeAmount.toLocaleString("vi-VN")} VNĐ
                           </span>
                         </div>
                         {changeAmount < 0 && (
                           <p className="text-xs text-red-600 mt-1">
-                            Insufficient payment! Need {Math.abs(changeAmount).toLocaleString("vi-VN")} VNĐ more
+                            Insufficient payment! Need{" "}
+                            {Math.abs(changeAmount).toLocaleString("vi-VN")} VNĐ
+                            more
                           </p>
                         )}
                       </div>
@@ -715,7 +725,8 @@ export default function SalesPage() {
                   disabled={
                     !activeOrder.customer ||
                     isSubmitting ||
-                    (activeOrder.paymentMethod === "cash" && (!activeOrder.cashReceived || changeAmount < 0))
+                    (activeOrder.paymentMethod === "cash" &&
+                      (!activeOrder.cashReceived || changeAmount < 0))
                   }
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-base"
                 >

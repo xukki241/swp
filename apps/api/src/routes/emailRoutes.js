@@ -1,6 +1,9 @@
 import express from "express";
 
-import { sendPurchaseOrder, sendSalesInvoice } from "../controllers/emailController.js";
+import {
+  sendPurchaseOrder,
+  sendSalesInvoice,
+} from "../controllers/emailController.js";
 import { authenticate } from "../middleware/checkAuth.js";
 
 const router = express.Router();
