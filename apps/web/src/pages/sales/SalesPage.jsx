@@ -49,6 +49,7 @@ export default function SalesPage() {
       customer: null,
       cart: [],
       paymentMethod: "cash",
+      cashReceived: "", // Amount received from customer
       createdAt: new Date(),
     },
   ]);
@@ -87,6 +88,16 @@ export default function SalesPage() {
     [activeOrder]
   );
 
+  // Calculate change amount for cash payment
+  const changeAmount = useMemo(() => {
+    if (activeOrder?.paymentMethod !== "cash" || !activeOrder?.cashReceived) {
+      return 0;
+    }
+    // cashReceived is in thousands (nghìn đồng), multiply by 1000
+    const received = Number(activeOrder.cashReceived) * 1000 || 0;
+    return Math.max(0, received - totalAmount);
+  }, [activeOrder, totalAmount]);
+
   // ========== ORDER MANAGEMENT ==========
 
   const createNewOrder = () => {
@@ -95,6 +106,7 @@ export default function SalesPage() {
       customer: null,
       cart: [],
       paymentMethod: "cash",
+      cashReceived: "",
       createdAt: new Date(),
     };
     setOrders((prev) => [...prev, newOrder]);
@@ -152,7 +164,12 @@ export default function SalesPage() {
   };
 
   const setPaymentMethod = (method) => {
-    updateActiveOrder({ paymentMethod: method });
+    // Reset cashReceived when switching to non-cash payment
+    const updates = { paymentMethod: method };
+    if (method !== "cash") {
+      updates.cashReceived = "";
+    }
+    updateActiveOrder(updates);
   };
 
   const setCart = (cart) => {
@@ -403,6 +420,9 @@ export default function SalesPage() {
 
       setSuccessOrder(enrichedOrder);
       toast.success("Order created successfully!");
+
+      // Note: Invoice email will be sent automatically when order is marked as "paid"
+
       setPendingOrderData(null);
       setShowVietQRDialog(false);
 
@@ -417,6 +437,7 @@ export default function SalesPage() {
               customer: null,
               cart: [],
               paymentMethod: "cash",
+              cashReceived: "",
               createdAt: new Date(),
             };
             setActiveOrderId(newOrder.id);
@@ -449,7 +470,7 @@ export default function SalesPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [activeOrder, activeOrderId, pendingOrderData]);
+  }, [activeOrder, activeOrderId, pendingOrderData, changeAmount]);
 
   const handleCloseSuccessModal = useCallback(() => {
     setSuccessOrder(null);
@@ -630,9 +651,83 @@ export default function SalesPage() {
                     onChange={setPaymentMethod}
                   />
                 </div>
+
+                {/* Cash Payment Details */}
+                {activeOrder.paymentMethod === "cash" && (
+                  <div className="space-y-3 p-4 bg-muted rounded-lg border">
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-2 block">
+                        Cash Received (in thousands VNĐ)
+                      </label>
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          placeholder="Enter amount (e.g., 100 = 100,000 VNĐ)"
+                          value={activeOrder.cashReceived}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            updateActiveOrder({ cashReceived: value });
+                          }}
+                          className="text-lg pr-16"
+                          min="0"
+                          step="1"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
+                          × 1,000
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Example: Enter "100" for 100,000 VNĐ
+                      </p>
+                    </div>
+
+                    {activeOrder.cashReceived && (
+                      <div className="space-y-2 pt-2 border-t">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Total:</span>
+                          <span className="font-semibold">
+                            {totalAmount.toLocaleString("vi-VN")} VNĐ
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            Received:
+                          </span>
+                          <span className="font-semibold">
+                            {(
+                              Number(activeOrder.cashReceived || 0) * 1000
+                            ).toLocaleString("vi-VN")}{" "}
+                            VNĐ
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-base pt-2 border-t">
+                          <span className="font-semibold">Change:</span>
+                          <span
+                            className={`font-bold text-lg ${changeAmount < 0 ? "text-red-600" : "text-green-600"}`}
+                          >
+                            {changeAmount.toLocaleString("vi-VN")} VNĐ
+                          </span>
+                        </div>
+                        {changeAmount < 0 && (
+                          <p className="text-xs text-red-600 mt-1">
+                            Insufficient payment! Need{" "}
+                            {Math.abs(changeAmount).toLocaleString("vi-VN")} VNĐ
+                            more
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <Button
                   onClick={handleCompleteOrder}
-                  disabled={!activeOrder.customer || isSubmitting}
+                  disabled={
+                    !activeOrder.customer ||
+                    isSubmitting ||
+                    (activeOrder.paymentMethod === "cash" &&
+                      (!activeOrder.cashReceived || changeAmount < 0))
+                  }
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-base"
                 >
                   {isSubmitting ? (

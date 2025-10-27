@@ -63,9 +63,7 @@ export const customerController = {
 
   // Get customer by ID
   getById: asyncHandler(async (req, res) => {
-    const customer = await customerService.getById(
-      Number.parseInt(req.params.id)
-    );
+    const customer = await customerService.getById(req.params.id); // UUID as string
 
     if (!customer) {
       return res.status(404).json({
@@ -82,27 +80,35 @@ export const customerController = {
 
   // Update customer
   update: asyncHandler(async (req, res) => {
-    const id = Number.parseInt(req.params.id);
+    const id = req.params.id; // UUID, keep as string
 
-    // Check for email uniqueness if being updated
+    // Check for email uniqueness if being updated and has a value
     if (req.body.email) {
-      const existingCustomer = await customerService.getByEmail(req.body.email);
-      if (existingCustomer && existingCustomer.id !== id) {
-        return res.status(400).json({
-          success: false,
-          message: `Customer with email '${req.body.email}' already exists`,
-        });
+      const trimmedEmail = req.body.email.trim();
+      if (trimmedEmail) {
+        const existingCustomer = await customerService.getByEmail(trimmedEmail);
+        // Compare IDs directly (both are UUIDs as strings)
+        if (existingCustomer && existingCustomer.id !== id) {
+          return res.status(400).json({
+            success: false,
+            message: `Customer with email '${trimmedEmail}' already exists`,
+          });
+        }
       }
     }
 
-    // Check for phone uniqueness if being updated
+    // Check for phone uniqueness if being updated and has a value
     if (req.body.phone) {
-      const existingCustomer = await customerService.getByPhone(req.body.phone);
-      if (existingCustomer && existingCustomer.id !== id) {
-        return res.status(400).json({
-          success: false,
-          message: `Customer with phone '${req.body.phone}' already exists`,
-        });
+      const trimmedPhone = req.body.phone.trim();
+      if (trimmedPhone) {
+        const existingCustomer = await customerService.getByPhone(trimmedPhone);
+        // Compare IDs directly (both are UUIDs as strings)
+        if (existingCustomer && existingCustomer.id !== id) {
+          return res.status(400).json({
+            success: false,
+            message: `Customer with phone '${trimmedPhone}' already exists`,
+          });
+        }
       }
     }
 
@@ -124,9 +130,7 @@ export const customerController = {
 
   // Delete customer
   delete: asyncHandler(async (req, res) => {
-    const customer = await customerService.delete(
-      Number.parseInt(req.params.id)
-    );
+    const customer = await customerService.delete(req.params.id); // UUID as string
 
     if (!customer) {
       return res.status(404).json({
