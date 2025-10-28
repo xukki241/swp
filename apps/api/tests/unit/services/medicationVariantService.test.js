@@ -236,4 +236,282 @@ describe("MedicationVariantService", () => {
       expect(result).toBeNull();
     });
   });
+
+  describe("getAllMedicationVariants - advanced filtering", () => {
+    it("should handle multiple conditions", async () => {
+      const mockVariants = [
+        { id: 1, name: "100mg", sku: "ASP-100", isActive: true },
+      ];
+
+      const mockQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue(mockVariants),
+      };
+      db.select.mockReturnValue(mockQuery);
+
+      const result = await medicationVariantService.getAllMedicationVariants({
+        search: "ASP",
+        medicationId: 1,
+        isActive: true,
+      });
+
+      expect(result).toEqual(mockVariants);
+      expect(mockQuery.where).toHaveBeenCalled();
+    });
+
+    it("should handle isActive false filter", async () => {
+      const mockVariants = [
+        { id: 1, name: "100mg", sku: "ASP-100", isActive: false },
+      ];
+
+      const mockQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue(mockVariants),
+      };
+      db.select.mockReturnValue(mockQuery);
+
+      const result = await medicationVariantService.getAllMedicationVariants({
+        isActive: false,
+      });
+
+      expect(result).toEqual(mockVariants);
+    });
+  });
+
+  describe("getAllMedicationVariants error handling", () => {
+    it("should handle database errors", async () => {
+      const mockQuery = {
+        from: vi.fn().mockRejectedValue(new Error("Database error")),
+      };
+      db.select = vi.fn().mockReturnValue(mockQuery);
+
+      await expect(
+        medicationVariantService.getAllMedicationVariants()
+      ).rejects.toThrow("Failed to fetch medication variants");
+    });
+  });
+
+  describe("getMedicationVariantById error handling", () => {
+    it("should handle database errors", async () => {
+      const mockQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockRejectedValue(new Error("Database error")),
+      };
+      db.select = vi.fn().mockReturnValue(mockQuery);
+
+      await expect(
+        medicationVariantService.getMedicationVariantById(1)
+      ).rejects.toThrow("Failed to fetch medication variant");
+    });
+  });
+
+  describe("getMedicationVariantBySku error handling", () => {
+    it("should handle database errors", async () => {
+      const mockQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockRejectedValue(new Error("Database error")),
+      };
+      db.select = vi.fn().mockReturnValue(mockQuery);
+
+      await expect(
+        medicationVariantService.getMedicationVariantBySku("TEST-SKU")
+      ).rejects.toThrow("Failed to fetch medication variant");
+    });
+
+    it("should return null for non-existent SKU", async () => {
+      const mockQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([]),
+      };
+      db.select = vi.fn().mockReturnValue(mockQuery);
+
+      const result =
+        await medicationVariantService.getMedicationVariantBySku("NON-EXIST");
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe("createMedicationVariant error handling", () => {
+    it("should handle generic database errors", async () => {
+      const variantData = {
+        name: "100mg",
+        sku: "ASP-100",
+        medicationId: 1,
+      };
+
+      const mockQuery = {
+        values: vi.fn().mockReturnThis(),
+        returning: vi.fn().mockRejectedValue(new Error("Database error")),
+      };
+      db.insert.mockReturnValue(mockQuery);
+
+      await expect(
+        medicationVariantService.createMedicationVariant(variantData)
+      ).rejects.toThrow("Failed to create medication variant");
+    });
+  });
+
+  describe("updateMedicationVariant error handling", () => {
+    it("should throw error for duplicate SKU", async () => {
+      const variantData = { sku: "DUPLICATE-SKU" };
+
+      const error = new Error("Duplicate");
+      error.code = "23505";
+
+      const mockQuery = {
+        set: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        returning: vi.fn().mockRejectedValue(error),
+      };
+      db.update.mockReturnValue(mockQuery);
+
+      await expect(
+        medicationVariantService.updateMedicationVariant(1, variantData)
+      ).rejects.toThrow("Medication variant with this SKU already exists");
+    });
+
+    it("should handle generic database errors", async () => {
+      const variantData = { name: "Test" };
+
+      const mockQuery = {
+        set: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        returning: vi.fn().mockRejectedValue(new Error("Database error")),
+      };
+      db.update.mockReturnValue(mockQuery);
+
+      await expect(
+        medicationVariantService.updateMedicationVariant(1, variantData)
+      ).rejects.toThrow("Failed to update medication variant");
+    });
+  });
+
+  describe("deleteMedicationVariant error handling", () => {
+    it("should handle database errors", async () => {
+      const mockQuery = {
+        where: vi.fn().mockReturnThis(),
+        returning: vi.fn().mockRejectedValue(new Error("Database error")),
+      };
+      db.delete = vi.fn().mockReturnValue(mockQuery);
+
+      await expect(
+        medicationVariantService.deleteMedicationVariant(1)
+      ).rejects.toThrow("Failed to delete medication variant");
+    });
+  });
+
+  describe("searchVariantsForSale", () => {
+    it("should search variants for sale with search term", async () => {
+      const mockResult = [
+        {
+          id: 1,
+          medicationId: 1,
+          medicationName: "Aspirin",
+          variantName: "100mg",
+          sku: "ASP-100",
+          barcode: "1234567890",
+          sellPrice: 10.5,
+          unit: "tablet",
+          isActive: true,
+          isForSale: true,
+          availableQuantity: "100",
+        },
+      ];
+
+      const mockQuery = {
+        from: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockResolvedValue(mockResult),
+      };
+      db.select = vi.fn().mockReturnValue(mockQuery);
+
+      const result = await medicationVariantService.searchVariantsForSale({
+        search: "Aspirin",
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0].availableQuantity).toBe(100);
+    });
+
+    it("should search variants for sale without search term", async () => {
+      const mockResult = [
+        {
+          id: 1,
+          medicationId: 1,
+          medicationName: "Aspirin",
+          variantName: "100mg",
+          sku: "ASP-100",
+          barcode: "1234567890",
+          sellPrice: 10.5,
+          unit: "tablet",
+          isActive: true,
+          isForSale: true,
+          availableQuantity: "50",
+        },
+      ];
+
+      const mockQuery = {
+        from: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockResolvedValue(mockResult),
+      };
+      db.select = vi.fn().mockReturnValue(mockQuery);
+
+      const result = await medicationVariantService.searchVariantsForSale();
+
+      expect(result).toHaveLength(1);
+      expect(result[0].availableQuantity).toBe(50);
+    });
+
+    it("should handle variants with null available quantity", async () => {
+      const mockResult = [
+        {
+          id: 1,
+          medicationId: 1,
+          medicationName: "Aspirin",
+          variantName: "100mg",
+          sku: "ASP-100",
+          barcode: "1234567890",
+          sellPrice: 10.5,
+          unit: "tablet",
+          isActive: true,
+          isForSale: true,
+          availableQuantity: null,
+        },
+      ];
+
+      const mockQuery = {
+        from: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockResolvedValue(mockResult),
+      };
+      db.select = vi.fn().mockReturnValue(mockQuery);
+
+      const result = await medicationVariantService.searchVariantsForSale();
+
+      expect(result).toHaveLength(1);
+      expect(result[0].availableQuantity).toBe(0);
+    });
+
+    it("should handle database errors", async () => {
+      const mockQuery = {
+        from: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockRejectedValue(new Error("Database error")),
+      };
+      db.select = vi.fn().mockReturnValue(mockQuery);
+
+      await expect(
+        medicationVariantService.searchVariantsForSale()
+      ).rejects.toThrow("Failed to search variants for sale");
+    });
+  });
 });

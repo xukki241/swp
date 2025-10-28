@@ -1,8 +1,8 @@
 import { and, eq, ilike, or } from "drizzle-orm";
 
-import { db } from "../../db/index.js";
-import { warehouseBins } from "../../db/schema/warehouseBins.js";
-import { warehouseRacks } from "../../db/schema/warehouseRacks.js";
+import { db } from "../db/index.js";
+import { warehouseBins } from "../db/schema/warehouseBins.js";
+import { warehouseRacks } from "../db/schema/warehouseRacks.js";
 
 export const warehouseBinService = {
   async create(binData) {
