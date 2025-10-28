@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { warehouseBinController } from "@/controllers/warehouse/warehouseBinController.js";
+import { warehouseBinController } from "@/controllers/warehouseBinController.js";
 import { inventoryService } from "@/services/inventoryService.js";
-import { warehouseBinService } from "@/services/warehouse/warehouseBinService.js";
+import { warehouseBinService } from "@/services/warehouseBinService.js";
 
 vi.mock("@/services/inventoryService.js");
-vi.mock("@/services/warehouse/warehouseBinService.js");
+vi.mock("@/services/warehouseBinService.js");
 
 describe("WarehouseBinController", () => {
   let req, res;

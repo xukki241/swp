@@ -1,6 +1,7 @@
 "use client";
 
 import { AppLayout } from "@/components/layouts/app-layout";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,14 +20,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { usePurchaseOrderReceipt } from "@/hooks/usePurchaseOrders";
 import {
+  usePurchaseOrderReceipt,
+  usePurchaseOrderReceiptAllocations,
+} from "@/hooks/usePurchaseOrders";
+import {
+  AlertCircle,
   ArrowLeft,
   Building2,
   Calendar,
+  CheckCircle,
   FileText,
+  MapPin,
   Package,
   User,
+  Warehouse,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 
@@ -34,6 +42,13 @@ export default function PurchaseOrderReceiptDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: receipt, isLoading, error } = usePurchaseOrderReceipt(id);
+  const {
+    data: allocationsData,
+    isLoading: isLoadingAllocations,
+    error: allocationsError,
+  } = usePurchaseOrderReceiptAllocations(id);
+
+  const allocations = allocationsData?.data || [];
 
   const getStatusBadge = (status) => {
     const colorMap = {
@@ -312,6 +327,137 @@ export default function PurchaseOrderReceiptDetailPage() {
                 </TableBody>
               </Table>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Warehouse Allocations */}
+        <Card className="shadow-md border-0">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <Warehouse className="w-6 h-6 text-primary" />
+              <div>
+                <CardTitle>Warehouse Allocation</CardTitle>
+                <CardDescription>
+                  Automatic allocation to warehouse locations using FIFO
+                  strategy
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {isLoadingAllocations ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : allocations.length === 0 ? (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  No inventory allocations found for this receipt.
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <>
+                <Alert className="bg-green-50 border-green-200">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <AlertDescription className="text-green-800">
+                    Successfully allocated {allocations.length} item(s) to
+                    warehouse locations
+                  </AlertDescription>
+                </Alert>
+
+                <div className="rounded-lg border overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[50px]">#</TableHead>
+                        <TableHead>Batch Number</TableHead>
+                        <TableHead>Mfg. Date</TableHead>
+                        <TableHead>Expiry Date</TableHead>
+                        <TableHead className="text-right">Quantity</TableHead>
+                        <TableHead>
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4" />
+                            Zone
+                          </div>
+                        </TableHead>
+                        <TableHead>Rack</TableHead>
+                        <TableHead>Bin</TableHead>
+                        <TableHead className="text-center">Level</TableHead>
+                        <TableHead className="text-center">Position</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {allocations.map((allocation, index) => (
+                        <TableRow key={allocation.inventoryId}>
+                          <TableCell className="font-medium">
+                            {index + 1}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">
+                              {allocation.batchNumber}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {allocation.manufactureDate
+                              ? formatDate(allocation.manufactureDate)
+                              : "N/A"}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {allocation.expiryDate
+                              ? formatDate(allocation.expiryDate)
+                              : "N/A"}
+                          </TableCell>
+                          <TableCell className="text-right font-semibold">
+                            {Number(allocation.quantity).toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col">
+                              <span className="font-semibold text-sm">
+                                {allocation.zoneCode}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {allocation.zoneName}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col">
+                              <span className="font-semibold text-sm">
+                                {allocation.rackCode}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {allocation.rackName}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col">
+                              <span className="font-semibold text-sm">
+                                {allocation.binCode}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {allocation.binName}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Badge variant="outline">
+                              L{allocation.binLevel}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Badge variant="outline">
+                              #{allocation.binNumber}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 

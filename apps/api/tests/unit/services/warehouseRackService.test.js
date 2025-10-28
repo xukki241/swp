@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { db } from "@/db/index.js";
-import { warehouseRackService } from "@/services/warehouse/warehouseRackService.js";
+import { warehouseRackService } from "@/services/warehouseRackService.js";
 
 describe("WarehouseRackService", () => {
   describe("create", () => {

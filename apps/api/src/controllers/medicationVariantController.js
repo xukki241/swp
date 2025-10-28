@@ -81,67 +81,81 @@ export const getMedicationVariantById = async (req, res, next) => {
   }
 };
 /**
- * Create a new medication variant
- * @route POST /api/medication-variants
+ * Create medication variants (batch)
+ * @route POST /api/medications/:medicationId/variants
  */
-export const createMedicationVariant = async (req, res, _next) => {
+export const createMedicationVariant = async (req, res, next) => {
   try {
-    const {
-      medicationId,
-      sku,
-      name,
-      unit,
-      unitFactor,
-      barcode,
-      sellPrice,
-      isActive,
-      isForSale,
-    } = req.body;
+    const { medicationId } = req.params; // Get from URL params
+    const variantsData = req.body; // Array of variants
 
-    // Validation
-    if (!medicationId || !sku || !name || !unit || !sellPrice) {
+    // Validate that body is an array
+    if (!Array.isArray(variantsData) || variantsData.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "medicationId, sku, name, unit, and sellPrice are required",
+        message: "Request body must be a non-empty array of variants",
       });
     }
 
-    // Check if SKU already exists
-    const existingVariant =
-      await medicationVariantService.getMedicationVariantBySku(sku);
-    if (existingVariant) {
-      return res.status(409).json({
-        success: false,
-        message: "Medication variant with this SKU already exists",
-      });
+    // Validate each variant
+    for (const variant of variantsData) {
+      if (
+        !variant.sku ||
+        !variant.name ||
+        !variant.unit ||
+        !variant.sellPrice
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Each variant must have sku, name, unit, and sellPrice",
+        });
+      }
     }
 
-    const variantData = {
-      medicationId: BigInt(medicationId),
-      sku,
-      name,
-      unit,
-      unitFactor: unitFactor || "1.00",
-      barcode: barcode || null,
-      sellPrice,
-      isActive: isActive !== undefined ? isActive : true,
-      isForSale: isForSale !== undefined ? isForSale : false,
-    };
+    // Create variants
+    const createdVariants = [];
+    for (const variantInput of variantsData) {
+      // Check if SKU already exists
+      const existingVariant =
+        await medicationVariantService.getMedicationVariantBySku(
+          variantInput.sku
+        );
+      if (existingVariant) {
+        return res.status(409).json({
+          success: false,
+          message: `Variant with SKU "${variantInput.sku}" already exists`,
+        });
+      }
 
-    const variant =
-      await medicationVariantService.createMedicationVariant(variantData);
+      const variantData = {
+        medicationId,
+        sku: variantInput.sku,
+        name: variantInput.name,
+        unit: variantInput.unit,
+        unitFactor: variantInput.unitFactor
+          ? String(variantInput.unitFactor)
+          : "1.0",
+        barcode: variantInput.barcode || null,
+        sellPrice: String(variantInput.sellPrice),
+        isActive:
+          variantInput.isActive !== undefined ? variantInput.isActive : true,
+        isForSale:
+          variantInput.isForSale !== undefined ? variantInput.isForSale : false,
+      };
+
+      const variant =
+        await medicationVariantService.createMedicationVariant(variantData);
+      createdVariants.push(variant);
+    }
 
     res.status(201).json({
       success: true,
-      message: "Medication variant created successfully",
-      data: variant,
+      message: `${createdVariants.length} variant(s) created successfully`,
+      data: createdVariants,
     });
   } catch (error) {
     logger.error("Error in createMedicationVariant controller:", error);
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    next(error);
   }
 };
 /**

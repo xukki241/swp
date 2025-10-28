@@ -123,7 +123,7 @@ export default function SupplierCreatePage() {
           lead_time_days: m.leadTimeDays
             ? Number.parseInt(m.leadTimeDays, 10)
             : null,
-          purchase_price: Number(m.purchasePrice).toFixed(2),
+          purchase_price: Number(m.purchasePrice),
           contract_id: m.contractId || null,
         }));
 

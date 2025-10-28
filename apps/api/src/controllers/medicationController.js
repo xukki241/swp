@@ -57,40 +57,51 @@ export const getMedicationById = async (req, res, next) => {
  */
 export const createMedication = async (req, res, next) => {
   try {
-    const {
-      name,
-      brand,
-      description,
-      isPrescriptionRequired,
-      isControlledSubstance,
-      status,
-      variants,
-    } = req.body;
+    const requestData = req.body;
 
-    // Validation
-    if (!name) {
+    // Check if it's an array or single object
+    const isArray = Array.isArray(requestData);
+    const medicationsToCreate = isArray ? requestData : [requestData];
+
+    // Validate each medication
+    const errors = [];
+    medicationsToCreate.forEach((med, index) => {
+      if (!med.name) {
+        errors.push(`Medication at index ${index}: name is required`);
+      }
+    });
+
+    if (errors.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Medication name is required",
+        message: "Validation failed",
+        errors: errors,
       });
     }
 
-    const medicationData = {
-      name,
-      brand: brand || null,
-      description: description || null,
-      isPrescriptionRequired: isPrescriptionRequired || false,
-      isControlledSubstance: isControlledSubstance || false,
-      status: status || "active",
-      variants: variants || [],
-    };
+    // Prepare medication data
+    const medicationsData = medicationsToCreate.map((med) => ({
+      name: med.name,
+      brand: med.brand || null,
+      description: med.description || null,
+      isPrescriptionRequired: med.is_prescription_required || false,
+      isControlledSubstance: med.is_controlled_substance || false,
+      status: med.status || "active",
+      variants: med.variants || [],
+    }));
 
-    const medication = await medicationService.createMedication(medicationData);
+    // Create medications (single or bulk)
+    const createdMedications = [];
+    for (const medicationData of medicationsData) {
+      const medication =
+        await medicationService.createMedication(medicationData);
+      createdMedications.push(medication);
+    }
 
     res.status(201).json({
       success: true,
-      message: "Medication created successfully",
-      data: medication,
+      message: `${createdMedications.length} medication(s) created successfully`,
+      data: isArray ? createdMedications : createdMedications[0],
     });
   } catch (error) {
     logger.error("Error in createMedication controller:", error);
@@ -109,8 +120,8 @@ export const updateMedication = async (req, res, next) => {
       name,
       brand,
       description,
-      isPrescriptionRequired,
-      isControlledSubstance,
+      is_prescription_required,
+      is_controlled_substance,
       status,
       variants,
     } = req.body;
@@ -134,11 +145,11 @@ export const updateMedication = async (req, res, next) => {
     if (description !== undefined) {
       medicationData.description = description;
     }
-    if (isPrescriptionRequired !== undefined) {
-      medicationData.isPrescriptionRequired = isPrescriptionRequired;
+    if (is_prescription_required !== undefined) {
+      medicationData.isPrescriptionRequired = is_prescription_required;
     }
-    if (isControlledSubstance !== undefined) {
-      medicationData.isControlledSubstance = isControlledSubstance;
+    if (is_controlled_substance !== undefined) {
+      medicationData.isControlledSubstance = is_controlled_substance;
     }
     if (status !== undefined) {
       medicationData.status = status;

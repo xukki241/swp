@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 
-import { warehouseRackService } from "../../services/warehouse/warehouseRackService.js";
+import { warehouseRackService } from "../services/warehouseRackService.js";
 
 export const warehouseRackController = {
   // Create a new warehouse rack

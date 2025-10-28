@@ -1,7 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
 import { instance } from "@/lib/axios";
 import * as api from "@/services/medicationsService";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const FIVE_MIN = 5 * 60 * 1000;
 
@@ -11,11 +10,9 @@ const FIVE_MIN = 5 * 60 * 1000;
  */
 export const getAllMedications = async (filters) => {
   if (filters && Object.keys(filters).length) {
-    // If filters provided, prefer service getMedications (if it exists).
     if (typeof api.getMedications === "function") {
       return api.getMedications(filters);
     }
-    // fallback to instance with query params
     const res = await instance.get("/medications", { params: filters });
     return res.data;
   }
@@ -25,7 +22,6 @@ export const getAllMedications = async (filters) => {
   }
 
   if (typeof api.getMedications === "function") {
-    // call without filters
     return api.getMedications({});
   }
 
@@ -81,9 +77,8 @@ export const useUpdateMedication = () => {
     mutationFn: ({ id, payload }) =>
       typeof api.updateMedication === "function"
         ? api.updateMedication(id, payload)
-        : instance.put(`/medications/${id}`, payload).then((r) => r.data),
+        : instance.patch(`/medications/${id}`, payload).then((r) => r.data),
     onSuccess: (_, vars) => {
-      // ensure both list & detail refresh
       qc.invalidateQueries({ queryKey: ["medications"] });
       if (vars && vars.id) {
         qc.invalidateQueries({ queryKey: ["medication", vars.id] });
@@ -105,12 +100,6 @@ export const useDeleteMedication = () => {
 
 /**
  * VARIANTS
- *
- * - useMedicationVariants: returns variants for a specific medication.
- *   Tries service helpers first, then falls back to reading the medication and returning its variants,
- *   then to an explicit endpoint /medications/:id/variants if available.
- *
- * - useMedicationsVariants: reads all variants across medications (endpoint /medications/variants/all).
  */
 export const useMedicationVariants = (medicationId) =>
   useQuery({
@@ -119,19 +108,13 @@ export const useMedicationVariants = (medicationId) =>
       if (!medicationId) {
         return [];
       }
-
-      // 1) api.getMedicationVariants(medicationId)
       if (typeof api.getMedicationVariants === "function") {
         return api.getMedicationVariants(medicationId);
       }
-
-      // 2) api.getMedicationById -> .variants
       if (typeof api.getMedicationById === "function") {
         const med = await api.getMedicationById(medicationId);
         return med?.variants ?? [];
       }
-
-      // 3) fallback axios endpoint
       const res = await instance.get(`/medications/${medicationId}/variants`);
       return res.data;
     },
@@ -144,7 +127,6 @@ export const getAllMedicationsVariants = async () => {
     return api.getAllMedicationsVariants();
   }
   if (typeof api.getAllMedicationVariants === "function") {
-    // attempt alternate naming
     return api.getAllMedicationVariants();
   }
   const res = await instance.get("/medications/variants/all");
@@ -164,14 +146,8 @@ export const useMedicationsVariants = () =>
 export const useCreateVariant = (medicationId) => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload) => {
-      if (typeof api.createVariant === "function") {
-        return api.createVariant({ medicationId, ...payload });
-      }
-      return instance
-        .post(`/medications/${medicationId}/variants`, payload)
-        .then((r) => r.data);
-    },
+    // payload là object; service sẽ tự wrap thành mảng khi POST
+    mutationFn: (payload) => api.createVariant(medicationId, payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["medication", medicationId] });
       qc.invalidateQueries({ queryKey: ["medicationVariants", medicationId] });
@@ -183,18 +159,16 @@ export const useCreateVariant = (medicationId) => {
 export const useUpdateVariant = (medicationId) => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ variantId, payload }) => {
-      if (typeof api.updateVariant === "function") {
-        return api.updateVariant(variantId, payload);
-      }
-      return instance
-        .put(`/medications/variants/${variantId}`, payload)
-        .then((r) => r.data);
-    },
-    onSuccess: () => {
+    // BẮT BUỘC truyền { variantId, payload }
+    mutationFn: ({ variantId, payload }) =>
+      api.updateVariant(medicationId, variantId, payload),
+    onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["medication", medicationId] });
       qc.invalidateQueries({ queryKey: ["medicationVariants", medicationId] });
       qc.invalidateQueries({ queryKey: ["medicationVariantsAll"] });
+      if (vars?.variantId) {
+        // nếu có trang detail variant thì có thể invalid thêm ở đây
+      }
     },
   });
 };
@@ -202,14 +176,8 @@ export const useUpdateVariant = (medicationId) => {
 export const useDeleteVariant = (medicationId) => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (variantId) => {
-      if (typeof api.deleteVariant === "function") {
-        return api.deleteVariant(variantId);
-      }
-      return instance
-        .delete(`/medications/variants/${variantId}`)
-        .then((r) => r.data);
-    },
+    // BẮT BUỘC truyền variantId
+    mutationFn: (variantId) => api.deleteVariant(medicationId, variantId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["medication", medicationId] });
       qc.invalidateQueries({ queryKey: ["medicationVariants", medicationId] });

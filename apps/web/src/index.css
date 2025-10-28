@@ -133,3 +133,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Override Dialog max-width for wide tables */
+@layer components {
+  [data-radix-dialog-content] {
+    max-width: min(98vw, 100%) !important;
+  }
+}
