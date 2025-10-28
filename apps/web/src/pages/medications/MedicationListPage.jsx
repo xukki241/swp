@@ -14,13 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Table,
   TableBody,
   TableCell,
@@ -28,23 +21,46 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import {
   useCreateMedication,
-  useCreateVariant,
   useDeleteMedication,
-  useDeleteVariant,
   useMedications,
   useMedicationVariants,
   useUpdateMedication,
-  useUpdateVariant,
 } from "@/hooks/useMedications";
-import { findVariantsByBarcode } from "@/services/medicationsService";
-import { Edit, Package, PlusCircle, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+
+import {
+  findVariantsByBarcode,
+  createVariant as svcCreateVariant,
+  deleteVariant as svcDeleteVariant,
+  updateVariant as svcUpdateVariant,
+} from "@/services/medicationsService";
+
+import {
+  Edit,
+  Eye,
+  Image as ImageIcon,
+  Package,
+  PlusCircle,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import MedicationViewModal from "./MedicationViewModal";
 
-// debounce
+import {
+  clearMedicationImage,
+  fileToDataURL,
+  getMedicationImageLocal,
+  getMedicationImageUrl,
+  setMedicationImage,
+} from "@/lib/mockImages";
+
+/* helpers */
 function useDebounced(value, delay = 350) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -53,33 +69,107 @@ function useDebounced(value, delay = 350) {
   }, [value, delay]);
   return debounced;
 }
+function PillPlaceholder({ className = "h-14 w-14" }) {
+  return (
+    <div
+      className={`rounded-xl border bg-muted/30 flex items-center justify-center ${className}`}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        className="h-7 w-7 opacity-60"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      >
+        <path d="M4 14a5 5 0 0 0 7.07 7.07l6.86-6.86a5 5 0 0 0-7.07-7.07L4 14Z" />
+        <path d="M8.5 8.5l7 7" />
+      </svg>
+    </div>
+  );
+}
+function StatusBadge({ status }) {
+  const s = (status || "active").toLowerCase();
+  const style =
+    s === "active"
+      ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+      : "bg-zinc-50 text-zinc-600 border-zinc-200";
+  return (
+    <span
+      className={`px-2 py-0.5 text-xs rounded-full border ${style} capitalize`}
+    >
+      {s}
+    </span>
+  );
+}
+
+/** Inline MedImage (không tạo file mới) */
+function MedImage({
+  medicationId,
+  alt = "",
+  version = 0,
+  className = "h-14 w-14 rounded-xl object-cover border",
+  placeholderClass = "h-14 w-14",
+  onClick, // ⬅️ thêm click-to-zoom
+}) {
+  const [errored, setErrored] = useState(false);
+
+  const src = useMemo(() => {
+    if (!medicationId) return null;
+    const local = getMedicationImageLocal(medicationId);
+    if (local) return local;
+    return `/images/medications/${medicationId}.jpg?v=${version}`;
+  }, [medicationId, version]);
+
+  useEffect(() => setErrored(false), [src]);
+
+  if (!src || errored) {
+    return <PillPlaceholder className={placeholderClass} />;
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={`${className} ${onClick ? "cursor-zoom-in" : ""}`}
+      onError={() => setErrored(true)}
+      onClick={onClick}
+    />
+  );
+}
 
 export default function MedicationListPage() {
+  /* filters */
   const [search, setSearch] = useState("");
   const debounced = useDebounced(search);
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter] = useState("all");
 
+  /* modals */
   const [medFormOpen, setMedFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
-
   const [manageMed, setManageMed] = useState(null);
+  const [viewMed, setViewMed] = useState(null);
   const medId = manageMed?.id;
 
-  const {
-    data: meds,
-    isLoading,
-    refetch,
-  } = useMedications({
-    search: debounced || undefined,
-    status: statusFilter !== "all" ? statusFilter : undefined,
-  });
+  /* data */
+  const filters = useMemo(
+    () => ({
+      search: debounced || undefined,
+      status: statusFilter !== "all" ? statusFilter : undefined,
+    }),
+    [debounced, statusFilter]
+  );
+  const { data: meds, isLoading, refetch } = useMedications(filters);
   const medications = Array.isArray(meds) ? meds : meds?.data || [];
 
   const createMed = useCreateMedication();
   const updateMed = useUpdateMedication();
   const deleteMed = useDeleteMedication();
 
-  // Medication form (status is controlled)
+  /* image refresh version map { [medId]: number } */
+  const [imageVersion, setImageVersion] = useState({});
+  const bumpImageVersion = (id) =>
+    setImageVersion((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+
+  /* medication form */
   const { handleSubmit, reset, control } = useForm({
     defaultValues: {
       name: "",
@@ -91,6 +181,16 @@ export default function MedicationListPage() {
     },
   });
 
+  // state cho ảnh (mock)
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [removeImage, setRemoveImage] = useState(false);
+
+  // ⬇️ Lightbox state
+  const [lightbox, setLightbox] = useState({ open: false, src: "", alt: "" });
+  const openLightbox = (src, alt) => setLightbox({ open: true, src, alt });
+  const closeLightbox = () => setLightbox({ open: false, src: "", alt: "" });
+
   const openAdd = () => {
     setEditing(null);
     reset({
@@ -101,6 +201,9 @@ export default function MedicationListPage() {
       isControlledSubstance: false,
       status: "active",
     });
+    setImageFile(null);
+    setImagePreview(null);
+    setRemoveImage(false);
     setMedFormOpen(true);
   };
 
@@ -114,21 +217,49 @@ export default function MedicationListPage() {
       isControlledSubstance: !!med.isControlledSubstance,
       status: med.status ?? "active",
     });
+    const local = getMedicationImageLocal(med.id);
+    setImagePreview(local || null);
+    setImageFile(null);
+    setRemoveImage(false);
     setMedFormOpen(true);
   };
 
+  async function onChangeImage(e) {
+    const f = e.target.files?.[0];
+    setImageFile(f || null);
+    const dataURL = await fileToDataURL(f);
+    setImagePreview(dataURL);
+    setRemoveImage(false);
+  }
+
   const onSubmitMed = async (data) => {
     try {
+      let savedId = editing?.id;
+
       if (editing) {
         await updateMed.mutateAsync({ id: editing.id, payload: data });
-        toast.success("Medication updated");
       } else {
-        await createMed.mutateAsync(data);
-        toast.success("Medication created");
+        const created = await createMed.mutateAsync(data);
+        savedId = Array.isArray(created) ? created[0]?.id : created?.id;
       }
+
+      if (savedId) {
+        if (removeImage) {
+          clearMedicationImage(savedId);
+          bumpImageVersion(savedId);
+        } else if (imagePreview) {
+          setMedicationImage(savedId, imagePreview);
+          bumpImageVersion(savedId);
+        }
+      }
+
+      toast.success(editing ? "Medication updated" : "Medication created");
       setMedFormOpen(false);
       setEditing(null);
-      await refetch(); // đảm bảo status/flags hiển thị tức thì
+      setImageFile(null);
+      setImagePreview(null);
+      setRemoveImage(false);
+      await refetch();
     } catch (e) {
       toast.error("Failed to save medication", {
         description: e?.response?.data?.message || e.message,
@@ -139,17 +270,16 @@ export default function MedicationListPage() {
   const handleDelete = async (id) => {
     if (confirm("Delete this medication?")) {
       await deleteMed.mutateAsync(id);
+      clearMedicationImage(id);
+      bumpImageVersion(id);
       toast.success("Deleted");
       await refetch();
     }
   };
 
-  // ===== Variants =====
-  const { data: variants = [] } = useMedicationVariants(medId);
-  const createVar = useCreateVariant(medId);
-  const updateVar = useUpdateVariant(medId);
-  const deleteVar = useDeleteVariant(medId);
-
+  /* VARIANTS */
+  const { data: variants = [], refetch: refetchVariants } =
+    useMedicationVariants(medId);
   const {
     handleSubmit: handleVarSubmit,
     control: controlVar,
@@ -167,9 +297,7 @@ export default function MedicationListPage() {
       isForSale: true,
     },
   });
-
   const [editingVar, setEditingVar] = useState(null);
-
   const onEditVariant = (v) => {
     setEditingVar(v);
     resetVar({
@@ -183,14 +311,12 @@ export default function MedicationListPage() {
       isForSale: !!v.isForSale,
     });
   };
-
   const validateBarcodeUnique = async (barcode, currentId) => {
     if (!barcode) return true;
     const list = await findVariantsByBarcode(barcode);
     const exact = list.filter((v) => String(v.barcode) === String(barcode));
     return exact.every((v) => String(v.id) === String(currentId || ""));
   };
-
   const saveVariant = async (form) => {
     try {
       if (!medId) return;
@@ -204,15 +330,42 @@ export default function MedicationListPage() {
         toast.error("Barcode already exists for another variant.");
         return;
       }
-
+      const payload = {
+        sku: (form.sku || "").trim(),
+        name: (form.name || "").trim(),
+        unit: (form.unit || "").trim(),
+        unitFactor:
+          form.unitFactor === "" || form.unitFactor == null
+            ? 1
+            : Number(form.unitFactor),
+        barcode: (form.barcode || "").trim() || null,
+        sellPrice:
+          form.sellPrice === "" || form.sellPrice == null
+            ? undefined
+            : Number(form.sellPrice),
+        isActive: !!form.isActive,
+        isForSale: !!form.isForSale,
+      };
+      if (!editingVar) {
+        if (
+          !payload.sku ||
+          !payload.name ||
+          !payload.unit ||
+          !payload.sellPrice
+        ) {
+          toast.error("Please fill in SKU, Name, Unit and Sell Price.");
+          return;
+        }
+        if (Number.isNaN(payload.sellPrice)) {
+          toast.error("Sell Price must be a number.");
+          return;
+        }
+      }
       if (editingVar) {
-        await updateVar.mutateAsync({
-          variantId: editingVar.id,
-          payload: { ...form },
-        });
+        await svcUpdateVariant(medId, editingVar.id, payload);
         toast.success("Variant updated");
       } else {
-        await createVar.mutateAsync({ ...form }); // hook auto-adds medicationId
+        await svcCreateVariant(medId, [payload]);
         toast.success("Variant created");
       }
       setEditingVar(null);
@@ -226,26 +379,29 @@ export default function MedicationListPage() {
         isActive: true,
         isForSale: true,
       });
+      await refetchVariants();
     } catch (err) {
       toast.error("Failed to save variant", {
         description: err?.response?.data?.message || err.message,
       });
     }
   };
-
   const handleDeleteVariant = async (variantId) => {
     if (!medId) return;
     if (confirm("Delete this variant?")) {
-      await deleteVar.mutateAsync(variantId);
+      await svcDeleteVariant(medId, variantId);
       toast.success("Deleted variant");
+      await refetchVariants();
     }
   };
+
+  const resetSearch = () => setSearch("");
 
   return (
     <AppLayout>
       <div className="space-y-6">
         <Card>
-          <CardHeader className="flex justify-between items-center">
+          <CardHeader className="flex items-center justify-between">
             <CardTitle>Medications</CardTitle>
             <div className="flex gap-2">
               <Input
@@ -254,16 +410,14 @@ export default function MedicationListPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-64"
               />
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Filter status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
+              {search && (
+                <Button variant="outline" onClick={resetSearch}>
+                  <X className="w-4 h-4 mr-1" /> Reset
+                </Button>
+              )}
+              <Button onClick={() => refetch()}>
+                <Search className="w-4 h-4 mr-1" /> Search
+              </Button>
               <Button onClick={openAdd}>
                 <PlusCircle className="mr-2 h-4 w-4" /> Add
               </Button>
@@ -274,81 +428,103 @@ export default function MedicationListPage() {
             {isLoading ? (
               <p>Loading...</p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Brand</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Status</TableHead>
-                    {/* ⬇️ Hai cột hiển thị yêu cầu */}
-                    <TableHead>Prescription req.</TableHead>
-                    <TableHead>Controlled substance</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {medications.map((m) => (
-                    <TableRow key={m.id}>
-                      <TableCell>{m.name}</TableCell>
-                      <TableCell>{m.brand}</TableCell>
-                      <TableCell className="max-w-[320px] truncate">
-                        {m.description}
-                      </TableCell>
-                      <TableCell className="capitalize">
-                        {m.status || "active"}
-                      </TableCell>
-                      {/* ⬇️ Yes/No rõ ràng */}
-                      <TableCell>
-                        {m.isPrescriptionRequired ? "Yes" : "No"}
-                      </TableCell>
-                      <TableCell>
-                        {m.isControlledSubstance ? "Yes" : "No"}
-                      </TableCell>
-                      <TableCell className="text-right space-x-2 whitespace-nowrap">
+              <div className="space-y-3">
+                {medications.map((m) => {
+                  // Tạo src hiện tại để lightbox mở đúng ảnh đang hiển thị
+                  const local = getMedicationImageLocal(m.id);
+                  const src =
+                    local ||
+                    `/images/medications/${m.id}.jpg?v=${imageVersion[m.id] || 0}`;
+                  return (
+                    <div
+                      key={m.id}
+                      className="flex items-center justify-between rounded-xl border bg-card p-4 shadow-sm"
+                    >
+                      <div className="flex items-center gap-4">
+                        <MedImage
+                          medicationId={m.id}
+                          alt={m.name}
+                          version={imageVersion[m.id] || 0}
+                          onClick={() => openLightbox(src, m.name)}
+                        />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <div className="font-medium">{m.name}</div>
+                            <StatusBadge status={m.status} />
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            Brand: {m.brand || "-"}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setViewMed(m)}
+                          title="View"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View
+                        </Button>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => handleEdit(m)}
+                          title="Edit"
                         >
-                          <Edit className="w-4 h-4" />
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => setManageMed(m)}
+                          title="Manage variants"
                         >
-                          <Package className="w-4 h-4" />
+                          <Package className="w-4 h-4 mr-1" />
+                          Variants
                         </Button>
                         <Button
                           size="sm"
                           variant="destructive"
                           onClick={() => handleDelete(m.id)}
+                          title="Delete"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Delete
                         </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {medications.length === 0 && (
-                    <TableRow>
-                      <TableCell
-                        colSpan={7}
-                        className="text-center text-sm text-muted-foreground"
-                      >
-                        No data
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {medications.length === 0 && (
+                  <div className="rounded-xl border p-10 text-center text-sm text-muted-foreground">
+                    No medications found
+                  </div>
+                )}
+              </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Medication Form (single close X) */}
+        {/* View modal (truyền imageVersion để cache-bust) */}
+        <MedicationViewModal
+          open={!!viewMed}
+          onClose={() => setViewMed(null)}
+          medication={viewMed}
+          withVariants
+          imageVersion={viewMed?.id ? imageVersion[viewMed.id] || 0 : 0}
+        />
+
+        {/* Medication Form */}
         <Dialog open={medFormOpen} onOpenChange={setMedFormOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl" aria-describedby="med-form-desc">
+            <p id="med-form-desc" className="sr-only">
+              Medication form dialog
+            </p>
             <DialogHeader>
               <DialogTitle>
                 {editing ? "Edit Medication" : "Add Medication"}
@@ -359,6 +535,70 @@ export default function MedicationListPage() {
               onSubmit={handleSubmit(onSubmitMed)}
               className="grid grid-cols-1 md:grid-cols-2 gap-3"
             >
+              {/* Ảnh preview + input file */}
+              <div className="md:col-span-2 flex items-center gap-3 rounded-lg border p-3">
+                <div className="shrink-0">
+                  {imagePreview ? (
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="h-16 w-16 rounded-lg object-cover border cursor-zoom-in"
+                      onClick={() => openLightbox(imagePreview, "Preview")}
+                    />
+                  ) : editing ? (
+                    (() => {
+                      const url = getMedicationImageUrl(editing.id);
+                      const src = url.includes("?v=")
+                        ? url
+                        : `${url}?v=${imageVersion[editing.id] || 0}`;
+                      return (
+                        <img
+                          key={
+                            (editing && editing.id) +
+                            ":v" +
+                            (imageVersion[editing.id] || 0)
+                          }
+                          src={src}
+                          alt="Current"
+                          className="h-16 w-16 rounded-lg object-cover border cursor-zoom-in"
+                          onError={(e) =>
+                            (e.currentTarget.style.visibility = "hidden")
+                          }
+                          onClick={() => openLightbox(src, "Current")}
+                        />
+                      );
+                    })()
+                  ) : (
+                    <PillPlaceholder className="h-16 w-16" />
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={onChangeImage}
+                      className="hidden"
+                      id="med-image-input"
+                    />
+                    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm">
+                      <ImageIcon className="w-4 h-4" />
+                      Choose image…
+                    </span>
+                  </label>
+
+                  <label className="inline-flex items-center gap-2 text-sm">
+                    <Checkbox
+                      checked={removeImage}
+                      onCheckedChange={(c) => setRemoveImage(!!c)}
+                    />
+                    <span>Remove image</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* fields */}
               <Controller
                 name="name"
                 control={control}
@@ -419,15 +659,14 @@ export default function MedicationListPage() {
                   name="status"
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    <Select value={value} onValueChange={onChange}>
-                      <SelectTrigger className="w-40">
-                        <SelectValue placeholder="Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <select
+                      value={value}
+                      onChange={(e) => onChange(e.target.value)}
+                      className="h-9 w-40 rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
                   )}
                 />
               </div>
@@ -446,22 +685,24 @@ export default function MedicationListPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Manage Variants (single close X) */}
+        {/* Manage Variants */}
         <Dialog
           open={!!manageMed}
           onOpenChange={(open) => !open && setManageMed(null)}
         >
-          <DialogContent className="max-w-5xl">
+          <DialogContent className="max-w-5xl" aria-describedby="variants-desc">
+            <p id="variants-desc" className="sr-only">
+              Medication variants dialog
+            </p>
             <DialogHeader>
               <DialogTitle>Manage Variants • {manageMed?.name}</DialogTitle>
             </DialogHeader>
 
-            {/* ⬇️ Hiển thị đầy đủ thông tin thuốc trong popup */}
             {manageMed && (
               <div className="mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
                 <div>
                   <span className="text-muted-foreground">Brand:</span>{" "}
-                  <span>{manageMed.brand || "-"}</span>
+                  {manageMed.brand || "-"}
                 </div>
                 <div>
                   <span className="text-muted-foreground">Status:</span>{" "}
@@ -473,22 +714,22 @@ export default function MedicationListPage() {
                   <span className="text-muted-foreground">
                     Prescription required:
                   </span>{" "}
-                  <span>{manageMed.isPrescriptionRequired ? "Yes" : "No"}</span>
+                  {manageMed.isPrescriptionRequired ? "Yes" : "No"}
                 </div>
                 <div>
                   <span className="text-muted-foreground">
                     Controlled substance:
                   </span>{" "}
-                  <span>{manageMed.isControlledSubstance ? "Yes" : "No"}</span>
+                  {manageMed.isControlledSubstance ? "Yes" : "No"}
                 </div>
                 <div className="md:col-span-2 lg:col-span-4">
                   <span className="text-muted-foreground">Description:</span>{" "}
-                  <span>{manageMed.description || "-"}</span>
+                  {manageMed.description || "-"}
                 </div>
               </div>
             )}
 
-            <div className="overflow-auto">
+            <div className="overflow-auto rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -605,7 +846,6 @@ export default function MedicationListPage() {
                     )}
                   />
                 </div>
-
                 <div className="flex items-center gap-2">
                   <Controller
                     name="isForSale"
@@ -650,6 +890,28 @@ export default function MedicationListPage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* 🔎 Lightbox – chỉ hiện ảnh */}
+      <Dialog open={lightbox.open} onOpenChange={(o) => !o && closeLightbox()}>
+        <DialogContent className="max-w-3xl" aria-describedby="lightbox-desc">
+          <p id="lightbox-desc" className="sr-only">
+            Medication image preview
+          </p>
+          <div className="flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={lightbox.src}
+              alt={lightbox.alt || "Medication image"}
+              className="max-h-[80vh] w-auto rounded-md object-contain"
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Close</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }

@@ -1,93 +1,177 @@
 import instance from "@/lib/axios";
 
-// ===== MEDICATIONS =====
+/* ===================== MEDICATIONS ===================== */
+
+// GET /api/medications?search=&status=
 export async function getMedications(params = {}) {
-  const response = await instance.get("/medications", { params });
-  return response.data;
+  const res = await instance.get("/medications", { params });
+  return res.data?.data ?? res.data;
 }
 
+// GET /api/medications/:id
 export async function getMedicationById(id) {
-  const response = await instance.get(`/medications/${id}`);
-  return response.data;
+  const res = await instance.get(`/medications/${id}`);
+  return res.data?.data ?? res.data;
 }
 
+// POST /api/medications (API nhận dạng batch)
 export async function createMedication(payload) {
-  const response = await instance.post("/medications", payload);
-  return response.data;
+  const arr = Array.isArray(payload) ? payload : [payload];
+  const body = arr.map((m) => ({
+    name: m.name,
+    brand: m.brand ?? null,
+    description: m.description ?? null,
+    // CREATE: 2 boolean dùng snake_case
+    is_prescription_required: !!m.isPrescriptionRequired,
+    is_controlled_substance: !!m.isControlledSubstance,
+    status: m.status ?? "active",
+  }));
+  const res = await instance.post("/medications", body);
+  return res.data?.data ?? res.data;
 }
 
-export async function updateMedication(id, payload) {
-  const response = await instance.patch(`/medications/${id}`, payload);
-  return response.data;
+// PATCH /api/medications/:id
+// BACKEND MỚI: cho update 2 boolean nếu gửi snake_case
+export async function updateMedication(id, payload = {}) {
+  const {
+    // camelCase (từ form FE)
+    isPrescriptionRequired,
+    isControlledSubstance,
+    // snake_case (nếu có gửi thẳng vào service)
+    is_prescription_required,
+    is_controlled_substance,
+    ...rest
+  } = payload;
+
+  const body = { ...rest };
+
+  // Ưu tiên camelCase nếu có; nếu không, nhận snake_case; nếu không truyền thì bỏ qua
+  if (
+    typeof isPrescriptionRequired !== "undefined" ||
+    typeof is_prescription_required !== "undefined"
+  ) {
+    body.is_prescription_required =
+      typeof isPrescriptionRequired !== "undefined"
+        ? !!isPrescriptionRequired
+        : !!is_prescription_required;
+  }
+
+  if (
+    typeof isControlledSubstance !== "undefined" ||
+    typeof is_controlled_substance !== "undefined"
+  ) {
+    body.is_controlled_substance =
+      typeof isControlledSubstance !== "undefined"
+        ? !!isControlledSubstance
+        : !!is_controlled_substance;
+  }
+
+  const res = await instance.patch(`/medications/${id}`, body);
+  return res.data?.data ?? res.data;
 }
 
+// DELETE /api/medications/:id
 export async function deleteMedication(id) {
-  const response = await instance.delete(`/medications/${id}`);
-  return response.data;
+  const res = await instance.delete(`/medications/${id}`);
+  return res.data?.data ?? res.data;
 }
 
-// ===== VARIANTS =====
-// Get all variants across all medications
+/* ===================== VARIANTS (LIST) ===================== */
+
+// GET /api/medications/variants/all
 export async function getAllMedicationsVariants(params = {}) {
-  const response = await instance.get("/medications/variants/all", { params });
-  return response.data;
+  const res = await instance.get("/medications/variants/all", { params });
+  return res.data?.data ?? res.data;
 }
 
-// Get variants for a specific medication
+// Alias tương thích
+export async function getAllMedicationVariants(params = {}) {
+  return getAllMedicationsVariants(params);
+}
+
+// GET /api/medications/:medicationId/variants
 export async function getMedicationVariants(medicationId) {
-  const response = await instance.get(`/medications/${medicationId}/variants`);
-  return response.data;
+  const res = await instance.get(`/medications/${medicationId}/variants`);
+  return res.data?.data ?? res.data;
 }
 
-// Note: To get a single variant, you need medicationId
-// Use: GET /medications/{medicationId}/variants/{variantId}
+// GET /api/medications/:medicationId/variants/:variantId
 export async function getMedicationVariant(medicationId, variantId) {
-  const response = await instance.get(
+  const res = await instance.get(
     `/medications/${medicationId}/variants/${variantId}`
   );
-  return response.data;
+  return res.data?.data ?? res.data;
 }
 
+/* ===================== VARIANTS (CRUD) ===================== */
+
+// POST /api/medications/:medicationId/variants (batch)
 export async function createVariant(medicationId, payload) {
-  const response = await instance.post(
+  const body = Array.isArray(payload) ? payload : [payload];
+  const res = await instance.post(
     `/medications/${medicationId}/variants`,
-    payload
+    body
   );
-  return response.data;
+  return res.data?.data ?? res.data;
 }
 
+// PATCH /api/medications/:medicationId/variants/:variantId
 export async function updateVariant(medicationId, variantId, payload) {
-  const response = await instance.patch(
+  const res = await instance.patch(
     `/medications/${medicationId}/variants/${variantId}`,
     payload
   );
-  return response.data;
+  return res.data?.data ?? res.data;
 }
 
+// DELETE /api/medications/:medicationId/variants/:variantId
 export async function deleteVariant(medicationId, variantId) {
-  const response = await instance.delete(
+  const res = await instance.delete(
     `/medications/${medicationId}/variants/${variantId}`
   );
-  return response.data;
+  return res.data?.data ?? res.data;
 }
 
-// ===== SEARCH =====
-// For POS: search medications with inventory data
+/* ===================== VIEW / RELATED ===================== */
+
+export async function getSuppliersByMedication(id) {
+  const res = await instance.get(`/medications/${id}/suppliers`);
+  return res.data;
+}
+
+export async function getPurchasesByMedication(id) {
+  const res = await instance.get(`/medications/${id}/purchases`);
+  return res.data;
+}
+
+export async function getSalesByMedication(id) {
+  const res = await instance.get(`/medications/${id}/sales`);
+  return res.data;
+}
+
+export async function getInventorySummary() {
+  const res = await instance.get(`/inventory/summary/by-variant`, {
+    params: { page: 1, limit: 10, sortOrder: "asc" },
+  });
+  return res.data;
+}
+
+/* ===================== SEARCH / VALIDATION ===================== */
+
 export async function searchMedications(search) {
-  const response = await instance.get("/medications/variants/search-for-sale", {
+  const res = await instance.get("/medications/variants/search-for-sale", {
     params: { search },
   });
-  return response.data;
+  return res.data;
 }
 
-// ===== BARCODE SEARCH =====
 export async function findVariantsByBarcode(barcode) {
   if (!barcode) {
     return [];
   }
-  const response = await instance.get("/medications/variants/all", {
+  const res = await instance.get("/medications/variants/all", {
     params: { search: barcode },
   });
-  const data = response.data;
-  return Array.isArray(data) ? data : data?.data || [];
+  const data = res.data?.data ?? res.data;
+  return Array.isArray(data) ? data : [];
 }
