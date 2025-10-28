@@ -328,8 +328,6 @@ describe("salesOrderService", () => {
       const mockOrder = {
         id: "order-1",
         status: "pending",
-        customerId: "cust-1",
-        totalAmount: 50,
       };
 
       const mockItems = [
@@ -337,8 +335,6 @@ describe("salesOrderService", () => {
           id: "item-1",
           medicationVariantId: "var-1",
           quantity: 10,
-          unitPrice: 5,
-          totalPrice: 50,
         },
       ];
 
@@ -350,7 +346,16 @@ describe("salesOrderService", () => {
         },
       ];
 
-      mockTx.query.salesOrders.findFirst.mockResolvedValue(mockOrder);
+      const mockUpdatedOrder = {
+        ...mockOrder,
+        status: "completed",
+      };
+
+      // First findFirst - get current order
+      // Second findFirst - get order with relations after update
+      mockTx.query.salesOrders.findFirst
+        .mockResolvedValueOnce(mockOrder)
+        .mockResolvedValueOnce(mockUpdatedOrder);
       mockTx.query.salesOrderItems.findMany.mockResolvedValue(mockItems);
       mockTx.select.mockReturnValue({
         from: vi.fn().mockReturnValue({
@@ -362,9 +367,7 @@ describe("salesOrderService", () => {
       mockTx.update.mockReturnValue({
         set: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            returning: vi
-              .fn()
-              .mockResolvedValue([{ ...mockOrder, status: "completed" }]),
+            returning: vi.fn().mockResolvedValue([mockUpdatedOrder]),
           }),
         }),
       });
@@ -390,7 +393,16 @@ describe("salesOrderService", () => {
         },
       ];
 
-      mockTx.query.salesOrders.findFirst.mockResolvedValue(mockOrder);
+      const mockUpdatedOrder = {
+        ...mockOrder,
+        status: "cancelled",
+      };
+
+      // First findFirst - get current order
+      // Second findFirst - get order with relations after update
+      mockTx.query.salesOrders.findFirst
+        .mockResolvedValueOnce(mockOrder)
+        .mockResolvedValueOnce(mockUpdatedOrder);
       mockTx.query.salesOrderItems.findMany.mockResolvedValue(mockItems);
       mockTx.select.mockReturnValue({
         from: vi.fn().mockReturnValue({
@@ -404,9 +416,7 @@ describe("salesOrderService", () => {
       mockTx.update.mockReturnValue({
         set: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            returning: vi
-              .fn()
-              .mockResolvedValue([{ ...mockOrder, status: "cancelled" }]),
+            returning: vi.fn().mockResolvedValue([mockUpdatedOrder]),
           }),
         }),
       });
