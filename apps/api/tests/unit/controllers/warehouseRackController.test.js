@@ -131,7 +131,8 @@ describe("WarehouseRackController", () => {
 
       await warehouseRackController.update(req, res);
 
-      expect(warehouseRackService.update).toHaveBeenCalledWith(1, {
+      // UUID string
+      expect(warehouseRackService.update).toHaveBeenCalledWith("1", {
         name: "Updated Rack",
         zoneId: "2",
       });
