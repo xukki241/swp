@@ -54,6 +54,9 @@ export const baseConfig = defineConfig([
       // Promise rules
       "promise/always-return": "warn",
       "promise/catch-or-return": "warn",
+
+      // Prettier rules
+      "prettier/prettier": "warn",
     },
   },
 ]);
