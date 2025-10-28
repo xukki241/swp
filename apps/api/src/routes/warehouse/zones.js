@@ -5,7 +5,7 @@ import {
 } from "@pharmaflow/dto";
 import express from "express";
 
-import { warehouseZoneController } from "../../controllers/warehouse/warehouseZoneController.js";
+import { warehouseZoneController } from "../../controllers/warehouseZoneController.js";
 import { createAuditLog } from "../../middleware/auditLog.js";
 import { authorize } from "../../middleware/checkAuth.js";
 import { validateBody } from "../../middleware/validate.js";

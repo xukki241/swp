@@ -1,8 +1,8 @@
 import { and, eq, ilike, or } from "drizzle-orm";
 
-import { db } from "../../db/index.js";
-import { warehouseRacks } from "../../db/schema/warehouseRacks.js";
-import { warehouseZones } from "../../db/schema/warehouseZones.js";
+import { db } from "../db/index.js";
+import { warehouseRacks } from "../db/schema/warehouseRacks.js";
+import { warehouseZones } from "../db/schema/warehouseZones.js";
 
 export const warehouseZoneService = {
   async create(zoneData) {

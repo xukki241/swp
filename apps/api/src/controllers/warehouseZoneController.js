@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 
-import { warehouseZoneService } from "../../services/warehouse/warehouseZoneService.js";
+import { warehouseZoneService } from "../services/warehouseZoneService.js";
 
 export const warehouseZoneController = {
   // Create a new warehouse zone
