@@ -7,8 +7,8 @@ import {
 } from "@pharmaflow/dto";
 import express from "express";
 
+import { warehouseBinController } from "../../controllers/warehouseBinsController.js";
 import { warehouseRackController } from "../../controllers/warehouseRackController.js";
-import { warehouseBinController } from ".../../controllers/warehouseRackController.js
 import { createAuditLog } from "../../middleware/auditLog.js";
 import { authorize } from "../../middleware/checkAuth.js";
 import { validateBody } from "../../middleware/validate.js";
