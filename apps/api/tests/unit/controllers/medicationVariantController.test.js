@@ -473,7 +473,10 @@ describe("MedicationVariantController", () => {
         next
       );
 
-      expect(inventoryService.getByMedicationVariantId).toHaveBeenCalledWith(1);
+      // UUID string
+      expect(inventoryService.getByMedicationVariantId).toHaveBeenCalledWith(
+        "1"
+      );
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         count: 1,
