@@ -83,7 +83,7 @@ export const warehouseZoneController = {
   // Get warehouse zone by ID
   getById: asyncHandler(async (req, res) => {
     const zone = await warehouseZoneService.getById(
-      Number.parseInt(req.params.id)
+      req.params.id // UUID string
     );
     if (!zone) {
       return res.status(404).json({
@@ -99,7 +99,7 @@ export const warehouseZoneController = {
 
   // Update warehouse zone
   update: asyncHandler(async (req, res) => {
-    const id = Number.parseInt(req.params.id);
+    const id = req.params.id; // UUID string
 
     // If code is being updated, check if new code already exists
     if (req.body.code) {

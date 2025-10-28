@@ -105,7 +105,7 @@ export const warehouseRackController = {
     // zoneId is UUID, no conversion needed
 
     const rack = await warehouseRackService.update(
-      Number.parseInt(req.params.id),
+      req.params.id, // UUID string
       updateData
     );
     if (!rack) {
