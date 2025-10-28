@@ -145,15 +145,15 @@ export default function StockDetailsDialog({
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Expiration Date</Label>
+                <Label className="text-muted-foreground">Manifacture Date</Label>
                 <p className="text-lg font-semibold">
-                  {medicationItem?.expiryDate}
+                  {medicationItem?.manufactureDate}
                 </p>
               </div>
               <div className="space-y-1">
                 <Label className="text-muted-foreground">Expiration Date</Label>
                 <p className="text-lg font-semibold">
-                  {medicationItem?.manufactureDate}
+                  {medicationItem?.expiryDate}
                 </p>
               </div>
               <div className="space-y-1">

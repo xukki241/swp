@@ -7,8 +7,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useInventory } from "@/hooks/useInventory";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { Eye, Plus, Search, Settings2 } from "lucide-react";
+import { Eye, Search, Settings2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import SearchFilters from "./components/SearchFilters";
 import AddStockDialog from "./components/AddStockDialog";
 import AddjustStockDialog from "./components/AdjustStockDialog";
 import StockDetailsDialog from "./components/StockDetailsDialog";
@@ -16,7 +17,6 @@ import StockDetailsDialog from "./components/StockDetailsDialog";
 export default function StockOverviewPage() {
   const { inventory, refetchInventory } = useInventory();
   const [medications, setMedications] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
   const [currentMedication, setCurrentMedication] = useState({});
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showAdjustDialog, setShowAdjustDialog] = useState(false);
@@ -26,25 +26,8 @@ export default function StockOverviewPage() {
     setMedications(inventory);
   }, [inventory]);
 
-  // Handle search debounce (300ms)
-  useEffect(() => {
-    let timerId = null;
-    if (searchValue.length === 0) {
-      setMedications(inventory);
-    } else {
-      timerId = setTimeout(() => {
-        const searchedMedications = inventory.filter((item) => {
-          return item.medicationVariant.name
-            .toLowerCase()
-            .includes(searchValue.toLowerCase());
-        });
-
-        console.log(searchedMedications);
-        setMedications(searchedMedications);
-      }, 300);
-    }
-    return () => clearTimeout(timerId);
-  }, [searchValue]);
+  const brands = ["Brand A", "Brand B", "Brand C"]; // Replace with dynamic data if available
+  const suppliers = ["Supplier X", "Supplier Y", "Supplier Z"]; // Replace with dynamic data if available
 
   // Handle show dialogs
   function handleShowDialog(type, medication = null) {
@@ -56,6 +39,40 @@ export default function StockOverviewPage() {
     } else if (type === "add") {
       setShowAddStockDialog(true);
     }
+  }
+
+  function handleSearch(filters) {
+    const filteredMedications = inventory.filter((item) => {
+      const matchesStock =
+        (!filters.stockMin || item.quantity >= Number(filters.stockMin)) &&
+        (!filters.stockMax || item.quantity <= Number(filters.stockMax));
+      const matchesPrice =
+        (!filters.priceMin || item.medicationVariant.sellPrice >= Number(filters.priceMin)) &&
+        (!filters.priceMax || item.medicationVariant.sellPrice <= Number(filters.priceMax));
+      const matchesManufactureDate =
+        (!filters.manufactureDateMin || new Date(item.manufactureDate) >= new Date(filters.manufactureDateMin)) &&
+        (!filters.manufactureDateMax || new Date(item.manufactureDate) <= new Date(filters.manufactureDateMax));
+      const matchesExpiryDate =
+        (!filters.expiryDateMin || new Date(item.expiryDate) >= new Date(filters.expiryDateMin)) &&
+        (!filters.expiryDateMax || new Date(item.expiryDate) <= new Date(filters.expiryDateMax));
+      const matchesBrand = !filters.brand || item.medicationVariant.brand === filters.brand;
+      const matchesSupplier = !filters.supplier || item.supplier === filters.supplier;
+      const matchesPrescription = !filters.prescription || item.medicationVariant.isPrescriptionRequired;
+      const matchesActive = !filters.active || item.isActive;
+
+      return (
+        matchesStock &&
+        matchesPrice &&
+        matchesManufactureDate &&
+        matchesExpiryDate &&
+        matchesBrand &&
+        matchesSupplier &&
+        matchesPrescription &&
+        matchesActive
+      );
+    });
+
+    setMedications(filteredMedications);
   }
 
   return (
@@ -70,18 +87,16 @@ export default function StockOverviewPage() {
         </div>
         <Card className="shadow-md rounded-xl border-0">
           <CardContent>
-            <div className="mb-6 flex items-center justify-between">
-              <div className="relative w-2/3">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search medicines by name..."
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  className="pl-10 w-full"
-                />
-              </div>
-            </div>
 
+            {/* Search Filters */}
+            <SearchFilters
+              onSearch={handleSearch}
+              brands={brands}
+              suppliers={suppliers}
+            />
+
+
+            {/* Medication List */}
             <div>
               {medications.map((medication) => (
                 <Card
@@ -151,6 +166,7 @@ export default function StockOverviewPage() {
         </Card>
       </div>
 
+      {/* Dialogs */}
       <StockDetailsDialog
         medicationItem={currentMedication}
         open={showDetailsDialog}
