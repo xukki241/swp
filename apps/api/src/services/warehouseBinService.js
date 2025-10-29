@@ -1,4 +1,4 @@
-import { and, eq, ilike, or } from "drizzle-orm";
+import { and, eq, gt, ilike, or } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import { warehouseBins } from "../db/schema/warehouseBins.js";
@@ -77,7 +77,10 @@ export const warehouseBinService = {
     let results = await db.query.warehouseBins.findMany({
       where: conditions.length > 0 ? and(...conditions) : undefined,
       with: {
-        inventoryEntries: true,
+        inventoryEntries: {
+          where: ({ quantity, quantityReserved }) =>
+            gt(quantity, quantityReserved),
+        },
         rack: {
           with: {
             zone: true,
@@ -100,7 +103,10 @@ export const warehouseBinService = {
     const bin = await db.query.warehouseBins.findFirst({
       where: eq(warehouseBins.id, id),
       with: {
-        inventoryEntries: true,
+        inventoryEntries: {
+          where: ({ quantity, quantityReserved }) =>
+            gt(quantity, quantityReserved),
+        },
         rack: {
           with: {
             zone: true,
@@ -116,7 +122,12 @@ export const warehouseBinService = {
     const bins = await db.query.warehouseBins.findMany({
       where: eq(warehouseBins.rackId, rackId),
       with: {
-        inventoryEntries: true,
+        inventoryEntries: {
+          where: ({ quantity, quantityReserved }) =>
+            gt(quantity, quantityReserved),
+          orderBy: (entry) => [entry.createdAt.desc()],
+          limit: 1,
+        },
         rack: {
           with: {
             zone: true,

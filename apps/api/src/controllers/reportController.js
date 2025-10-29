@@ -59,7 +59,7 @@ export const reportController = {
     const { id } = req.params;
 
     try {
-      const report = await reportService.getById(parseInt(id));
+      const report = await reportService.getById(id); // UUID string
 
       res.json({
         success: true,
@@ -79,7 +79,7 @@ export const reportController = {
     const { id } = req.params;
 
     try {
-      await reportService.delete(parseInt(id));
+      await reportService.delete(id); // UUID string
 
       res.json({
         success: true,

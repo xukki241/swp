@@ -41,7 +41,7 @@ export const purchaseOrderItemController = {
   async getById(req, res) {
     try {
       const item = await purchaseOrderItemService.getById(
-        Number.parseInt(req.params.id)
+        req.params.id // UUID string
       );
       if (!item) {
         return res.status(404).json({ error: "Purchase order item not found" });
@@ -56,7 +56,7 @@ export const purchaseOrderItemController = {
   async update(req, res) {
     try {
       const item = await purchaseOrderItemService.update(
-        Number.parseInt(req.params.id),
+        req.params.id, // UUID string
         req.body
       );
       if (!item) {
@@ -72,7 +72,7 @@ export const purchaseOrderItemController = {
   async delete(req, res) {
     try {
       const item = await purchaseOrderItemService.delete(
-        Number.parseInt(req.params.id)
+        req.params.id // UUID string
       );
       if (!item) {
         return res.status(404).json({ error: "Purchase order item not found" });

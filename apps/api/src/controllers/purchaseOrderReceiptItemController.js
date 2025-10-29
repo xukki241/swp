@@ -3,7 +3,7 @@ import { purchaseOrderReceiptItemService } from "../services/purchaseOrderReceip
 export const purchaseOrderReceiptItemController = {
   async getAllByReceipt(req, res) {
     try {
-      const purchaseOrderReceiptId = Number.parseInt(req.params.receiptId);
+      const purchaseOrderReceiptId = req.params.receiptId; // UUID string
       const items = await purchaseOrderReceiptItemService.getAll({
         purchaseOrderReceiptId,
       });
@@ -26,9 +26,7 @@ export const purchaseOrderReceiptItemController = {
   async getAll(req, res) {
     try {
       const filters = {
-        purchaseOrderReceiptId: req.query.purchaseOrderReceiptId
-          ? Number.parseInt(req.query.purchaseOrderReceiptId)
-          : undefined,
+        purchaseOrderReceiptId: req.query.purchaseOrderReceiptId || undefined, // UUID string
         limit: Number.parseInt(req.query.limit) || 100,
         offset: Number.parseInt(req.query.offset) || 0,
       };
@@ -43,7 +41,7 @@ export const purchaseOrderReceiptItemController = {
   async getById(req, res) {
     try {
       const item = await purchaseOrderReceiptItemService.getById(
-        Number.parseInt(req.params.id)
+        req.params.id // UUID string
       );
       if (!item) {
         return res
@@ -59,7 +57,7 @@ export const purchaseOrderReceiptItemController = {
   async update(req, res) {
     try {
       const item = await purchaseOrderReceiptItemService.update(
-        Number.parseInt(req.params.id),
+        req.params.id, // UUID string
         req.body
       );
       if (!item) {
@@ -77,7 +75,7 @@ export const purchaseOrderReceiptItemController = {
   async delete(req, res) {
     try {
       const item = await purchaseOrderReceiptItemService.delete(
-        Number.parseInt(req.params.id)
+        req.params.id // UUID string
       );
       if (!item) {
         return res
