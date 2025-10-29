@@ -54,19 +54,6 @@ export default function DashboardPage() {
     );
   }, [purchaseOrderReceiptsData]);
 
-  // Debug logging
-  console.log("Dashboard Debug:", {
-    currentYear,
-    currentMonth,
-    monthlyReport,
-    isLoadingReport,
-    reportError,
-    reportData: monthlyReport?.data,
-    topSellingMedications:
-      monthlyReport?.data?.data?.topSellingMedications ||
-      monthlyReport?.data?.topSellingMedications,
-  });
-
   // Calculate stats from report
   const stats = useMemo(() => {
     if (!monthlyReport?.data?.data) {
@@ -279,10 +266,10 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid gap-6">
-          {/* Top Selling Medications - Full Width */}
-          <Card className="rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
+        {/* Main Content Grid - 7:3 Layout */}
+        <div className="grid gap-6 lg:grid-cols-10">
+          {/* Top Selling Medications - 7 columns */}
+          <Card className="lg:col-span-7 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
@@ -350,13 +337,13 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Purchase Order Receipts - Full Width */}
-          <Card className="rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
+          {/* Purchase Order Receipts - 3 columns */}
+          <Card className="lg:col-span-3 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
                   <Package className="h-5 w-5 text-primary" />
-                  Recent Purchase Order Receipts
+                  Recent Receipts
                 </CardTitle>
                 <Badge
                   variant="secondary"
@@ -388,29 +375,29 @@ export default function DashboardPage() {
                   {purchaseOrderReceipts.map((receipt) => (
                     <div
                       key={receipt.id}
-                      className="group flex items-center justify-between rounded-xl border border-border p-4 transition-all hover:border-primary/50 hover:bg-primary/5 hover:scale-[1.02]"
+                      className="group flex flex-col gap-2 rounded-xl border border-border p-3 transition-all hover:border-primary/50 hover:bg-primary/5"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 font-bold text-white shadow-md">
-                          <Package className="h-5 w-5" />
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-md">
+                          <Package className="h-4 w-4" />
                         </div>
-                        <div>
-                          <p className="font-semibold text-foreground">
-                            Receipt #{receipt.id.slice(0, 8)}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm text-foreground truncate">
+                            #{receipt.id.slice(0, 8)}
                           </p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-xs text-muted-foreground">
                             {new Date(
                               receipt.receivedDate
                             ).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold text-primary">
-                          {receipt.supplierName || "Unknown Supplier"}
+                      <div className="text-xs">
+                        <p className="font-medium text-primary truncate">
+                          {receipt.supplierName || "Unknown"}
                         </p>
-                        <p className="text-sm text-muted-foreground">
-                          Received by: {receipt.receivedByName || "N/A"}
+                        <p className="text-muted-foreground truncate">
+                          {receipt.receivedByName || "N/A"}
                         </p>
                       </div>
                     </div>
