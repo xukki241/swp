@@ -46,10 +46,13 @@ export const upload = multer({
 });
 
 // Middleware for single file upload
-export const uploadSingle = upload.single("file");
+// Returns a middleware function for the specified field name
+export const uploadSingle = (fieldName = "file") => upload.single(fieldName);
 
 // Middleware for multiple files upload
-export const uploadMultiple = upload.array("files", 10); // Max 10 files
+// Returns a middleware function for the specified field name
+export const uploadMultiple = (fieldName = "files", maxCount = 10) =>
+  upload.array(fieldName, maxCount);
 
 // Error handling middleware for multer errors
 export const handleMulterError = (err, req, res, next) => {

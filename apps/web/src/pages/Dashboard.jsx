@@ -12,7 +12,6 @@ import { useMonthlySalesReport } from "@/hooks/useReports";
 import {
   Activity,
   AlertTriangle,
-  BarChart3,
   Clock,
   DollarSign,
   Package,
@@ -145,28 +144,11 @@ export default function DashboardPage() {
     return reportData.topSellingMedications.slice(0, 5);
   }, [monthlyReport]);
 
-  // Sales by status
-  const salesByStatus = useMemo(() => {
-    const reportData = monthlyReport?.data?.data || monthlyReport?.data;
-    if (!reportData?.salesByStatus) return [];
-    return reportData.salesByStatus;
-  }, [monthlyReport]);
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(amount || 0);
-  };
-
-  const getStatusColor = (status) => {
-    const colors = {
-      completed: "bg-green-100 text-green-700",
-      pending: "bg-yellow-100 text-yellow-700",
-      cancelled: "bg-red-100 text-red-700",
-      processing: "bg-blue-100 text-blue-700",
-    };
-    return colors[status] || "bg-gray-100 text-gray-700";
   };
 
   // Quick action items with navigation
@@ -196,12 +178,12 @@ export default function DashboardPage() {
       path: "/medications",
     },
     {
-      title: "Analytics",
-      description: "View reports",
-      icon: BarChart3,
+      title: "Customers",
+      description: "Manage customers",
+      icon: Users,
       color: "bg-orange-100",
       iconColor: "text-orange-600",
-      path: "/dashboard",
+      path: "/customers",
     },
   ];
 
@@ -280,9 +262,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Top Selling Medications - Takes 2 columns */}
-          <Card className="lg:col-span-2 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
+        <div className="grid gap-6">
+          {/* Top Selling Medications - Full Width */}
+          <Card className="rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
@@ -341,61 +323,6 @@ export default function DashboardPage() {
                         <p className="text-sm text-muted-foreground">
                           {Number(med.totalQuantity).toLocaleString()} units
                           sold
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Sales by Status - Takes 1 column */}
-          <Card className="rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-primary" />
-                Sales by Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isLoadingReport ? (
-                <div className="space-y-4">
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="h-16 animate-pulse rounded-xl bg-gray-200"
-                    />
-                  ))}
-                </div>
-              ) : salesByStatus.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <AlertTriangle className="h-12 w-12 text-muted-foreground/50" />
-                  <p className="mt-4 text-muted-foreground">
-                    No status data available
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {salesByStatus.map((status) => (
-                    <div
-                      key={status.status}
-                      className="flex items-center justify-between rounded-xl border border-border p-4 transition-all hover:border-primary/50 hover:scale-[1.02]"
-                    >
-                      <div>
-                        <Badge
-                          variant="secondary"
-                          className={getStatusColor(status.status)}
-                        >
-                          {status.status?.toUpperCase()}
-                        </Badge>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                          {Number(status.count).toLocaleString()} orders
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-foreground">
-                          {formatCurrency(status.totalAmount)}
                         </p>
                       </div>
                     </div>
