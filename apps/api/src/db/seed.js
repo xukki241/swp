@@ -269,6 +269,77 @@ async function seed() {
       ])
       .returning();
 
+    // 6. Seed Medication Images (Sample Files)
+    console.log("🖼️ Seeding medication images...");
+
+    // Create sample image buffers (1x1 PNG placeholders with different colors)
+    const createSampleImage = (color) => {
+      // Minimal valid PNG header + IEND chunk
+      const base64 = `iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN${color}AAAA${color}wAAQpwMvKLK8QAAAABJRU5ErkJggg==`;
+      return Buffer.from(base64, "base64");
+    };
+
+    const [
+      imageParacetamol,
+      imageAmoxicillin,
+      imageIbuprofen,
+      imageOmeprazole,
+      imageCetirizine,
+      imageMetformin,
+    ] = await db
+      .insert(files)
+      .values([
+        {
+          filename: "paracetamol.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("k8"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "amoxicillin.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Ma"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "ibuprofen.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Ng"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "omeprazole.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Ow"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "cetirizine.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Pg"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "metformin.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Qg"),
+          uploadedBy: owner.id,
+        },
+      ])
+      .returning();
+
     // 6. Seed Medications
     console.log("💊 Seeding medications...");
     const [
@@ -295,6 +366,7 @@ async function seed() {
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageParacetamol.id,
         },
         {
           name: "Amoxicillin",
@@ -303,6 +375,7 @@ async function seed() {
           isPrescriptionRequired: true,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageAmoxicillin.id,
         },
         {
           name: "Ibuprofen",
@@ -311,6 +384,7 @@ async function seed() {
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageIbuprofen.id,
         },
         {
           name: "Omeprazole",
@@ -320,6 +394,7 @@ async function seed() {
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageOmeprazole.id,
         },
         {
           name: "Cetirizine",
@@ -328,6 +403,7 @@ async function seed() {
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageCetirizine.id,
         },
         {
           name: "Metformin",
@@ -336,6 +412,7 @@ async function seed() {
           isPrescriptionRequired: true,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageMetformin.id,
         },
         {
           name: "Atorvastatin",
@@ -1082,30 +1159,85 @@ async function seed() {
 
     // 14. Seed Purchase Order Receipts (for received orders)
     console.log("📥 Seeding purchase order receipts...");
-    const [receipt1] = await db
+    const [receipt1, receipt2, receipt3, receipt4] = await db
       .insert(purchaseOrderReceipts)
       .values([
+        // Receipt for PO1 (Viet Pharmaceutical - May 2024)
         {
           purchaseOrderId: po1.id,
           receivedDate: new Date("2024-05-23T10:00:00Z"),
           receivedBy: staff1.id,
+        },
+        // Receipt for PO2 (Saigon MediSupply - June 2024)
+        {
+          purchaseOrderId: po2.id,
+          receivedDate: new Date("2024-06-08T14:30:00Z"),
+          receivedBy: staff2.id,
+        },
+        // Receipt for PO3 (Global BioMed - June 2024)
+        {
+          purchaseOrderId: po3.id,
+          receivedDate: new Date("2024-06-25T09:15:00Z"),
+          receivedBy: staff1.id,
+        },
+        // Receipt for PO4 (Viet Pharmaceutical - June 2024)
+        {
+          purchaseOrderId: po4.id,
+          receivedDate: new Date("2024-06-20T11:00:00Z"),
+          receivedBy: staff3.id,
         },
       ])
       .returning();
 
     // 15. Seed Purchase Order Receipt Items
     console.log("📋 Seeding purchase order receipt items...");
-    const receiptItemData = purchaseOrderItemsResults
+
+    // Receipt 1 items (PO1)
+    const receipt1ItemData = purchaseOrderItemsResults
       .filter((item) => item.purchaseOrderId === po1.id)
       .map((item) => ({
         purchaseOrderReceiptId: receipt1.id,
         purchaseOrderItemId: item.id,
-        quantity: item.quantity, // Assume full quantity received
+        quantity: item.quantity,
       }));
+
+    // Receipt 2 items (PO2)
+    const receipt2ItemData = purchaseOrderItemsResults
+      .filter((item) => item.purchaseOrderId === po2.id)
+      .map((item) => ({
+        purchaseOrderReceiptId: receipt2.id,
+        purchaseOrderItemId: item.id,
+        quantity: item.quantity,
+      }));
+
+    // Receipt 3 items (PO3)
+    const receipt3ItemData = purchaseOrderItemsResults
+      .filter((item) => item.purchaseOrderId === po3.id)
+      .map((item) => ({
+        purchaseOrderReceiptId: receipt3.id,
+        purchaseOrderItemId: item.id,
+        quantity: item.quantity,
+      }));
+
+    // Receipt 4 items (PO4)
+    const receipt4ItemData = purchaseOrderItemsResults
+      .filter((item) => item.purchaseOrderId === po4.id)
+      .map((item) => ({
+        purchaseOrderReceiptId: receipt4.id,
+        purchaseOrderItemId: item.id,
+        quantity: item.quantity,
+      }));
+
+    const allReceiptItemData = [
+      ...receipt1ItemData,
+      ...receipt2ItemData,
+      ...receipt3ItemData,
+      ...receipt4ItemData,
+    ];
 
     const receiptItemsResults = await db
       .insert(purchaseOrderReceiptItems)
-      .values(receiptItemData)
+      .values(allReceiptItemData)
       .returning();
 
     // 16. Seed Inventory (ALL variants with at least 20 units each)
@@ -1181,6 +1313,7 @@ async function seed() {
           orderDate: new Date("2025-08-10T10:30:00Z"),
           totalAmount: 220000,
           status: "paid",
+          status: "paid",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
@@ -1213,6 +1346,7 @@ async function seed() {
           orderDate: new Date("2025-09-01T16:30:00Z"),
           totalAmount: 540000,
           status: "paid",
+          status: "paid",
           paymentMethod: "bank_transfer",
           salespersonId: staff2.id,
         },
@@ -1222,6 +1356,7 @@ async function seed() {
           orderDate: new Date("2025-10-02T09:15:00Z"),
           totalAmount: 450000,
           status: "paid",
+          status: "paid",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
@@ -1229,6 +1364,7 @@ async function seed() {
           customerId: customer2.id,
           orderDate: new Date("2025-10-05T14:30:00Z"),
           totalAmount: 680000,
+          status: "paid",
           status: "paid",
           paymentMethod: "bank_transfer",
           salespersonId: staff2.id,
@@ -1238,6 +1374,7 @@ async function seed() {
           orderDate: new Date("2025-10-08T11:00:00Z"),
           totalAmount: 320000,
           status: "paid",
+          status: "paid",
           paymentMethod: "mobile_payment",
           salespersonId: staff1.id,
         },
@@ -1246,6 +1383,7 @@ async function seed() {
           orderDate: new Date("2025-10-12T16:45:00Z"),
           totalAmount: 1250000,
           status: "paid",
+          status: "paid",
           paymentMethod: "bank_transfer",
           salespersonId: staff3.id,
         },
@@ -1253,6 +1391,7 @@ async function seed() {
           customerId: customer1.id,
           orderDate: new Date("2025-10-15T10:20:00Z"),
           totalAmount: 540000,
+          status: "paid",
           status: "paid",
           paymentMethod: "cash",
           salespersonId: staff2.id,
@@ -1277,6 +1416,7 @@ async function seed() {
           customerId: customer4.id,
           orderDate: new Date("2025-10-22T15:15:00Z"),
           totalAmount: 760000,
+          status: "paid",
           status: "paid",
           paymentMethod: "bank_transfer",
           salespersonId: staff3.id,
@@ -1839,7 +1979,7 @@ async function seed() {
     - User Registrations: 3
     - Customers: 6
     - Suppliers: 5
-    - Medications: 12
+    - Medications: 12 (6 with images)
     - Medication Variants: 26
     - Supplier-Medication Links: 14
     - Warehouse Zones: 4
@@ -1851,9 +1991,11 @@ async function seed() {
     - Receipt Items: 3
     - Inventory Entries: 26 (ALL variants with 20-200 units each)
     - Sales Orders: 15 (5 from June 2024 + 10 from October 2025)
-      * October 2025: 10 orders - 7 delivered, 1 paid, 2 pending
-      * Total October Revenue: 7,580,000 VND
-    - Sales Order Items: 6 (old June 2024 data only - October items removed for simplicity)
+      * Status: pending, paid, cancelled only
+      * October 2025: 10 orders - 8 paid, 1 cancelled, 1 pending
+      * Total October Revenue: 6,580,000 VND (from 8 paid orders)
+    - Sales Order Items: 38 (5 from June 2024 + 33 from October 2025)
+      * October items include medications: Paracetamol, Ibuprofen, Amoxicillin, etc.
     - Files: 3
     - File Attachments: 3
     - Notifications: 5

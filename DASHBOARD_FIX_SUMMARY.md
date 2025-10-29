@@ -21,7 +21,7 @@ Dashboard hiển thị tất cả giá trị = 0:
 // BEFORE (SAI)
 const currentMonth = currentDate.getMonth(); // 0-11
 
-// AFTER (ĐÚNG)  
+// AFTER (ĐÚNG)
 const currentMonth = currentDate.getMonth() + 1; // 1-12 để match API
 ```
 
@@ -44,13 +44,15 @@ console.log('Dashboard Debug:', {
 Dashboard hiển thị error message nếu API call fail:
 
 ```jsx
-{reportError && (
-  <Card className="border-red-200 bg-red-50">
-    <CardContent>
-      Error Loading Dashboard Data: {reportError.message}
-    </CardContent>
-  </Card>
-)}
+{
+  reportError && (
+    <Card className="border-red-200 bg-red-50">
+      <CardContent>
+        Error Loading Dashboard Data: {reportError.message}
+      </CardContent>
+    </Card>
+  );
+}
 ```
 
 ### 4. Handle Response Structure
@@ -105,8 +107,8 @@ const reportData = monthlyReport.data.data || monthlyReport.data;
 Chạy query để kiểm tra:
 
 ```sql
-SELECT COUNT(*) FROM sales_orders 
-WHERE order_date >= '2025-10-01' 
+SELECT COUNT(*) FROM sales_orders
+WHERE order_date >= '2025-10-01'
   AND order_date < '2025-11-01';
 ```
 
@@ -122,15 +124,15 @@ WHERE order_date >= '2025-10-01'
 ```sql
 -- Tạo 1 sales order test
 INSERT INTO sales_orders (
-  customer_id, 
-  order_date, 
-  total_amount, 
-  status, 
-  payment_method, 
+  customer_id,
+  order_date,
+  total_amount,
+  status,
+  payment_method,
   created_by
 ) VALUES (
   1,                    -- customer_id (cần có customer)
-  CURRENT_DATE,         -- order_date  
+  CURRENT_DATE,         -- order_date
   500000,               -- total_amount
   'completed',          -- status
   'cash',               -- payment_method

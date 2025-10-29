@@ -8,6 +8,7 @@ import { AppLayout } from "@/components/layouts/app-layout";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCurrentUser } from "@/hooks/useAuth";
+import { usePurchaseOrderReceipts } from "@/hooks/usePurchaseOrders";
 import { useMonthlySalesReport } from "@/hooks/useReports";
 import AIAnalyticsDialog from "@/components/AIAnalyticsDialog";
 import {
@@ -44,15 +45,18 @@ export default function DashboardPage() {
     error: reportError,
   } = useMonthlySalesReport(currentYear, currentMonth);
 
-  // Debug logging
-  console.log("Dashboard Debug:", {
-    currentYear,
-    currentMonth,
-    monthlyReport,
-    isLoadingReport,
-    reportError,
-    reportData: monthlyReport?.data,
-  });
+  // Get Purchase Order Receipts
+  const { data: purchaseOrderReceiptsData = [], isLoading: isLoadingReceipts } =
+    usePurchaseOrderReceipts({ limit: 5 });
+
+  // Sort receipts by receivedDate descending
+  const purchaseOrderReceipts = useMemo(() => {
+    if (!purchaseOrderReceiptsData || purchaseOrderReceiptsData.length === 0)
+      return [];
+    return [...purchaseOrderReceiptsData].sort(
+      (a, b) => new Date(b.receivedDate) - new Date(a.receivedDate)
+    );
+  }, [purchaseOrderReceiptsData]);
 
   // Calculate stats from report
   const stats = useMemo(() => {
@@ -149,28 +153,11 @@ export default function DashboardPage() {
     return reportData.topSellingMedications.slice(0, 5);
   }, [monthlyReport]);
 
-  // Sales by status
-  const salesByStatus = useMemo(() => {
-    const reportData = monthlyReport?.data?.data || monthlyReport?.data;
-    if (!reportData?.salesByStatus) return [];
-    return reportData.salesByStatus;
-  }, [monthlyReport]);
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(amount || 0);
-  };
-
-  const getStatusColor = (status) => {
-    const colors = {
-      completed: "bg-green-100 text-green-700",
-      pending: "bg-yellow-100 text-yellow-700",
-      cancelled: "bg-red-100 text-red-700",
-      processing: "bg-blue-100 text-blue-700",
-    };
-    return colors[status] || "bg-gray-100 text-gray-700";
   };
 
   // Quick action items with navigation
@@ -283,10 +270,10 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Top Selling Medications - Takes 2 columns */}
-          <Card className="lg:col-span-2 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
+        {/* Main Content Grid - 7:3 Layout */}
+        <div className="grid gap-6 lg:grid-cols-10">
+          {/* Top Selling Medications - 7 columns */}
+          <Card className="lg:col-span-7 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
@@ -354,52 +341,67 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Sales by Status - Takes 1 column */}
-          <Card className="rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
+          {/* Purchase Order Receipts - 3 columns */}
+          <Card className="lg:col-span-3 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-primary" />
-                Sales by Status
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
+                  <Package className="h-5 w-5 text-primary" />
+                  Recent Receipts
+                </CardTitle>
+                <Badge
+                  variant="secondary"
+                  className="bg-primary/10 text-primary"
+                >
+                  Latest 5
+                </Badge>
+              </div>
             </CardHeader>
             <CardContent>
-              {isLoadingReport ? (
+              {isLoadingReceipts ? (
                 <div className="space-y-4">
-                  {[1, 2, 3].map((i) => (
+                  {[1, 2, 3, 4, 5].map((i) => (
                     <div
                       key={i}
                       className="h-16 animate-pulse rounded-xl bg-gray-200"
                     />
                   ))}
                 </div>
-              ) : salesByStatus.length === 0 ? (
+              ) : purchaseOrderReceipts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <AlertTriangle className="h-12 w-12 text-muted-foreground/50" />
+                  <Package className="h-12 w-12 text-muted-foreground/50" />
                   <p className="mt-4 text-muted-foreground">
-                    No status data available
+                    No receipts available
                   </p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {salesByStatus.map((status) => (
+                  {purchaseOrderReceipts.map((receipt) => (
                     <div
-                      key={status.status}
-                      className="flex items-center justify-between rounded-xl border border-border p-4 transition-all hover:border-primary/50 hover:scale-[1.02]"
+                      key={receipt.id}
+                      className="group flex flex-col gap-2 rounded-xl border border-border p-3 transition-all hover:border-primary/50 hover:bg-primary/5"
                     >
-                      <div>
-                        <Badge
-                          variant="secondary"
-                          className={getStatusColor(status.status)}
-                        >
-                          {status.status?.toUpperCase()}
-                        </Badge>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                          {Number(status.count).toLocaleString()} orders
-                        </p>
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-md">
+                          <Package className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm text-foreground truncate">
+                            #{receipt.id.slice(0, 8)}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(
+                              receipt.receivedDate
+                            ).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold text-foreground">
-                          {formatCurrency(status.totalAmount)}
+                      <div className="text-xs">
+                        <p className="font-medium text-primary truncate">
+                          {receipt.supplierName || "Unknown"}
+                        </p>
+                        <p className="text-muted-foreground truncate">
+                          {receipt.receivedByName || "N/A"}
                         </p>
                       </div>
                     </div>
