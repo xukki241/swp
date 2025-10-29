@@ -4,24 +4,36 @@ import { Badge } from "@/components/ui/badge"
 import { X } from "lucide-react"
 
 export default function ActiveFilters({ filters, onRemoveFilter }) {
+    function renderSupplierNames(suppliers) {
+        return <div>
+            Supplier:
+            {suppliers.map((supplier, index) => (
+                <div key={supplier.id}>
+                    {supplier.name}
+                    {index < suppliers.length - 1 ? ", " : ""}
+                </div>
+            ))}
+        </div>
+    }
+
     const formatFilterDisplay = (key, value) => {
         if (!value || (Array.isArray(value) && value.length === 0)) return null
 
         switch (key) {
             case "stock":
-                return value.min || value.max ? `stock: ${value.min || "0"} - ${value.max || "∞"}` : null
+                return value.min || value.max ? `Stock: ${value.min || "0"} - ${value.max || "∞"} ` : null
             case "price":
-                return value.min || value.max ? `price: ${value.min || "0"} - ${value.max || "∞"}` : null
+                return value.min || value.max ? `Price: ${value.min || "0"} - ${value.max || "∞"} ` : null
             case "manufactureDate":
-                return value.from || value.to ? `manufacture: ${value.from || "any"} - ${value.to || "any"}` : null
+                return value.from || value.to ? `Manufacture: ${value.from || "any"} - ${value.to || "any"} ` : null
             case "expiryDate":
-                return value.from || value.to ? `expiry: ${value.from || "any"} - ${value.to || "any"}` : null
-            case "brand":
-                return Array.isArray(value) && value.length > 0 ? `brand: ${value.join(", ")}` : null
+                return value.from || value.to ? `Expiry: ${value.from || "any"} - ${value.to || "any"} ` : null
             case "supplier":
-                return Array.isArray(value) && value.length > 0 ? `supplier: ${value.join(", ")}` : null
+                return Array.isArray(value) && value.length > 0
+                    ? renderSupplierNames(value)
+                    : null
             case "prescription":
-                return value ? "prescription: required" : null
+                return value ? "Prescription: required" : null
             default:
                 return null
         }
@@ -46,10 +58,10 @@ export default function ActiveFilters({ filters, onRemoveFilter }) {
                 if (!display) return null
 
                 return (
-                    <Badge key={key} variant="secondary" className="gap-1">
+                    <Badge key={key} variant="secondary" className="gap-1 max-w-full">
                         {display}
                         <button onClick={() => onRemoveFilter(key)} className="ml-1 hover:opacity-70">
-                            <X className="h-3 w-3" />
+                            <X className="h-3 w-3 cursor-pointer" />
                         </button>
                     </Badge>
                 )

@@ -11,6 +11,7 @@ import {
   getZoneById,
   updateBin,
   updateRack,
+  updateZone
 } from "../services/warehouseService";
 
 /**

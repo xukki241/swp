@@ -24,7 +24,6 @@ export default function StockOverviewPage() {
   const [showAddStockDialog, setShowAddStockDialog] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
 
-  console.log(suppliers)
   useEffect(() => {
     setMedications(inventory)
   }, [inventory])
