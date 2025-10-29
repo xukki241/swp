@@ -8,10 +8,12 @@ import { AppLayout } from "@/components/layouts/app-layout";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCurrentUser } from "@/hooks/useAuth";
+import { usePurchaseOrderReceipts } from "@/hooks/usePurchaseOrders";
 import { useMonthlySalesReport } from "@/hooks/useReports";
 import {
   Activity,
   AlertTriangle,
+  BarChart3,
   Clock,
   DollarSign,
   Package,
@@ -39,6 +41,19 @@ export default function DashboardPage() {
     error: reportError,
   } = useMonthlySalesReport(currentYear, currentMonth);
 
+  // Get Purchase Order Receipts
+  const { data: purchaseOrderReceiptsData = [], isLoading: isLoadingReceipts } =
+    usePurchaseOrderReceipts({ limit: 5 });
+
+  // Sort receipts by receivedDate descending
+  const purchaseOrderReceipts = useMemo(() => {
+    if (!purchaseOrderReceiptsData || purchaseOrderReceiptsData.length === 0)
+      return [];
+    return [...purchaseOrderReceiptsData].sort(
+      (a, b) => new Date(b.receivedDate) - new Date(a.receivedDate)
+    );
+  }, [purchaseOrderReceiptsData]);
+
   // Debug logging
   console.log("Dashboard Debug:", {
     currentYear,
@@ -47,6 +62,9 @@ export default function DashboardPage() {
     isLoadingReport,
     reportError,
     reportData: monthlyReport?.data,
+    topSellingMedications:
+      monthlyReport?.data?.data?.topSellingMedications ||
+      monthlyReport?.data?.topSellingMedications,
   });
 
   // Calculate stats from report
@@ -178,12 +196,12 @@ export default function DashboardPage() {
       path: "/medications",
     },
     {
-      title: "Customers",
-      description: "Manage customers",
-      icon: Users,
+      title: "Analytics",
+      description: "View reports and analytics",
+      icon: BarChart3,
       color: "bg-orange-100",
       iconColor: "text-orange-600",
-      path: "/customers",
+      path: "/reports",
     },
   ];
 
@@ -323,6 +341,76 @@ export default function DashboardPage() {
                         <p className="text-sm text-muted-foreground">
                           {Number(med.totalQuantity).toLocaleString()} units
                           sold
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Purchase Order Receipts - Full Width */}
+          <Card className="rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
+                  <Package className="h-5 w-5 text-primary" />
+                  Recent Purchase Order Receipts
+                </CardTitle>
+                <Badge
+                  variant="secondary"
+                  className="bg-primary/10 text-primary"
+                >
+                  Latest 5
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {isLoadingReceipts ? (
+                <div className="space-y-4">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div
+                      key={i}
+                      className="h-16 animate-pulse rounded-xl bg-gray-200"
+                    />
+                  ))}
+                </div>
+              ) : purchaseOrderReceipts.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <Package className="h-12 w-12 text-muted-foreground/50" />
+                  <p className="mt-4 text-muted-foreground">
+                    No receipts available
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {purchaseOrderReceipts.map((receipt) => (
+                    <div
+                      key={receipt.id}
+                      className="group flex items-center justify-between rounded-xl border border-border p-4 transition-all hover:border-primary/50 hover:bg-primary/5 hover:scale-[1.02]"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 font-bold text-white shadow-md">
+                          <Package className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">
+                            Receipt #{receipt.id.slice(0, 8)}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(
+                              receipt.receivedDate
+                            ).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-primary">
+                          {receipt.supplierName || "Unknown Supplier"}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Received by: {receipt.receivedByName || "N/A"}
                         </p>
                       </div>
                     </div>
