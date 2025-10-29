@@ -196,35 +196,33 @@ Dựa trên dữ liệu bán hàng và tồn kho sau đây, hãy đưa ra các k
 
 **TOP SẢN PHẨM BÁN CHẠY:**
 ${dataContext.topSellingProducts
-  .map(
-    (p, i) =>
-      `${i + 1}. ${p.name}
+          .map(
+            (p, i) =>
+              `${i + 1}. ${p.name}
    - Số lượng bán: ${p.quantitySold}
    - Doanh thu: ${p.revenue.toLocaleString("vi-VN")} VNĐ
    - Số đơn hàng: ${p.orderCount}`
-  )
-  .join("\n")}
+          )
+          .join("\n")}
 
 **SẢN PHẨM TỒN KHO THẤP:**
-${
-  dataContext.lowStockProducts.length > 0
-    ? dataContext.lowStockProducts
-        .map((p) => `- ${p.name}: ${p.currentStock} đơn vị còn lại`)
-        .join("\n")
-    : "Không có sản phẩm tồn kho thấp"
-}
+${dataContext.lowStockProducts.length > 0
+          ? dataContext.lowStockProducts
+            .map((p) => `- ${p.name}: ${p.currentStock} đơn vị còn lại`)
+            .join("\n")
+          : "Không có sản phẩm tồn kho thấp"
+        }
 
 **SẢN PHẨM SẮP HẾT HẠN (trong 90 ngày):**
-${
-  dataContext.expiringSoonProducts.length > 0
-    ? dataContext.expiringSoonProducts
-        .map(
-          (p) =>
-            `- ${p.name}: ${p.stock} đơn vị, hết hạn ${new Date(p.expiryDate).toLocaleDateString("vi-VN")}`
-        )
-        .join("\n")
-    : "Không có sản phẩm sắp hết hạn"
-}
+${dataContext.expiringSoonProducts.length > 0
+          ? dataContext.expiringSoonProducts
+            .map(
+              (p) =>
+                `- ${p.name}: ${p.stock} đơn vị, hết hạn ${new Date(p.expiryDate).toLocaleDateString("vi-VN")}`
+            )
+            .join("\n")
+          : "Không có sản phẩm sắp hết hạn"
+        }
 
 **YÊU CẦU PHÂN TÍCH:**
 
@@ -279,7 +277,7 @@ Chỉ trả về JSON, không có text ngoài lề.
 `;
 
       // Call Gemini API
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
