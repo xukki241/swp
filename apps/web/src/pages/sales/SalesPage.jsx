@@ -317,8 +317,15 @@ export default function SalesPage() {
 
   const updateCartItem = useCallback(
     (index, quantity) => {
-      if (quantity <= 0) {
-        removeCartItem(index);
+      // Allow empty string for editing (will be fixed on blur)
+      if (quantity === "" || quantity === 0) {
+        const updatedCart = [...activeOrder.cart];
+        updatedCart[index] = { ...updatedCart[index], quantity: quantity === "" ? "" : 0 };
+        setCart(updatedCart);
+        return;
+      }
+
+      if (quantity < 0) {
         return;
       }
 
@@ -516,11 +523,10 @@ export default function SalesPage() {
               return (
                 <div
                   key={order.id}
-                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${
-                    isActive
+                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${isActive
                       ? "border-primary bg-primary/10 text-foreground"
                       : "border-border bg-card hover:border-primary/50 text-muted-foreground"
-                  }`}
+                    }`}
                   onClick={() => setActiveOrderId(order.id)}
                 >
                   <FileText className="h-4 w-4" />
@@ -610,19 +616,69 @@ export default function SalesPage() {
                           </p>
                         </div>
                         <div className="flex items-center gap-2 ml-2">
-                          <Input
-                            type="number"
-                            min="1"
-                            max={item.availableQuantity}
-                            value={item.quantity}
-                            onChange={(e) =>
-                              updateCartItem(
-                                index,
-                                Number.parseInt(e.target.value) || 1
-                              )
-                            }
-                            className="w-12 text-center text-sm"
-                          />
+                          <div className="flex items-center border border-border rounded-md overflow-hidden">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                updateCartItem(
+                                  index,
+                                  Math.max(1, item.quantity - 1)
+                                )
+                              }
+                              disabled={item.quantity <= 1}
+                              className="h-8 w-8 p-0 hover:bg-muted rounded-none"
+                            >
+                              <span className="text-lg font-bold">−</span>
+                            </Button>
+                            <Input
+                              type="number"
+                              min="1"
+                              max={item.availableQuantity}
+                              value={item.quantity}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                // Allow empty string for editing
+                                if (value === "" || value === "0") {
+                                  updateCartItem(index, "");
+                                  return;
+                                }
+                                const val = Number.parseInt(value);
+                                if (!isNaN(val)) {
+                                  if (val > item.availableQuantity) {
+                                    toast.warning(`Maximum available: ${item.availableQuantity}`);
+                                    updateCartItem(index, item.availableQuantity);
+                                  } else {
+                                    updateCartItem(index, val);
+                                  }
+                                }
+                              }}
+                              onBlur={(e) => {
+                                const val = Number.parseInt(e.target.value);
+                                if (isNaN(val) || val < 1 || e.target.value === "") {
+                                  updateCartItem(index, 1);
+                                } else if (val > item.availableQuantity) {
+                                  toast.warning(`Maximum available: ${item.availableQuantity}`);
+                                  updateCartItem(index, item.availableQuantity);
+                                }
+                              }}
+                              className="w-14 h-8 text-center text-sm border-0 border-x border-border focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                updateCartItem(
+                                  index,
+                                  Math.min(item.availableQuantity, item.quantity + 1)
+                                )
+                              }
+                              disabled={item.quantity >= item.availableQuantity}
+                              className="h-8 w-8 p-0 hover:bg-muted rounded-none"
+                            >
+                              <span className="text-lg font-bold">+</span>
+                            </Button>
+                          </div>
                           <Button
                             variant="ghost"
                             size="sm"

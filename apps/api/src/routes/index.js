@@ -1,5 +1,6 @@
 import { Router } from "express";
 
+import aiAnalysisRouter from "./aiAnalysisRoutes.js";
 import auditRouter from "./auditRoutes.js";
 import { authRouter } from "./authRoutes.js";
 import { customerRouter } from "./customerRoutes.js";
@@ -40,6 +41,7 @@ apiRouter.use("/shifts", shiftRouter); // Shift management
 apiRouter.use("/shift-assignments", shiftAssignmentRouter); // Shift assignments
 apiRouter.use("/search", searchRouter); // Full-text search routes
 apiRouter.use("/audit-logs", auditRouter); // Audit log routes
+apiRouter.use("/ai-analysis", aiAnalysisRouter); // AI analysis and recommendations
 apiRouter.use(emailRouter); // Email routes
 
 export default apiRouter;

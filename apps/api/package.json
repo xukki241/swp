@@ -25,6 +25,7 @@
     "db:seed": "node src/db/seed.js"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@pharmaflow/dto": "workspace:*",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",

@@ -1,35 +1,66 @@
+import AIAnalyticsDialog from "@/components/AIAnalyticsDialog";
+import {
+  ActivityItem,
+  QuickActionCard,
+  StatCard,
+  WelcomeBanner,
+} from "@/components/dashboard";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCurrentUser } from "@/hooks/useAuth";
+import { usePurchaseOrderReceipts } from "@/hooks/usePurchaseOrders";
 import { useMonthlySalesReport } from "@/hooks/useReports";
 import {
+  Activity,
   AlertTriangle,
-  ArrowUpRight,
-  Calendar,
+  BarChart3,
+  Clock,
   DollarSign,
   Package,
   ShoppingCart,
-  TrendingDown,
   TrendingUp,
+  Users,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const { data: currentUser } = useCurrentUser();
   const userName = currentUser?.user?.name || "User";
+  const userRole = currentUser?.user?.role || "staff";
+
+  // AI Analytics Dialog state
+  const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
 
   // Get current month report
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
-  const currentMonth = currentDate.getMonth();
+  const currentMonth = currentDate.getMonth() + 1; // API expects 1-12, not 0-11
 
-  const { data: monthlyReport, isLoading: isLoadingReport } =
-    useMonthlySalesReport(currentYear, currentMonth);
+  const {
+    data: monthlyReport,
+    isLoading: isLoadingReport,
+    error: reportError,
+  } = useMonthlySalesReport(currentYear, currentMonth);
+
+  // Get Purchase Order Receipts
+  const { data: purchaseOrderReceiptsData = [], isLoading: isLoadingReceipts } =
+    usePurchaseOrderReceipts({ limit: 5 });
+
+  // Sort receipts by receivedDate descending
+  const purchaseOrderReceipts = useMemo(() => {
+    if (!purchaseOrderReceiptsData || purchaseOrderReceiptsData.length === 0)
+      return [];
+    return [...purchaseOrderReceiptsData].sort(
+      (a, b) => new Date(b.receivedDate) - new Date(a.receivedDate)
+    );
+  }, [purchaseOrderReceiptsData]);
 
   // Calculate stats from report
   const stats = useMemo(() => {
-    if (!monthlyReport?.data) {
+    if (!monthlyReport?.data?.data) {
       return [
         {
           title: "Total Orders",
@@ -66,7 +97,8 @@ export default function DashboardPage() {
       ];
     }
 
-    const { summary, topSellingMedications } = monthlyReport.data;
+    const reportData = monthlyReport.data.data || monthlyReport.data;
+    const { summary, topSellingMedications } = reportData;
     const totalOrders = summary?.totalOrders || 0;
     const totalRevenue = summary?.totalRevenue || 0;
     const avgOrder = totalOrders > 0 ? totalRevenue / totalOrders : 0;
@@ -116,14 +148,9 @@ export default function DashboardPage() {
 
   // Top selling medications
   const topMedications = useMemo(() => {
-    if (!monthlyReport?.data?.topSellingMedications) return [];
-    return monthlyReport.data.topSellingMedications.slice(0, 5);
-  }, [monthlyReport]);
-
-  // Sales by status
-  const salesByStatus = useMemo(() => {
-    if (!monthlyReport?.data?.salesByStatus) return [];
-    return monthlyReport.data.salesByStatus;
+    const reportData = monthlyReport?.data?.data || monthlyReport?.data;
+    if (!reportData?.topSellingMedications) return [];
+    return reportData.topSellingMedications.slice(0, 5);
   }, [monthlyReport]);
 
   const formatCurrency = (amount) => {
@@ -133,103 +160,124 @@ export default function DashboardPage() {
     }).format(amount || 0);
   };
 
-  const getStatusColor = (status) => {
-    const colors = {
-      completed: "bg-green-100 text-green-700",
-      pending: "bg-yellow-100 text-yellow-700",
-      cancelled: "bg-red-100 text-red-700",
-      processing: "bg-blue-100 text-blue-700",
-    };
-    return colors[status] || "bg-gray-100 text-gray-700";
+  // Quick action items with navigation
+  const quickActions = [
+    {
+      title: "New Sale",
+      description: "Create order",
+      icon: ShoppingCart,
+      color: "bg-blue-100",
+      iconColor: "text-blue-600",
+      path: "/sales",
+    },
+    {
+      title: "Inventory",
+      description: "Check stock",
+      icon: Package,
+      color: "bg-green-100",
+      iconColor: "text-green-600",
+      path: "/inventory/stock",
+    },
+    {
+      title: "Medications",
+      description: "Manage products",
+      icon: Activity,
+      color: "bg-purple-100",
+      iconColor: "text-purple-600",
+      path: "/medications",
+    },
+    {
+      title: "Analytics",
+      description: "AI-powered insights",
+      icon: BarChart3,
+      color: "bg-gradient-to-br from-orange-100 to-pink-100",
+      iconColor: "text-orange-600",
+      onClick: () => setIsAIDialogOpen(true), // Open AI dialog instead of navigation
+    },
+  ];
+
+  // Mock recent activities - Replace with actual API data
+  const recentActivities = [
+    {
+      id: 1,
+      type: "sale",
+      description: "New sale order completed",
+      time: "5 minutes ago",
+      icon: ShoppingCart,
+      color: "text-green-600",
+    },
+    {
+      id: 2,
+      type: "inventory",
+      description: "Stock updated for Paracetamol",
+      time: "15 minutes ago",
+      icon: Package,
+      color: "text-blue-600",
+    },
+    {
+      id: 3,
+      type: "alert",
+      description: "Low stock alert: Amoxicillin",
+      time: "1 hour ago",
+      icon: AlertTriangle,
+      color: "text-orange-600",
+    },
+    {
+      id: 4,
+      type: "user",
+      description: "New user registration pending",
+      time: "2 hours ago",
+      icon: Users,
+      color: "text-purple-600",
+    },
+  ];
+
+  // Get time-based greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
   };
 
   return (
     <AppLayout title="Dashboard">
-      <div className="space-y-6">
+      <div className="space-y-6 animate-in fade-in duration-500">
         {/* Welcome Section */}
-        <div className="rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/80 p-8 text-primary-foreground shadow-xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-4xl font-bold">
-                Welcome back, {userName}! 👋
-              </h2>
-              <p className="mt-2 text-lg text-primary-foreground/90">
-                Here's what's happening with your pharmacy today
-              </p>
-              <div className="mt-4 flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4" />
-                <span>
-                  {currentDate.toLocaleDateString("vi-VN", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </span>
+        <WelcomeBanner userName={userName} greeting={getGreeting()} />
+
+        {/* Error Display */}
+        {reportError && (
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 text-red-700">
+                <AlertTriangle className="h-5 w-5" />
+                <div>
+                  <p className="font-semibold">Error Loading Dashboard Data</p>
+                  <p className="text-sm">
+                    {reportError.message || "Failed to fetch monthly report"}
+                  </p>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Stats Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
-            const TrendIcon = stat.trendUp ? TrendingUp : TrendingDown;
-            return (
-              <Card
-                key={stat.title}
-                className="group relative overflow-hidden rounded-2xl border-0 shadow-lg transition-all hover:shadow-xl hover:scale-[1.02]"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {stat.title}
-                  </CardTitle>
-                  <div className="rounded-xl bg-primary/10 p-3 transition-colors group-hover:bg-primary/20">
-                    <Icon className="h-5 w-5 text-primary" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {stat.loading ? (
-                    <div className="h-10 w-32 animate-pulse rounded bg-gray-200" />
-                  ) : (
-                    <>
-                      <div className="text-3xl font-bold text-foreground">
-                        {stat.value}
-                      </div>
-                      <div className="mt-2 flex items-center gap-1 text-sm">
-                        <TrendIcon
-                          className={`h-4 w-4 ${
-                            stat.trendUp ? "text-green-600" : "text-red-600"
-                          }`}
-                        />
-                        <span
-                          className={`font-medium ${
-                            stat.trendUp ? "text-green-600" : "text-red-600"
-                          }`}
-                        >
-                          {stat.trend}
-                        </span>
-                        <span className="text-muted-foreground">
-                          from last month
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
+          {stats.map((stat) => (
+            <StatCard key={stat.title} stat={stat} />
+          ))}
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Top Selling Medications - Takes 2 columns */}
-          <Card className="lg:col-span-2 rounded-2xl border-0 shadow-lg">
+        {/* Main Content Grid - 7:3 Layout */}
+        <div className="grid gap-6 lg:grid-cols-10">
+          {/* Top Selling Medications - 7 columns */}
+          <Card className="lg:col-span-7 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl font-bold text-foreground">
+                <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
+                  <Package className="h-5 w-5 text-primary" />
                   Top Selling Medications
                 </CardTitle>
                 <Badge
@@ -262,10 +310,10 @@ export default function DashboardPage() {
                   {topMedications.map((med, index) => (
                     <div
                       key={med.medicationId}
-                      className="group flex items-center justify-between rounded-xl border border-border p-4 transition-all hover:border-primary/50 hover:bg-primary/5"
+                      className="group flex items-center justify-between rounded-xl border border-border p-4 transition-all hover:border-primary/50 hover:bg-primary/5 hover:scale-[1.02]"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 font-bold text-primary">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 font-bold text-white shadow-md">
                           #{index + 1}
                         </div>
                         <div>
@@ -293,51 +341,67 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Sales by Status - Takes 1 column */}
-          <Card className="rounded-2xl border-0 shadow-lg">
+          {/* Purchase Order Receipts - 3 columns */}
+          <Card className="lg:col-span-3 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-foreground">
-                Sales by Status
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
+                  <Package className="h-5 w-5 text-primary" />
+                  Recent Receipts
+                </CardTitle>
+                <Badge
+                  variant="secondary"
+                  className="bg-primary/10 text-primary"
+                >
+                  Latest 5
+                </Badge>
+              </div>
             </CardHeader>
             <CardContent>
-              {isLoadingReport ? (
+              {isLoadingReceipts ? (
                 <div className="space-y-4">
-                  {[1, 2, 3].map((i) => (
+                  {[1, 2, 3, 4, 5].map((i) => (
                     <div
                       key={i}
                       className="h-16 animate-pulse rounded-xl bg-gray-200"
                     />
                   ))}
                 </div>
-              ) : salesByStatus.length === 0 ? (
+              ) : purchaseOrderReceipts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <AlertTriangle className="h-12 w-12 text-muted-foreground/50" />
+                  <Package className="h-12 w-12 text-muted-foreground/50" />
                   <p className="mt-4 text-muted-foreground">
-                    No status data available
+                    No receipts available
                   </p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {salesByStatus.map((status) => (
+                  {purchaseOrderReceipts.map((receipt) => (
                     <div
-                      key={status.status}
-                      className="flex items-center justify-between rounded-xl border border-border p-4 transition-all hover:border-primary/50"
+                      key={receipt.id}
+                      className="group flex flex-col gap-2 rounded-xl border border-border p-3 transition-all hover:border-primary/50 hover:bg-primary/5"
                     >
-                      <div>
-                        <Badge
-                          variant="secondary"
-                          className={getStatusColor(status.status)}
-                        >
-                          {status.status?.toUpperCase()}
-                        </Badge>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                          {Number(status.count).toLocaleString()} orders
-                        </p>
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-md">
+                          <Package className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm text-foreground truncate">
+                            #{receipt.id.slice(0, 8)}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(
+                              receipt.receivedDate
+                            ).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold text-foreground">
-                          {formatCurrency(status.totalAmount)}
+                      <div className="text-xs">
+                        <p className="font-medium text-primary truncate">
+                          {receipt.supplierName || "Unknown"}
+                        </p>
+                        <p className="text-muted-foreground truncate">
+                          {receipt.receivedByName || "N/A"}
                         </p>
                       </div>
                     </div>
@@ -348,64 +412,57 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <Card className="rounded-2xl border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-foreground">
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <button className="group flex items-center gap-3 rounded-xl border border-border p-4 transition-all hover:border-primary hover:bg-primary/5">
-                <div className="rounded-lg bg-blue-100 p-3">
-                  <ShoppingCart className="h-5 w-5 text-blue-600" />
-                </div>
-                <div className="text-left">
-                  <p className="font-semibold text-foreground">New Sale</p>
-                  <p className="text-sm text-muted-foreground">Create order</p>
-                </div>
-                <ArrowUpRight className="ml-auto h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
-              </button>
+        {/* Quick Actions & Recent Activities Grid */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Quick Actions - 2 columns */}
+          <Card className="lg:col-span-2 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
+                <Activity className="h-5 w-5 text-primary" />
+                Quick Actions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-2">
+                {quickActions.map((action, index) => (
+                  <QuickActionCard
+                    key={action.path || index}
+                    action={action}
+                    onClick={
+                      action.onClick
+                        ? action.onClick
+                        : () => navigate(action.path)
+                    }
+                  />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-              <button className="group flex items-center gap-3 rounded-xl border border-border p-4 transition-all hover:border-primary hover:bg-primary/5">
-                <div className="rounded-lg bg-green-100 p-3">
-                  <Package className="h-5 w-5 text-green-600" />
-                </div>
-                <div className="text-left">
-                  <p className="font-semibold text-foreground">Inventory</p>
-                  <p className="text-sm text-muted-foreground">Check stock</p>
-                </div>
-                <ArrowUpRight className="ml-auto h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
-              </button>
-
-              <button className="group flex items-center gap-3 rounded-xl border border-border p-4 transition-all hover:border-primary hover:bg-primary/5">
-                <div className="rounded-lg bg-purple-100 p-3">
-                  <TrendingUp className="h-5 w-5 text-purple-600" />
-                </div>
-                <div className="text-left">
-                  <p className="font-semibold text-foreground">Reports</p>
-                  <p className="text-sm text-muted-foreground">
-                    View analytics
-                  </p>
-                </div>
-                <ArrowUpRight className="ml-auto h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
-              </button>
-
-              <button className="group flex items-center gap-3 rounded-xl border border-border p-4 transition-all hover:border-primary hover:bg-primary/5">
-                <div className="rounded-lg bg-orange-100 p-3">
-                  <AlertTriangle className="h-5 w-5 text-orange-600" />
-                </div>
-                <div className="text-left">
-                  <p className="font-semibold text-foreground">Alerts</p>
-                  <p className="text-sm text-muted-foreground">View warnings</p>
-                </div>
-                <ArrowUpRight className="ml-auto h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
-              </button>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Recent Activities - 1 column */}
+          <Card className="rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
+                <Clock className="h-5 w-5 text-primary" />
+                Recent Activities
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentActivities.map((activity) => (
+                  <ActivityItem key={activity.id} activity={activity} />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
+
+      {/* AI Analytics Dialog */}
+      <AIAnalyticsDialog
+        open={isAIDialogOpen}
+        onOpenChange={setIsAIDialogOpen}
+      />
     </AppLayout>
   );
 }

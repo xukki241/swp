@@ -351,7 +351,7 @@
 - **Name:** Text, required
 - **Brand:** Text, optional
 - **Description:** Text area, optional
-- **Image:** File upload (image/* types)
+- **Image:** File upload (image/\* types)
 - **Prescription Required:** Boolean checkbox
 - **Controlled Substance:** Boolean checkbox
 - **Status:** Dropdown (active/inactive)
@@ -1488,7 +1488,7 @@
 
 - **Real-time validation** on blur/change
 - **Error messages** displayed below fields
-- **Required field** indicators (*)
+- **Required field** indicators (\*)
 - **Toast notifications** for success/error
 
 ### Data Tables
@@ -1549,8 +1549,8 @@
 
 **Permission Matrix:**
 
-| Feature               | Admin  | Manager  | Staff  |
-| --------------------- | ------ | -------- | ------ |
+| Feature               | Admin   | Manager   | Staff   |
+| --------------------- | ------- | --------- | ------- |
 | User Management       | ✅ Full | ✅ View   | ❌      |
 | Registration Approval | ✅      | ❌        | ❌      |
 | Medications           | ✅      | ✅        | ✅ View |

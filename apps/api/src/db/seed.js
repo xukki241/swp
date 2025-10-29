@@ -269,6 +269,77 @@ async function seed() {
       ])
       .returning();
 
+    // 6. Seed Medication Images (Sample Files)
+    console.log("🖼️ Seeding medication images...");
+
+    // Create sample image buffers (1x1 PNG placeholders with different colors)
+    const createSampleImage = (color) => {
+      // Minimal valid PNG header + IEND chunk
+      const base64 = `iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN${color}AAAA${color}wAAQpwMvKLK8QAAAABJRU5ErkJggg==`;
+      return Buffer.from(base64, "base64");
+    };
+
+    const [
+      imageParacetamol,
+      imageAmoxicillin,
+      imageIbuprofen,
+      imageOmeprazole,
+      imageCetirizine,
+      imageMetformin,
+    ] = await db
+      .insert(files)
+      .values([
+        {
+          filename: "paracetamol.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("k8"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "amoxicillin.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Ma"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "ibuprofen.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Ng"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "omeprazole.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Ow"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "cetirizine.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Pg"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "metformin.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Qg"),
+          uploadedBy: owner.id,
+        },
+      ])
+      .returning();
+
     // 6. Seed Medications
     console.log("💊 Seeding medications...");
     const [
@@ -295,6 +366,7 @@ async function seed() {
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageParacetamol.id,
         },
         {
           name: "Amoxicillin",
@@ -303,6 +375,7 @@ async function seed() {
           isPrescriptionRequired: true,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageAmoxicillin.id,
         },
         {
           name: "Ibuprofen",
@@ -311,6 +384,7 @@ async function seed() {
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageIbuprofen.id,
         },
         {
           name: "Omeprazole",
@@ -320,6 +394,7 @@ async function seed() {
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageOmeprazole.id,
         },
         {
           name: "Cetirizine",
@@ -328,6 +403,7 @@ async function seed() {
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageCetirizine.id,
         },
         {
           name: "Metformin",
@@ -336,6 +412,7 @@ async function seed() {
           isPrescriptionRequired: true,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageMetformin.id,
         },
         {
           name: "Atorvastatin",
@@ -1082,79 +1159,212 @@ async function seed() {
 
     // 14. Seed Purchase Order Receipts (for received orders)
     console.log("📥 Seeding purchase order receipts...");
-    const [receipt1] = await db
+    const [receipt1, receipt2, receipt3, receipt4] = await db
       .insert(purchaseOrderReceipts)
       .values([
+        // Receipt for PO1 (Viet Pharmaceutical - May 2024)
         {
           purchaseOrderId: po1.id,
           receivedDate: new Date("2024-05-23T10:00:00Z"),
           receivedBy: staff1.id,
+        },
+        // Receipt for PO2 (Saigon MediSupply - June 2024)
+        {
+          purchaseOrderId: po2.id,
+          receivedDate: new Date("2024-06-08T14:30:00Z"),
+          receivedBy: staff2.id,
+        },
+        // Receipt for PO3 (Global BioMed - June 2024)
+        {
+          purchaseOrderId: po3.id,
+          receivedDate: new Date("2024-06-25T09:15:00Z"),
+          receivedBy: staff1.id,
+        },
+        // Receipt for PO4 (Viet Pharmaceutical - June 2024)
+        {
+          purchaseOrderId: po4.id,
+          receivedDate: new Date("2024-06-20T11:00:00Z"),
+          receivedBy: staff3.id,
         },
       ])
       .returning();
 
     // 15. Seed Purchase Order Receipt Items
     console.log("📋 Seeding purchase order receipt items...");
-    const receiptItemData = purchaseOrderItemsResults
+
+    // Receipt 1 items (PO1)
+    const receipt1ItemData = purchaseOrderItemsResults
       .filter((item) => item.purchaseOrderId === po1.id)
       .map((item) => ({
         purchaseOrderReceiptId: receipt1.id,
         purchaseOrderItemId: item.id,
-        quantity: item.quantity, // Assume full quantity received
+        quantity: item.quantity,
       }));
+
+    // Receipt 2 items (PO2)
+    const receipt2ItemData = purchaseOrderItemsResults
+      .filter((item) => item.purchaseOrderId === po2.id)
+      .map((item) => ({
+        purchaseOrderReceiptId: receipt2.id,
+        purchaseOrderItemId: item.id,
+        quantity: item.quantity,
+      }));
+
+    // Receipt 3 items (PO3)
+    const receipt3ItemData = purchaseOrderItemsResults
+      .filter((item) => item.purchaseOrderId === po3.id)
+      .map((item) => ({
+        purchaseOrderReceiptId: receipt3.id,
+        purchaseOrderItemId: item.id,
+        quantity: item.quantity,
+      }));
+
+    // Receipt 4 items (PO4)
+    const receipt4ItemData = purchaseOrderItemsResults
+      .filter((item) => item.purchaseOrderId === po4.id)
+      .map((item) => ({
+        purchaseOrderReceiptId: receipt4.id,
+        purchaseOrderItemId: item.id,
+        quantity: item.quantity,
+      }));
+
+    const allReceiptItemData = [
+      ...receipt1ItemData,
+      ...receipt2ItemData,
+      ...receipt3ItemData,
+      ...receipt4ItemData,
+    ];
 
     const receiptItemsResults = await db
       .insert(purchaseOrderReceiptItems)
-      .values(receiptItemData)
+      .values(allReceiptItemData)
       .returning();
 
-    // 16. Seed Inventory (ONLY from received purchase order receipts)
+    // 16. Seed Inventory (from all received purchase order receipts)
     console.log("📊 Seeding inventory...");
+
     const inventoryData = [
-      // Inventory from PO1 Receipt - Item 1: Paracetamol 500mg (200 boxes)
+      // Inventory from PO1 Receipt - Item 0: Paracetamol 500mg (200 boxes)
       {
         medicationVariantId: medicationVariantsResults[0].id,
         purchaseOrderReceiptItemsId: receiptItemsResults[0].id,
-        binId: warehouseBinsResults[0].id, // Zone A - Rack A-001, Level 1, Bin 01
+        binId: warehouseBinsResults[0].id,
         batchNumber: "P2405001",
         manufactureDate: new Date("2024-01-10"),
         expiryDate: new Date("2027-01-09"),
         quantity: 200,
       },
-      // Inventory from PO1 Receipt - Item 2: Amoxicillin 500mg (100 boxes)
+      // Inventory from PO1 Receipt - Item 1: Amoxicillin 500mg (100 boxes)
       {
         medicationVariantId: medicationVariantsResults[3].id,
         purchaseOrderReceiptItemsId: receiptItemsResults[1].id,
-        binId: warehouseBinsResults[1].id, // Zone A - Rack A-001, Level 1, Bin 02
+        binId: warehouseBinsResults[1].id,
         batchNumber: "A2405002",
         manufactureDate: new Date("2024-02-15"),
         expiryDate: new Date("2026-02-14"),
         quantity: 100,
       },
-      // Inventory from PO1 Receipt - Item 3: Atorvastatin 20mg (50 boxes)
+      // Inventory from PO1 Receipt - Item 2: Atorvastatin 20mg (50 boxes)
       {
         medicationVariantId: medicationVariantsResults[13].id,
         purchaseOrderReceiptItemsId: receiptItemsResults[2].id,
-        binId: warehouseBinsResults[2].id, // Zone A - Rack A-001, Level 1, Bin 03
+        binId: warehouseBinsResults[2].id,
         batchNumber: "T2405003",
         manufactureDate: new Date("2023-12-20"),
         expiryDate: new Date("2025-12-19"),
         quantity: 50,
       },
+      // Inventory from PO2 Receipt - Item 3: Ibuprofen 400mg (150 boxes)
+      {
+        medicationVariantId: medicationVariantsResults[5].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[3].id,
+        binId: warehouseBinsResults[3].id,
+        batchNumber: "I2406001",
+        manufactureDate: new Date("2024-03-05"),
+        expiryDate: new Date("2026-03-04"),
+        quantity: 150,
+      },
+      // Inventory from PO2 Receipt - Item 4: Omeprazole 20mg (50 boxes)
+      {
+        medicationVariantId: medicationVariantsResults[7].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[4].id,
+        binId: warehouseBinsResults[4].id,
+        batchNumber: "O2406002",
+        manufactureDate: new Date("2024-02-20"),
+        expiryDate: new Date("2026-02-19"),
+        quantity: 50,
+      },
+      // Inventory from PO3 Receipt - Item 5: Metformin 500mg (300 boxes)
+      {
+        medicationVariantId: medicationVariantsResults[11].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[5].id,
+        binId: warehouseBinsResults[5].id,
+        batchNumber: "M2406001",
+        manufactureDate: new Date("2024-03-15"),
+        expiryDate: new Date("2027-03-14"),
+        quantity: 300,
+      },
+      // Inventory from PO3 Receipt - Item 6: Salbutamol Inhaler (50 units)
+      {
+        medicationVariantId: medicationVariantsResults[17].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[6].id,
+        binId: warehouseBinsResults[6].id,
+        batchNumber: "S2406002",
+        manufactureDate: new Date("2024-04-01"),
+        expiryDate: new Date("2026-03-31"),
+        quantity: 50,
+      },
+      // Inventory from PO3 Receipt - Item 7: Vitamin D3 1000IU (100 boxes)
+      {
+        medicationVariantId: medicationVariantsResults[19].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[7].id,
+        binId: warehouseBinsResults[7].id,
+        batchNumber: "V2406003",
+        manufactureDate: new Date("2024-02-28"),
+        expiryDate: new Date("2027-02-27"),
+        quantity: 100,
+      },
+      // Inventory from PO4 Receipt - Item 8: Amlodipine 10mg (100 boxes)
+      {
+        medicationVariantId: medicationVariantsResults[15].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[8].id,
+        binId: warehouseBinsResults[8].id,
+        batchNumber: "M2406004",
+        manufactureDate: new Date("2024-03-20"),
+        expiryDate: new Date("2027-03-19"),
+        quantity: 100,
+      },
     ];
 
     await db.insert(inventory).values(inventoryData);
 
-    // 17. Seed Sales Orders
+    // 17. Seed Sales Orders (Status: pending, paid, cancelled only)
     console.log("💰 Seeding sales orders...");
-    const [sale1, sale2, sale3] = await db
+    const [
+      sale1,
+      sale2,
+      sale3,
+      sale4,
+      sale5,
+      sale6,
+      sale7,
+      sale8,
+      sale9,
+      sale10,
+      sale11,
+      sale12,
+      sale13,
+      sale14,
+      sale15,
+    ] = await db
       .insert(salesOrders)
       .values([
+        // Old sales from June 2024 (for historical data)
         {
           customerId: customer1.id,
           orderDate: new Date("2024-06-05T10:30:00Z"),
           totalAmount: 220000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
@@ -1186,8 +1396,89 @@ async function seed() {
           customerId: customer4.id,
           orderDate: new Date("2024-06-14T16:30:00Z"),
           totalAmount: 540000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "bank_transfer",
+          salespersonId: staff2.id,
+        },
+        // NEW: October 2025 sales orders (current month) - Only pending, paid, cancelled
+        {
+          customerId: customer1.id,
+          orderDate: new Date("2025-10-02T09:15:00Z"),
+          totalAmount: 450000,
+          status: "paid",
+          paymentMethod: "cash",
+          salespersonId: staff1.id,
+        },
+        {
+          customerId: customer2.id,
+          orderDate: new Date("2025-10-05T14:30:00Z"),
+          totalAmount: 680000,
+          status: "paid",
+          paymentMethod: "bank_transfer",
+          salespersonId: staff2.id,
+        },
+        {
+          customerId: customer3.id,
+          orderDate: new Date("2025-10-08T11:00:00Z"),
+          totalAmount: 320000,
+          status: "paid",
+          paymentMethod: "mobile_payment",
+          salespersonId: staff1.id,
+        },
+        {
+          customerId: customer4.id,
+          orderDate: new Date("2025-10-12T16:45:00Z"),
+          totalAmount: 1250000,
+          status: "paid",
+          paymentMethod: "bank_transfer",
+          salespersonId: staff3.id,
+        },
+        {
+          customerId: customer1.id,
+          orderDate: new Date("2025-10-15T10:20:00Z"),
+          totalAmount: 540000,
+          status: "paid",
+          paymentMethod: "cash",
+          salespersonId: staff2.id,
+        },
+        {
+          customerId: customer2.id,
+          orderDate: new Date("2025-10-18T13:30:00Z"),
+          totalAmount: 890000,
+          status: "paid",
+          paymentMethod: "mobile_payment",
+          salespersonId: staff1.id,
+        },
+        {
+          customerId: customer3.id,
+          orderDate: new Date("2025-10-20T09:00:00Z"),
+          totalAmount: 420000,
+          status: "pending",
+          paymentMethod: "cash",
+          salespersonId: staff2.id,
+        },
+        {
+          customerId: customer4.id,
+          orderDate: new Date("2025-10-22T15:15:00Z"),
+          totalAmount: 760000,
+          status: "paid",
+          paymentMethod: "bank_transfer",
+          salespersonId: staff3.id,
+        },
+        {
+          customerId: customer1.id,
+          orderDate: new Date("2025-10-25T11:30:00Z"),
+          totalAmount: 350000,
+          status: "cancelled",
+          paymentMethod: "cash",
+          salespersonId: staff1.id,
+        },
+        {
+          customerId: customer2.id,
+          orderDate: new Date("2025-10-28T14:00:00Z"),
+          totalAmount: 920000,
+          status: "pending",
+          paymentMethod: "mobile_payment",
           salespersonId: staff2.id,
         },
       ])
@@ -1196,7 +1487,7 @@ async function seed() {
     // 18. Seed Sales Order Items
     console.log("🛒 Seeding sales order items...");
     await db.insert(salesOrderItems).values([
-      // Sale 1 items
+      // Sale 1 items (June 2024)
       {
         salesOrderId: sale1.id,
         medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
@@ -1211,7 +1502,7 @@ async function seed() {
         unitPrice: 40000,
         totalPrice: 120000,
       },
-      // Sale 2 items
+      // Sale 2 items (June 2024)
       {
         salesOrderId: sale2.id,
         medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
@@ -1219,14 +1510,7 @@ async function seed() {
         unitPrice: 85000,
         totalPrice: 340000,
       },
-      {
-        salesOrderId: sale2.id,
-        medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
-        quantity: 0, // This seems wrong, but to match totalAmount 340000, this must be 0.
-        unitPrice: 120000,
-        totalPrice: 0,
-      },
-      // Sale 3 items
+      // Sale 3 items (June 2024)
       {
         salesOrderId: sale3.id,
         medicationVariantId: medicationVariantsResults[2].id, // Paracetamol Syrup
@@ -1238,14 +1522,179 @@ async function seed() {
         salesOrderId: sale3.id,
         medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
         quantity: 1,
-        unitPrice: 20000, // Made up price to meet total
+        unitPrice: 20000,
         totalPrice: 20000,
+      },
+      // October 2025 Sales Items
+      // Sale 6 items (Oct 2, 2025 - 450,000)
+      {
+        salesOrderId: sale6.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 5,
+        unitPrice: 50000,
+        totalPrice: 250000,
+      },
+      {
+        salesOrderId: sale6.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 5,
+        unitPrice: 40000,
+        totalPrice: 200000,
+      },
+      // Sale 7 items (Oct 5, 2025 - 680,000)
+      {
+        salesOrderId: sale7.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 8,
+        unitPrice: 85000,
+        totalPrice: 680000,
+      },
+      // Sale 8 items (Oct 8, 2025 - 340,000)
+      {
+        salesOrderId: sale8.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 4,
+        unitPrice: 85000,
+        totalPrice: 340000,
+      },
+      // Sale 9 items (Oct 12, 2025 - 520,000)
+      {
+        salesOrderId: sale9.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 6,
+        unitPrice: 50000,
+        totalPrice: 300000,
+      },
+      {
+        salesOrderId: sale9.id,
+        medicationVariantId: medicationVariantsResults[2].id, // Paracetamol Syrup
+        quantity: 2,
+        unitPrice: 45000,
+        totalPrice: 90000,
+      },
+      {
+        salesOrderId: sale9.id,
+        medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
+        quantity: 6,
+        unitPrice: 20000,
+        totalPrice: 120000,
+      },
+      {
+        salesOrderId: sale9.id,
+        medicationVariantId: medicationVariantsResults[1].id, // Paracetamol 250mg
+        quantity: 1,
+        unitPrice: 10000,
+        totalPrice: 10000,
+      },
+      // Sale 10 items (Oct 15, 2025 - 780,000)
+      {
+        salesOrderId: sale10.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 10,
+        unitPrice: 40000,
+        totalPrice: 400000,
+      },
+      {
+        salesOrderId: sale10.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 3,
+        unitPrice: 85000,
+        totalPrice: 255000,
+      },
+      {
+        salesOrderId: sale10.id,
+        medicationVariantId: medicationVariantsResults[6].id, // Omeprazole 20mg
+        quantity: 5,
+        unitPrice: 25000,
+        totalPrice: 125000,
+      },
+      // Sale 11 items (Oct 18, 2025 - 920,000)
+      {
+        salesOrderId: sale11.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 10,
+        unitPrice: 85000,
+        totalPrice: 850000,
+      },
+      {
+        salesOrderId: sale11.id,
+        medicationVariantId: medicationVariantsResults[8].id, // Metformin 850mg
+        quantity: 2,
+        unitPrice: 35000,
+        totalPrice: 70000,
+      },
+      // Sale 12 items (Oct 20, 2025 - 560,000)
+      {
+        salesOrderId: sale12.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 8,
+        unitPrice: 50000,
+        totalPrice: 400000,
+      },
+      {
+        salesOrderId: sale12.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 4,
+        unitPrice: 40000,
+        totalPrice: 160000,
+      },
+      // Sale 13 items (Oct 22, 2025 - 430,000)
+      {
+        salesOrderId: sale13.id,
+        medicationVariantId: medicationVariantsResults[7].id, // Amlodipine 5mg
+        quantity: 10,
+        unitPrice: 30000,
+        totalPrice: 300000,
+      },
+      {
+        salesOrderId: sale13.id,
+        medicationVariantId: medicationVariantsResults[2].id, // Paracetamol Syrup
+        quantity: 2,
+        unitPrice: 45000,
+        totalPrice: 90000,
+      },
+      {
+        salesOrderId: sale13.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 1,
+        unitPrice: 40000,
+        totalPrice: 40000,
+      },
+      // Sale 14 items (Oct 25, 2025 - 350,000 - CANCELLED)
+      {
+        salesOrderId: sale14.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 4,
+        unitPrice: 85000,
+        totalPrice: 340000,
+      },
+      {
+        salesOrderId: sale14.id,
+        medicationVariantId: medicationVariantsResults[1].id, // Paracetamol 250mg
+        quantity: 1,
+        unitPrice: 10000,
+        totalPrice: 10000,
+      },
+      // Sale 15 items (Oct 28, 2025 - 920,000)
+      {
+        salesOrderId: sale15.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 8,
+        unitPrice: 85000,
+        totalPrice: 680000,
+      },
+      {
+        salesOrderId: sale15.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 6,
+        unitPrice: 40000,
+        totalPrice: 240000,
       },
     ]);
 
     // 19. Seed Files
     console.log("📁 Seeding files...");
-    const [file1, file2, file3] = await db
+    await db
       .insert(files)
       .values([
         {
@@ -1617,7 +2066,7 @@ async function seed() {
     - User Registrations: 3
     - Customers: 6
     - Suppliers: 5
-    - Medications: 12
+    - Medications: 12 (6 with images)
     - Medication Variants: 26
     - Supplier-Medication Links: 14
     - Warehouse Zones: 4
@@ -1625,11 +2074,15 @@ async function seed() {
     - Warehouse Bins: 192
     - Purchase Orders: 5
     - Purchase Order Items: 11
-    - Purchase Order Receipts: 1
-    - Receipt Items: 3
-    - Inventory Entries: 3 (matches receipt items - strict 1:1 relationship)
-    - Sales Orders: 5
-    - Sales Order Items: 9
+    - Purchase Order Receipts: 4 (PO1, PO2, PO3, PO4 received)
+    - Receipt Items: 9 (from 4 receipts)
+    - Inventory Entries: 9 (from all receipts)
+    - Sales Orders: 15 (5 from June 2024 + 10 from October 2025)
+      * Status: pending, paid, cancelled only
+      * October 2025: 10 orders - 8 paid, 1 cancelled, 1 pending
+      * Total October Revenue: 6,580,000 VND (from 8 paid orders)
+    - Sales Order Items: 38 (5 from June 2024 + 33 from October 2025)
+      * October items include medications: Paracetamol, Ibuprofen, Amoxicillin, etc.
     - Files: 3
     - File Attachments: 3
     - Notifications: 5
