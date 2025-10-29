@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCurrentUser } from "@/hooks/useAuth";
 import { useMonthlySalesReport } from "@/hooks/useReports";
+import AIAnalyticsDialog from "@/components/AIAnalyticsDialog";
 import {
   Activity,
   AlertTriangle,
@@ -20,7 +21,7 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 
 export default function DashboardPage() {
@@ -28,6 +29,9 @@ export default function DashboardPage() {
   const { data: currentUser } = useCurrentUser();
   const userName = currentUser?.user?.name || "User";
   const userRole = currentUser?.user?.role || "staff";
+
+  // AI Analytics Dialog state
+  const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
 
   // Get current month report
   const currentDate = new Date();
@@ -197,11 +201,11 @@ export default function DashboardPage() {
     },
     {
       title: "Analytics",
-      description: "View reports",
+      description: "AI-powered insights",
       icon: BarChart3,
-      color: "bg-orange-100",
+      color: "bg-gradient-to-br from-orange-100 to-pink-100",
       iconColor: "text-orange-600",
-      path: "/dashboard",
+      onClick: () => setIsAIDialogOpen(true), // Open AI dialog instead of navigation
     },
   ];
 
@@ -418,11 +422,15 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2">
-                {quickActions.map((action) => (
+                {quickActions.map((action, index) => (
                   <QuickActionCard
-                    key={action.path}
+                    key={action.path || index}
                     action={action}
-                    onClick={() => navigate(action.path)}
+                    onClick={
+                      action.onClick
+                        ? action.onClick
+                        : () => navigate(action.path)
+                    }
                   />
                 ))}
               </div>
@@ -447,6 +455,12 @@ export default function DashboardPage() {
           </Card>
         </div>
       </div>
+
+      {/* AI Analytics Dialog */}
+      <AIAnalyticsDialog
+        open={isAIDialogOpen}
+        onOpenChange={setIsAIDialogOpen}
+      />
     </AppLayout>
   );
 }

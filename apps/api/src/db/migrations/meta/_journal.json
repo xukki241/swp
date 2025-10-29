@@ -43,6 +43,13 @@
       "when": 1761321286308,
       "tag": "0005_typical_mantis",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1761728157376,
+      "tag": "0006_flimsy_skrulls",
+      "breakpoints": true
     }
   ]
 }

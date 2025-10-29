@@ -1172,21 +1172,21 @@ async function seed() {
 
     // 17. Seed Sales Orders
     console.log("💰 Seeding sales orders...");
-    const [sale1, sale2, sale3] = await db
+    const salesOrdersResults = await db
       .insert(salesOrders)
       .values([
-        // Old sales from June 2024 (for historical data)
+        // Recent sales from August 2025 (within 80 days)
         {
           customerId: customer1.id,
-          orderDate: new Date("2024-06-05T10:30:00Z"),
+          orderDate: new Date("2025-08-10T10:30:00Z"),
           totalAmount: 220000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
         {
           customerId: customer2.id,
-          orderDate: new Date("2024-06-08T15:00:00Z"),
+          orderDate: new Date("2025-08-15T15:00:00Z"),
           totalAmount: 340000,
           status: "paid",
           paymentMethod: "credit_card",
@@ -1194,7 +1194,7 @@ async function seed() {
         },
         {
           customerId: customer3.id,
-          orderDate: new Date("2024-06-12T09:00:00Z"),
+          orderDate: new Date("2025-08-20T09:00:00Z"),
           totalAmount: 110000,
           status: "pending",
           paymentMethod: "mobile_payment",
@@ -1202,7 +1202,7 @@ async function seed() {
         },
         {
           customerId: customer1.id,
-          orderDate: new Date("2024-06-13T11:00:00Z"),
+          orderDate: new Date("2025-08-25T11:00:00Z"),
           totalAmount: 85000,
           status: "cancelled",
           paymentMethod: "cash",
@@ -1210,18 +1210,18 @@ async function seed() {
         },
         {
           customerId: customer4.id,
-          orderDate: new Date("2024-06-14T16:30:00Z"),
+          orderDate: new Date("2025-09-01T16:30:00Z"),
           totalAmount: 540000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "bank_transfer",
           salespersonId: staff2.id,
         },
-        // NEW: October 2025 sales orders (current month)
+        // October 2025 sales orders (current month)
         {
           customerId: customer1.id,
           orderDate: new Date("2025-10-02T09:15:00Z"),
           totalAmount: 450000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
@@ -1229,7 +1229,7 @@ async function seed() {
           customerId: customer2.id,
           orderDate: new Date("2025-10-05T14:30:00Z"),
           totalAmount: 680000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "bank_transfer",
           salespersonId: staff2.id,
         },
@@ -1237,7 +1237,7 @@ async function seed() {
           customerId: customer3.id,
           orderDate: new Date("2025-10-08T11:00:00Z"),
           totalAmount: 320000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "mobile_payment",
           salespersonId: staff1.id,
         },
@@ -1245,7 +1245,7 @@ async function seed() {
           customerId: customer4.id,
           orderDate: new Date("2025-10-12T16:45:00Z"),
           totalAmount: 1250000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "bank_transfer",
           salespersonId: staff3.id,
         },
@@ -1253,7 +1253,7 @@ async function seed() {
           customerId: customer1.id,
           orderDate: new Date("2025-10-15T10:20:00Z"),
           totalAmount: 540000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "cash",
           salespersonId: staff2.id,
         },
@@ -1277,7 +1277,7 @@ async function seed() {
           customerId: customer4.id,
           orderDate: new Date("2025-10-22T15:15:00Z"),
           totalAmount: 760000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "bank_transfer",
           salespersonId: staff3.id,
         },
@@ -1285,7 +1285,7 @@ async function seed() {
           customerId: customer1.id,
           orderDate: new Date("2025-10-25T11:30:00Z"),
           totalAmount: 350000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
@@ -1303,43 +1303,165 @@ async function seed() {
     // 18. Seed Sales Order Items
     console.log("🛒 Seeding sales order items...");
     await db.insert(salesOrderItems).values([
-      // Sale 1 items (June 2024)
+      // August 2025 - Order 1
       {
-        salesOrderId: sale1.id,
+        salesOrderId: salesOrdersResults[0].id,
         medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
         quantity: 2,
         unitPrice: 50000,
         totalPrice: 100000,
       },
       {
-        salesOrderId: sale1.id,
+        salesOrderId: salesOrdersResults[0].id,
         medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
         quantity: 3,
         unitPrice: 40000,
         totalPrice: 120000,
       },
-      // Sale 2 items (June 2024)
+      // August 2025 - Order 2
       {
-        salesOrderId: sale2.id,
+        salesOrderId: salesOrdersResults[1].id,
         medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
         quantity: 4,
         unitPrice: 85000,
         totalPrice: 340000,
       },
-      // Sale 3 items (June 2024)
+      // August 2025 - Order 3 (pending)
       {
-        salesOrderId: sale3.id,
+        salesOrderId: salesOrdersResults[2].id,
         medicationVariantId: medicationVariantsResults[2].id, // Paracetamol Syrup
         quantity: 2,
         unitPrice: 45000,
         totalPrice: 90000,
       },
       {
-        salesOrderId: sale3.id,
+        salesOrderId: salesOrdersResults[2].id,
         medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
         quantity: 1,
         unitPrice: 20000,
         totalPrice: 20000,
+      },
+      // September 2025 - Order 5
+      {
+        salesOrderId: salesOrdersResults[4].id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 3,
+        unitPrice: 85000,
+        totalPrice: 255000,
+      },
+      {
+        salesOrderId: salesOrdersResults[4].id,
+        medicationVariantId: medicationVariantsResults[10].id, // Omeprazole 20mg
+        quantity: 5,
+        unitPrice: 57000,
+        totalPrice: 285000,
+      },
+      // October 2025 - Order 6
+      {
+        salesOrderId: salesOrdersResults[5].id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 5,
+        unitPrice: 50000,
+        totalPrice: 250000,
+      },
+      {
+        salesOrderId: salesOrdersResults[5].id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 5,
+        unitPrice: 40000,
+        totalPrice: 200000,
+      },
+      // October 2025 - Order 7
+      {
+        salesOrderId: salesOrdersResults[6].id,
+        medicationVariantId: medicationVariantsResults[12].id, // Metformin 500mg
+        quantity: 8,
+        unitPrice: 85000,
+        totalPrice: 680000,
+      },
+      // October 2025 - Order 8
+      {
+        salesOrderId: salesOrdersResults[7].id,
+        medicationVariantId: medicationVariantsResults[6].id, // Aspirin 100mg
+        quantity: 4,
+        unitPrice: 80000,
+        totalPrice: 320000,
+      },
+      // October 2025 - Order 9
+      {
+        salesOrderId: salesOrdersResults[8].id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 10,
+        unitPrice: 85000,
+        totalPrice: 850000,
+      },
+      {
+        salesOrderId: salesOrdersResults[8].id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 8,
+        unitPrice: 50000,
+        totalPrice: 400000,
+      },
+      // October 2025 - Order 10
+      {
+        salesOrderId: salesOrdersResults[9].id,
+        medicationVariantId: medicationVariantsResults[11].id, // Losartan 50mg
+        quantity: 6,
+        unitPrice: 90000,
+        totalPrice: 540000,
+      },
+      // October 2025 - Order 11
+      {
+        salesOrderId: salesOrdersResults[10].id,
+        medicationVariantId: medicationVariantsResults[14].id, // Simvastatin 20mg
+        quantity: 7,
+        unitPrice: 127000,
+        totalPrice: 889000,
+      },
+      {
+        salesOrderId: salesOrdersResults[10].id,
+        medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
+        quantity: 1,
+        unitPrice: 20000,
+        totalPrice: 1000,
+      },
+      // October 2025 - Order 12
+      {
+        salesOrderId: salesOrdersResults[12].id,
+        medicationVariantId: medicationVariantsResults[16].id, // Amlodipine 5mg
+        quantity: 5,
+        unitPrice: 152000,
+        totalPrice: 760000,
+      },
+      // October 2025 - Order 13
+      {
+        salesOrderId: salesOrdersResults[13].id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 5,
+        unitPrice: 40000,
+        totalPrice: 200000,
+      },
+      {
+        salesOrderId: salesOrdersResults[13].id,
+        medicationVariantId: medicationVariantsResults[8].id, // Loratadine 10mg
+        quantity: 3,
+        unitPrice: 50000,
+        totalPrice: 150000,
+      },
+      // October 2025 - Order 14 (pending)
+      {
+        salesOrderId: salesOrdersResults[14].id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 10,
+        unitPrice: 50000,
+        totalPrice: 500000,
+      },
+      {
+        salesOrderId: salesOrdersResults[14].id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 5,
+        unitPrice: 85000,
+        totalPrice: 420000,
       },
     ]);
 
@@ -1395,7 +1517,7 @@ async function seed() {
       },
       {
         userId: staff2.id,
-        message: `New sales order SO-${sale3.id.substring(0, 8)} is pending payment.`,
+        message: `New sales order SO-${salesOrdersResults[2].id.substring(0, 8)} is pending payment.`,
         isRead: false,
       },
       {
@@ -1437,7 +1559,7 @@ async function seed() {
         userId: staff2.id,
         action: "CREATE",
         entity: "sales_order",
-        entityId: sale2.id,
+        entityId: salesOrdersResults[1].id,
         changes: {
           customerId: customer2.id,
           totalAmount: 340000,
@@ -1448,7 +1570,7 @@ async function seed() {
         userId: staff2.id,
         action: "UPDATE",
         entity: "sales_order",
-        entityId: sale2.id,
+        entityId: salesOrdersResults[1].id,
         changes: {
           status: { from: "pending", to: "paid" },
         },
