@@ -85,17 +85,17 @@
 
 **Bây giờ:** 9 inventory entries từ 4 receipts:
 
-| Medication | Variant | Quantity | Batch | Expiry | Bin |
-|------------|---------|----------|-------|--------|-----|
-| Paracetamol | 500mg Tablets | 200 | P2405001 | 2027-01-09 | Zone A, Rack A-001, L1-B01 |
-| Amoxicillin | 500mg Capsules | 100 | A2405002 | 2026-02-14 | Zone A, Rack A-001, L1-B02 |
-| Atorvastatin | 20mg Tablets | 50 | T2405003 | 2025-12-19 | Zone A, Rack A-001, L1-B03 |
-| Ibuprofen | 400mg Tablets | 150 | I2406001 | 2026-03-04 | Zone A, Rack A-001, L1-B04 |
-| Omeprazole | 20mg Capsules | 50 | O2406002 | 2026-02-19 | Zone A, Rack A-001, L1-B05 |
-| Metformin | 500mg Tablets | 300 | M2406001 | 2027-03-14 | Zone A, Rack A-001, L1-B06 |
-| Salbutamol | 100mcg Inhaler | 50 | S2406002 | 2026-03-31 | Zone A, Rack A-001, L1-B07 |
-| Vitamin D3 | 1000IU Capsules | 100 | V2406003 | 2027-02-27 | Zone A, Rack A-001, L1-B08 |
-| Amlodipine | 10mg Tablets | 100 | M2406004 | 2027-03-19 | Zone A, Rack A-001, L1-B09 |
+| Medication   | Variant         | Quantity | Batch    | Expiry     | Bin                        |
+| ------------ | --------------- | -------- | -------- | ---------- | -------------------------- |
+| Paracetamol  | 500mg Tablets   | 200      | P2405001 | 2027-01-09 | Zone A, Rack A-001, L1-B01 |
+| Amoxicillin  | 500mg Capsules  | 100      | A2405002 | 2026-02-14 | Zone A, Rack A-001, L1-B02 |
+| Atorvastatin | 20mg Tablets    | 50       | T2405003 | 2025-12-19 | Zone A, Rack A-001, L1-B03 |
+| Ibuprofen    | 400mg Tablets   | 150      | I2406001 | 2026-03-04 | Zone A, Rack A-001, L1-B04 |
+| Omeprazole   | 20mg Capsules   | 50       | O2406002 | 2026-02-19 | Zone A, Rack A-001, L1-B05 |
+| Metformin    | 500mg Tablets   | 300      | M2406001 | 2027-03-14 | Zone A, Rack A-001, L1-B06 |
+| Salbutamol   | 100mcg Inhaler  | 50       | S2406002 | 2026-03-31 | Zone A, Rack A-001, L1-B07 |
+| Vitamin D3   | 1000IU Capsules | 100      | V2406003 | 2027-02-27 | Zone A, Rack A-001, L1-B08 |
+| Amlodipine   | 10mg Tablets    | 100      | M2406004 | 2027-03-19 | Zone A, Rack A-001, L1-B09 |
 
 ## Files đã sửa đổi
 
@@ -157,7 +157,7 @@
 ```sql
 SELECT status, COUNT(*) as count, SUM(total_amount) as revenue
 FROM sales_orders
-WHERE EXTRACT(YEAR FROM order_date) = 2025 
+WHERE EXTRACT(YEAR FROM order_date) = 2025
   AND EXTRACT(MONTH FROM order_date) = 10
 GROUP BY status;
 ```
@@ -255,8 +255,8 @@ curl http://localhost:5000/api/reports/sales/monthly/2025/10 \
 
 ```sql
 -- Update các status cũ sang mới
-UPDATE sales_orders 
-SET status = CASE 
+UPDATE sales_orders
+SET status = CASE
   WHEN status IN ('delivered', 'completed') THEN 'paid'
   WHEN status IN ('processing') THEN 'pending'
   ELSE status

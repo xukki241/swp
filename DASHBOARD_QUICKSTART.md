@@ -18,7 +18,7 @@
 import DashboardPage from "@/pages/Dashboard";
 
 // Trong Routes
-<Route path="/dashboard" element={<DashboardPage />} />
+<Route path="/dashboard" element={<DashboardPage />} />;
 ```
 
 ### 3. Kiểm tra Hooks
@@ -62,8 +62,8 @@ const quickActions = [
   {
     title: "Tên Action",
     description: "Mô tả ngắn",
-    icon: IconComponent,      // từ lucide-react
-    color: "bg-blue-100",      // Tailwind color
+    icon: IconComponent, // từ lucide-react
+    color: "bg-blue-100", // Tailwind color
     iconColor: "text-blue-600",
     path: "/route-path",
   },

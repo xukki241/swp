@@ -111,11 +111,11 @@ Kết nối vào database và chạy query:
 -- Kiểm tra có sales orders không
 SELECT COUNT(*) as total_orders, SUM(total_amount) as total_revenue
 FROM sales_orders
-WHERE order_date >= '2025-10-01' 
+WHERE order_date >= '2025-10-01'
   AND order_date < '2025-11-01';
 
 -- Kiểm tra sales order items
-SELECT 
+SELECT
   m.name as medication_name,
   mv.name as variant_name,
   SUM(soi.quantity) as total_quantity,
@@ -124,19 +124,19 @@ FROM sales_order_items soi
 LEFT JOIN sales_orders so ON soi.sales_order_id = so.id
 LEFT JOIN medication_variants mv ON soi.medication_variant_id = mv.id
 LEFT JOIN medications m ON mv.medication_id = m.id
-WHERE so.order_date >= '2025-10-01' 
+WHERE so.order_date >= '2025-10-01'
   AND so.order_date < '2025-11-01'
 GROUP BY m.name, mv.name
 ORDER BY total_quantity DESC
 LIMIT 10;
 
 -- Kiểm tra sales by status
-SELECT 
+SELECT
   status,
   COUNT(*) as order_count,
   SUM(total_amount) as total_amount
 FROM sales_orders
-WHERE order_date >= '2025-10-01' 
+WHERE order_date >= '2025-10-01'
   AND order_date < '2025-11-01'
 GROUP BY status;
 ```
@@ -157,14 +157,14 @@ Nếu đang development và cần test data:
 ```sql
 -- Tạo test sales orders cho tháng hiện tại
 INSERT INTO sales_orders (customer_id, order_date, total_amount, status, payment_method, created_by)
-VALUES 
+VALUES
   (1, CURRENT_DATE - INTERVAL '5 days', 500000, 'completed', 'cash', 1),
   (2, CURRENT_DATE - INTERVAL '3 days', 750000, 'completed', 'banking', 1),
   (3, CURRENT_DATE - INTERVAL '1 day', 300000, 'pending', 'cash', 1);
 
 -- Tạo sales order items (cần có medication_variant_id hợp lệ)
 INSERT INTO sales_order_items (sales_order_id, medication_variant_id, quantity, unit_price)
-VALUES 
+VALUES
   (LASTVAL(), 1, 2, 250000),  -- LASTVAL() lấy ID của sales order vừa tạo
   (LASTVAL(), 2, 3, 100000);
 ```
@@ -199,7 +199,8 @@ Nếu API trả về structure khác, update Dashboard.jsx:
 const reportData = monthlyReport.data.data || monthlyReport.data;
 
 // Có thể cần
-const reportData = monthlyReport.report?.data || monthlyReport.data?.data || monthlyReport.data;
+const reportData =
+  monthlyReport.report?.data || monthlyReport.data?.data || monthlyReport.data;
 ```
 
 ---
@@ -270,7 +271,7 @@ Thêm vào Dashboard.jsx để monitor:
 ```javascript
 useEffect(() => {
   if (monthlyReport) {
-    console.log('📊 Monthly Report Updated:', {
+    console.log("📊 Monthly Report Updated:", {
       hasData: !!monthlyReport?.data,
       structure: Object.keys(monthlyReport || {}),
       summary: monthlyReport?.data?.data?.summary,
@@ -288,12 +289,12 @@ Enable debug logging trong API:
 ```javascript
 // apps/api/src/controllers/reportController.js
 generateMonthly: asyncHandler(async (req, res) => {
-  console.log('🔍 Generate Monthly Report:', {
+  console.log("🔍 Generate Monthly Report:", {
     year: req.query.year,
     month: req.query.month,
     user: req.user?.id,
   });
-  
+
   // ... rest of code
 });
 ```
