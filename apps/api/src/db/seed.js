@@ -269,6 +269,77 @@ async function seed() {
       ])
       .returning();
 
+    // 6. Seed Medication Images (Sample Files)
+    console.log("🖼️ Seeding medication images...");
+
+    // Create sample image buffers (1x1 PNG placeholders with different colors)
+    const createSampleImage = (color) => {
+      // Minimal valid PNG header + IEND chunk
+      const base64 = `iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN${color}AAAA${color}wAAQpwMvKLK8QAAAABJRU5ErkJggg==`;
+      return Buffer.from(base64, "base64");
+    };
+
+    const [
+      imageParacetamol,
+      imageAmoxicillin,
+      imageIbuprofen,
+      imageOmeprazole,
+      imageCetirizine,
+      imageMetformin,
+    ] = await db
+      .insert(files)
+      .values([
+        {
+          filename: "paracetamol.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("k8"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "amoxicillin.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Ma"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "ibuprofen.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Ng"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "omeprazole.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Ow"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "cetirizine.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Pg"),
+          uploadedBy: owner.id,
+        },
+        {
+          filename: "metformin.png",
+          fileType: "png",
+          mimeType: "image/png",
+          fileSize: 95,
+          blob: createSampleImage("Qg"),
+          uploadedBy: owner.id,
+        },
+      ])
+      .returning();
+
     // 6. Seed Medications
     console.log("💊 Seeding medications...");
     const [
@@ -295,6 +366,7 @@ async function seed() {
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageParacetamol.id,
         },
         {
           name: "Amoxicillin",
@@ -303,6 +375,7 @@ async function seed() {
           isPrescriptionRequired: true,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageAmoxicillin.id,
         },
         {
           name: "Ibuprofen",
@@ -311,6 +384,7 @@ async function seed() {
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageIbuprofen.id,
         },
         {
           name: "Omeprazole",
@@ -320,6 +394,7 @@ async function seed() {
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageOmeprazole.id,
         },
         {
           name: "Cetirizine",
@@ -328,6 +403,7 @@ async function seed() {
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageCetirizine.id,
         },
         {
           name: "Metformin",
@@ -336,6 +412,7 @@ async function seed() {
           isPrescriptionRequired: true,
           isControlledSubstance: false,
           status: "active",
+          imageId: imageMetformin.id,
         },
         {
           name: "Atorvastatin",
