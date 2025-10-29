@@ -1159,70 +1159,186 @@ async function seed() {
 
     // 14. Seed Purchase Order Receipts (for received orders)
     console.log("📥 Seeding purchase order receipts...");
-    const [receipt1] = await db
+    const [receipt1, receipt2, receipt3, receipt4] = await db
       .insert(purchaseOrderReceipts)
       .values([
+        // Receipt for PO1 (Viet Pharmaceutical - May 2024)
         {
           purchaseOrderId: po1.id,
           receivedDate: new Date("2024-05-23T10:00:00Z"),
           receivedBy: staff1.id,
+        },
+        // Receipt for PO2 (Saigon MediSupply - June 2024)
+        {
+          purchaseOrderId: po2.id,
+          receivedDate: new Date("2024-06-08T14:30:00Z"),
+          receivedBy: staff2.id,
+        },
+        // Receipt for PO3 (Global BioMed - June 2024)
+        {
+          purchaseOrderId: po3.id,
+          receivedDate: new Date("2024-06-25T09:15:00Z"),
+          receivedBy: staff1.id,
+        },
+        // Receipt for PO4 (Viet Pharmaceutical - June 2024)
+        {
+          purchaseOrderId: po4.id,
+          receivedDate: new Date("2024-06-20T11:00:00Z"),
+          receivedBy: staff3.id,
         },
       ])
       .returning();
 
     // 15. Seed Purchase Order Receipt Items
     console.log("📋 Seeding purchase order receipt items...");
-    const receiptItemData = purchaseOrderItemsResults
+
+    // Receipt 1 items (PO1)
+    const receipt1ItemData = purchaseOrderItemsResults
       .filter((item) => item.purchaseOrderId === po1.id)
       .map((item) => ({
         purchaseOrderReceiptId: receipt1.id,
         purchaseOrderItemId: item.id,
-        quantity: item.quantity, // Assume full quantity received
+        quantity: item.quantity,
       }));
+
+    // Receipt 2 items (PO2)
+    const receipt2ItemData = purchaseOrderItemsResults
+      .filter((item) => item.purchaseOrderId === po2.id)
+      .map((item) => ({
+        purchaseOrderReceiptId: receipt2.id,
+        purchaseOrderItemId: item.id,
+        quantity: item.quantity,
+      }));
+
+    // Receipt 3 items (PO3)
+    const receipt3ItemData = purchaseOrderItemsResults
+      .filter((item) => item.purchaseOrderId === po3.id)
+      .map((item) => ({
+        purchaseOrderReceiptId: receipt3.id,
+        purchaseOrderItemId: item.id,
+        quantity: item.quantity,
+      }));
+
+    // Receipt 4 items (PO4)
+    const receipt4ItemData = purchaseOrderItemsResults
+      .filter((item) => item.purchaseOrderId === po4.id)
+      .map((item) => ({
+        purchaseOrderReceiptId: receipt4.id,
+        purchaseOrderItemId: item.id,
+        quantity: item.quantity,
+      }));
+
+    const allReceiptItemData = [
+      ...receipt1ItemData,
+      ...receipt2ItemData,
+      ...receipt3ItemData,
+      ...receipt4ItemData,
+    ];
 
     const receiptItemsResults = await db
       .insert(purchaseOrderReceiptItems)
-      .values(receiptItemData)
+      .values(allReceiptItemData)
       .returning();
 
-    // 16. Seed Inventory (ONLY from received purchase order receipts)
+    // 16. Seed Inventory (from all received purchase order receipts)
     console.log("📊 Seeding inventory...");
+
     const inventoryData = [
-      // Inventory from PO1 Receipt - Item 1: Paracetamol 500mg (200 boxes)
+      // Inventory from PO1 Receipt - Item 0: Paracetamol 500mg (200 boxes)
       {
         medicationVariantId: medicationVariantsResults[0].id,
         purchaseOrderReceiptItemsId: receiptItemsResults[0].id,
-        binId: warehouseBinsResults[0].id, // Zone A - Rack A-001, Level 1, Bin 01
+        binId: warehouseBinsResults[0].id,
         batchNumber: "P2405001",
         manufactureDate: new Date("2024-01-10"),
         expiryDate: new Date("2027-01-09"),
         quantity: 200,
       },
-      // Inventory from PO1 Receipt - Item 2: Amoxicillin 500mg (100 boxes)
+      // Inventory from PO1 Receipt - Item 1: Amoxicillin 500mg (100 boxes)
       {
         medicationVariantId: medicationVariantsResults[3].id,
         purchaseOrderReceiptItemsId: receiptItemsResults[1].id,
-        binId: warehouseBinsResults[1].id, // Zone A - Rack A-001, Level 1, Bin 02
+        binId: warehouseBinsResults[1].id,
         batchNumber: "A2405002",
         manufactureDate: new Date("2024-02-15"),
         expiryDate: new Date("2026-02-14"),
         quantity: 100,
       },
-      // Inventory from PO1 Receipt - Item 3: Atorvastatin 20mg (50 boxes)
+      // Inventory from PO1 Receipt - Item 2: Atorvastatin 20mg (50 boxes)
       {
         medicationVariantId: medicationVariantsResults[13].id,
         purchaseOrderReceiptItemsId: receiptItemsResults[2].id,
-        binId: warehouseBinsResults[2].id, // Zone A - Rack A-001, Level 1, Bin 03
+        binId: warehouseBinsResults[2].id,
         batchNumber: "T2405003",
         manufactureDate: new Date("2023-12-20"),
         expiryDate: new Date("2025-12-19"),
         quantity: 50,
       },
+      // Inventory from PO2 Receipt - Item 3: Ibuprofen 400mg (150 boxes)
+      {
+        medicationVariantId: medicationVariantsResults[5].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[3].id,
+        binId: warehouseBinsResults[3].id,
+        batchNumber: "I2406001",
+        manufactureDate: new Date("2024-03-05"),
+        expiryDate: new Date("2026-03-04"),
+        quantity: 150,
+      },
+      // Inventory from PO2 Receipt - Item 4: Omeprazole 20mg (50 boxes)
+      {
+        medicationVariantId: medicationVariantsResults[7].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[4].id,
+        binId: warehouseBinsResults[4].id,
+        batchNumber: "O2406002",
+        manufactureDate: new Date("2024-02-20"),
+        expiryDate: new Date("2026-02-19"),
+        quantity: 50,
+      },
+      // Inventory from PO3 Receipt - Item 5: Metformin 500mg (300 boxes)
+      {
+        medicationVariantId: medicationVariantsResults[11].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[5].id,
+        binId: warehouseBinsResults[5].id,
+        batchNumber: "M2406001",
+        manufactureDate: new Date("2024-03-15"),
+        expiryDate: new Date("2027-03-14"),
+        quantity: 300,
+      },
+      // Inventory from PO3 Receipt - Item 6: Salbutamol Inhaler (50 units)
+      {
+        medicationVariantId: medicationVariantsResults[17].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[6].id,
+        binId: warehouseBinsResults[6].id,
+        batchNumber: "S2406002",
+        manufactureDate: new Date("2024-04-01"),
+        expiryDate: new Date("2026-03-31"),
+        quantity: 50,
+      },
+      // Inventory from PO3 Receipt - Item 7: Vitamin D3 1000IU (100 boxes)
+      {
+        medicationVariantId: medicationVariantsResults[19].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[7].id,
+        binId: warehouseBinsResults[7].id,
+        batchNumber: "V2406003",
+        manufactureDate: new Date("2024-02-28"),
+        expiryDate: new Date("2027-02-27"),
+        quantity: 100,
+      },
+      // Inventory from PO4 Receipt - Item 8: Amlodipine 10mg (100 boxes)
+      {
+        medicationVariantId: medicationVariantsResults[15].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[8].id,
+        binId: warehouseBinsResults[8].id,
+        batchNumber: "M2406004",
+        manufactureDate: new Date("2024-03-20"),
+        expiryDate: new Date("2027-03-19"),
+        quantity: 100,
+      },
     ];
 
     await db.insert(inventory).values(inventoryData);
 
-    // 17. Seed Sales Orders
+    // 17. Seed Sales Orders (Status: pending, paid, cancelled only)
     console.log("💰 Seeding sales orders...");
     const [sale1, sale2, sale3] = await db
       .insert(salesOrders)
@@ -1232,7 +1348,7 @@ async function seed() {
           customerId: customer1.id,
           orderDate: new Date("2024-06-05T10:30:00Z"),
           totalAmount: 220000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
@@ -1264,16 +1380,16 @@ async function seed() {
           customerId: customer4.id,
           orderDate: new Date("2024-06-14T16:30:00Z"),
           totalAmount: 540000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "bank_transfer",
           salespersonId: staff2.id,
         },
-        // NEW: October 2025 sales orders (current month)
+        // NEW: October 2025 sales orders (current month) - Only pending, paid, cancelled
         {
           customerId: customer1.id,
           orderDate: new Date("2025-10-02T09:15:00Z"),
           totalAmount: 450000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
@@ -1281,7 +1397,7 @@ async function seed() {
           customerId: customer2.id,
           orderDate: new Date("2025-10-05T14:30:00Z"),
           totalAmount: 680000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "bank_transfer",
           salespersonId: staff2.id,
         },
@@ -1289,7 +1405,7 @@ async function seed() {
           customerId: customer3.id,
           orderDate: new Date("2025-10-08T11:00:00Z"),
           totalAmount: 320000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "mobile_payment",
           salespersonId: staff1.id,
         },
@@ -1297,7 +1413,7 @@ async function seed() {
           customerId: customer4.id,
           orderDate: new Date("2025-10-12T16:45:00Z"),
           totalAmount: 1250000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "bank_transfer",
           salespersonId: staff3.id,
         },
@@ -1305,7 +1421,7 @@ async function seed() {
           customerId: customer1.id,
           orderDate: new Date("2025-10-15T10:20:00Z"),
           totalAmount: 540000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "cash",
           salespersonId: staff2.id,
         },
@@ -1329,7 +1445,7 @@ async function seed() {
           customerId: customer4.id,
           orderDate: new Date("2025-10-22T15:15:00Z"),
           totalAmount: 760000,
-          status: "delivered",
+          status: "paid",
           paymentMethod: "bank_transfer",
           salespersonId: staff3.id,
         },
@@ -1337,7 +1453,7 @@ async function seed() {
           customerId: customer1.id,
           orderDate: new Date("2025-10-25T11:30:00Z"),
           totalAmount: 350000,
-          status: "delivered",
+          status: "cancelled",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
@@ -1769,7 +1885,7 @@ async function seed() {
     - User Registrations: 3
     - Customers: 6
     - Suppliers: 5
-    - Medications: 12
+    - Medications: 12 (6 with images)
     - Medication Variants: 26
     - Supplier-Medication Links: 14
     - Warehouse Zones: 4
@@ -1777,11 +1893,13 @@ async function seed() {
     - Warehouse Bins: 192
     - Purchase Orders: 5
     - Purchase Order Items: 11
-    - Purchase Order Receipts: 1
-    - Receipt Items: 3
-    - Inventory Entries: 3 (matches receipt items - strict 1:1 relationship)
+    - Purchase Order Receipts: 4 (PO1, PO2, PO3, PO4 received)
+    - Receipt Items: 9 (from 4 receipts)
+    - Inventory Entries: 9 (from all receipts)
     - Sales Orders: 15 (5 from June 2024 + 10 from October 2025)
-      * October 2025: 10 orders - 7 delivered, 1 paid, 2 pending
+      * Status: pending, paid, cancelled only
+      * October 2025: 10 orders - 8 paid, 1 cancelled, 1 pending
+      * Total October Revenue: 7,580,000 VND
       * Total October Revenue: 7,580,000 VND
     - Sales Order Items: 6 (old June 2024 data only - October items removed for simplicity)
     - Files: 3
