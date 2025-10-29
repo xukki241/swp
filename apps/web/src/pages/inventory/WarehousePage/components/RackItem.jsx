@@ -19,19 +19,19 @@ import { useWarehouse } from "../../../../hooks/useWarehouse";
 import { BinGrid } from "./BinGrid";
 
 export function RackItem({ rack, isExpanded, onToggle }) {
-  const { bins, updateRackData } = useWarehouse();
+  const { updateRackData } = useWarehouse();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    rackCode: rack.rackCode || "",
-    rackName: rack.rackName || "",
+    rackCode: rack.code || "",
+    rackName: rack.name || "",
     description: rack.description || "",
   });
 
   useEffect(() => {
     setFormData({
-      rackCode: rack.rackCode || "",
-      rackName: rack.rackName || "",
+      rackCode: rack.code || "",
+      rackName: rack.name || "",
       description: rack.description || "",
     });
   }, [rack]);
@@ -54,8 +54,6 @@ export function RackItem({ rack, isExpanded, onToggle }) {
     }
   };
 
-  const rackBins = bins[rack.id] || [];
-
   return (
     <>
       <Card className="shadow-sm rounded-lg border">
@@ -75,8 +73,8 @@ export function RackItem({ rack, isExpanded, onToggle }) {
                 )}
               </Button>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">{rack.rackName}</h3>
-                <p className="text-sm text-muted-foreground">{rack.rackCode}</p>
+                <h3 className="font-semibold text-gray-900">{rack.name}</h3>
+                <p className="text-sm text-muted-foreground">{rack.code}</p>
               </div>
             </div>
             <Button
@@ -97,7 +95,7 @@ export function RackItem({ rack, isExpanded, onToggle }) {
 
         {isExpanded && (
           <CardContent>
-            <BinGrid rackId={rack.id} bins={rackBins} />
+            <BinGrid rackId={rack.id} bins={rack.bins} />
           </CardContent>
         )}
       </Card>

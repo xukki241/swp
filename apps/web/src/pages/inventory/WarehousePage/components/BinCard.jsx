@@ -26,6 +26,7 @@ import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
 import { Textarea } from "../../../../components/ui/textarea";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
+import MedicinePlaceholder from '../../../../assets/medicine-placeholder.jpg'
 
 export function BinCard({ bin, rackId }) {
   const { updateBinData, deleteBinData } = useWarehouse();
@@ -33,10 +34,10 @@ export function BinCard({ bin, rackId }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    binCode: bin.binCode || "",
-    binName: bin.binName || "",
-    binLevel: bin.binLevel || "",
-    binNumber: bin.binNumber || "",
+    binCode: bin.code || "",
+    binName: bin.name || "",
+    binLevel: bin.level || "",
+    binNumber: bin.number || "",
     description: bin.description || "",
   });
 
@@ -72,13 +73,13 @@ export function BinCard({ bin, rackId }) {
 
   return (
     <>
-      <Card className="shadow-sm rounded-lg border hover:shadow-md transition-shadow overflow-hidden group">
+      <Card className="shadow-sm rounded-lg border hover:shadow-md transition-shadow overflow-hidden group pt-0">
         <CardContent className="p-0">
           {/* Bin Image */}
-          <div className="relative h-32 bg-gray-100 overflow-hidden">
+          <div className="relative h-50 bg-gray-100 overflow-hidden">
             <img
-              src="/placeholder.svg"
-              alt={bin.binName}
+              src={bin?.medication?.img_url || MedicinePlaceholder}
+              alt={bin.name}
               className="w-full h-full object-cover"
             />
             {/* Action Buttons - Show on Hover */}
@@ -105,13 +106,13 @@ export function BinCard({ bin, rackId }) {
           {/* Bin Info */}
           <div className="p-3">
             <h4 className="font-semibold text-sm text-gray-900 truncate">
-              {bin.binName}
+              {bin.name}
             </h4>
             <p className="text-xs text-muted-foreground mt-1">
-              Code: {bin.binCode}
+              Code: {bin.code}
             </p>
             <p className="text-xs text-muted-foreground">
-              Position: Level {bin.binLevel}, Bin {bin.binNumber}
+              Position: Level {bin.level}, Bin {bin.number}
             </p>
           </div>
         </CardContent>
