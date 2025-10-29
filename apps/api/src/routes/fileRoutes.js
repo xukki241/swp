@@ -29,7 +29,7 @@ const idParamSchema = z.object({
  */
 fileRouter.post(
   "/",
-  uploadSingle,
+  uploadSingle("file"),
   handleMulterError,
   createAuditLog("CREATE", "file"),
   fileController.upload
@@ -42,7 +42,7 @@ fileRouter.post(
  */
 fileRouter.post(
   "/batch",
-  uploadMultiple,
+  uploadMultiple("files", 10),
   handleMulterError,
   createAuditLog("CREATE", "file"),
   fileController.uploadMultiple

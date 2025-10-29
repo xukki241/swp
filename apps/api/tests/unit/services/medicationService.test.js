@@ -59,7 +59,7 @@ describe("MedicationService", () => {
     });
   });
 
-  describe("getMedicationById", () => { 
+  describe("getMedicationById", () => {
     it("should fetch medication with variants", async () => {
       const mockMedication = {
         id: 1,

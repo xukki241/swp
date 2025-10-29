@@ -88,7 +88,7 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/medications/$medicationId/uplo
 
 **Error Responses:**
 
-*400 Bad Request - No file uploaded:*
+_400 Bad Request - No file uploaded:_
 
 ```json
 {
@@ -97,7 +97,7 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/medications/$medicationId/uplo
 }
 ```
 
-*400 Bad Request - Invalid file type:*
+_400 Bad Request - Invalid file type:_
 
 ```json
 {
@@ -106,7 +106,7 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/medications/$medicationId/uplo
 }
 ```
 
-*400 Bad Request - File too large:*
+_400 Bad Request - File too large:_
 
 ```json
 {
@@ -115,7 +115,7 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/medications/$medicationId/uplo
 }
 ```
 
-*404 Not Found - Medication not found:*
+_404 Not Found - Medication not found:_
 
 ```json
 {
@@ -124,7 +124,7 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/medications/$medicationId/uplo
 }
 ```
 
-*403 Forbidden - Insufficient permissions:*
+_403 Forbidden - Insufficient permissions:_
 
 ```json
 {
@@ -196,7 +196,7 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/medications/$medicationId/imag
 
 **Error Responses:**
 
-*404 Not Found - Medication not found:*
+_404 Not Found - Medication not found:_
 
 ```json
 {
@@ -205,7 +205,7 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/medications/$medicationId/imag
 }
 ```
 
-*404 Not Found - No image to delete:*
+_404 Not Found - No image to delete:_
 
 ```json
 {
@@ -214,7 +214,7 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/medications/$medicationId/imag
 }
 ```
 
-*403 Forbidden - Insufficient permissions:*
+_403 Forbidden - Insufficient permissions:_
 
 ```json
 {

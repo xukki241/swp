@@ -24,16 +24,16 @@ Displays a metric with icon, value, and trend.
 import { StatCard } from "@/components/dashboard";
 import { ShoppingCart } from "lucide-react";
 
-<StatCard 
+<StatCard
   stat={{
     title: "Total Orders",
     value: "150",
     icon: ShoppingCart,
     trend: "+12.5%",
     trendUp: true,
-    loading: false
-  }} 
-/>
+    loading: false,
+  }}
+/>;
 ```
 
 ---
@@ -52,10 +52,7 @@ Animated welcome header with greeting and date/time.
 ```jsx
 import { WelcomeBanner } from "@/components/dashboard";
 
-<WelcomeBanner 
-  userName="John Doe" 
-  greeting="Good morning" 
-/>
+<WelcomeBanner userName="John Doe" greeting="Good morning" />;
 ```
 
 ---
@@ -91,10 +88,10 @@ const navigate = useNavigate();
     icon: ShoppingCart,
     color: "bg-blue-100",
     iconColor: "text-blue-600",
-    path: "/sales"
+    path: "/sales",
   }}
   onClick={() => navigate("/sales")}
-/>
+/>;
 ```
 
 ---
@@ -126,9 +123,9 @@ import { ShoppingCart } from "lucide-react";
     description: "New sale order completed",
     time: "5 minutes ago",
     icon: ShoppingCart,
-    color: "text-green-600"
+    color: "text-green-600",
   }}
-/>
+/>;
 ```
 
 ## Styling
