@@ -424,6 +424,7 @@ describe("MedicationVariantService", () => {
 
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
         leftJoin: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
         groupBy: vi.fn().mockResolvedValue(mockResult),
@@ -457,6 +458,7 @@ describe("MedicationVariantService", () => {
 
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
         leftJoin: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
         groupBy: vi.fn().mockResolvedValue(mockResult),
@@ -488,6 +490,7 @@ describe("MedicationVariantService", () => {
 
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
         leftJoin: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
         groupBy: vi.fn().mockResolvedValue(mockResult),
