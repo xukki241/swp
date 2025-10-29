@@ -1,3 +1,4 @@
+import { fileService } from "../services/fileService.js";
 import { inventoryService } from "../services/inventoryService.js";
 import * as medicationService from "../services/medicationService.js";
 import logger from "../utils/logger.js";
@@ -278,6 +279,109 @@ export const getMedicationSales = async (req, res, next) => {
     });
   } catch (error) {
     logger.error("Error in getMedicationSales controller:", error);
+    next(error);
+  }
+};
+
+/**
+ * Upload medication image
+ * @route POST /api/medications/:id/upload-image
+ */
+export const uploadMedicationImage = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    // Check if medication exists
+    const medication = await medicationService.getMedicationById(id);
+    if (!medication) {
+      return res.status(404).json({
+        success: false,
+        message: "Medication not found",
+      });
+    }
+
+    // Check if file was uploaded
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded",
+      });
+    }
+
+    // Create file record
+    const fileData = {
+      filename: req.file.originalname,
+      fileType: req.file.mimetype.split("/")[1],
+      mimeType: req.file.mimetype,
+      fileSize: req.file.size,
+      blob: req.file.buffer,
+      uploadedBy: req.user.id,
+    };
+
+    const file = await fileService.create(fileData);
+
+    // Update medication with image
+    const updatedMedication = await medicationService.updateMedication(id, {
+      imageId: file.id,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Medication image uploaded successfully",
+      data: {
+        medication: updatedMedication,
+        image: {
+          id: file.id,
+          filename: file.filename,
+          url: `/api/files/${file.id}`,
+        },
+      },
+    });
+  } catch (error) {
+    logger.error("Error in uploadMedicationImage controller:", error);
+    next(error);
+  }
+};
+
+/**
+ * Delete medication image
+ * @route DELETE /api/medications/:id/image
+ */
+export const deleteMedicationImage = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    // Check if medication exists
+    const medication = await medicationService.getMedicationById(id);
+    if (!medication) {
+      return res.status(404).json({
+        success: false,
+        message: "Medication not found",
+      });
+    }
+
+    if (!medication.imageId) {
+      return res.status(404).json({
+        success: false,
+        message: "Medication has no image",
+      });
+    }
+
+    // Delete file
+    await fileService.delete(medication.imageId);
+
+    // Update medication to remove image reference
+    const updatedMedication = await medicationService.updateMedication(id, {
+      imageId: null,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Medication image deleted successfully",
+      data: updatedMedication,
+    });
+  } catch (error) {
+    logger.error("Error in deleteMedicationImage controller:", error);
     next(error);
   }
 };

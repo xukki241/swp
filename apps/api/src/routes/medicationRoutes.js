@@ -17,6 +17,7 @@ import * as medicationController from "../controllers/medicationController.js";
 import * as medicationVariantController from "../controllers/medicationVariantController.js";
 import { createAuditLog } from "../middleware/auditLog.js";
 import { authenticate, authorize } from "../middleware/checkAuth.js";
+import { handleMulterError, uploadSingle } from "../middleware/upload.js";
 
 import { medicationVariantRouter } from "./medicationVariantRoutes.js";
 
@@ -116,6 +117,34 @@ medicationRouter.get(
   "/:id/sales",
   validateParams(idParamSchema),
   medicationController.getMedicationSales
+);
+
+/**
+ * @route   POST /api/medications/:id/upload-image
+ * @desc    Upload medication image
+ * @access  Private (Owner only)
+ */
+medicationRouter.post(
+  "/:id/upload-image",
+  authorize("owner"),
+  validateParams(idParamSchema),
+  uploadSingle("image"),
+  handleMulterError,
+  createAuditLog("UPDATE", "medication"),
+  medicationController.uploadMedicationImage
+);
+
+/**
+ * @route   DELETE /api/medications/:id/image
+ * @desc    Delete medication image
+ * @access  Private (Owner only)
+ */
+medicationRouter.delete(
+  "/:id/image",
+  authorize("owner"),
+  validateParams(idParamSchema),
+  createAuditLog("DELETE", "medication"),
+  medicationController.deleteMedicationImage
 );
 
 /**
