@@ -1,7 +1,9 @@
 "use client";
 
-import { Edit2, Trash2 } from "lucide-react";
+import { truncateWords } from "@/lib/utils";
+import { Edit2, Eye, Trash2 } from "lucide-react";
 import { useState } from "react";
+import MedicinePlaceholder from "../../../../assets/medicine-placeholder.jpg";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,10 +28,10 @@ import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
 import { Textarea } from "../../../../components/ui/textarea";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
-import MedicinePlaceholder from '../../../../assets/medicine-placeholder.jpg'
 
 export function BinCard({ bin, rackId }) {
   const { updateBinData, deleteBinData } = useWarehouse();
+  const [showBinDetails, setShowBinDetails] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,7 +75,7 @@ export function BinCard({ bin, rackId }) {
 
   return (
     <>
-      <Card className="shadow-sm rounded-lg border hover:shadow-md transition-shadow overflow-hidden group pt-0">
+      <Card className="shadow-sm rounded-lg border hover:shadow-md transition-shadow overflow-hidden group pt-0 max-w-60">
         <CardContent className="p-0">
           {/* Bin Image */}
           <div className="relative h-50 bg-gray-100 overflow-hidden">
@@ -83,18 +85,26 @@ export function BinCard({ bin, rackId }) {
               className="w-full h-full object-cover"
             />
             {/* Action Buttons - Show on Hover */}
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
               <Button
-                size="sm"
-                variant="secondary"
+                size="xs"
+                variant="outline"
+                onClick={() => setShowBinDetails(true)}
+                className="rounded-full p-2 h-auto"
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+              <Button
+                size="xs"
+                variant="outline"
                 onClick={() => setShowEditDialog(true)}
                 className="rounded-full p-2 h-auto"
               >
                 <Edit2 className="h-4 w-4" />
               </Button>
               <Button
-                size="sm"
-                variant="destructive"
+                size="xs"
+                variant="outline"
                 onClick={() => setShowDeleteDialog(true)}
                 className="rounded-full p-2 h-auto"
               >
@@ -105,8 +115,8 @@ export function BinCard({ bin, rackId }) {
 
           {/* Bin Info */}
           <div className="p-3">
-            <h4 className="font-semibold text-sm text-gray-900 truncate">
-              {bin.name}
+            <h4 className="font-semibold text-sm text-gray-900">
+              {truncateWords(bin.name, 10)}
             </h4>
             <p className="text-xs text-muted-foreground mt-1">
               Code: {bin.code}
@@ -117,6 +127,80 @@ export function BinCard({ bin, rackId }) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Bin Details Dialog */}
+      <Dialog open={showBinDetails} onOpenChange={setShowBinDetails}>
+        <DialogContent className="max-w-2xl" aria-describedby={undefined}>
+          <DialogHeader>
+            <DialogTitle>Bin Details</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <div className="flex items-start gap-6">
+              <img
+                src={
+                  bin?.medication?.medicationVariant?.img_url ||
+                  MedicinePlaceholder
+                }
+                alt={bin?.name}
+                className="w-32 h-32 rounded-lg object-cover border"
+              />
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {bin?.name || "N/A"}
+                </h3>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Code</Label>
+                <p className="text-lg font-semibold capitalize">
+                  {bin?.code || "N/A"}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Storage Area</Label>
+                <p className="text-lg font-semibold">
+                  {bin?.rack?.zone?.name || "N/A"}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Rack</Label>
+                <p className="text-lg font-semibold">
+                  {bin?.rack?.name || "N/A"}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Level</Label>
+                <p className="text-lg font-semibold">{bin?.level || "N/A"}</p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Number</Label>
+                <p className="text-lg font-semibold">{bin?.number || "N/A"}</p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Medication</Label>
+                <p className="text-lg font-semibold capitalize">
+                  {bin?.medicationVariant?.name || "N/A"}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Stock</Label>
+                <p className="text-lg font-semibold capitalize">
+                  {bin?.medicationVariant?.quantity
+                    ? `${bin?.medicationVariant?.quantity} ${bin?.medicationVariant?.unit}`
+                    : "N/A"}
+                </p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBinDetails(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Bin Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
@@ -208,7 +292,7 @@ export function BinCard({ bin, rackId }) {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Bin</AlertDialogTitle>
+            <AlertDialogTitle>Delete Bin {bin.name}</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete {bin.binName}? This action cannot
               be undone.
