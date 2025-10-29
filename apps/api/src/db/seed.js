@@ -1340,7 +1340,23 @@ async function seed() {
 
     // 17. Seed Sales Orders (Status: pending, paid, cancelled only)
     console.log("💰 Seeding sales orders...");
-    const [sale1, sale2, sale3] = await db
+    const [
+      sale1,
+      sale2,
+      sale3,
+      sale4,
+      sale5,
+      sale6,
+      sale7,
+      sale8,
+      sale9,
+      sale10,
+      sale11,
+      sale12,
+      sale13,
+      sale14,
+      sale15,
+    ] = await db
       .insert(salesOrders)
       .values([
         // Old sales from June 2024 (for historical data)
@@ -1508,6 +1524,171 @@ async function seed() {
         quantity: 1,
         unitPrice: 20000,
         totalPrice: 20000,
+      },
+      // October 2025 Sales Items
+      // Sale 6 items (Oct 2, 2025 - 450,000)
+      {
+        salesOrderId: sale6.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 5,
+        unitPrice: 50000,
+        totalPrice: 250000,
+      },
+      {
+        salesOrderId: sale6.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 5,
+        unitPrice: 40000,
+        totalPrice: 200000,
+      },
+      // Sale 7 items (Oct 5, 2025 - 680,000)
+      {
+        salesOrderId: sale7.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 8,
+        unitPrice: 85000,
+        totalPrice: 680000,
+      },
+      // Sale 8 items (Oct 8, 2025 - 340,000)
+      {
+        salesOrderId: sale8.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 4,
+        unitPrice: 85000,
+        totalPrice: 340000,
+      },
+      // Sale 9 items (Oct 12, 2025 - 520,000)
+      {
+        salesOrderId: sale9.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 6,
+        unitPrice: 50000,
+        totalPrice: 300000,
+      },
+      {
+        salesOrderId: sale9.id,
+        medicationVariantId: medicationVariantsResults[2].id, // Paracetamol Syrup
+        quantity: 2,
+        unitPrice: 45000,
+        totalPrice: 90000,
+      },
+      {
+        salesOrderId: sale9.id,
+        medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
+        quantity: 6,
+        unitPrice: 20000,
+        totalPrice: 120000,
+      },
+      {
+        salesOrderId: sale9.id,
+        medicationVariantId: medicationVariantsResults[1].id, // Paracetamol 250mg
+        quantity: 1,
+        unitPrice: 10000,
+        totalPrice: 10000,
+      },
+      // Sale 10 items (Oct 15, 2025 - 780,000)
+      {
+        salesOrderId: sale10.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 10,
+        unitPrice: 40000,
+        totalPrice: 400000,
+      },
+      {
+        salesOrderId: sale10.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 3,
+        unitPrice: 85000,
+        totalPrice: 255000,
+      },
+      {
+        salesOrderId: sale10.id,
+        medicationVariantId: medicationVariantsResults[6].id, // Omeprazole 20mg
+        quantity: 5,
+        unitPrice: 25000,
+        totalPrice: 125000,
+      },
+      // Sale 11 items (Oct 18, 2025 - 920,000)
+      {
+        salesOrderId: sale11.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 10,
+        unitPrice: 85000,
+        totalPrice: 850000,
+      },
+      {
+        salesOrderId: sale11.id,
+        medicationVariantId: medicationVariantsResults[8].id, // Metformin 850mg
+        quantity: 2,
+        unitPrice: 35000,
+        totalPrice: 70000,
+      },
+      // Sale 12 items (Oct 20, 2025 - 560,000)
+      {
+        salesOrderId: sale12.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 8,
+        unitPrice: 50000,
+        totalPrice: 400000,
+      },
+      {
+        salesOrderId: sale12.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 4,
+        unitPrice: 40000,
+        totalPrice: 160000,
+      },
+      // Sale 13 items (Oct 22, 2025 - 430,000)
+      {
+        salesOrderId: sale13.id,
+        medicationVariantId: medicationVariantsResults[7].id, // Amlodipine 5mg
+        quantity: 10,
+        unitPrice: 30000,
+        totalPrice: 300000,
+      },
+      {
+        salesOrderId: sale13.id,
+        medicationVariantId: medicationVariantsResults[2].id, // Paracetamol Syrup
+        quantity: 2,
+        unitPrice: 45000,
+        totalPrice: 90000,
+      },
+      {
+        salesOrderId: sale13.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 1,
+        unitPrice: 40000,
+        totalPrice: 40000,
+      },
+      // Sale 14 items (Oct 25, 2025 - 350,000 - CANCELLED)
+      {
+        salesOrderId: sale14.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 4,
+        unitPrice: 85000,
+        totalPrice: 340000,
+      },
+      {
+        salesOrderId: sale14.id,
+        medicationVariantId: medicationVariantsResults[1].id, // Paracetamol 250mg
+        quantity: 1,
+        unitPrice: 10000,
+        totalPrice: 10000,
+      },
+      // Sale 15 items (Oct 28, 2025 - 920,000)
+      {
+        salesOrderId: sale15.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 8,
+        unitPrice: 85000,
+        totalPrice: 680000,
+      },
+      {
+        salesOrderId: sale15.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 6,
+        unitPrice: 40000,
+        totalPrice: 240000,
       },
     ]);
 
@@ -1899,9 +2080,9 @@ async function seed() {
     - Sales Orders: 15 (5 from June 2024 + 10 from October 2025)
       * Status: pending, paid, cancelled only
       * October 2025: 10 orders - 8 paid, 1 cancelled, 1 pending
-      * Total October Revenue: 7,580,000 VND
-      * Total October Revenue: 7,580,000 VND
-    - Sales Order Items: 6 (old June 2024 data only - October items removed for simplicity)
+      * Total October Revenue: 6,580,000 VND (from 8 paid orders)
+    - Sales Order Items: 38 (5 from June 2024 + 33 from October 2025)
+      * October items include medications: Paracetamol, Ibuprofen, Amoxicillin, etc.
     - Files: 3
     - File Attachments: 3
     - Notifications: 5
