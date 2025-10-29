@@ -276,8 +276,16 @@ Lưu ý:
 Chỉ trả về JSON, không có text ngoài lề.
 `;
 
-      // Call Gemini API
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+      // Call Gemini API - Using Gemini 2.0 Flash for faster performance
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.0-flash-exp",
+        generationConfig: {
+          temperature: 0.7,
+          topP: 0.95,
+          topK: 40,
+          maxOutputTokens: 8192,
+        },
+      });
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
@@ -317,6 +325,7 @@ Chỉ trả về JSON, không có text ngoài lề.
     const { salesData, inventoryData, lowStockItems, expiringSoonItems } =
       await this.getSalesAndInventoryData(daysBack);
 
+    // Calculate total revenue from query (already grouped by variant)
     const totalRevenue = salesData.reduce(
       (sum, item) => sum + Number(item.totalRevenue),
       0
@@ -326,12 +335,31 @@ Chỉ trả về JSON, không có text ngoài lề.
       0
     );
 
+    // Get distinct order count for accurate average
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - daysBack);
+
+    const [orderStats] = await db
+      .select({
+        totalOrders: sql`COUNT(DISTINCT ${salesOrders.id})`.as("total_orders"),
+      })
+      .from(salesOrders)
+      .where(
+        and(
+          gte(salesOrders.orderDate, startDate),
+          eq(salesOrders.status, "paid")
+        )
+      );
+
+    const totalOrders = Number(orderStats.totalOrders) || 0;
+
     return {
       summary: {
         totalRevenue,
         totalQuantitySold,
+        totalOrders,
         totalProducts: salesData.length,
-        averageOrderValue: totalRevenue / salesData.length || 0,
+        averageOrderValue: totalOrders > 0 ? totalRevenue / totalOrders : 0,
       },
       topSellingProducts: salesData.slice(0, 5),
       lowStockAlerts: lowStockItems.length,
