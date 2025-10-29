@@ -1,3 +1,4 @@
+import AIAnalyticsDialog from "@/components/AIAnalyticsDialog";
 import {
   ActivityItem,
   QuickActionCard,
@@ -10,7 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCurrentUser } from "@/hooks/useAuth";
 import { usePurchaseOrderReceipts } from "@/hooks/usePurchaseOrders";
 import { useMonthlySalesReport } from "@/hooks/useReports";
-import AIAnalyticsDialog from "@/components/AIAnalyticsDialog";
 import {
   Activity,
   AlertTriangle,

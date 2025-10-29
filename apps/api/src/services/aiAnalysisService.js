@@ -3,182 +3,189 @@ import { and, desc, eq, gte, sql } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import {
-    inventory,
-    medications,
-    medicationVariants,
-    salesOrderItems,
-    salesOrders,
+  inventory,
+  medications,
+  medicationVariants,
+  salesOrderItems,
+  salesOrders,
 } from "../db/schema/index.js";
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(
-    process.env.GOOGLE_AI_API_KEY || "YOUR_API_KEY"
+  process.env.GOOGLE_AI_API_KEY || "YOUR_API_KEY"
 );
 
 /**
  * Analyze sales data and inventory to provide purchasing recommendations
  */
 export const aiAnalysisService = {
-    /**
-     * Get comprehensive sales and inventory data for AI analysis
-     */
-    async getSalesAndInventoryData(daysBack = 90) {
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() - daysBack);
+  /**
+   * Get comprehensive sales and inventory data for AI analysis
+   */
+  async getSalesAndInventoryData(daysBack = 90) {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - daysBack);
 
-        console.log("AI Analysis - Start Date:", startDate.toISOString());
-        console.log("AI Analysis - Days Back:", daysBack);
+    console.log("AI Analysis - Start Date:", startDate.toISOString());
+    console.log("AI Analysis - Days Back:", daysBack);
 
-        // Get sales data with medication details
-        const salesData = await db
-            .select({
-                medicationId: medications.id,
-                medicationName: medications.name,
-                variantId: medicationVariants.id,
-                variantName: medicationVariants.name,
-                sku: medicationVariants.sku,
-                sellPrice: medicationVariants.sellPrice,
-                unit: medicationVariants.unit,
-                totalQuantitySold: sql`SUM(${salesOrderItems.quantity})`.as(
-                    "total_quantity_sold"
-                ),
-                totalRevenue: sql`SUM(${salesOrderItems.totalPrice})`.as(
-                    "total_revenue"
-                ),
-                orderCount: sql`COUNT(DISTINCT ${salesOrders.id})`.as("order_count"),
-            })
-            .from(salesOrderItems)
-            .innerJoin(salesOrders, eq(salesOrderItems.salesOrderId, salesOrders.id))
-            .innerJoin(
-                medicationVariants,
-                eq(salesOrderItems.medicationVariantId, medicationVariants.id)
-            )
-            .innerJoin(
-                medications,
-                eq(medicationVariants.medicationId, medications.id)
-            )
-            .where(
-                and(
-                    gte(salesOrders.orderDate, startDate),
-                    eq(salesOrders.status, "paid")
-                )
-            )
-            .groupBy(
-                medications.id,
-                medications.name,
-                medicationVariants.id,
-                medicationVariants.name,
-                medicationVariants.sku,
-                medicationVariants.sellPrice,
-                medicationVariants.unit
-            )
-            .orderBy(desc(sql`SUM(${salesOrderItems.quantity})`));
+    // Get sales data with medication details
+    const salesData = await db
+      .select({
+        medicationId: medications.id,
+        medicationName: medications.name,
+        variantId: medicationVariants.id,
+        variantName: medicationVariants.name,
+        sku: medicationVariants.sku,
+        sellPrice: medicationVariants.sellPrice,
+        unit: medicationVariants.unit,
+        totalQuantitySold: sql`SUM(${salesOrderItems.quantity})`.as(
+          "total_quantity_sold"
+        ),
+        totalRevenue: sql`SUM(${salesOrderItems.totalPrice})`.as(
+          "total_revenue"
+        ),
+        orderCount: sql`COUNT(DISTINCT ${salesOrders.id})`.as("order_count"),
+      })
+      .from(salesOrderItems)
+      .innerJoin(salesOrders, eq(salesOrderItems.salesOrderId, salesOrders.id))
+      .innerJoin(
+        medicationVariants,
+        eq(salesOrderItems.medicationVariantId, medicationVariants.id)
+      )
+      .innerJoin(
+        medications,
+        eq(medicationVariants.medicationId, medications.id)
+      )
+      .where(
+        and(
+          gte(salesOrders.orderDate, startDate),
+          eq(salesOrders.status, "paid")
+        )
+      )
+      .groupBy(
+        medications.id,
+        medications.name,
+        medicationVariants.id,
+        medicationVariants.name,
+        medicationVariants.sku,
+        medicationVariants.sellPrice,
+        medicationVariants.unit
+      )
+      .orderBy(desc(sql`SUM(${salesOrderItems.quantity})`));
 
-        console.log("AI Analysis - Sales Data Count:", salesData.length);
-        console.log("AI Analysis - First 3 sales:", salesData.slice(0, 3));
+    console.log("AI Analysis - Sales Data Count:", salesData.length);
+    console.log("AI Analysis - First 3 sales:", salesData.slice(0, 3));
 
-        // Calculate total for verification
-        const totalFromQuery = salesData.reduce((sum, item) => sum + Number(item.totalRevenue), 0);
-        const totalQty = salesData.reduce((sum, item) => sum + Number(item.totalQuantitySold), 0);
-        console.log("AI Analysis - Total Revenue from Query:", totalFromQuery);
-        console.log("AI Analysis - Total Quantity Sold:", totalQty);
+    // Calculate total for verification
+    const totalFromQuery = salesData.reduce(
+      (sum, item) => sum + Number(item.totalRevenue),
+      0
+    );
+    const totalQty = salesData.reduce(
+      (sum, item) => sum + Number(item.totalQuantitySold),
+      0
+    );
+    console.log("AI Analysis - Total Revenue from Query:", totalFromQuery);
+    console.log("AI Analysis - Total Quantity Sold:", totalQty);
 
-        // Get current inventory levels
-        const inventoryData = await db
-            .select({
-                variantId: medicationVariants.id,
-                variantName: medicationVariants.name,
-                medicationName: medications.name,
-                sku: medicationVariants.sku,
-                totalStock: sql`SUM(${inventory.quantity})`.as("total_stock"),
-                availableStock:
-                    sql`SUM(${inventory.quantity} - ${inventory.quantityReserved})`.as(
-                        "available_stock"
-                    ),
-                nearestExpiry: sql`MIN(${inventory.expiryDate})`.as("nearest_expiry"),
-            })
-            .from(inventory)
-            .innerJoin(
-                medicationVariants,
-                eq(inventory.medicationVariantId, medicationVariants.id)
-            )
-            .innerJoin(
-                medications,
-                eq(medicationVariants.medicationId, medications.id)
-            )
-            .groupBy(
-                medicationVariants.id,
-                medicationVariants.name,
-                medications.name,
-                medicationVariants.sku
-            );
+    // Get current inventory levels
+    const inventoryData = await db
+      .select({
+        variantId: medicationVariants.id,
+        variantName: medicationVariants.name,
+        medicationName: medications.name,
+        sku: medicationVariants.sku,
+        totalStock: sql`SUM(${inventory.quantity})`.as("total_stock"),
+        availableStock:
+          sql`SUM(${inventory.quantity} - ${inventory.quantityReserved})`.as(
+            "available_stock"
+          ),
+        nearestExpiry: sql`MIN(${inventory.expiryDate})`.as("nearest_expiry"),
+      })
+      .from(inventory)
+      .innerJoin(
+        medicationVariants,
+        eq(inventory.medicationVariantId, medicationVariants.id)
+      )
+      .innerJoin(
+        medications,
+        eq(medicationVariants.medicationId, medications.id)
+      )
+      .groupBy(
+        medicationVariants.id,
+        medicationVariants.name,
+        medications.name,
+        medicationVariants.sku
+      );
 
-        // Get low stock items
-        const lowStockItems = inventoryData.filter(
-            (item) => Number(item.availableStock) < 20
-        );
+    // Get low stock items
+    const lowStockItems = inventoryData.filter(
+      (item) => Number(item.availableStock) < 20
+    );
 
-        // Get items expiring soon (within 90 days)
-        const expiringDate = new Date();
-        expiringDate.setDate(expiringDate.getDate() + 90);
-        const expiringSoonItems = inventoryData.filter(
-            (item) => item.nearestExpiry && new Date(item.nearestExpiry) < expiringDate
-        );
+    // Get items expiring soon (within 90 days)
+    const expiringDate = new Date();
+    expiringDate.setDate(expiringDate.getDate() + 90);
+    const expiringSoonItems = inventoryData.filter(
+      (item) =>
+        item.nearestExpiry && new Date(item.nearestExpiry) < expiringDate
+    );
 
-        return {
-            salesData,
-            inventoryData,
-            lowStockItems,
-            expiringSoonItems,
-            daysAnalyzed: daysBack,
-        };
-    },
+    return {
+      salesData,
+      inventoryData,
+      lowStockItems,
+      expiringSoonItems,
+      daysAnalyzed: daysBack,
+    };
+  },
 
-    /**
-     * Generate AI-powered purchasing recommendations using Google Gemini
-     */
-    async generatePurchaseRecommendations(daysBack = 90) {
-        try {
-            // Get data
-            const {
-                salesData,
-                inventoryData,
-                lowStockItems,
-                expiringSoonItems,
-                daysAnalyzed,
-            } = await this.getSalesAndInventoryData(daysBack);
+  /**
+   * Generate AI-powered purchasing recommendations using Google Gemini
+   */
+  async generatePurchaseRecommendations(daysBack = 90) {
+    try {
+      // Get data
+      const {
+        salesData,
+        inventoryData,
+        lowStockItems,
+        expiringSoonItems,
+        daysAnalyzed,
+      } = await this.getSalesAndInventoryData(daysBack);
 
-            // Prepare data summary for AI
-            const topSellingItems = salesData.slice(0, 10);
-            const dataContext = {
-                analysisperiod: `${daysAnalyzed} days`,
-                totalProductsSold: salesData.reduce(
-                    (sum, item) => sum + Number(item.totalQuantitySold),
-                    0
-                ),
-                totalRevenue: salesData.reduce(
-                    (sum, item) => sum + Number(item.totalRevenue),
-                    0
-                ),
-                topSellingProducts: topSellingItems.map((item) => ({
-                    name: `${item.medicationName} - ${item.variantName}`,
-                    quantitySold: Number(item.totalQuantitySold),
-                    revenue: Number(item.totalRevenue),
-                    orderCount: Number(item.orderCount),
-                })),
-                lowStockProducts: lowStockItems.map((item) => ({
-                    name: `${item.medicationName} - ${item.variantName}`,
-                    currentStock: Number(item.availableStock),
-                })),
-                expiringSoonProducts: expiringSoonItems.map((item) => ({
-                    name: `${item.medicationName} - ${item.variantName}`,
-                    expiryDate: item.nearestExpiry,
-                    stock: Number(item.availableStock),
-                })),
-            };
+      // Prepare data summary for AI
+      const topSellingItems = salesData.slice(0, 10);
+      const dataContext = {
+        analysisperiod: `${daysAnalyzed} days`,
+        totalProductsSold: salesData.reduce(
+          (sum, item) => sum + Number(item.totalQuantitySold),
+          0
+        ),
+        totalRevenue: salesData.reduce(
+          (sum, item) => sum + Number(item.totalRevenue),
+          0
+        ),
+        topSellingProducts: topSellingItems.map((item) => ({
+          name: `${item.medicationName} - ${item.variantName}`,
+          quantitySold: Number(item.totalQuantitySold),
+          revenue: Number(item.totalRevenue),
+          orderCount: Number(item.orderCount),
+        })),
+        lowStockProducts: lowStockItems.map((item) => ({
+          name: `${item.medicationName} - ${item.variantName}`,
+          currentStock: Number(item.availableStock),
+        })),
+        expiringSoonProducts: expiringSoonItems.map((item) => ({
+          name: `${item.medicationName} - ${item.variantName}`,
+          expiryDate: item.nearestExpiry,
+          stock: Number(item.availableStock),
+        })),
+      };
 
-            // Create prompt for Gemini
-            const prompt = `
+      // Create prompt for Gemini
+      const prompt = `
 Bạn là một chuyên gia phân tích dữ liệu và quản lý tồn kho cho nhà thuốc. 
 Dựa trên dữ liệu bán hàng và tồn kho sau đây, hãy đưa ra các khuyến nghị chi tiết về việc nhập hàng:
 
@@ -189,33 +196,35 @@ Dựa trên dữ liệu bán hàng và tồn kho sau đây, hãy đưa ra các k
 
 **TOP SẢN PHẨM BÁN CHẠY:**
 ${dataContext.topSellingProducts
-                    .map(
-                        (p, i) =>
-                            `${i + 1}. ${p.name}
+  .map(
+    (p, i) =>
+      `${i + 1}. ${p.name}
    - Số lượng bán: ${p.quantitySold}
    - Doanh thu: ${p.revenue.toLocaleString("vi-VN")} VNĐ
    - Số đơn hàng: ${p.orderCount}`
-                    )
-                    .join("\n")}
+  )
+  .join("\n")}
 
 **SẢN PHẨM TỒN KHO THẤP:**
-${dataContext.lowStockProducts.length > 0
-                    ? dataContext.lowStockProducts
-                        .map((p) => `- ${p.name}: ${p.currentStock} đơn vị còn lại`)
-                        .join("\n")
-                    : "Không có sản phẩm tồn kho thấp"
-                }
+${
+  dataContext.lowStockProducts.length > 0
+    ? dataContext.lowStockProducts
+        .map((p) => `- ${p.name}: ${p.currentStock} đơn vị còn lại`)
+        .join("\n")
+    : "Không có sản phẩm tồn kho thấp"
+}
 
 **SẢN PHẨM SẮP HẾT HẠN (trong 90 ngày):**
-${dataContext.expiringSoonProducts.length > 0
-                    ? dataContext.expiringSoonProducts
-                        .map(
-                            (p) =>
-                                `- ${p.name}: ${p.stock} đơn vị, hết hạn ${new Date(p.expiryDate).toLocaleDateString("vi-VN")}`
-                        )
-                        .join("\n")
-                    : "Không có sản phẩm sắp hết hạn"
-                }
+${
+  dataContext.expiringSoonProducts.length > 0
+    ? dataContext.expiringSoonProducts
+        .map(
+          (p) =>
+            `- ${p.name}: ${p.stock} đơn vị, hết hạn ${new Date(p.expiryDate).toLocaleDateString("vi-VN")}`
+        )
+        .join("\n")
+    : "Không có sản phẩm sắp hết hạn"
+}
 
 **YÊU CẦU PHÂN TÍCH:**
 
@@ -269,84 +278,80 @@ Lưu ý:
 Chỉ trả về JSON, không có text ngoài lề.
 `;
 
-            // Call Gemini API
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const text = response.text();
+      // Call Gemini API
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
 
-            // Parse JSON response
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) {
-                throw new Error("AI response is not valid JSON");
-            }
+      // Parse JSON response
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error("AI response is not valid JSON");
+      }
 
-            const recommendations = JSON.parse(jsonMatch[0]);
+      const recommendations = JSON.parse(jsonMatch[0]);
 
-            return {
-                success: true,
-                data: recommendations,
-                metadata: {
-                    analyzedPeriod: daysAnalyzed,
-                    analyzedAt: new Date().toISOString(),
-                    dataPoints: {
-                        salesRecords: salesData.length,
-                        inventoryItems: inventoryData.length,
-                        lowStockItems: lowStockItems.length,
-                        expiringSoonItems: expiringSoonItems.length,
-                    },
-                },
-            };
-        } catch (error) {
-            console.error("AI Analysis Error:", error);
-            throw new Error(`Failed to generate recommendations: ${error.message}`);
-        }
-    },
+      return {
+        success: true,
+        data: recommendations,
+        metadata: {
+          analyzedPeriod: daysAnalyzed,
+          analyzedAt: new Date().toISOString(),
+          dataPoints: {
+            salesRecords: salesData.length,
+            inventoryItems: inventoryData.length,
+            lowStockItems: lowStockItems.length,
+            expiringSoonItems: expiringSoonItems.length,
+          },
+        },
+      };
+    } catch (error) {
+      console.error("AI Analysis Error:", error);
+      throw new Error(`Failed to generate recommendations: ${error.message}`);
+    }
+  },
 
-    /**
-     * Get quick insights without full AI analysis
-     */
-    async getQuickInsights(daysBack = 30) {
-        const {
-            salesData,
-            inventoryData,
-            lowStockItems,
-            expiringSoonItems,
-        } = await this.getSalesAndInventoryData(daysBack);
+  /**
+   * Get quick insights without full AI analysis
+   */
+  async getQuickInsights(daysBack = 30) {
+    const { salesData, inventoryData, lowStockItems, expiringSoonItems } =
+      await this.getSalesAndInventoryData(daysBack);
 
-        const totalRevenue = salesData.reduce(
-            (sum, item) => sum + Number(item.totalRevenue),
-            0
-        );
-        const totalQuantitySold = salesData.reduce(
-            (sum, item) => sum + Number(item.totalQuantitySold),
-            0
-        );
+    const totalRevenue = salesData.reduce(
+      (sum, item) => sum + Number(item.totalRevenue),
+      0
+    );
+    const totalQuantitySold = salesData.reduce(
+      (sum, item) => sum + Number(item.totalQuantitySold),
+      0
+    );
 
-        return {
-            summary: {
-                totalRevenue,
-                totalQuantitySold,
-                totalProducts: salesData.length,
-                averageOrderValue: totalRevenue / salesData.length || 0,
-            },
-            topSellingProducts: salesData.slice(0, 5),
-            lowStockAlerts: lowStockItems.length,
-            expiryAlerts: expiringSoonItems.length,
-            criticalActions: [
-                ...lowStockItems.slice(0, 3).map((item) => ({
-                    type: "LOW_STOCK",
-                    product: `${item.medicationName} - ${item.variantName}`,
-                    currentStock: Number(item.availableStock),
-                    action: "Consider restocking",
-                })),
-                ...expiringSoonItems.slice(0, 3).map((item) => ({
-                    type: "EXPIRING_SOON",
-                    product: `${item.medicationName} - ${item.variantName}`,
-                    expiryDate: item.nearestExpiry,
-                    action: "Avoid ordering more",
-                })),
-            ],
-        };
-    },
+    return {
+      summary: {
+        totalRevenue,
+        totalQuantitySold,
+        totalProducts: salesData.length,
+        averageOrderValue: totalRevenue / salesData.length || 0,
+      },
+      topSellingProducts: salesData.slice(0, 5),
+      lowStockAlerts: lowStockItems.length,
+      expiryAlerts: expiringSoonItems.length,
+      criticalActions: [
+        ...lowStockItems.slice(0, 3).map((item) => ({
+          type: "LOW_STOCK",
+          product: `${item.medicationName} - ${item.variantName}`,
+          currentStock: Number(item.availableStock),
+          action: "Consider restocking",
+        })),
+        ...expiringSoonItems.slice(0, 3).map((item) => ({
+          type: "EXPIRING_SOON",
+          product: `${item.medicationName} - ${item.variantName}`,
+          expiryDate: item.nearestExpiry,
+          action: "Avoid ordering more",
+        })),
+      ],
+    };
+  },
 };

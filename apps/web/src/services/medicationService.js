@@ -17,9 +17,12 @@ export const medicationService = {
 
   // Search medications for POS
   async searchMedications(search) {
-    const response = await instance.get("/medications/variants/search-for-sale", {
-      params: { search },
-    });
+    const response = await instance.get(
+      "/medications/variants/search-for-sale",
+      {
+        params: { search },
+      }
+    );
     return response.data;
   },
 };

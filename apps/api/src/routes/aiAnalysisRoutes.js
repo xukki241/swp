@@ -12,9 +12,9 @@ const router = express.Router();
  * @query   daysBack - Number of days to analyze (default: 90)
  */
 router.get(
-    "/purchase-recommendations",
-    authenticate,
-    aiAnalysisController.getPurchaseRecommendations
+  "/purchase-recommendations",
+  authenticate,
+  aiAnalysisController.getPurchaseRecommendations
 );
 
 /**
@@ -24,9 +24,9 @@ router.get(
  * @query   daysBack - Number of days to analyze (default: 30)
  */
 router.get(
-    "/quick-insights",
-    authenticate,
-    aiAnalysisController.getQuickInsights
+  "/quick-insights",
+  authenticate,
+  aiAnalysisController.getQuickInsights
 );
 
 /**
