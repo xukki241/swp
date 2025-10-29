@@ -29,7 +29,7 @@ import { Label } from "../../../../components/ui/label";
 import { Textarea } from "../../../../components/ui/textarea";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
 
-export function BinCard({ bin, rackId }) {
+export function BinCard({ bin, rackId, refetch }) {
   const { updateBinData, deleteBinData } = useWarehouse();
   const [showBinDetails, setShowBinDetails] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -54,6 +54,7 @@ export function BinCard({ bin, rackId }) {
     try {
       await updateBinData(bin.id, formData);
       setShowEditDialog(false);
+      refetch();
     } catch (error) {
       console.error("Failed to update bin:", error);
     } finally {
@@ -66,6 +67,7 @@ export function BinCard({ bin, rackId }) {
     try {
       await deleteBinData(bin.id, rackId);
       setShowDeleteDialog(false);
+      refetch();
     } catch (error) {
       console.error("Failed to delete bin:", error);
     } finally {
@@ -139,7 +141,8 @@ export function BinCard({ bin, rackId }) {
               <img
                 src={
                   bin?.medication?.medicationVariant?.img_url ||
-                  MedicinePlaceholder
+                  MedicinePlaceholder ||
+                  "/placeholder.svg"
                 }
                 alt={bin?.name}
                 className="w-32 h-32 rounded-lg object-cover border"
@@ -214,18 +217,9 @@ export function BinCard({ bin, rackId }) {
 
           <form onSubmit={handleEditSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="binCode">Bin Code</Label>
-              <Input
-                id="binCode"
-                name="binCode"
-                value={formData.binCode}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="binName">Bin Name</Label>
+              <Label className="mb-2" htmlFor="binName">
+                Bin Name
+              </Label>
               <Input
                 id="binName"
                 name="binName"
@@ -235,9 +229,24 @@ export function BinCard({ bin, rackId }) {
               />
             </div>
 
+            <div>
+              <Label className="mb-2" htmlFor="binCode">
+                Bin Code
+              </Label>
+              <Input
+                id="binCode"
+                name="binCode"
+                value={formData.binCode}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="binLevel">Level</Label>
+                <Label className="mb-2" htmlFor="binLevel">
+                  Level
+                </Label>
                 <Input
                   id="binLevel"
                   name="binLevel"
@@ -248,7 +257,9 @@ export function BinCard({ bin, rackId }) {
                 />
               </div>
               <div>
-                <Label htmlFor="binNumber">Bin Number</Label>
+                <Label className="mb-2" htmlFor="binNumber">
+                  Bin Number
+                </Label>
                 <Input
                   id="binNumber"
                   name="binNumber"
@@ -261,7 +272,9 @@ export function BinCard({ bin, rackId }) {
             </div>
 
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label className="mb-2" htmlFor="description">
+                Description
+              </Label>
               <Textarea
                 id="description"
                 name="description"
