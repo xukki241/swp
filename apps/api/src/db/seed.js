@@ -1108,42 +1108,67 @@ async function seed() {
       .values(receiptItemData)
       .returning();
 
-    // 16. Seed Inventory (ONLY from received purchase order receipts)
+    // 16. Seed Inventory (ALL variants with at least 20 units each)
     console.log("📊 Seeding inventory...");
-    const inventoryData = [
-      // Inventory from PO1 Receipt - Item 1: Paracetamol 500mg (200 boxes)
-      {
-        medicationVariantId: medicationVariantsResults[0].id,
-        purchaseOrderReceiptItemsId: receiptItemsResults[0].id,
-        binId: warehouseBinsResults[0].id, // Zone A - Rack A-001, Level 1, Bin 01
-        batchNumber: "P2405001",
-        manufactureDate: new Date("2024-01-10"),
-        expiryDate: new Date("2027-01-09"),
-        quantity: 200,
-      },
-      // Inventory from PO1 Receipt - Item 2: Amoxicillin 500mg (100 boxes)
-      {
-        medicationVariantId: medicationVariantsResults[3].id,
-        purchaseOrderReceiptItemsId: receiptItemsResults[1].id,
-        binId: warehouseBinsResults[1].id, // Zone A - Rack A-001, Level 1, Bin 02
-        batchNumber: "A2405002",
-        manufactureDate: new Date("2024-02-15"),
-        expiryDate: new Date("2026-02-14"),
-        quantity: 100,
-      },
-      // Inventory from PO1 Receipt - Item 3: Atorvastatin 20mg (50 boxes)
-      {
-        medicationVariantId: medicationVariantsResults[13].id,
-        purchaseOrderReceiptItemsId: receiptItemsResults[2].id,
-        binId: warehouseBinsResults[2].id, // Zone A - Rack A-001, Level 1, Bin 03
-        batchNumber: "T2405003",
-        manufactureDate: new Date("2023-12-20"),
-        expiryDate: new Date("2025-12-19"),
-        quantity: 50,
-      },
-    ];
+
+    // Helper function to get a random bin
+    const getRandomBin = (startIdx, count) => {
+      const idx = Math.floor(Math.random() * count) + startIdx;
+      return warehouseBinsResults[idx];
+    };
+
+    // Helper function to generate batch number
+    const generateBatchNumber = (variantSku) => {
+      const year = new Date().getFullYear().toString().substring(2);
+      const month = String(new Date().getMonth() + 1).padStart(2, '0');
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      return `${variantSku.substring(0, 3)}-${year}${month}-${random}`;
+    };
+
+    // Create inventory for ALL medication variants
+    const inventoryData = medicationVariantsResults.map((variant, index) => {
+      // Determine storage zone based on medication type
+      let binStartIdx = 0; // Default: Zone A (Normal storage)
+      let binCount = 24; // Bins in Zone A, Rack 1
+
+      // Special handling for controlled substances (Tramadol)
+      if (variant.name.includes('Tramadol')) {
+        binStartIdx = 168; // Zone D (Controlled vault) - last 24 bins
+        binCount = 24;
+      }
+      // Cold storage for certain items (if needed in future)
+      else if (variant.name.includes('Insulin') || variant.name.includes('Vaccine')) {
+        binStartIdx = 120; // Zone C (Cold storage)
+        binCount = 48;
+      }
+
+      // Random quantity between 20 and 200
+      const quantity = Math.floor(Math.random() * 181) + 20;
+
+      // Random manufacture date in the past year
+      const manufactureDate = new Date();
+      manufactureDate.setMonth(manufactureDate.getMonth() - Math.floor(Math.random() * 12));
+
+      // Expiry date: 1-3 years from manufacture
+      const expiryDate = new Date(manufactureDate);
+      const yearsToAdd = Math.floor(Math.random() * 3) + 1;
+      expiryDate.setFullYear(expiryDate.getFullYear() + yearsToAdd);
+
+      return {
+        medicationVariantId: variant.id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[0].id, // Link to a receipt (using first one)
+        binId: getRandomBin(binStartIdx, binCount).id,
+        batchNumber: generateBatchNumber(variant.sku),
+        manufactureDate,
+        expiryDate,
+        quantity,
+        quantityReserved: 0, // No reservations initially
+      };
+    });
 
     await db.insert(inventory).values(inventoryData);
+
+    console.log(`✅ Created inventory for ${inventoryData.length} variants (20-200 units each)`);
 
     // 17. Seed Sales Orders
     console.log("💰 Seeding sales orders...");
@@ -1702,7 +1727,7 @@ async function seed() {
     - Purchase Order Items: 11
     - Purchase Order Receipts: 1
     - Receipt Items: 3
-    - Inventory Entries: 3 (matches receipt items - strict 1:1 relationship)
+    - Inventory Entries: 26 (ALL variants with 20-200 units each)
     - Sales Orders: 15 (5 from June 2024 + 10 from October 2025)
       * October 2025: 10 orders - 7 delivered, 1 paid, 2 pending
       * Total October Revenue: 7,580,000 VND

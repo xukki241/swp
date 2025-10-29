@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Plus, Search } from "lucide-react";
+import { Loader2, MapPin, Plus, Search } from "lucide-react";
 import { useState } from "react";
 
 export default function MedicationSearch({
@@ -58,11 +58,54 @@ export default function MedicationSearch({
                     Stock: {medication.availableQuantity}
                   </span>
                 </div>
+
+                {/* FEFO Location Information */}
+                {medication.locations && medication.locations.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    <div className="flex items-start gap-1 text-xs">
+                      <MapPin className="w-3 h-3 text-purple-600 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <span className="font-semibold text-purple-700">
+                          Pick from (FEFO):
+                        </span>
+                        <div className="space-y-0.5 mt-1">
+                          {medication.locations.slice(0, 3).map((loc, idx) => (
+                            <div
+                              key={idx}
+                              className="text-gray-700 bg-purple-50 px-2 py-1 rounded border border-purple-200"
+                            >
+                              <span className="font-medium">
+                                {loc.location?.fullLocation || "Location N/A"}
+                              </span>
+                              <span className="text-gray-600 ml-2">
+                                • Qty: {loc.quantity}
+                              </span>
+                              {loc.expiryDate && (
+                                <span className="text-orange-600 ml-2">
+                                  • Exp:{" "}
+                                  {new Date(loc.expiryDate).toLocaleDateString(
+                                    "vi-VN"
+                                  )}
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                          {medication.locations.length > 3 && (
+                            <p className="text-gray-500 italic pl-2">
+                              +{medication.locations.length - 3} more
+                              location(s)
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
               <Button
                 onClick={() => onSelectMedication(medication)}
                 size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white ml-3"
               >
                 <Plus className="w-4 h-4 mr-1" />
                 Add

@@ -17,8 +17,8 @@ export const medicationService = {
 
   // Search medications for POS
   async searchMedications(search) {
-    const response = await instance.get("/medications/variants/all", {
-      params: { search, isActive: true },
+    const response = await instance.get("/medications/variants/search-for-sale", {
+      params: { search },
     });
     return response.data;
   },
