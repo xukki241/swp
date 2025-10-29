@@ -47,13 +47,14 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 
+// 🔄 CHỈ ĐỔI DÒNG IMPORT NÀY: dùng từ fileUrls thay vì mockImages
 import {
   clearMedicationImage,
   fileToDataURL,
   getMedicationImageLocal,
   getMedicationImageUrl,
   setMedicationImage,
-} from "@/lib/mockImages";
+} from "@/lib/fileUrls";
 
 /* helpers */
 function useDebounced(value, delay = 350) {
@@ -261,7 +262,7 @@ export default function MedicationListPage() {
     }
   };
 
-  /* VARIANTS (giữ nguyên logic fetch để Manage dialog hoạt động nếu bạn vẫn dùng) */
+  /* VARIANTS (giữ nguyên) */
   const { data: variants = [], refetch: refetchVariants } = useMedicationVariants(medId);
   const {
     handleSubmit: handleVarSubmit,
@@ -374,7 +375,6 @@ export default function MedicationListPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Medications</h1>
-          <p className="text-muted-foreground mt-1">View, search and manage medications</p>
         </div>
 
         <Card>
@@ -382,7 +382,7 @@ export default function MedicationListPage() {
             <CardTitle>Medication Catalog</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* ==== FILTER BAR (inline, giống UserListPage) ==== */}
+            {/* FILTER BAR */}
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2 sm:items-center">
                 <div className="flex items-center gap-2">
@@ -424,7 +424,6 @@ export default function MedicationListPage() {
                 </Button>
               </div>
             </div>
-            {/* ==== /FILTER BAR ==== */}
 
             {isLoading ? (
               <p>Loading...</p>

@@ -11,7 +11,7 @@ import {
 import {
   getMedicationImageLocal,
   getMedicationImageUrl,
-} from "@/lib/mockImages";
+} from "@/lib/fileUrls";
 import {
   getInventorySummary,
   getPurchasesByMedication,

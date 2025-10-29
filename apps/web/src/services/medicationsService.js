@@ -175,3 +175,21 @@ export async function findVariantsByBarcode(barcode) {
   const data = res.data?.data ?? res.data;
   return Array.isArray(data) ? data : [];
 }
+
+/** Upload/replace medication image (multipart/form-data, field: "image") */
+export async function uploadMedicationImage(medicationId, file) {
+  const form = new FormData();
+  form.append("image", file);
+  const { data } = await api.post(
+    `/api/medications/${medicationId}/upload-image`,
+    form,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+  return data?.data; // { medication, image }
+}
+
+/** Delete medication image (set imageId = null) */
+export async function deleteMedicationImage(medicationId) {
+  const { data } = await api.delete(`/api/medications/${medicationId}/image`);
+  return data?.data; // medication
+}
