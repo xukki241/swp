@@ -25,6 +25,23 @@ import { toast } from "sonner";
 
 import { aiAnalysisService } from "@/services/aiAnalysisService";
 
+// Format large numbers with K, M, B suffixes
+const formatCompactNumber = (num) => {
+  if (!num) return "0";
+  const absNum = Math.abs(num);
+
+  if (absNum >= 1_000_000_000) {
+    return (num / 1_000_000_000).toFixed(1) + "B";
+  }
+  if (absNum >= 1_000_000) {
+    return (num / 1_000_000).toFixed(1) + "M";
+  }
+  if (absNum >= 1_000) {
+    return (num / 1_000).toFixed(1) + "K";
+  }
+  return num.toString();
+};
+
 export default function AIAnalyticsDialog({ open, onOpenChange }) {
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
@@ -43,7 +60,7 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
       // Load both recommendations and quick insights in parallel
       const [recData, insightsData] = await Promise.all([
         aiAnalysisService.getPurchaseRecommendations(daysBack),
-        aiAnalysisService.getQuickInsights(30), // Last 30 days for quick insights
+        aiAnalysisService.getQuickInsights(daysBack), // Use same daysBack parameter
       ]);
 
       setRecommendations(recData);
@@ -99,18 +116,21 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className="max-w-none w-[90vw] max-h-[90vh] overflow-y-auto"
+        style={{ minWidth: '1600px' }}
+      >
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Brain className="w-6 h-6 text-purple-600" />
-              <DialogTitle>AI-Powered Purchase Analytics</DialogTitle>
+              <DialogTitle className="text-xl">AI-Powered Purchase Analytics</DialogTitle>
             </div>
             <div className="flex items-center gap-2">
               <select
                 value={daysBack}
                 onChange={(e) => setDaysBack(Number(e.target.value))}
-                className="text-sm border rounded px-2 py-1"
+                className="text-sm border rounded px-3 py-1.5"
               >
                 <option value={30}>Last 30 days</option>
                 <option value={60}>Last 60 days</option>
@@ -158,52 +178,104 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
               {recommendations?.data && (
                 <div className="space-y-4">
                   {/* Summary Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-blue-600 font-medium">
-                            Total Revenue
-                          </p>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">
+                          Total Revenue
+                        </p>
+                        <DollarSign className="w-5 h-5 text-blue-400" />
+                      </div>
+                      <div className="mb-2">
+                        <div className="flex items-baseline gap-1.5">
                           <p className="text-2xl font-bold text-blue-900">
-                            {quickInsights?.summary.totalRevenue?.toLocaleString(
-                              "vi-VN"
-                            )}{" "}
-                            đ
+                            {formatCompactNumber(quickInsights?.summary.totalRevenue)}
                           </p>
+                          <span className="text-sm text-blue-700 font-medium">đ</span>
                         </div>
-                        <DollarSign className="w-8 h-8 text-blue-600" />
+                      </div>
+                      <div className="pt-2 border-t border-blue-200/50">
+                        <p className="text-[10px] text-blue-600 leading-tight">
+                          {quickInsights?.summary.totalRevenue?.toLocaleString("vi-VN")} VND
+                        </p>
+                        <p className="text-[10px] text-blue-500 mt-0.5">
+                          {quickInsights?.summary.totalOrders || 0} orders
+                        </p>
                       </div>
                     </div>
 
                     <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-green-600 font-medium">
-                            Products Sold
-                          </p>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-green-600 font-semibold uppercase tracking-wide">
+                          Products Sold
+                        </p>
+                        <Package className="w-5 h-5 text-green-400" />
+                      </div>
+                      <div className="mb-2">
+                        <div className="flex items-baseline gap-1.5">
                           <p className="text-2xl font-bold text-green-900">
-                            {quickInsights?.summary.totalQuantitySold?.toLocaleString()}
+                            {formatCompactNumber(quickInsights?.summary.totalQuantitySold)}
                           </p>
+                          <span className="text-sm text-green-700 font-medium">units</span>
                         </div>
-                        <Package className="w-8 h-8 text-green-600" />
+                      </div>
+                      <div className="pt-2 border-t border-green-200/50">
+                        <p className="text-[10px] text-green-600 leading-tight">
+                          {quickInsights?.summary.totalQuantitySold?.toLocaleString()} total
+                        </p>
+                        <p className="text-[10px] text-green-500 mt-0.5">
+                          {quickInsights?.summary.totalProducts || 0} variants
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg border border-orange-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-orange-600 font-semibold uppercase tracking-wide">
+                          Avg Order Value
+                        </p>
+                        <TrendingUp className="w-5 h-5 text-orange-400" />
+                      </div>
+                      <div className="mb-2">
+                        <div className="flex items-baseline gap-1.5">
+                          <p className="text-2xl font-bold text-orange-900">
+                            {formatCompactNumber(quickInsights?.summary.averageOrderValue)}
+                          </p>
+                          <span className="text-sm text-orange-700 font-medium">đ</span>
+                        </div>
+                      </div>
+                      <div className="pt-2 border-t border-orange-200/50">
+                        <p className="text-[10px] text-orange-600 leading-tight">
+                          {quickInsights?.summary.averageOrderValue?.toLocaleString("vi-VN", { maximumFractionDigits: 0 })} VND
+                        </p>
+                        <p className="text-[10px] text-orange-500 mt-0.5">
+                          per transaction
+                        </p>
                       </div>
                     </div>
 
                     <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-purple-600 font-medium">
-                            Investment Needed
-                          </p>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-purple-600 font-semibold uppercase tracking-wide">
+                          Investment Needed
+                        </p>
+                        <TrendingUp className="w-5 h-5 text-purple-400" />
+                      </div>
+                      <div className="mb-2">
+                        <div className="flex items-baseline gap-1.5">
                           <p className="text-2xl font-bold text-purple-900">
-                            {recommendations.data.financialProjection?.estimatedTotalInvestment?.toLocaleString(
-                              "vi-VN"
-                            ) || "N/A"}{" "}
-                            đ
+                            {formatCompactNumber(recommendations.data.financialProjection?.estimatedTotalInvestment)}
                           </p>
+                          <span className="text-sm text-purple-700 font-medium">đ</span>
                         </div>
-                        <TrendingUp className="w-8 h-8 text-purple-600" />
+                      </div>
+                      <div className="pt-2 border-t border-purple-200/50">
+                        <p className="text-[10px] text-purple-600 leading-tight">
+                          {recommendations.data.financialProjection?.estimatedTotalInvestment?.toLocaleString("vi-VN") || "N/A"} VND
+                        </p>
+                        <p className="text-[10px] text-purple-500 mt-0.5">
+                          {recommendations.data.priorityRecommendations?.length || 0} items
+                        </p>
                       </div>
                     </div>
                   </div>
