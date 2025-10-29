@@ -201,7 +201,7 @@ export const updateMedicationVariant = async (req, res, _next) => {
 
     const variantData = {};
     if (medicationId !== undefined) {
-      variantData.medicationId = BigInt(medicationId);
+      variantData.medicationId = medicationId; // UUID string
     }
     if (sku !== undefined) {
       variantData.sku = sku;
@@ -280,7 +280,7 @@ export const deleteMedicationVariant = async (req, res, next) => {
  */
 export const getMedicationVariantInventory = async (req, res, next) => {
   try {
-    const id = Number.parseInt(req.params.id);
+    const id = req.params.id; // UUID string
     const items = await inventoryService.getByMedicationVariantId(id);
 
     res.status(200).json({

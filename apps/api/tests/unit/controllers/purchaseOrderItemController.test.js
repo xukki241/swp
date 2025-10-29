@@ -84,7 +84,7 @@ describe("PurchaseOrderItemController", () => {
 
       await purchaseOrderItemController.getById(req, res);
 
-      expect(purchaseOrderItemService.getById).toHaveBeenCalledWith(1);
+      expect(purchaseOrderItemService.getById).toHaveBeenCalledWith("1"); // UUID string
       expect(res.json).toHaveBeenCalledWith(mockItem);
     });
 
@@ -107,7 +107,11 @@ describe("PurchaseOrderItemController", () => {
 
       await purchaseOrderItemController.update(req, res);
 
-      expect(purchaseOrderItemService.update).toHaveBeenCalledWith(1, req.body);
+      // UUID string
+      expect(purchaseOrderItemService.update).toHaveBeenCalledWith(
+        "1",
+        req.body
+      );
       expect(res.json).toHaveBeenCalledWith(mockItem);
     });
 

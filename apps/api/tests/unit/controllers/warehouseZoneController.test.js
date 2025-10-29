@@ -95,7 +95,7 @@ describe("WarehouseZoneController", () => {
 
       await warehouseZoneController.getById(req, res);
 
-      expect(warehouseZoneService.getById).toHaveBeenCalledWith(1);
+      expect(warehouseZoneService.getById).toHaveBeenCalledWith("1"); // UUID string
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: { id: 1, code: "Z001" },
@@ -123,7 +123,7 @@ describe("WarehouseZoneController", () => {
 
       await warehouseZoneController.update(req, res);
 
-      expect(warehouseZoneService.update).toHaveBeenCalledWith(1, req.body);
+      expect(warehouseZoneService.update).toHaveBeenCalledWith("1", req.body); // UUID string
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         message: "Warehouse zone updated successfully",
