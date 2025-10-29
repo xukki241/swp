@@ -1147,9 +1147,26 @@ async function seed() {
 
     // 17. Seed Sales Orders
     console.log("💰 Seeding sales orders...");
-    const [sale1, sale2, sale3] = await db
+    const [
+      sale1,
+      sale2,
+      sale3,
+      sale4,
+      sale5,
+      sale6,
+      sale7,
+      sale8,
+      sale9,
+      sale10,
+      sale11,
+      sale12,
+      sale13,
+      sale14,
+      sale15,
+    ] = await db
       .insert(salesOrders)
       .values([
+        // Old sales from June 2024 (for historical data)
         {
           customerId: customer1.id,
           orderDate: new Date("2024-06-05T10:30:00Z"),
@@ -1190,13 +1207,94 @@ async function seed() {
           paymentMethod: "bank_transfer",
           salespersonId: staff2.id,
         },
+        // NEW: October 2025 sales orders (current month)
+        {
+          customerId: customer1.id,
+          orderDate: new Date("2025-10-02T09:15:00Z"),
+          totalAmount: 450000,
+          status: "delivered",
+          paymentMethod: "cash",
+          salespersonId: staff1.id,
+        },
+        {
+          customerId: customer2.id,
+          orderDate: new Date("2025-10-05T14:30:00Z"),
+          totalAmount: 680000,
+          status: "delivered",
+          paymentMethod: "bank_transfer",
+          salespersonId: staff2.id,
+        },
+        {
+          customerId: customer3.id,
+          orderDate: new Date("2025-10-08T11:00:00Z"),
+          totalAmount: 320000,
+          status: "delivered",
+          paymentMethod: "mobile_payment",
+          salespersonId: staff1.id,
+        },
+        {
+          customerId: customer4.id,
+          orderDate: new Date("2025-10-12T16:45:00Z"),
+          totalAmount: 1250000,
+          status: "delivered",
+          paymentMethod: "bank_transfer",
+          salespersonId: staff3.id,
+        },
+        {
+          customerId: customer1.id,
+          orderDate: new Date("2025-10-15T10:20:00Z"),
+          totalAmount: 540000,
+          status: "delivered",
+          paymentMethod: "cash",
+          salespersonId: staff2.id,
+        },
+        {
+          customerId: customer2.id,
+          orderDate: new Date("2025-10-18T13:30:00Z"),
+          totalAmount: 890000,
+          status: "paid",
+          paymentMethod: "mobile_payment",
+          salespersonId: staff1.id,
+        },
+        {
+          customerId: customer3.id,
+          orderDate: new Date("2025-10-20T09:00:00Z"),
+          totalAmount: 420000,
+          status: "pending",
+          paymentMethod: "cash",
+          salespersonId: staff2.id,
+        },
+        {
+          customerId: customer4.id,
+          orderDate: new Date("2025-10-22T15:15:00Z"),
+          totalAmount: 760000,
+          status: "delivered",
+          paymentMethod: "bank_transfer",
+          salespersonId: staff3.id,
+        },
+        {
+          customerId: customer1.id,
+          orderDate: new Date("2025-10-25T11:30:00Z"),
+          totalAmount: 350000,
+          status: "delivered",
+          paymentMethod: "cash",
+          salespersonId: staff1.id,
+        },
+        {
+          customerId: customer2.id,
+          orderDate: new Date("2025-10-28T14:00:00Z"),
+          totalAmount: 920000,
+          status: "pending",
+          paymentMethod: "mobile_payment",
+          salespersonId: staff2.id,
+        },
       ])
       .returning();
 
     // 18. Seed Sales Order Items
     console.log("🛒 Seeding sales order items...");
     await db.insert(salesOrderItems).values([
-      // Sale 1 items
+      // Sale 1 items (June 2024)
       {
         salesOrderId: sale1.id,
         medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
@@ -1211,7 +1309,7 @@ async function seed() {
         unitPrice: 40000,
         totalPrice: 120000,
       },
-      // Sale 2 items
+      // Sale 2 items (June 2024)
       {
         salesOrderId: sale2.id,
         medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
@@ -1219,14 +1317,7 @@ async function seed() {
         unitPrice: 85000,
         totalPrice: 340000,
       },
-      {
-        salesOrderId: sale2.id,
-        medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
-        quantity: 0, // This seems wrong, but to match totalAmount 340000, this must be 0.
-        unitPrice: 120000,
-        totalPrice: 0,
-      },
-      // Sale 3 items
+      // Sale 3 items (June 2024)
       {
         salesOrderId: sale3.id,
         medicationVariantId: medicationVariantsResults[2].id, // Paracetamol Syrup
@@ -1238,8 +1329,204 @@ async function seed() {
         salesOrderId: sale3.id,
         medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
         quantity: 1,
-        unitPrice: 20000, // Made up price to meet total
+        unitPrice: 20000,
         totalPrice: 20000,
+      },
+
+      // NEW: October 2025 sales order items
+      // Sale 6 items (Oct 2, 2025 - 450,000 VND)
+      {
+        salesOrderId: sale6.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 4,
+        unitPrice: 50000,
+        totalPrice: 200000,
+      },
+      {
+        salesOrderId: sale6.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 5,
+        unitPrice: 50000,
+        totalPrice: 250000,
+      },
+
+      // Sale 7 items (Oct 5, 2025 - 680,000 VND)
+      {
+        salesOrderId: sale7.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 4,
+        unitPrice: 85000,
+        totalPrice: 340000,
+      },
+      {
+        salesOrderId: sale7.id,
+        medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
+        quantity: 2,
+        unitPrice: 120000,
+        totalPrice: 240000,
+      },
+      {
+        salesOrderId: sale7.id,
+        medicationVariantId: medicationVariantsResults[19].id, // Vitamin D3
+        quantity: 2,
+        unitPrice: 50000,
+        totalPrice: 100000,
+      },
+
+      // Sale 8 items (Oct 8, 2025 - 320,000 VND)
+      {
+        salesOrderId: sale8.id,
+        medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
+        quantity: 5,
+        unitPrice: 45000,
+        totalPrice: 225000,
+      },
+      {
+        salesOrderId: sale8.id,
+        medicationVariantId: medicationVariantsResults[2].id, // Paracetamol Syrup
+        quantity: 2,
+        unitPrice: 47500,
+        totalPrice: 95000,
+      },
+
+      // Sale 9 items (Oct 12, 2025 - 1,250,000 VND)
+      {
+        salesOrderId: sale9.id,
+        medicationVariantId: medicationVariantsResults[13].id, // Atorvastatin 20mg
+        quantity: 3,
+        unitPrice: 220000,
+        totalPrice: 660000,
+      },
+      {
+        salesOrderId: sale9.id,
+        medicationVariantId: medicationVariantsResults[11].id, // Metformin 500mg
+        quantity: 5,
+        unitPrice: 75000,
+        totalPrice: 375000,
+      },
+      {
+        salesOrderId: sale9.id,
+        medicationVariantId: medicationVariantsResults[15].id, // Amlodipine 10mg
+        quantity: 2,
+        unitPrice: 107500,
+        totalPrice: 215000,
+      },
+
+      // Sale 10 items (Oct 15, 2025 - 540,000 VND)
+      {
+        salesOrderId: sale10.id,
+        medicationVariantId: medicationVariantsResults[17].id, // Salbutamol Inhaler
+        quantity: 4,
+        unitPrice: 95000,
+        totalPrice: 380000,
+      },
+      {
+        salesOrderId: sale10.id,
+        medicationVariantId: medicationVariantsResults[6].id, // Ibuprofen 200mg
+        quantity: 4,
+        unitPrice: 40000,
+        totalPrice: 160000,
+      },
+
+      // Sale 11 items (Oct 18, 2025 - 890,000 VND)
+      {
+        salesOrderId: sale11.id,
+        medicationVariantId: medicationVariantsResults[21].id, // Azithromycin 500mg
+        quantity: 6,
+        unitPrice: 75000,
+        totalPrice: 450000,
+      },
+      {
+        salesOrderId: sale11.id,
+        medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
+        quantity: 2,
+        unitPrice: 120000,
+        totalPrice: 240000,
+      },
+      {
+        salesOrderId: sale11.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 4,
+        unitPrice: 50000,
+        totalPrice: 200000,
+      },
+
+      // Sale 12 items (Oct 20, 2025 - 420,000 VND - pending)
+      {
+        salesOrderId: sale12.id,
+        medicationVariantId: medicationVariantsResults[4].id, // Amoxicillin Suspension
+        quantity: 5,
+        unitPrice: 65000,
+        totalPrice: 325000,
+      },
+      {
+        salesOrderId: sale12.id,
+        medicationVariantId: medicationVariantsResults[19].id, // Vitamin D3
+        quantity: 2,
+        unitPrice: 47500,
+        totalPrice: 95000,
+      },
+
+      // Sale 13 items (Oct 22, 2025 - 760,000 VND)
+      {
+        salesOrderId: sale13.id,
+        medicationVariantId: medicationVariantsResults[13].id, // Atorvastatin 20mg
+        quantity: 2,
+        unitPrice: 220000,
+        totalPrice: 440000,
+      },
+      {
+        salesOrderId: sale13.id,
+        medicationVariantId: medicationVariantsResults[15].id, // Amlodipine 10mg
+        quantity: 2,
+        unitPrice: 125000,
+        totalPrice: 250000,
+      },
+      {
+        salesOrderId: sale13.id,
+        medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
+        quantity: 2,
+        unitPrice: 35000,
+        totalPrice: 70000,
+      },
+
+      // Sale 14 items (Oct 25, 2025 - 350,000 VND)
+      {
+        salesOrderId: sale14.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 3,
+        unitPrice: 50000,
+        totalPrice: 150000,
+      },
+      {
+        salesOrderId: sale14.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 4,
+        unitPrice: 50000,
+        totalPrice: 200000,
+      },
+
+      // Sale 15 items (Oct 28, 2025 - 920,000 VND - pending)
+      {
+        salesOrderId: sale15.id,
+        medicationVariantId: medicationVariantsResults[11].id, // Metformin 500mg
+        quantity: 8,
+        unitPrice: 75000,
+        totalPrice: 600000,
+      },
+      {
+        salesOrderId: sale15.id,
+        medicationVariantId: medicationVariantsResults[21].id, // Azithromycin 500mg
+        quantity: 3,
+        unitPrice: 75000,
+        totalPrice: 225000,
+      },
+      {
+        salesOrderId: sale15.id,
+        medicationVariantId: medicationVariantsResults[19].id, // Vitamin D3
+        quantity: 2,
+        unitPrice: 47500,
+        totalPrice: 95000,
       },
     ]);
 
@@ -1628,8 +1915,10 @@ async function seed() {
     - Purchase Order Receipts: 1
     - Receipt Items: 3
     - Inventory Entries: 3 (matches receipt items - strict 1:1 relationship)
-    - Sales Orders: 5
-    - Sales Order Items: 9
+    - Sales Orders: 15 (5 from June 2024 + 10 from October 2025)
+      * October 2025: 10 orders - 7 delivered, 1 paid, 2 pending
+      * Total October Revenue: 7,580,000 VND
+    - Sales Order Items: 42 (5 old + 37 new for October)
     - Files: 3
     - File Attachments: 3
     - Notifications: 5
