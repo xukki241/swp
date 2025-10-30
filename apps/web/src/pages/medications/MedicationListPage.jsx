@@ -13,9 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
 
 import {
   useCreateMedication,
@@ -44,8 +41,8 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 // 🔄 CHỈ ĐỔI DÒNG IMPORT NÀY: dùng từ fileUrls thay vì mockImages
 import {
@@ -67,8 +64,16 @@ function useDebounced(value, delay = 350) {
 }
 function PillPlaceholder({ className = "h-14 w-14" }) {
   return (
-    <div className={`rounded-xl border bg-muted/30 flex items-center justify-center ${className}`}>
-      <svg viewBox="0 0 24 24" className="h-7 w-7 opacity-60" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <div
+      className={`rounded-xl border bg-muted/30 flex items-center justify-center ${className}`}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        className="h-7 w-7 opacity-60"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      >
         <path d="M4 14a5 5 0 0 0 7.07 7.07l6.86-6.86a5 5 0 0 0-7.07-7.07L4 14Z" />
         <path d="M8.5 8.5l7 7" />
       </svg>
@@ -81,7 +86,13 @@ function StatusBadge({ status }) {
     s === "active"
       ? "bg-emerald-50 text-emerald-700 border-emerald-200"
       : "bg-zinc-50 text-zinc-600 border-zinc-200";
-  return <span className={`px-2 py-0.5 text-xs rounded-full border ${style} capitalize`}>{s}</span>;
+  return (
+    <span
+      className={`px-2 py-0.5 text-xs rounded-full border ${style} capitalize`}
+    >
+      {s}
+    </span>
+  );
 }
 
 /** Inline MedImage (không tạo file mới) */
@@ -263,7 +274,8 @@ export default function MedicationListPage() {
   };
 
   /* VARIANTS (giữ nguyên) */
-  const { data: variants = [], refetch: refetchVariants } = useMedicationVariants(medId);
+  const { data: variants = [], refetch: refetchVariants } =
+    useMedicationVariants(medId);
   const {
     handleSubmit: handleVarSubmit,
     control: controlVar,
@@ -307,7 +319,10 @@ export default function MedicationListPage() {
 
       const ok = await validateBarcodeUnique(form.barcode, editingVar?.id);
       if (!ok) {
-        setVarError("barcode", { type: "validate", message: "Barcode already exists for another variant." });
+        setVarError("barcode", {
+          type: "validate",
+          message: "Barcode already exists for another variant.",
+        });
         toast.error("Barcode already exists for another variant.");
         return;
       }
@@ -315,14 +330,25 @@ export default function MedicationListPage() {
         sku: (form.sku || "").trim(),
         name: (form.name || "").trim(),
         unit: (form.unit || "").trim(),
-        unitFactor: form.unitFactor === "" || form.unitFactor == null ? 1 : Number(form.unitFactor),
+        unitFactor:
+          form.unitFactor === "" || form.unitFactor == null
+            ? 1
+            : Number(form.unitFactor),
         barcode: (form.barcode || "").trim() || null,
-        sellPrice: form.sellPrice === "" || form.sellPrice == null ? undefined : Number(form.sellPrice),
+        sellPrice:
+          form.sellPrice === "" || form.sellPrice == null
+            ? undefined
+            : Number(form.sellPrice),
         isActive: !!form.isActive,
         isForSale: !!form.isForSale,
       };
       if (!editingVar) {
-        if (!payload.sku || !payload.name || !payload.unit || !payload.sellPrice) {
+        if (
+          !payload.sku ||
+          !payload.name ||
+          !payload.unit ||
+          !payload.sellPrice
+        ) {
           toast.error("Please fill in SKU, Name, Unit and Sell Price.");
           return;
         }
@@ -340,8 +366,14 @@ export default function MedicationListPage() {
       }
       setEditingVar(null);
       resetVar({
-        sku: "", name: "", unit: "", unitFactor: "1.00",
-        barcode: "", sellPrice: "", isActive: true, isForSale: true,
+        sku: "",
+        name: "",
+        unit: "",
+        unitFactor: "1.00",
+        barcode: "",
+        sellPrice: "",
+        isActive: true,
+        isForSale: true,
       });
       await refetchVariants();
     } catch (err) {
@@ -384,7 +416,10 @@ export default function MedicationListPage() {
           <CardContent className="space-y-4">
             {/* FILTER BAR */}
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2 sm:items-center">
+              <form
+                onSubmit={handleSearchSubmit}
+                className="flex flex-col sm:flex-row gap-2 sm:items-center"
+              >
                 <div className="flex items-center gap-2">
                   <select
                     value={statusFilter}
@@ -410,7 +445,11 @@ export default function MedicationListPage() {
                     <Search className="w-4 h-4 mr-1" />
                     Search
                   </Button>
-                  <Button type="button" variant="outline" onClick={handleClearFilters}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleClearFilters}
+                  >
                     <X className="w-4 h-4 mr-1" />
                     Clear
                   </Button>
@@ -431,7 +470,9 @@ export default function MedicationListPage() {
               <div className="space-y-3">
                 {medications.map((m) => {
                   const local = getMedicationImageLocal(m.id);
-                  const src = local || `/images/medications/${m.id}.jpg?v=${imageVersion[m.id] || 0}`;
+                  const src =
+                    local ||
+                    `/images/medications/${m.id}.jpg?v=${imageVersion[m.id] || 0}`;
                   return (
                     <div
                       key={m.id}
@@ -449,7 +490,9 @@ export default function MedicationListPage() {
                             <div className="font-medium">{m.name}</div>
                             <StatusBadge status={m.status} />
                           </div>
-                          <div className="text-sm text-muted-foreground">Brand: {m.brand || "-"}</div>
+                          <div className="text-sm text-muted-foreground">
+                            Brand: {m.brand || "-"}
+                          </div>
                         </div>
                       </div>
 
@@ -457,26 +500,44 @@ export default function MedicationListPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => navigate(`/medications/${m.id}`, { state: { medication: m } })}
+                          onClick={() =>
+                            navigate(`/medications/${m.id}`, {
+                              state: { medication: m },
+                            })
+                          }
                           title="View"
                         >
                           <Eye className="w-4 h-4 mr-1" />
                           View
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => handleEdit(m)} title="Edit">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEdit(m)}
+                          title="Edit"
+                        >
                           <Edit className="w-4 h-4 mr-1" />
                           Edit
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => navigate(`/medications/${m.id}/variants`, { state: { medication: m } })}
+                          onClick={() =>
+                            navigate(`/medications/${m.id}/variants`, {
+                              state: { medication: m },
+                            })
+                          }
                           title="Manage variants"
                         >
                           <Package className="w-4 h-4 mr-1" />
                           Variants
                         </Button>
-                        <Button size="sm" variant="destructive" onClick={() => handleDelete(m.id)} title="Delete">
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDelete(m.id)}
+                          title="Delete"
+                        >
                           <Trash2 className="w-4 h-4 mr-1" />
                           Delete
                         </Button>
@@ -498,12 +559,19 @@ export default function MedicationListPage() {
         {/* Medication Form (popup) */}
         <Dialog open={medFormOpen} onOpenChange={setMedFormOpen}>
           <DialogContent className="max-w-2xl" aria-describedby="med-form-desc">
-            <p id="med-form-desc" className="sr-only">Medication form dialog</p>
+            <p id="med-form-desc" className="sr-only">
+              Medication form dialog
+            </p>
             <DialogHeader>
-              <DialogTitle>{editing ? "Edit Medication" : "Add Medication"}</DialogTitle>
+              <DialogTitle>
+                {editing ? "Edit Medication" : "Add Medication"}
+              </DialogTitle>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit(onSubmitMed)} className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <form
+              onSubmit={handleSubmit(onSubmitMed)}
+              className="grid grid-cols-1 md:grid-cols-2 gap-3"
+            >
               {/* Ảnh preview + input file */}
               <div className="md:col-span-2 flex items-center gap-3 rounded-lg border p-3">
                 <div className="shrink-0">
@@ -517,14 +585,22 @@ export default function MedicationListPage() {
                   ) : editing ? (
                     (() => {
                       const url = getMedicationImageUrl(editing.id);
-                      const src = url.includes("?v=") ? url : `${url}?v=${imageVersion[editing.id] || 0}`;
+                      const src = url.includes("?v=")
+                        ? url
+                        : `${url}?v=${imageVersion[editing.id] || 0}`;
                       return (
                         <img
-                          key={(editing && editing.id) + ":v" + (imageVersion[editing.id] || 0)}
+                          key={
+                            (editing && editing.id) +
+                            ":v" +
+                            (imageVersion[editing.id] || 0)
+                          }
                           src={src}
                           alt="Current"
                           className="h-16 w-16 rounded-lg object-cover border cursor-zoom-in"
-                          onError={(e) => (e.currentTarget.style.visibility = "hidden")}
+                          onError={(e) =>
+                            (e.currentTarget.style.visibility = "hidden")
+                          }
                           onClick={() => openLightbox(src, "Current")}
                         />
                       );
@@ -536,7 +612,13 @@ export default function MedicationListPage() {
 
                 <div className="flex flex-col gap-2">
                   <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
-                    <input type="file" accept="image/*" onChange={onChangeImage} className="hidden" id="med-image-input" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={onChangeImage}
+                      className="hidden"
+                      id="med-image-input"
+                    />
                     <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm">
                       <ImageIcon className="w-4 h-4" />
                       Choose image…
@@ -544,42 +626,75 @@ export default function MedicationListPage() {
                   </label>
 
                   <label className="inline-flex items-center gap-2 text-sm">
-                    <Checkbox checked={removeImage} onCheckedChange={(c) => setRemoveImage(!!c)} />
+                    <Checkbox
+                      checked={removeImage}
+                      onCheckedChange={(c) => setRemoveImage(!!c)}
+                    />
                     <span>Remove image</span>
                   </label>
                 </div>
               </div>
 
               {/* fields */}
-              <Controller name="name" control={control} rules={{ required: true }}
-                render={({ field }) => <Input {...field} placeholder="Name" />}/>
-              <Controller name="brand" control={control}
-                render={({ field }) => <Input {...field} placeholder="Brand" />}/>
-              <Controller name="description" control={control}
-                render={({ field }) => <Input {...field} className="md:col-span-2" placeholder="Description" />}/>
+              <Controller
+                name="name"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => <Input {...field} placeholder="Name" />}
+              />
+              <Controller
+                name="brand"
+                control={control}
+                render={({ field }) => <Input {...field} placeholder="Brand" />}
+              />
+              <Controller
+                name="description"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    className="md:col-span-2"
+                    placeholder="Description"
+                  />
+                )}
+              />
 
               <div className="flex items-center gap-2">
-                <Controller name="isPrescriptionRequired" control={control}
+                <Controller
+                  name="isPrescriptionRequired"
+                  control={control}
                   render={({ field: { value, onChange } }) => (
                     <>
-                      <Checkbox checked={!!value} onCheckedChange={(c) => onChange(!!c)} />
+                      <Checkbox
+                        checked={!!value}
+                        onCheckedChange={(c) => onChange(!!c)}
+                      />
                       <span>Prescription required</span>
                     </>
-                  )}/>
+                  )}
+                />
               </div>
 
               <div className="flex items-center gap-2">
-                <Controller name="isControlledSubstance" control={control}
+                <Controller
+                  name="isControlledSubstance"
+                  control={control}
                   render={({ field: { value, onChange } }) => (
                     <>
-                      <Checkbox checked={!!value} onCheckedChange={(c) => onChange(!!c)} />
+                      <Checkbox
+                        checked={!!value}
+                        onCheckedChange={(c) => onChange(!!c)}
+                      />
                       <span>Controlled substance</span>
                     </>
-                  )}/>
+                  )}
+                />
               </div>
 
               <div>
-                <Controller name="status" control={control}
+                <Controller
+                  name="status"
+                  control={control}
                   render={({ field: { value, onChange } }) => (
                     <select
                       value={value}
@@ -589,14 +704,19 @@ export default function MedicationListPage() {
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
                     </select>
-                  )}/>
+                  )}
+                />
               </div>
 
               <DialogFooter className="md:col-span-2 flex gap-2 justify-end">
                 <DialogClose asChild>
-                  <Button type="button" variant="outline">Cancel</Button>
+                  <Button type="button" variant="outline">
+                    Cancel
+                  </Button>
                 </DialogClose>
-                <Button type="submit">{editing ? "Save Changes" : "Add Medication"}</Button>
+                <Button type="submit">
+                  {editing ? "Save Changes" : "Add Medication"}
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -606,7 +726,9 @@ export default function MedicationListPage() {
       {/* Lightbox – chỉ hiện ảnh */}
       <Dialog open={lightbox.open} onOpenChange={(o) => !o && closeLightbox()}>
         <DialogContent className="max-w-3xl" aria-describedby="lightbox-desc">
-          <p id="lightbox-desc" className="sr-only">Medication image preview</p>
+          <p id="lightbox-desc" className="sr-only">
+            Medication image preview
+          </p>
           <div className="flex items-center justify-center">
             <img
               src={lightbox.src}

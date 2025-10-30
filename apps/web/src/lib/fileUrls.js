@@ -16,7 +16,9 @@ export function getMedicationImageLocal(medicationId) {
 /** Lưu dataURL ảnh cục bộ */
 export function setMedicationImage(medicationId, dataUrl) {
   try {
-    if (dataUrl) localStorage.setItem(IMG_KEY(medicationId), dataUrl);
+    if (dataUrl) {
+      localStorage.setItem(IMG_KEY(medicationId), dataUrl);
+    }
   } catch {
     // ignore quota/private mode
   }
@@ -34,7 +36,9 @@ export function clearMedicationImage(medicationId) {
 /** File -> dataURL để preview/lưu local */
 export function fileToDataURL(file) {
   return new Promise((resolve, reject) => {
-    if (!file) return resolve(null);
+    if (!file) {
+      return resolve(null);
+    }
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result || ""));
     reader.onerror = reject;
@@ -44,17 +48,23 @@ export function fileToDataURL(file) {
 
 /** URL fallback ảnh tĩnh trong public (nếu bạn có để sẵn) */
 export function getMedicationImageUrl(medicationId, version = 0) {
-  if (!medicationId) return null;
+  if (!medicationId) {
+    return null;
+  }
   return `/images/medications/${medicationId}.jpg?v=${version}`;
 }
 
 /** Giữ sẵn nếu cần dùng theo fileId (không dùng trong mock hiện tại) */
 export function getFileViewUrl(fileId, version = 0) {
-  if (!fileId) return null;
+  if (!fileId) {
+    return null;
+  }
   return `/api/files/${fileId}/view?v=${version}`;
 }
 
 export function getFileDownloadUrl(fileId) {
-  if (!fileId) return null;
+  if (!fileId) {
+    return null;
+  }
   return `/api/files/${fileId}/download`;
 }

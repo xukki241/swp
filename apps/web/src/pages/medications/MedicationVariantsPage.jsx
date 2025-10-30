@@ -1,21 +1,31 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle,
-} from "@/components/ui/dialog";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { ArrowLeft, Edit, PlusCircle, Search, Trash2, X } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useLocation, useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 import { useMedicationVariants } from "@/hooks/useMedications";
 import {
@@ -47,9 +57,15 @@ export default function MedicationVariantsPage() {
       const q = appliedSearch.trim().toLowerCase();
       v = v.filter(
         (x) =>
-          String(x.sku || "").toLowerCase().includes(q) ||
-          String(x.name || "").toLowerCase().includes(q) ||
-          String(x.barcode || "").toLowerCase().includes(q)
+          String(x.sku || "")
+            .toLowerCase()
+            .includes(q) ||
+          String(x.name || "")
+            .toLowerCase()
+            .includes(q) ||
+          String(x.barcode || "")
+            .toLowerCase()
+            .includes(q)
       );
     }
     return v;
@@ -58,12 +74,7 @@ export default function MedicationVariantsPage() {
   // Popup form state
   const [formOpen, setFormOpen] = useState(false);
   const [editingVar, setEditingVar] = useState(null);
-  const {
-    handleSubmit,
-    control,
-    reset,
-    setError,
-  } = useForm({
+  const { handleSubmit, control, reset, setError } = useForm({
     defaultValues: {
       sku: "",
       name: "",
@@ -119,7 +130,10 @@ export default function MedicationVariantsPage() {
 
       const ok = await validateBarcodeUnique(form.barcode, editingVar?.id);
       if (!ok) {
-        setError("barcode", { type: "validate", message: "Barcode already exists for another variant." });
+        setError("barcode", {
+          type: "validate",
+          message: "Barcode already exists for another variant.",
+        });
         toast.error("Barcode already exists for another variant.");
         return;
       }
@@ -128,15 +142,27 @@ export default function MedicationVariantsPage() {
         sku: (form.sku || "").trim(),
         name: (form.name || "").trim(),
         unit: (form.unit || "").trim(),
-        unitFactor: form.unitFactor === "" || form.unitFactor == null ? 1 : Number(form.unitFactor),
+        unitFactor:
+          form.unitFactor === "" || form.unitFactor == null
+            ? 1
+            : Number(form.unitFactor),
         barcode: (form.barcode || "").trim() || null,
-        sellPrice: form.sellPrice === "" || form.sellPrice == null ? undefined : Number(form.sellPrice),
+        sellPrice:
+          form.sellPrice === "" || form.sellPrice == null
+            ? undefined
+            : Number(form.sellPrice),
         isActive: !!form.isActive,
         isForSale: !!form.isForSale,
       };
 
       if (!editingVar) {
-        if (!payload.sku || !payload.name || !payload.unit || payload.sellPrice == null || Number.isNaN(payload.sellPrice)) {
+        if (
+          !payload.sku ||
+          !payload.name ||
+          !payload.unit ||
+          payload.sellPrice == null ||
+          Number.isNaN(payload.sellPrice)
+        ) {
           toast.error("Please fill in SKU, Name, Unit and valid Sell Price.");
           return;
         }
@@ -177,12 +203,21 @@ export default function MedicationVariantsPage() {
     setStatusFilter("all");
   };
 
-  const medTitle = passedMedication?.name ? `${passedMedication.name} • Variants` : `Medication #${medId} • Variants`;
+  const medTitle = passedMedication?.name
+    ? `${passedMedication.name} • Variants`
+    : `Medication #${medId} • Variants`;
 
   return (
     <AppLayout>
       <div className="mb-4 flex items-center gap-2">
-        <Button variant="outline" onClick={() => navigate(`/medications/${medId}`, { state: { medication: passedMedication } })}>
+        <Button
+          variant="outline"
+          onClick={() =>
+            navigate(`/medications/${medId}`, {
+              state: { medication: passedMedication },
+            })
+          }
+        >
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Details
         </Button>
         <Button variant="outline" onClick={() => navigate("/medications")}>
@@ -198,7 +233,10 @@ export default function MedicationVariantsPage() {
         <CardContent className="space-y-4">
           {/* ==== FILTER BAR (inline, giống UserListPage) ==== */}
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2 sm:items-center">
+            <form
+              onSubmit={handleSearchSubmit}
+              className="flex flex-col sm:flex-row gap-2 sm:items-center"
+            >
               <div className="flex items-center gap-2">
                 <select
                   value={statusFilter}
@@ -224,7 +262,11 @@ export default function MedicationVariantsPage() {
                   <Search className="w-4 h-4 mr-1" />
                   Search
                 </Button>
-                <Button type="button" variant="outline" onClick={handleClearFilters}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClearFilters}
+                >
                   <X className="w-4 h-4 mr-1" />
                   Clear
                 </Button>
@@ -262,14 +304,27 @@ export default function MedicationVariantsPage() {
                     <TableCell>{v.unit}</TableCell>
                     <TableCell>{v.unitFactor}</TableCell>
                     <TableCell>{v.barcode || "-"}</TableCell>
-                    <TableCell>{typeof v.sellPrice === "number" ? v.sellPrice.toLocaleString() : v.sellPrice}</TableCell>
+                    <TableCell>
+                      {typeof v.sellPrice === "number"
+                        ? v.sellPrice.toLocaleString()
+                        : v.sellPrice}
+                    </TableCell>
                     <TableCell>{v.isActive ? "Active" : "Inactive"}</TableCell>
                     <TableCell>{v.isForSale ? "Yes" : "No"}</TableCell>
                     <TableCell className="text-right space-x-2">
-                      <Button size="sm" onClick={() => openEdit(v)} title="Edit">
+                      <Button
+                        size="sm"
+                        onClick={() => openEdit(v)}
+                        title="Edit"
+                      >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="destructive" onClick={() => onDeleteVariant(v.id)} title="Delete">
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => onDeleteVariant(v.id)}
+                        title="Delete"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </TableCell>
@@ -277,7 +332,10 @@ export default function MedicationVariantsPage() {
                 ))}
                 {variants.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center text-sm text-muted-foreground">
+                    <TableCell
+                      colSpan={9}
+                      className="text-center text-sm text-muted-foreground"
+                    >
                       No variants
                     </TableCell>
                   </TableRow>
@@ -290,26 +348,65 @@ export default function MedicationVariantsPage() {
 
       {/* Popup Add/Edit Variant */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="max-w-2xl" aria-describedby="variant-form-desc">
-          <p id="variant-form-desc" className="sr-only">Variant form dialog</p>
+        <DialogContent
+          className="max-w-2xl"
+          aria-describedby="variant-form-desc"
+        >
+          <p id="variant-form-desc" className="sr-only">
+            Variant form dialog
+          </p>
           <DialogHeader>
-            <DialogTitle>{editingVar ? "Edit Variant" : "Add Variant"}</DialogTitle>
+            <DialogTitle>
+              {editingVar ? "Edit Variant" : "Add Variant"}
+            </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit(onSubmitVariant)} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            <Controller name="sku" control={control} render={({ field }) => <Input {...field} placeholder="SKU" />} />
-            <Controller name="name" control={control} render={({ field }) => <Input {...field} placeholder="Name" />} />
-            <Controller name="unit" control={control} render={({ field }) => <Input {...field} placeholder="Unit" />} />
-            <Controller name="unitFactor" control={control} render={({ field }) => <Input {...field} placeholder="Factor" />} />
-            <Controller name="barcode" control={control} render={({ field }) => <Input {...field} placeholder="Barcode" />} />
-            <Controller name="sellPrice" control={control} render={({ field }) => <Input {...field} placeholder="Sell Price" type="number" />} />
+          <form
+            onSubmit={handleSubmit(onSubmitVariant)}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
+          >
+            <Controller
+              name="sku"
+              control={control}
+              render={({ field }) => <Input {...field} placeholder="SKU" />}
+            />
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => <Input {...field} placeholder="Name" />}
+            />
+            <Controller
+              name="unit"
+              control={control}
+              render={({ field }) => <Input {...field} placeholder="Unit" />}
+            />
+            <Controller
+              name="unitFactor"
+              control={control}
+              render={({ field }) => <Input {...field} placeholder="Factor" />}
+            />
+            <Controller
+              name="barcode"
+              control={control}
+              render={({ field }) => <Input {...field} placeholder="Barcode" />}
+            />
+            <Controller
+              name="sellPrice"
+              control={control}
+              render={({ field }) => (
+                <Input {...field} placeholder="Sell Price" type="number" />
+              )}
+            />
             <div className="flex items-center gap-2">
               <Controller
                 name="isActive"
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <>
-                    <Checkbox checked={!!value} onCheckedChange={(c) => onChange(!!c)} />
+                    <Checkbox
+                      checked={!!value}
+                      onCheckedChange={(c) => onChange(!!c)}
+                    />
                     <span>Active</span>
                   </>
                 )}
@@ -321,7 +418,10 @@ export default function MedicationVariantsPage() {
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <>
-                    <Checkbox checked={!!value} onCheckedChange={(c) => onChange(!!c)} />
+                    <Checkbox
+                      checked={!!value}
+                      onCheckedChange={(c) => onChange(!!c)}
+                    />
                     <span>For Sale</span>
                   </>
                 )}
@@ -330,9 +430,13 @@ export default function MedicationVariantsPage() {
 
             <DialogFooter className="md:col-span-2 lg:col-span-3 flex gap-2 justify-end">
               <DialogClose asChild>
-                <Button type="button" variant="outline">Cancel</Button>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
               </DialogClose>
-              <Button type="submit">{editingVar ? "Save Changes" : "Add Variant"}</Button>
+              <Button type="submit">
+                {editingVar ? "Save Changes" : "Add Variant"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

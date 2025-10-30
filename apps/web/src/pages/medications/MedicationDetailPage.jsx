@@ -1,30 +1,40 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import {
-  getMedicationImageLocal,
-  getMedicationImageUrl,
-} from "@/lib/fileUrls";
+import { getMedicationImageLocal, getMedicationImageUrl } from "@/lib/fileUrls";
 import {
   getInventorySummary,
+  getMedicationVariants,
   getPurchasesByMedication,
   getSalesByMedication,
   getSuppliersByMedication,
-  getMedicationVariants,
 } from "@/services/medicationsService";
 import { ArrowLeft } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 function PillPlaceholder({ className = "h-20 w-20" }) {
   return (
-    <div className={`rounded-xl border bg-muted/30 flex items-center justify-center ${className}`}>
-      <svg viewBox="0 0 24 24" className="h-10 w-10 opacity-60" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <div
+      className={`rounded-xl border bg-muted/30 flex items-center justify-center ${className}`}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        className="h-10 w-10 opacity-60"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      >
         <path d="M4 14a5 5 0 0 0 7.07 7.07l6.86-6.86a5 5 0 0 0-7.07-7.07L4 14Z" />
         <path d="M8.5 8.5l7 7" />
       </svg>
@@ -45,7 +55,10 @@ function MedImage({ id, alt }) {
       src={src}
       alt={alt}
       className="h-20 w-20 rounded-xl object-cover border"
-      onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextElementSibling.style.display = "flex"; }}
+      onError={(e) => {
+        e.currentTarget.style.display = "none";
+        e.currentTarget.nextElementSibling.style.display = "flex";
+      }}
     />
   );
 }
@@ -65,7 +78,13 @@ export default function MedicationDetailsPage() {
 
   useEffect(() => {
     if (!medication && id) {
-      setMedication({ id, name: "Medication", status: "-", brand: "-", description: "-" });
+      setMedication({
+        id,
+        name: "Medication",
+        status: "-",
+        brand: "-",
+        description: "-",
+      });
     }
   }, [id, medication]);
 
@@ -91,7 +110,7 @@ export default function MedicationDetailsPage() {
 
   const variantNameById = useMemo(() => {
     const m = new Map();
-    (variants || []).forEach(v => m.set(String(v.id), v.name));
+    (variants || []).forEach((v) => m.set(String(v.id), v.name));
     return m;
   }, [variants]);
 
@@ -101,7 +120,13 @@ export default function MedicationDetailsPage() {
         <Button variant="outline" onClick={() => navigate("/medications")}>
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Medications
         </Button>
-        <Button onClick={() => navigate(`/medications/${id}/variants`, { state: { medication: medication || passedMedication } })}>
+        <Button
+          onClick={() =>
+            navigate(`/medications/${id}/variants`, {
+              state: { medication: medication || passedMedication },
+            })
+          }
+        >
           Manage Variants
         </Button>
       </div>
@@ -119,11 +144,23 @@ export default function MedicationDetailsPage() {
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm flex-1">
-              <div><b>Brand:</b> {medication?.brand || "-"}</div>
-              <div><b>Status:</b> {medication?.status || "-"}</div>
-              <div><b>Prescription:</b> {medication?.isPrescriptionRequired ? "Yes" : "No"}</div>
-              <div><b>Controlled:</b> {medication?.isControlledSubstance ? "Yes" : "No"}</div>
-              <div className="col-span-2 md:col-span-4"><b>Description:</b> {medication?.description || "-"}</div>
+              <div>
+                <b>Brand:</b> {medication?.brand || "-"}
+              </div>
+              <div>
+                <b>Status:</b> {medication?.status || "-"}
+              </div>
+              <div>
+                <b>Prescription:</b>{" "}
+                {medication?.isPrescriptionRequired ? "Yes" : "No"}
+              </div>
+              <div>
+                <b>Controlled:</b>{" "}
+                {medication?.isControlledSubstance ? "Yes" : "No"}
+              </div>
+              <div className="col-span-2 md:col-span-4">
+                <b>Description:</b> {medication?.description || "-"}
+              </div>
             </div>
           </div>
         </CardContent>
@@ -131,7 +168,9 @@ export default function MedicationDetailsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
-          <CardHeader><CardTitle>Suppliers</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Suppliers</CardTitle>
+          </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
@@ -153,7 +192,12 @@ export default function MedicationDetailsPage() {
                 ))}
                 {suppliers.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground">No suppliers found</TableCell>
+                    <TableCell
+                      colSpan={4}
+                      className="text-center text-muted-foreground"
+                    >
+                      No suppliers found
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -162,7 +206,9 @@ export default function MedicationDetailsPage() {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Sales Orders</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Sales Orders</CardTitle>
+          </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
@@ -177,8 +223,13 @@ export default function MedicationDetailsPage() {
               <TableBody>
                 {sales.map((s) => (
                   <TableRow key={s.id}>
-                    <TableCell>{s.customerName || (s.customerId ? String(s.customerId).slice(0,8) : "-")}</TableCell>
-                    <TableCell>{new Date(s.orderDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {s.customerName ||
+                        (s.customerId ? String(s.customerId).slice(0, 8) : "-")}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(s.orderDate).toLocaleDateString()}
+                    </TableCell>
                     <TableCell>{s.status}</TableCell>
                     <TableCell>{s.paymentMethod}</TableCell>
                     <TableCell>{s.totalAmount}</TableCell>
@@ -186,7 +237,12 @@ export default function MedicationDetailsPage() {
                 ))}
                 {sales.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">No sales found</TableCell>
+                    <TableCell
+                      colSpan={5}
+                      className="text-center text-muted-foreground"
+                    >
+                      No sales found
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -195,7 +251,9 @@ export default function MedicationDetailsPage() {
         </Card>
 
         <Card className="lg:col-span-2">
-          <CardHeader><CardTitle>Purchase Orders</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Purchase Orders</CardTitle>
+          </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
@@ -210,16 +268,28 @@ export default function MedicationDetailsPage() {
               <TableBody>
                 {purchases.map((p) => (
                   <TableRow key={p.id}>
-                    <TableCell>{p.supplierName || (p.supplierId ? String(p.supplierId).slice(0,8) : "-")}</TableCell>
-                    <TableCell>{new Date(p.orderDate).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(p.expectedDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {p.supplierName ||
+                        (p.supplierId ? String(p.supplierId).slice(0, 8) : "-")}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(p.orderDate).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(p.expectedDate).toLocaleDateString()}
+                    </TableCell>
                     <TableCell>{p.status}</TableCell>
                     <TableCell>{p.totalAmount}</TableCell>
                   </TableRow>
                 ))}
                 {purchases.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">No purchases found</TableCell>
+                    <TableCell
+                      colSpan={5}
+                      className="text-center text-muted-foreground"
+                    >
+                      No purchases found
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -228,7 +298,9 @@ export default function MedicationDetailsPage() {
         </Card>
 
         <Card className="lg:col-span-2">
-          <CardHeader><CardTitle>Inventory Summary</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Inventory Summary</CardTitle>
+          </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
@@ -241,21 +313,34 @@ export default function MedicationDetailsPage() {
               </TableHeader>
               <TableBody>
                 {inventory
-                  .filter((inv) => !inv.medicationId || String(inv.medicationId) === String(id))
+                  .filter(
+                    (inv) =>
+                      !inv.medicationId ||
+                      String(inv.medicationId) === String(id)
+                  )
                   .map((inv) => (
-                    <TableRow key={`${inv.medicationVariantId}-${inv.locationId || "all"}`}>
+                    <TableRow
+                      key={`${inv.medicationVariantId}-${inv.locationId || "all"}`}
+                    >
                       <TableCell>
                         {variantNameById.get(String(inv.medicationVariantId)) ||
-                          (inv.medicationVariantId ? String(inv.medicationVariantId).slice(0, 8) : "-")}
+                          (inv.medicationVariantId
+                            ? String(inv.medicationVariantId).slice(0, 8)
+                            : "-")}
                       </TableCell>
                       <TableCell>{inv.totalQuantity}</TableCell>
                       <TableCell>{inv.totalReserved}</TableCell>
                       <TableCell>{inv.availableQuantity}</TableCell>
                     </TableRow>
-                ))}
+                  ))}
                 {inventory.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground">No inventory found</TableCell>
+                    <TableCell
+                      colSpan={4}
+                      className="text-center text-muted-foreground"
+                    >
+                      No inventory found
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>

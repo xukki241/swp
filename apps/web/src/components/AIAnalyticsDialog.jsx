@@ -118,13 +118,15 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="max-w-none w-[90vw] max-h-[90vh] overflow-y-auto"
-        style={{ minWidth: '1600px' }}
+        style={{ minWidth: "1600px" }}
       >
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Brain className="w-6 h-6 text-purple-600" />
-              <DialogTitle className="text-xl">AI-Powered Purchase Analytics</DialogTitle>
+              <DialogTitle className="text-xl">
+                AI-Powered Purchase Analytics
+              </DialogTitle>
             </div>
             <div className="flex items-center gap-2">
               <select
@@ -189,14 +191,21 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                       <div className="mb-2">
                         <div className="flex items-baseline gap-1.5">
                           <p className="text-2xl font-bold text-blue-900">
-                            {formatCompactNumber(quickInsights?.summary.totalRevenue)}
+                            {formatCompactNumber(
+                              quickInsights?.summary.totalRevenue
+                            )}
                           </p>
-                          <span className="text-sm text-blue-700 font-medium">đ</span>
+                          <span className="text-sm text-blue-700 font-medium">
+                            đ
+                          </span>
                         </div>
                       </div>
                       <div className="pt-2 border-t border-blue-200/50">
                         <p className="text-[10px] text-blue-600 leading-tight">
-                          {quickInsights?.summary.totalRevenue?.toLocaleString("vi-VN")} VND
+                          {quickInsights?.summary.totalRevenue?.toLocaleString(
+                            "vi-VN"
+                          )}{" "}
+                          VND
                         </p>
                         <p className="text-[10px] text-blue-500 mt-0.5">
                           {quickInsights?.summary.totalOrders || 0} orders
@@ -214,14 +223,19 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                       <div className="mb-2">
                         <div className="flex items-baseline gap-1.5">
                           <p className="text-2xl font-bold text-green-900">
-                            {formatCompactNumber(quickInsights?.summary.totalQuantitySold)}
+                            {formatCompactNumber(
+                              quickInsights?.summary.totalQuantitySold
+                            )}
                           </p>
-                          <span className="text-sm text-green-700 font-medium">units</span>
+                          <span className="text-sm text-green-700 font-medium">
+                            units
+                          </span>
                         </div>
                       </div>
                       <div className="pt-2 border-t border-green-200/50">
                         <p className="text-[10px] text-green-600 leading-tight">
-                          {quickInsights?.summary.totalQuantitySold?.toLocaleString()} total
+                          {quickInsights?.summary.totalQuantitySold?.toLocaleString()}{" "}
+                          total
                         </p>
                         <p className="text-[10px] text-green-500 mt-0.5">
                           {quickInsights?.summary.totalProducts || 0} variants
@@ -239,14 +253,22 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                       <div className="mb-2">
                         <div className="flex items-baseline gap-1.5">
                           <p className="text-2xl font-bold text-orange-900">
-                            {formatCompactNumber(quickInsights?.summary.averageOrderValue)}
+                            {formatCompactNumber(
+                              quickInsights?.summary.averageOrderValue
+                            )}
                           </p>
-                          <span className="text-sm text-orange-700 font-medium">đ</span>
+                          <span className="text-sm text-orange-700 font-medium">
+                            đ
+                          </span>
                         </div>
                       </div>
                       <div className="pt-2 border-t border-orange-200/50">
                         <p className="text-[10px] text-orange-600 leading-tight">
-                          {quickInsights?.summary.averageOrderValue?.toLocaleString("vi-VN", { maximumFractionDigits: 0 })} VND
+                          {quickInsights?.summary.averageOrderValue?.toLocaleString(
+                            "vi-VN",
+                            { maximumFractionDigits: 0 }
+                          )}{" "}
+                          VND
                         </p>
                         <p className="text-[10px] text-orange-500 mt-0.5">
                           per transaction
@@ -264,17 +286,27 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                       <div className="mb-2">
                         <div className="flex items-baseline gap-1.5">
                           <p className="text-2xl font-bold text-purple-900">
-                            {formatCompactNumber(recommendations.data.financialProjection?.estimatedTotalInvestment)}
+                            {formatCompactNumber(
+                              recommendations.data.financialProjection
+                                ?.estimatedTotalInvestment
+                            )}
                           </p>
-                          <span className="text-sm text-purple-700 font-medium">đ</span>
+                          <span className="text-sm text-purple-700 font-medium">
+                            đ
+                          </span>
                         </div>
                       </div>
                       <div className="pt-2 border-t border-purple-200/50">
                         <p className="text-[10px] text-purple-600 leading-tight">
-                          {recommendations.data.financialProjection?.estimatedTotalInvestment?.toLocaleString("vi-VN") || "N/A"} VND
+                          {recommendations.data.financialProjection?.estimatedTotalInvestment?.toLocaleString(
+                            "vi-VN"
+                          ) || "N/A"}{" "}
+                          VND
                         </p>
                         <p className="text-[10px] text-purple-500 mt-0.5">
-                          {recommendations.data.priorityRecommendations?.length || 0} items
+                          {recommendations.data.priorityRecommendations
+                            ?.length || 0}{" "}
+                          items
                         </p>
                       </div>
                     </div>

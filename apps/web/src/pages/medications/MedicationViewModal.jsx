@@ -1,7 +1,6 @@
 // apps/web/src/pages/medications/MedicationViewModal.jsx
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,12 +12,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import {
   getMedicationImageLocal,
   getMedicationImageUrl,
-} from "@/lib/fileUrls";
+} from "@/lib/mockImages";
 import {
   getInventorySummary,
   getMedicationVariants,
@@ -26,12 +30,21 @@ import {
   getSalesByMedication,
   getSuppliersByMedication,
 } from "@/services/medicationsService";
+import { useEffect, useMemo, useState } from "react";
 
 /* Helpers */
 function PillPlaceholder({ className = "h-20 w-20" }) {
   return (
-    <div className={`rounded-xl border bg-muted/30 flex items-center justify-center ${className}`}>
-      <svg viewBox="0 0 24 24" className="h-10 w-10 opacity-60" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <div
+      className={`rounded-xl border bg-muted/30 flex items-center justify-center ${className}`}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        className="h-10 w-10 opacity-60"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      >
         <path d="M4 14a5 5 0 0 0 7.07 7.07l6.86-6.86a5 5 0 0 0-7.07-7.07L4 14Z" />
         <path d="M8.5 8.5l7 7" />
       </svg>
@@ -87,12 +100,13 @@ export default function MedicationViewModal({
   // map variantId -> variantName (để hiển thị tên thay vì ID)
   const variantNameById = useMemo(() => {
     const m = new Map();
-    variants.forEach(v => m.set(String(v.id), v.name));
+    variants.forEach((v) => m.set(String(v.id), v.name));
     return m;
   }, [variants]);
 
   useEffect(() => {
-    if ((isModal && (!open || !medication)) || (!isModal && !medication)) return;
+    if ((isModal && (!open || !medication)) || (!isModal && !medication))
+      return;
 
     (async () => {
       try {
@@ -108,7 +122,7 @@ export default function MedicationViewModal({
         // Sales: hiển thị customerName hoặc short-id
         const salesRaw = so?.data || [];
         setSales(
-          salesRaw.map(row => ({
+          salesRaw.map((row) => ({
             ...row,
             customerName:
               row.customerName ||
@@ -129,7 +143,11 @@ export default function MedicationViewModal({
   if (!medication) return null;
 
   const body = (
-    <div className={isModal ? "space-y-6 max-h-[75vh] overflow-y-auto" : "space-y-6"}>
+    <div
+      className={
+        isModal ? "space-y-6 max-h-[75vh] overflow-y-auto" : "space-y-6"
+      }
+    >
       {/* Header + image */}
       <div className="flex items-start gap-4">
         <MedImage
@@ -139,11 +157,22 @@ export default function MedicationViewModal({
           onClick={openLightbox}
         />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm flex-1">
-          <div><b>Brand:</b> {medication.brand || "-"}</div>
-          <div><b>Status:</b> {medication.status || "-"}</div>
-          <div><b>Prescription:</b> {medication.isPrescriptionRequired ? "Yes" : "No"}</div>
-          <div><b>Controlled:</b> {medication.isControlledSubstance ? "Yes" : "No"}</div>
-          <div className="col-span-2 md:col-span-4"><b>Description:</b> {medication.description || "-"}</div>
+          <div>
+            <b>Brand:</b> {medication.brand || "-"}
+          </div>
+          <div>
+            <b>Status:</b> {medication.status || "-"}
+          </div>
+          <div>
+            <b>Prescription:</b>{" "}
+            {medication.isPrescriptionRequired ? "Yes" : "No"}
+          </div>
+          <div>
+            <b>Controlled:</b> {medication.isControlledSubstance ? "Yes" : "No"}
+          </div>
+          <div className="col-span-2 md:col-span-4">
+            <b>Description:</b> {medication.description || "-"}
+          </div>
         </div>
       </div>
 
@@ -166,7 +195,7 @@ export default function MedicationViewModal({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {variants.map(v => (
+                {variants.map((v) => (
                   <TableRow key={v.id}>
                     <TableCell>{v.sku}</TableCell>
                     <TableCell>{v.name}</TableCell>
@@ -180,7 +209,12 @@ export default function MedicationViewModal({
                 ))}
                 {variants.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground">No variants</TableCell>
+                    <TableCell
+                      colSpan={8}
+                      className="text-center text-muted-foreground"
+                    >
+                      No variants
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -203,7 +237,7 @@ export default function MedicationViewModal({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {suppliers.map(s => (
+              {suppliers.map((s) => (
                 <TableRow key={s.id}>
                   <TableCell>{s.name}</TableCell>
                   <TableCell>{s.contactName}</TableCell>
@@ -213,7 +247,12 @@ export default function MedicationViewModal({
               ))}
               {suppliers.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">No suppliers</TableCell>
+                  <TableCell
+                    colSpan={4}
+                    className="text-center text-muted-foreground"
+                  >
+                    No suppliers
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -236,18 +275,27 @@ export default function MedicationViewModal({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {purchases.map(p => (
+              {purchases.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell>{p.supplierName || "-"}</TableCell>
-                  <TableCell>{new Date(p.orderDate).toLocaleDateString()}</TableCell>
-                  <TableCell>{new Date(p.expectedDate).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    {new Date(p.orderDate).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(p.expectedDate).toLocaleDateString()}
+                  </TableCell>
                   <TableCell>{p.status}</TableCell>
                   <TableCell>{p.totalAmount}</TableCell>
                 </TableRow>
               ))}
               {purchases.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">No purchases</TableCell>
+                  <TableCell
+                    colSpan={5}
+                    className="text-center text-muted-foreground"
+                  >
+                    No purchases
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -270,10 +318,12 @@ export default function MedicationViewModal({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sales.map(s => (
+              {sales.map((s) => (
                 <TableRow key={s.id}>
                   <TableCell>{s.customerName}</TableCell>
-                  <TableCell>{new Date(s.orderDate).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    {new Date(s.orderDate).toLocaleDateString()}
+                  </TableCell>
                   <TableCell>{s.status}</TableCell>
                   <TableCell>{s.paymentMethod}</TableCell>
                   <TableCell>{s.totalAmount}</TableCell>
@@ -281,7 +331,12 @@ export default function MedicationViewModal({
               ))}
               {sales.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">No sales</TableCell>
+                  <TableCell
+                    colSpan={5}
+                    className="text-center text-muted-foreground"
+                  >
+                    No sales
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -304,9 +359,13 @@ export default function MedicationViewModal({
             </TableHeader>
             <TableBody>
               {inventory
-                .filter(inv => String(inv.medicationId) === String(medication.id))
-                .map(inv => (
-                  <TableRow key={`${inv.medicationVariantId}-${inv.medicationId}`}>
+                .filter(
+                  (inv) => String(inv.medicationId) === String(medication.id)
+                )
+                .map((inv) => (
+                  <TableRow
+                    key={`${inv.medicationVariantId}-${inv.medicationId}`}
+                  >
                     <TableCell>
                       {variantNameById.get(String(inv.medicationVariantId)) ||
                         String(inv.medicationVariantId).slice(0, 8)}
@@ -316,9 +375,16 @@ export default function MedicationViewModal({
                     <TableCell>{inv.availableQuantity}</TableCell>
                   </TableRow>
                 ))}
-              {inventory.filter(inv => String(inv.medicationId) === String(medication.id)).length === 0 && (
+              {inventory.filter(
+                (inv) => String(inv.medicationId) === String(medication.id)
+              ).length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">No inventory</TableCell>
+                  <TableCell
+                    colSpan={4}
+                    className="text-center text-muted-foreground"
+                  >
+                    No inventory
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
