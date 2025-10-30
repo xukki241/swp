@@ -320,7 +320,10 @@ export default function SalesPage() {
       // Allow empty string for editing (will be fixed on blur)
       if (quantity === "" || quantity === 0) {
         const updatedCart = [...activeOrder.cart];
-        updatedCart[index] = { ...updatedCart[index], quantity: quantity === "" ? "" : 0 };
+        updatedCart[index] = {
+          ...updatedCart[index],
+          quantity: quantity === "" ? "" : 0,
+        };
         setCart(updatedCart);
         return;
       }
@@ -523,10 +526,11 @@ export default function SalesPage() {
               return (
                 <div
                   key={order.id}
-                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${isActive
+                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${
+                    isActive
                       ? "border-primary bg-primary/10 text-foreground"
                       : "border-border bg-card hover:border-primary/50 text-muted-foreground"
-                    }`}
+                  }`}
                   onClick={() => setActiveOrderId(order.id)}
                 >
                   <FileText className="h-4 w-4" />
@@ -646,8 +650,13 @@ export default function SalesPage() {
                                 const val = Number.parseInt(value);
                                 if (!isNaN(val)) {
                                   if (val > item.availableQuantity) {
-                                    toast.warning(`Maximum available: ${item.availableQuantity}`);
-                                    updateCartItem(index, item.availableQuantity);
+                                    toast.warning(
+                                      `Maximum available: ${item.availableQuantity}`
+                                    );
+                                    updateCartItem(
+                                      index,
+                                      item.availableQuantity
+                                    );
                                   } else {
                                     updateCartItem(index, val);
                                   }
@@ -655,10 +664,16 @@ export default function SalesPage() {
                               }}
                               onBlur={(e) => {
                                 const val = Number.parseInt(e.target.value);
-                                if (isNaN(val) || val < 1 || e.target.value === "") {
+                                if (
+                                  isNaN(val) ||
+                                  val < 1 ||
+                                  e.target.value === ""
+                                ) {
                                   updateCartItem(index, 1);
                                 } else if (val > item.availableQuantity) {
-                                  toast.warning(`Maximum available: ${item.availableQuantity}`);
+                                  toast.warning(
+                                    `Maximum available: ${item.availableQuantity}`
+                                  );
                                   updateCartItem(index, item.availableQuantity);
                                 }
                               }}
@@ -670,7 +685,10 @@ export default function SalesPage() {
                               onClick={() =>
                                 updateCartItem(
                                   index,
-                                  Math.min(item.availableQuantity, item.quantity + 1)
+                                  Math.min(
+                                    item.availableQuantity,
+                                    item.quantity + 1
+                                  )
                                 )
                               }
                               disabled={item.quantity >= item.availableQuantity}
