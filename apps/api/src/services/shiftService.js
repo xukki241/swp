@@ -309,7 +309,7 @@ export const updateShiftAssignment = async (id, assignmentData) => {
 export const checkInShift = async (id) => {
   try {
     const vnTime = new Date().toLocaleString("en-US", {
-      timeZone: "Asia/Ho_Chi_Minh"
+      timeZone: "Asia/Ho_Chi_Minh",
     });
 
     const result = await db
@@ -333,7 +333,7 @@ export const checkInShift = async (id) => {
 export const checkOutShift = async (id) => {
   try {
     const vnTime = new Date().toLocaleString("en-US", {
-      timeZone: "Asia/Ho_Chi_Minh"
+      timeZone: "Asia/Ho_Chi_Minh",
     });
 
     const result = await db
