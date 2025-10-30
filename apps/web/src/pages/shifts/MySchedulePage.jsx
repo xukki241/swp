@@ -279,7 +279,7 @@ export default function MySchedulePage() {
                                         Check-in:{" "}
                                         {new Date(
                                           assignment.checkInTime
-                                        ).toLocaleTimeString()}
+                                        ).toLocaleTimeString("vi-VN")}
                                       </span>
                                     </div>
                                   )}
@@ -291,7 +291,7 @@ export default function MySchedulePage() {
                                         Check-out:{" "}
                                         {new Date(
                                           assignment.checkOutTime
-                                        ).toLocaleTimeString()}
+                                        ).toLocaleTimeString("vi-VN")}
                                       </span>
                                     </div>
                                   )}
