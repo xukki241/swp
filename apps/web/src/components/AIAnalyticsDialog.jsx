@@ -117,8 +117,8 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-none w-[90vw] max-h-[90vh] overflow-y-auto"
-        style={{ minWidth: '1600px' }}
+        className="max-w-none w-[50vw] max-h-[90vh] overflow-y-auto"
+        style={{ minWidth: '1200px' }}
       >
         <DialogHeader>
           <div className="flex items-center justify-between">
