@@ -83,7 +83,7 @@ export const salesOrderService = {
         if (totalAvailable < quantity) {
           throw new Error(
             `Insufficient inventory for ${variant.name} (${variant.sku}). ` +
-              `Requested: ${quantity}, Available: ${totalAvailable}`
+            `Requested: ${quantity}, Available: ${totalAvailable}`
           );
         }
 
@@ -130,6 +130,8 @@ export const salesOrderService = {
           status: "pending",
           salespersonId: userId || null,
           prescriptionId: soData.prescription_id || null,
+          prescriptionNote: soData.prescription_note || null,
+          notes: soData.notes || null,
           orderDate: new Date(),
         })
         .returning();
