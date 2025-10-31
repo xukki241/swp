@@ -24,8 +24,8 @@ Module quản lý thông tin khách hàng, lịch sử mua hàng và loyalty pro
 2. Click button "Add Customer"
 3. Modal/form hiển thị với các fields:
    - **Required**:
-     - Full Name *
-     - Phone Number *
+     - Full Name \*
+     - Phone Number \*
    - **Optional**:
      - Email
      - Date of Birth
@@ -471,15 +471,15 @@ CREATE INDEX idx_customers_name_fts ON customers USING gin(to_tsvector('english'
 
 ## Error Codes
 
-| Code | Message | HTTP Status |
-|------|---------|-------------|
-| CUST_001 | Customer not found | 404 |
-| CUST_002 | Phone number already exists | 409 |
-| CUST_003 | Invalid phone number format | 400 |
-| CUST_004 | Invalid email format | 400 |
-| CUST_005 | Email already exists | 409 |
-| CUST_006 | Unauthorized action | 403 |
-| CUST_007 | Customer inactive | 400 |
+| Code     | Message                     | HTTP Status |
+| -------- | --------------------------- | ----------- |
+| CUST_001 | Customer not found          | 404         |
+| CUST_002 | Phone number already exists | 409         |
+| CUST_003 | Invalid phone number format | 400         |
+| CUST_004 | Invalid email format        | 400         |
+| CUST_005 | Email already exists        | 409         |
+| CUST_006 | Unauthorized action         | 403         |
+| CUST_007 | Customer inactive           | 400         |
 
 ---
 

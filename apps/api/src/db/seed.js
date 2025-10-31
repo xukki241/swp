@@ -362,7 +362,7 @@ async function seed() {
           name: "Paracetamol",
           brand: "Tylenol",
           description:
-            "Analgesic and antipyretic for pain relief and fever reduction",
+            "Thuốc giảm đau, hạ sốt hiệu quả cho đau nhức và sốt nhẹ đến trung bình",
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
@@ -371,7 +371,7 @@ async function seed() {
         {
           name: "Amoxicillin",
           brand: "Amoxil",
-          description: "Beta-lactam antibiotic for bacterial infections",
+          description: "Kháng sinh nhóm beta-lactam điều trị nhiễm khuẩn",
           isPrescriptionRequired: true,
           isControlledSubstance: false,
           status: "active",
@@ -380,7 +380,7 @@ async function seed() {
         {
           name: "Ibuprofen",
           brand: "Brufen",
-          description: "Non-steroidal anti-inflammatory drug (NSAID)",
+          description: "Thuốc chống viêm không steroid, giảm đau và hạ sốt",
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
@@ -390,7 +390,7 @@ async function seed() {
           name: "Omeprazole",
           brand: "Losec",
           description:
-            "Proton pump inhibitor for gastric acid-related disorders",
+            "Thuốc ức chế bơm proton điều trị trào ngược dạ dày, loét dạ dày",
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
@@ -399,7 +399,7 @@ async function seed() {
         {
           name: "Cetirizine",
           brand: "Zyrtec",
-          description: "Antihistamine for allergic conditions",
+          description: "Thuốc kháng histamin điều trị dị ứng, viêm mũi dị ứng",
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
@@ -408,7 +408,8 @@ async function seed() {
         {
           name: "Metformin",
           brand: "Glucophage",
-          description: "Oral antidiabetic medication for type 2 diabetes",
+          description:
+            "Thuốc điều trị bệnh tiểu đường type 2, kiểm soát đường huyết",
           isPrescriptionRequired: true,
           isControlledSubstance: false,
           status: "active",
@@ -417,7 +418,7 @@ async function seed() {
         {
           name: "Atorvastatin",
           brand: "Lipitor",
-          description: "Statin for cholesterol management",
+          description: "Thuốc nhóm statin điều trị tăng cholesterol máu",
           isPrescriptionRequired: true,
           isControlledSubstance: false,
           status: "active",
@@ -425,7 +426,7 @@ async function seed() {
         {
           name: "Amlodipine",
           brand: "Norvasc",
-          description: "Calcium channel blocker for hypertension",
+          description: "Thuốc chẹn kênh canxi điều trị tăng huyết áp",
           isPrescriptionRequired: true,
           isControlledSubstance: false,
           status: "active",
@@ -433,7 +434,7 @@ async function seed() {
         {
           name: "Salbutamol",
           brand: "Ventolin",
-          description: "Bronchodilator for asthma and COPD",
+          description: "Thuốc giãn phế quản điều trị hen suyễn và COPD",
           isPrescriptionRequired: true,
           isControlledSubstance: false,
           status: "active",
@@ -441,7 +442,8 @@ async function seed() {
         {
           name: "Vitamin D3",
           brand: "Cholecalciferol",
-          description: "Vitamin D supplement for bone health",
+          description:
+            "Thực phẩm chức năng bổ sung vitamin D cho xương chắc khỏe",
           isPrescriptionRequired: false,
           isControlledSubstance: false,
           status: "active",
@@ -449,7 +451,8 @@ async function seed() {
         {
           name: "Azithromycin",
           brand: "Zithromax",
-          description: "Macrolide antibiotic for respiratory infections",
+          description:
+            "Kháng sinh nhóm macrolide điều trị nhiễm khuẩn đường hô hấp",
           isPrescriptionRequired: true,
           isControlledSubstance: false,
           status: "active",
@@ -457,7 +460,7 @@ async function seed() {
         {
           name: "Tramadol",
           brand: "Ultram",
-          description: "Opioid analgesic for moderate to severe pain",
+          description: "Thuốc giảm đau mạnh dạng opioid cho đau vừa đến nặng",
           isPrescriptionRequired: true,
           isControlledSubstance: true,
           status: "active",
@@ -472,7 +475,7 @@ async function seed() {
       {
         medicationId: med1.id,
         sku: "PAR-500-TAB-100",
-        name: "Paracetamol 500mg Tablets (Box of 100)",
+        name: "Paracetamol 500mg Viên nén (Hộp 100 viên)",
         unit: "tablet",
         unitFactor: 1.0,
         barcode: "8934567890001",
@@ -483,7 +486,7 @@ async function seed() {
       {
         medicationId: med1.id,
         sku: "PAR-650-TAB-50",
-        name: "Paracetamol 650mg Tablets (Box of 50)",
+        name: "Paracetamol 650mg Viên nén (Hộp 50 viên)",
         unit: "tablet",
         unitFactor: 1.0,
         barcode: "8934567890002",
@@ -494,7 +497,7 @@ async function seed() {
       {
         medicationId: med1.id,
         sku: "PAR-250-SYR-60ML",
-        name: "Paracetamol 250mg/5ml Syrup (60ml bottle)",
+        name: "Paracetamol 250mg/5ml Siro (Chai 60ml)",
         unit: "bottle",
         unitFactor: 1.0,
         barcode: "8934567890003",
@@ -507,7 +510,7 @@ async function seed() {
       {
         medicationId: med2.id,
         sku: "AMX-500-CAP-20",
-        name: "Amoxicillin 500mg Capsules (Box of 20)",
+        name: "Amoxicillin 500mg Viên nang (Hộp 20 viên)",
         unit: "capsule",
         unitFactor: 1.0,
         barcode: "8934567890011",
@@ -518,7 +521,7 @@ async function seed() {
       {
         medicationId: med2.id,
         sku: "AMX-250-SUS-100ML",
-        name: "Amoxicillin 250mg/5ml Suspension (100ml bottle)",
+        name: "Amoxicillin 250mg/5ml Hỗn dịch (Chai 100ml)",
         unit: "bottle",
         unitFactor: 1.0,
         barcode: "8934567890012",
@@ -531,7 +534,7 @@ async function seed() {
       {
         medicationId: med3.id,
         sku: "IBU-400-TAB-30",
-        name: "Ibuprofen 400mg Tablets (Box of 30)",
+        name: "Ibuprofen 400mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
         unitFactor: 1.0,
         barcode: "8934567890021",
@@ -542,7 +545,7 @@ async function seed() {
       {
         medicationId: med3.id,
         sku: "IBU-200-TAB-50",
-        name: "Ibuprofen 200mg Tablets (Box of 50)",
+        name: "Ibuprofen 200mg Viên nén (Hộp 50 viên)",
         unit: "tablet",
         unitFactor: 1.0,
         barcode: "8934567890022",
@@ -555,7 +558,7 @@ async function seed() {
       {
         medicationId: med4.id,
         sku: "OME-20-CAP-28",
-        name: "Omeprazole 20mg Capsules (Box of 28)",
+        name: "Omeprazole 20mg Viên nang (Hộp 28 viên)",
         unit: "capsule",
         unitFactor: 1.0,
         barcode: "8934567890031",
@@ -566,7 +569,7 @@ async function seed() {
       {
         medicationId: med4.id,
         sku: "OME-40-CAP-14",
-        name: "Omeprazole 40mg Capsules (Box of 14)",
+        name: "Omeprazole 40mg Viên nang (Hộp 14 viên)",
         unit: "capsule",
         unitFactor: 1.0,
         barcode: "8934567890032",
@@ -579,7 +582,7 @@ async function seed() {
       {
         medicationId: med5.id,
         sku: "CET-10-TAB-30",
-        name: "Cetirizine 10mg Tablets (Box of 30)",
+        name: "Cetirizine 10mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
         unitFactor: 1.0,
         barcode: "8934567890041",
@@ -590,7 +593,7 @@ async function seed() {
       {
         medicationId: med5.id,
         sku: "CET-5-SYR-60ML",
-        name: "Cetirizine 5mg/5ml Syrup (60ml bottle)",
+        name: "Cetirizine 5mg/5ml Siro (Chai 60ml)",
         unit: "bottle",
         unitFactor: 1.0,
         barcode: "8934567890042",
@@ -603,7 +606,7 @@ async function seed() {
       {
         medicationId: med6.id,
         sku: "MET-500-TAB-60",
-        name: "Metformin 500mg Tablets (Box of 60)",
+        name: "Metformin 500mg Viên nén (Hộp 60 viên)",
         unit: "tablet",
         unitFactor: 1.0,
         barcode: "8934567890051",
@@ -614,7 +617,7 @@ async function seed() {
       {
         medicationId: med6.id,
         sku: "MET-850-TAB-30",
-        name: "Metformin 850mg Tablets (Box of 30)",
+        name: "Metformin 850mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
         unitFactor: 1.0,
         barcode: "8934567890052",
@@ -627,7 +630,7 @@ async function seed() {
       {
         medicationId: med7.id,
         sku: "ATO-10-TAB-30",
-        name: "Atorvastatin 10mg Tablets (Box of 30)",
+        name: "Atorvastatin 10mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
         unitFactor: 1.0,
         barcode: "8934567890061",
@@ -638,7 +641,7 @@ async function seed() {
       {
         medicationId: med7.id,
         sku: "ATO-20-TAB-30",
-        name: "Atorvastatin 20mg Tablets (Box of 30)",
+        name: "Atorvastatin 20mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
         unitFactor: 1.0,
         barcode: "8934567890062",
@@ -651,7 +654,7 @@ async function seed() {
       {
         medicationId: med8.id,
         sku: "AML-5-TAB-30",
-        name: "Amlodipine 5mg Tablets (Box of 30)",
+        name: "Amlodipine 5mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
         unitFactor: 1.0,
         barcode: "8934567890071",
@@ -662,7 +665,7 @@ async function seed() {
       {
         medicationId: med8.id,
         sku: "AML-10-TAB-30",
-        name: "Amlodipine 10mg Tablets (Box of 30)",
+        name: "Amlodipine 10mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
         unitFactor: 1.0,
         barcode: "8934567890072",
@@ -675,7 +678,7 @@ async function seed() {
       {
         medicationId: med9.id,
         sku: "SAL-100-INH-200",
-        name: "Salbutamol 100mcg Inhaler (200 doses)",
+        name: "Salbutamol 100mcg Xịt hít (200 liều)",
         unit: "inhaler",
         unitFactor: 1.0,
         barcode: "8934567890081",
@@ -686,7 +689,7 @@ async function seed() {
       {
         medicationId: med9.id,
         sku: "SAL-2-NEB-20",
-        name: "Salbutamol 2mg/2ml Nebules (Box of 20)",
+        name: "Salbutamol 2mg/2ml Dung dịch xông (Hộp 20 ống)",
         unit: "nebule",
         unitFactor: 1.0,
         barcode: "8934567890082",
@@ -699,7 +702,7 @@ async function seed() {
       {
         medicationId: med10.id,
         sku: "VID-1000-CAP-30",
-        name: "Vitamin D3 1000IU Soft Capsules (Box of 30)",
+        name: "Vitamin D3 1000IU Viên nang mềm (Hộp 30 viên)",
         unit: "capsule",
         unitFactor: 1.0,
         barcode: "8934567890091",
@@ -710,7 +713,7 @@ async function seed() {
       {
         medicationId: med10.id,
         sku: "VID-400-DROP-10ML",
-        name: "Vitamin D3 400IU/drop Oral Drops (10ml bottle)",
+        name: "Vitamin D3 400IU/giọt Dung dịch uống (Chai 10ml)",
         unit: "bottle",
         unitFactor: 1.0,
         barcode: "8934567890092",
@@ -723,7 +726,7 @@ async function seed() {
       {
         medicationId: med11.id,
         sku: "AZI-500-TAB-3",
-        name: "Azithromycin 500mg Tablets (Box of 3)",
+        name: "Azithromycin 500mg Viên nén (Hộp 3 viên)",
         unit: "tablet",
         unitFactor: 1.0,
         barcode: "8934567890101",
@@ -734,7 +737,7 @@ async function seed() {
       {
         medicationId: med11.id,
         sku: "AZI-200-SUS-15ML",
-        name: "Azithromycin 200mg/5ml Suspension (15ml bottle)",
+        name: "Azithromycin 200mg/5ml Hỗn dịch (Chai 15ml)",
         unit: "bottle",
         unitFactor: 1.0,
         barcode: "8934567890102",
@@ -747,24 +750,24 @@ async function seed() {
       {
         medicationId: med12.id,
         sku: "TRA-50-CAP-20",
-        name: "Tramadol 50mg Capsules (Box of 20)",
+        name: "Tramadol 50mg Viên nang (Hộp 20 viên)",
         unit: "capsule",
         unitFactor: 1.0,
         barcode: "8934567890111",
         sellPrice: 250000,
         isActive: true,
-        isForSale: false, // Controlled substance - special handling
+        isForSale: false, // Thuốc kiểm soát đặc biệt - cần xử lý riêng
       },
       {
         medicationId: med12.id,
         sku: "TRA-100-TAB-10",
-        name: "Tramadol 100mg Extended-Release Tablets (Box of 10)",
+        name: "Tramadol 100mg Viên giải phóng kéo dài (Hộp 10 viên)",
         unit: "tablet",
         unitFactor: 1.0,
         barcode: "8934567890112",
         sellPrice: 180000,
         isActive: true,
-        isForSale: false, // Controlled substance - special handling
+        isForSale: false, // Thuốc kiểm soát đặc biệt - cần xử lý riêng
       },
     ];
 
@@ -780,35 +783,35 @@ async function seed() {
       .values([
         {
           code: "NORM-A",
-          name: "Normal Storage Zone A",
+          name: "Khu Bảo Quản Thường A",
           type: "normal",
-          location: "Ground Floor - Section A (Main Warehouse)",
+          location: "Tầng Trệt - Khu A (Kho Chính)",
           description:
-            "Primary storage for tablets, capsules, and general medications at room temperature",
+            "Khu vực bảo quản chính cho viên nén, viên nang và các thuốc thông thường ở nhiệt độ phòng",
         },
         {
           code: "NORM-B",
-          name: "Normal Storage Zone B",
+          name: "Khu Bảo Quản Thường B",
           type: "normal",
-          location: "Ground Floor - Section B (Main Warehouse)",
+          location: "Tầng Trệt - Khu B (Kho Chính)",
           description:
-            "Secondary storage for high-volume OTC medications and supplements",
+            "Khu vực phụ bảo quản thuốc không kê đơn và thực phẩm chức năng với khối lượng lớn",
         },
         {
           code: "COLD-C",
-          name: "Cold Storage Zone C",
+          name: "Khu Bảo Quản Lạnh C",
           type: "cold",
-          location: "Second Floor - Cold Storage Facility",
+          location: "Tầng 2 - Kho Lạnh Chuyên Dụng",
           description:
-            "Temperature-controlled (2-8°C) storage for vaccines, insulin, and biologics",
+            "Khu bảo quản kiểm soát nhiệt độ (2-8°C) cho vaccine, insulin và dược phẩm sinh học",
         },
         {
           code: "CTRL-D",
-          name: "Controlled Substances Vault D",
+          name: "Kho Thuốc Kiểm Soát Đặc Biệt D",
           type: "hazard",
-          location: "Basement - High Security Vault",
+          location: "Tầng Hầm - Két An Toàn Cao Cấp",
           description:
-            "Restricted access vault for controlled substances and narcotics with 24/7 monitoring",
+            "Két bảo quản hạn chế truy cập cho thuốc kiểm soát đặc biệt và ma túy với giám sát 24/7",
         },
       ])
       .returning();
@@ -822,53 +825,53 @@ async function seed() {
         {
           zoneId: zone1.id,
           code: "R-A-001",
-          name: "Rack A-001 (Oral Solids)",
-          description: "Tablets and capsules - Antibiotics and Analgesics",
+          name: "Giá A-001 (Thuốc Uống Dạng Rắn)",
+          description: "Viên nén và viên nang - Kháng sinh và giảm đau",
         },
         {
           zoneId: zone1.id,
           code: "R-A-002",
-          name: "Rack A-002 (Cardiovascular)",
-          description: "Blood pressure and cholesterol medications",
+          name: "Giá A-002 (Tim Mạch)",
+          description: "Thuốc huyết áp và cholesterol",
         },
         {
           zoneId: zone1.id,
           code: "R-A-003",
-          name: "Rack A-003 (Liquids & Syrups)",
-          description: "Liquid formulations and suspensions",
+          name: "Giá A-003 (Dạng Lỏng & Siro)",
+          description: "Thuốc dạng lỏng và hỗn dịch",
         },
         // Zone B - Normal Storage Racks
         {
           zoneId: zone2.id,
           code: "R-B-001",
-          name: "Rack B-001 (OTC Medications)",
-          description: "Over-the-counter pain relief and cold medications",
+          name: "Giá B-001 (Thuốc Không Kê Đơn)",
+          description: "Thuốc giảm đau và cảm lạnh bán tự do",
         },
         {
           zoneId: zone2.id,
           code: "R-B-002",
-          name: "Rack B-002 (Vitamins & Supplements)",
-          description: "Dietary supplements and multivitamins",
+          name: "Giá B-002 (Vitamin & Thực Phẩm Chức Năng)",
+          description: "Thực phẩm bổ sung và vitamin tổng hợp",
         },
         // Zone C - Cold Storage Racks
         {
           zoneId: zone3.id,
           code: "R-C-001",
-          name: "Cold Rack C-001 (Vaccines)",
-          description: "Vaccine storage with temperature monitoring",
+          name: "Giá Lạnh C-001 (Vaccine)",
+          description: "Bảo quản vaccine với giám sát nhiệt độ",
         },
         {
           zoneId: zone3.id,
           code: "R-C-002",
-          name: "Cold Rack C-002 (Insulin & Biologics)",
-          description: "Refrigerated insulin and biological products",
+          name: "Giá Lạnh C-002 (Insulin & Dược Phẩm Sinh Học)",
+          description: "Bảo quản lạnh insulin và sản phẩm sinh học",
         },
         // Zone D - Controlled Substances
         {
           zoneId: zone4.id,
           code: "R-D-001",
-          name: "Secure Vault D-001 (Narcotics)",
-          description: "High-security storage for controlled narcotics",
+          name: "Két An Toàn D-001 (Thuốc Gây Nghiện)",
+          description: "Bảo quản an ninh cao cho thuốc gây nghiện kiểm soát",
         },
       ])
       .returning();
@@ -884,10 +887,10 @@ async function seed() {
           binData.push({
             rackId: rack.id,
             code: `${rack.code}-L${level}-B${number.toString().padStart(2, "0")}`,
-            name: `${rack.name} - Level ${level} - Bin ${number}`,
+            name: `${rack.name} - Tầng ${level} - Ngăn ${number}`,
             level,
             number,
-            description: `Storage bin at level ${level}, position ${number}`,
+            description: `Ngăn chứa thuốc tầng ${level}, vị trí ${number}`,
           });
         }
       }
@@ -1753,28 +1756,28 @@ async function seed() {
     await db.insert(notifications).values([
       {
         userId: owner.id,
-        message: `Purchase order PO-${po1.id.substring(0, 8)} has been fully received.`,
+        message: `Đơn đặt hàng PO-${po1.id.substring(0, 8)} đã được nhận đầy đủ.`,
         isRead: true,
       },
       {
         userId: staff1.id,
         message:
-          "Low stock alert: Ibuprofen 400mg Tablets is below the configured threshold.",
+          "Cảnh báo tồn kho thấp: Ibuprofen 400mg Viên nén đã dưới ngưỡng cấu hình.",
         isRead: false,
       },
       {
         userId: staff2.id,
-        message: `New sales order SO-${sale3.id.substring(0, 8)} is pending payment.`,
+        message: `Đơn hàng mới SO-${sale3.id.substring(0, 8)} đang chờ thanh toán.`,
         isRead: false,
       },
       {
         userId: owner.id,
-        message: "The monthly sales summary report for May 2024 is available.",
+        message: "Báo cáo tổng kết bán hàng tháng 5/2024 đã sẵn sàng.",
         isRead: false,
       },
       {
         userId: staff3.id,
-        message: `Your user account status has been changed to 'inactive'.`,
+        message: `Trạng thái tài khoản của bạn đã được thay đổi thành 'không hoạt động'.`,
         isRead: true,
       },
     ]);
@@ -2002,115 +2005,115 @@ async function seed() {
     await db.insert(settings).values([
       {
         key: "pharmacyInfo.name",
-        name: "Pharmacy Name",
+        name: "Tên Nhà Thuốc",
         group: "pharmacyInfo",
-        value: { name: "PharmaFlow Solutions" },
-        description: "The official name of the pharmacy business.",
+        value: { name: "Nhà Thuốc PharmaFlow" },
+        description: "Tên chính thức của doanh nghiệp nhà thuốc.",
       },
       {
         key: "pharmacyInfo.address",
-        name: "Pharmacy Address",
+        name: "Địa Chỉ Nhà Thuốc",
         group: "pharmacyInfo",
         value: {
-          address: "123 Health Avenue, Medical District, Ho Chi Minh City",
+          address: "123 Đường Y Tế, Khu Y Khoa, Thành phố Hồ Chí Minh",
         },
-        description: "The physical address of the main pharmacy branch.",
+        description: "Địa chỉ vật lý của chi nhánh nhà thuốc chính.",
       },
       {
         key: "pharmacyInfo.phone",
-        name: "Pharmacy Phone",
+        name: "Số Điện Thoại",
         group: "pharmacyInfo",
         value: { phone: "+84 28 3812 3456" },
-        description: "The primary contact phone number for the pharmacy.",
+        description: "Số điện thoại liên hệ chính của nhà thuốc.",
       },
       {
         key: "pharmacyInfo.email",
-        name: "Pharmacy Email",
+        name: "Email Nhà Thuốc",
         group: "pharmacyInfo",
         value: { email: "support@pharmaflow.vn" },
-        description: "The primary contact email for customer support.",
+        description: "Email liên hệ chính cho hỗ trợ khách hàng.",
       },
       {
         key: "reporting.lowStockThreshold",
-        name: "Low Stock Threshold",
+        name: "Ngưỡng Tồn Kho Thấp",
         group: "reporting",
         value: { lowStockThreshold: 20 },
         description:
-          "The inventory quantity below which a medication is considered low stock.",
+          "Số lượng tồn kho mà dưới đó thuốc được coi là tồn kho thấp.",
       },
       {
         key: "reporting.expiryWarningDays",
-        name: "Expiry Warning Days",
+        name: "Số Ngày Cảnh Báo Hết Hạn",
         group: "reporting",
         value: { expiryWarningDays: 90 },
         description:
-          "The number of days before a medication's expiry date to trigger a warning.",
+          "Số ngày trước ngày hết hạn của thuốc để kích hoạt cảnh báo.",
       },
       {
         key: "sales.currency",
-        name: "Currency",
+        name: "Đơn Vị Tiền Tệ",
         group: "sales",
         value: { currency: "VND" },
-        description: "The default currency for all financial transactions.",
+        description: "Đơn vị tiền tệ mặc định cho tất cả giao dịch tài chính.",
       },
       {
         key: "sales.taxRate",
-        name: "VAT Rate",
+        name: "Thuế VAT",
         group: "sales",
         value: { taxRate: 0.05 },
         description:
-          "The Value Added Tax (VAT) rate applied to sales (e.g., 0.05 for 5%).",
+          "Thuế giá trị gia tăng (VAT) áp dụng cho bán hàng (ví dụ: 0.05 cho 5%).",
       },
       {
         key: "system.timezone",
-        name: "System Timezone",
+        name: "Múi Giờ Hệ Thống",
         group: "system",
         value: { timezone: "Asia/Ho_Chi_Minh" },
-        description: "The timezone for all date and time operations.",
+        description: "Múi giờ cho tất cả các thao tác ngày và giờ.",
       },
       {
         key: "system.language",
-        name: "Default Language",
+        name: "Ngôn Ngữ Mặc Định",
         group: "system",
         value: { language: "vi" },
         description:
-          "The default language for the user interface (e.g., 'en', 'vi').",
+          "Ngôn ngữ mặc định cho giao diện người dùng (ví dụ: 'en', 'vi').",
       },
     ]);
 
-    console.log("✅ Database seeding completed successfully!");
+    console.log("✅ Khởi tạo dữ liệu hoàn tất thành công!");
     console.log(`
-    📈 Seeded data summary:
-    - Users: 5
-    - User Credentials: 5
-    - User Registrations: 3
-    - Customers: 6
-    - Suppliers: 5
-    - Medications: 12 (6 with images)
-    - Medication Variants: 26
-    - Supplier-Medication Links: 14
-    - Warehouse Zones: 4
-    - Warehouse Racks: 8
-    - Warehouse Bins: 192
-    - Purchase Orders: 5
-    - Purchase Order Items: 11
-    - Purchase Order Receipts: 4 (PO1, PO2, PO3, PO4 received)
-    - Receipt Items: 9 (from 4 receipts)
-    - Inventory Entries: 11 (from all receipts + 2 extra Paracetamol variants)
-    - Sales Orders: 15 (5 from June 2024 + 10 from October 2025)
-      * Status: pending, paid, cancelled only
-      * October 2025: 10 orders - 8 paid, 1 cancelled, 1 pending
-      * Total October Revenue: 6,580,000 VND (from 8 paid orders)
-    - Sales Order Items: 38 (5 from June 2024 + 33 from October 2025)
-      * October items include medications: Paracetamol, Ibuprofen, Amoxicillin, etc.
-    - Files: 3
-    - File Attachments: 3
-    - Notifications: 5
-    - Audit Logs: 5
-    - Reports: 4
-    - Shifts: 4
-    - Shift Assignments: 8
-    - Settings: 10
+    📈 Tổng kết dữ liệu đã khởi tạo:
+    - Người dùng: 5
+    - Thông tin đăng nhập: 5
+    - Đăng ký người dùng: 3
+    - Khách hàng: 6
+    - Nhà cung cấp: 5
+    - Thuốc: 12 (6 có hình ảnh)
+    - Biến thể thuốc: 26
+    - Liên kết Nhà cung cấp-Thuốc: 14
+    - Khu vực kho: 4
+    - Giá kho: 8
+    - Ngăn chứa: 192
+    - Đơn đặt hàng: 5
+    - Mục đơn đặt hàng: 11
+    - Phiếu nhập kho: 4 (PO1, PO2, PO3, PO4 đã nhận)
+    - Mục phiếu nhập: 9 (từ 4 phiếu nhập)
+    - Bản ghi tồn kho: 11 (từ tất cả phiếu nhập + 2 biến thể Paracetamol bổ sung)
+    - Đơn bán hàng: 15 (5 từ tháng 6/2024 + 10 từ tháng 10/2025)
+      * Trạng thái: chờ xử lý, đã thanh toán, đã hủy
+      * Tháng 10/2025: 10 đơn - 8 đã thanh toán, 1 đã hủy, 1 chờ xử lý
+      * Tổng doanh thu tháng 10: 6.580.000 VND (từ 8 đơn đã thanh toán)
+    - Mục đơn bán hàng: 38 (5 từ tháng 6/2024 + 33 từ tháng 10/2025)
+      * Mục tháng 10 bao gồm: Paracetamol, Ibuprofen, Amoxicillin, v.v.
+    - Tệp tin: 3
+    - Tệp đính kèm: 3
+    - Thông báo: 5
+    - Nhật ký kiểm toán: 5
+    - Báo cáo: 4
+    - Ca làm việc: 4
+    - Phân công ca: 8
+    - Cài đặt: 10
         `);
   } catch (error) {
     console.error("❌ Error during seeding:", error);
@@ -2121,10 +2124,10 @@ async function seed() {
 // Run the seed function
 seed()
   .then(() => {
-    console.log("🎉 Seeding process completed!");
+    console.log("🎉 Hoàn tất quá trình khởi tạo dữ liệu!");
     process.exit(0);
   })
   .catch((error) => {
-    console.error("💥 Seeding failed:", error);
+    console.error("💥 Khởi tạo dữ liệu thất bại:", error);
     process.exit(1);
   });
