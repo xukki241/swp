@@ -93,10 +93,10 @@ GET /api/suppliers/:id/medications
 1. Click "Add Supplier" button
 2. Form hiển thị:
    - **Required**:
-     - Company Name *
-     - Contact Person *
-     - Phone *
-     - Email *
+     - Company Name \*
+     - Contact Person \*
+     - Phone \*
+     - Email \*
    - **Optional**:
      - Address
      - Tax Code

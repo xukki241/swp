@@ -32,7 +32,6 @@ Module AI Analytics sử dụng Machine Learning và AI để cung cấp insight
   - Chart hiển thị predicted revenue by day
   - Confidence interval (upper/lower bounds)
   - Actual vs Predicted comparison (cho past days)
-  
 - **Top Growing Products**:
   - List products có trend tăng trưởng
   - % growth rate
@@ -50,7 +49,6 @@ Module AI Analytics sử dụng Machine Learning và AI để cung cấp insight
   - Suggested quantity (based on prediction)
   - Optimal reorder timing
   - Expected stockout date
-  
 - **Overstock Alerts**:
   - Products có stock quá cao
   - Recommended action: Promotion/Discount
@@ -69,7 +67,6 @@ Module AI Analytics sử dụng Machine Learning và AI để cung cấp insight
   - Frequent buyers
   - At-risk customers (haven't purchased recently)
   - New customers
-  
 - **Purchase Patterns**:
   - Common product combinations
   - Seasonal trends
@@ -83,7 +80,6 @@ Module AI Analytics sử dụng Machine Learning và AI để cung cấp insight
   - Date & time
   - Possible causes
   - Action needed
-  
 - **Inventory Anomalies**:
   - Unexpected stock changes
   - Discrepancies
@@ -100,7 +96,6 @@ Module AI Analytics sử dụng Machine Learning và AI để cung cấp insight
   - Auto-generated PO drafts
   - Optimized supplier selection
   - Bulk discount opportunities
-  
 - **Pricing Optimization**:
   - Suggested price adjustments
   - Competitor price comparison
@@ -465,13 +460,13 @@ CREATE TABLE anomalies (
 
 ### Error Handling
 
-| Error Code | Message | Action |
-|------------|---------|--------|
-| AI_001 | Model not available | Use fallback analytics |
-| AI_002 | Insufficient data | Show data requirements |
-| AI_003 | Prediction failed | Retry or show cached |
-| AI_004 | Low confidence | Display with warning |
-| AI_005 | Training in progress | Show ETA |
+| Error Code | Message              | Action                 |
+| ---------- | -------------------- | ---------------------- |
+| AI_001     | Model not available  | Use fallback analytics |
+| AI_002     | Insufficient data    | Show data requirements |
+| AI_003     | Prediction failed    | Retry or show cached   |
+| AI_004     | Low confidence       | Display with warning   |
+| AI_005     | Training in progress | Show ETA               |
 
 ### Testing Checklist
 
