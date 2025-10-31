@@ -383,7 +383,10 @@ export default function SalesPage() {
     }
 
     // Check if prescription order requires prescription note
-    if (activeOrder.isPrescriptionOrder && !activeOrder.prescriptionNote?.trim()) {
+    if (
+      activeOrder.isPrescriptionOrder &&
+      !activeOrder.prescriptionNote?.trim()
+    ) {
       toast.error("Prescription note is required for prescription orders");
       return;
     }
@@ -542,10 +545,11 @@ export default function SalesPage() {
               return (
                 <div
                   key={order.id}
-                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${isActive
-                    ? "border-primary bg-primary/10 text-foreground"
-                    : "border-border bg-card hover:border-primary/50 text-muted-foreground"
-                    }`}
+                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${
+                    isActive
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border bg-card hover:border-primary/50 text-muted-foreground"
+                  }`}
                   onClick={() => setActiveOrderId(order.id)}
                 >
                   <FileText className="h-4 w-4" />
@@ -750,7 +754,8 @@ export default function SalesPage() {
                         Đây là đơn thuốc kê đơn (Prescription Order)
                       </span>
                       <p className="text-xs text-amber-700 mt-1">
-                        Tick vào ô này nếu khách hàng mua thuốc kê đơn. Bắt buộc phải có ghi chú đơn thuốc bên dưới.
+                        Tick vào ô này nếu khách hàng mua thuốc kê đơn. Bắt buộc
+                        phải có ghi chú đơn thuốc bên dưới.
                       </p>
                     </div>
                   </label>
@@ -899,7 +904,8 @@ export default function SalesPage() {
                     isSubmitting ||
                     (activeOrder.paymentMethod === "cash" &&
                       (!activeOrder.cashReceived || changeAmount < 0)) ||
-                    (activeOrder.isPrescriptionOrder && !activeOrder.prescriptionNote?.trim())
+                    (activeOrder.isPrescriptionOrder &&
+                      !activeOrder.prescriptionNote?.trim())
                   }
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-base"
                 >

@@ -64,9 +64,9 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
       ]);
 
       setRecommendations(recData);
-      console.log(recData)
+      console.log(recData);
       setQuickInsights(insightsData.data);
-      console.log(insightsData?.data?.summary)
+      console.log(insightsData?.data?.summary);
     } catch (error) {
       console.error("Error loading AI analysis:", error);
       toast.error("Failed to load AI analysis");
@@ -336,7 +336,10 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                             Công thức tính toán:
                           </p>
                           <p className="text-gray-700 font-mono text-sm bg-white p-2 rounded border">
-                            {recommendations.data.forecastingMethodology.calculation}
+                            {
+                              recommendations.data.forecastingMethodology
+                                .calculation
+                            }
                           </p>
                         </div>
 
@@ -347,9 +350,14 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                           <ul className="space-y-1">
                             {recommendations.data.forecastingMethodology.principles?.map(
                               (principle, idx) => (
-                                <li key={idx} className="flex items-start gap-2 text-sm">
+                                <li
+                                  key={idx}
+                                  className="flex items-start gap-2 text-sm"
+                                >
                                   <span className="text-blue-600">•</span>
-                                  <span className="text-gray-700">{principle}</span>
+                                  <span className="text-gray-700">
+                                    {principle}
+                                  </span>
                                 </li>
                               )
                             )}
@@ -363,9 +371,14 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                           <ul className="space-y-1">
                             {recommendations.data.forecastingMethodology.standards?.map(
                               (standard, idx) => (
-                                <li key={idx} className="flex items-start gap-2 text-sm">
+                                <li
+                                  key={idx}
+                                  className="flex items-start gap-2 text-sm"
+                                >
                                   <span className="text-blue-600">•</span>
-                                  <span className="text-gray-700">{standard}</span>
+                                  <span className="text-gray-700">
+                                    {standard}
+                                  </span>
                                 </li>
                               )
                             )}
@@ -377,7 +390,10 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                             Lý do chọn phương pháp:
                           </p>
                           <p className="text-gray-700 text-sm">
-                            {recommendations.data.forecastingMethodology.rationale}
+                            {
+                              recommendations.data.forecastingMethodology
+                                .rationale
+                            }
                           </p>
                         </div>
                       </div>

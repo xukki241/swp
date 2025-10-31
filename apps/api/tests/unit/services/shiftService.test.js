@@ -64,32 +64,33 @@ describe("Shift Service (deleteShift & createShiftAssignment)", () => {
 
   // createShiftAssignment
   describe("createShiftAssignment()", () => {
-    it("should create shift assignment successfully for valid future date"), async () => {
-      const nowDate = new Date();
-      nowDate.setDate(nowDate.getDate())
+    (it("should create shift assignment successfully for valid future date"),
+      async () => {
+        const nowDate = new Date();
+        nowDate.setDate(nowDate.getDate());
 
-      const mockAssignment = {
-        id: "assign-0",
-        userId: "user-0",
-        shiftId: "shift-0",
-        assignedDate: nowDate.toDateString(),
-      };
+        const mockAssignment = {
+          id: "assign-0",
+          userId: "user-0",
+          shiftId: "shift-0",
+          assignedDate: nowDate.toDateString(),
+        };
 
-      db.select.mockReturnValue({
-        from: vi.fn().mockReturnThis,
-        where: vi.fn().mockReturnThis,
-        limit: vi.fn().mockResolvedValue([])
-      })
+        db.select.mockReturnValue({
+          from: vi.fn().mockReturnThis,
+          where: vi.fn().mockReturnThis,
+          limit: vi.fn().mockResolvedValue([]),
+        });
 
-      db.insert.mockReturnValue({
-        values: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([mockAssignment]),
+        db.insert.mockReturnValue({
+          values: vi.fn().mockReturnThis(),
+          returning: vi.fn().mockResolvedValue([mockAssignment]),
+        });
+        const result = await shiftService.createShiftAssignment(mockAssignment);
+
+        expect(result).toEqual(mockAssignment);
+        expect(db.insert).toHaveBeenCalled();
       });
-      const result = await shiftService.createShiftAssignment(mockAssignment);
-
-      expect(result).toEqual(mockAssignment);
-      expect(db.insert).toHaveBeenCalled();
-    }
     it("should create shift assignment successfully for valid future date", async () => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 1);
