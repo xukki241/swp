@@ -127,6 +127,9 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
               <DialogTitle className="text-xl">
                 AI-Powered Purchase Analytics
               </DialogTitle>
+              <DialogTitle className="text-xl">
+                AI-Powered Purchase Analytics
+              </DialogTitle>
             </div>
             <div className="flex items-center gap-2">
               <select
@@ -194,7 +197,13 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                             {formatCompactNumber(
                               quickInsights?.summary.totalRevenue
                             )}
+                            {formatCompactNumber(
+                              quickInsights?.summary.totalRevenue
+                            )}
                           </p>
+                          <span className="text-sm text-blue-700 font-medium">
+                            đ
+                          </span>
                           <span className="text-sm text-blue-700 font-medium">
                             đ
                           </span>
@@ -202,6 +211,10 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                       </div>
                       <div className="pt-2 border-t border-blue-200/50">
                         <p className="text-[10px] text-blue-600 leading-tight">
+                          {quickInsights?.summary.totalRevenue?.toLocaleString(
+                            "vi-VN"
+                          )}{" "}
+                          VND
                           {quickInsights?.summary.totalRevenue?.toLocaleString(
                             "vi-VN"
                           )}{" "}
@@ -226,7 +239,13 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                             {formatCompactNumber(
                               quickInsights?.summary.totalQuantitySold
                             )}
+                            {formatCompactNumber(
+                              quickInsights?.summary.totalQuantitySold
+                            )}
                           </p>
+                          <span className="text-sm text-green-700 font-medium">
+                            units
+                          </span>
                           <span className="text-sm text-green-700 font-medium">
                             units
                           </span>
@@ -234,6 +253,8 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                       </div>
                       <div className="pt-2 border-t border-green-200/50">
                         <p className="text-[10px] text-green-600 leading-tight">
+                          {quickInsights?.summary.totalQuantitySold?.toLocaleString()}{" "}
+                          total
                           {quickInsights?.summary.totalQuantitySold?.toLocaleString()}{" "}
                           total
                         </p>
@@ -256,7 +277,13 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                             {formatCompactNumber(
                               quickInsights?.summary.averageOrderValue
                             )}
+                            {formatCompactNumber(
+                              quickInsights?.summary.averageOrderValue
+                            )}
                           </p>
+                          <span className="text-sm text-orange-700 font-medium">
+                            đ
+                          </span>
                           <span className="text-sm text-orange-700 font-medium">
                             đ
                           </span>
@@ -264,6 +291,11 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                       </div>
                       <div className="pt-2 border-t border-orange-200/50">
                         <p className="text-[10px] text-orange-600 leading-tight">
+                          {quickInsights?.summary.averageOrderValue?.toLocaleString(
+                            "vi-VN",
+                            { maximumFractionDigits: 0 }
+                          )}{" "}
+                          VND
                           {quickInsights?.summary.averageOrderValue?.toLocaleString(
                             "vi-VN",
                             { maximumFractionDigits: 0 }
@@ -290,7 +322,14 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                               recommendations.data.financialProjection
                                 ?.estimatedTotalInvestment
                             )}
+                            {formatCompactNumber(
+                              recommendations.data.financialProjection
+                                ?.estimatedTotalInvestment
+                            )}
                           </p>
+                          <span className="text-sm text-purple-700 font-medium">
+                            đ
+                          </span>
                           <span className="text-sm text-purple-700 font-medium">
                             đ
                           </span>
@@ -302,8 +341,15 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                             "vi-VN"
                           ) || "N/A"}{" "}
                           VND
+                          {recommendations.data.financialProjection?.estimatedTotalInvestment?.toLocaleString(
+                            "vi-VN"
+                          ) || "N/A"}{" "}
+                          VND
                         </p>
                         <p className="text-[10px] text-purple-500 mt-0.5">
+                          {recommendations.data.priorityRecommendations
+                            ?.length || 0}{" "}
+                          items
                           {recommendations.data.priorityRecommendations
                             ?.length || 0}{" "}
                           items

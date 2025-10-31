@@ -1,6 +1,7 @@
 // apps/web/src/pages/medications/MedicationViewModal.jsx
 "use client";
 
+import { getMedicationImageLocal, getMedicationImageUrl } from "@/lib/fileUrls";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,7 +23,7 @@ import {
 import {
   getMedicationImageLocal,
   getMedicationImageUrl,
-} from "@/lib/mockImages";
+} from "@/lib/fileUrls";
 import {
   getInventorySummary,
   getMedicationVariants,
@@ -54,11 +55,10 @@ function PillPlaceholder({ className = "h-20 w-20" }) {
 function MedImage({ medicationId, alt = "", version = 0, onClick }) {
   const [errored, setErrored] = useState(false);
   const src = useMemo(() => {
-    if (!medicationId) return null;
+    if (medication?.imageId) return `http://localhost:3000/api/files/${medication.imageId}/view`;
     const local = getMedicationImageLocal(medicationId);
-    const base = local || getMedicationImageUrl(medicationId);
-    return base ? (base.includes("?v=") ? base : `${base}?v=${version}`) : null;
-  }, [medicationId, version]);
+    return local || getMedicationImageUrl(medicationId);
+  }, [medicationId, medication?.imageId, version]);
   useEffect(() => setErrored(false), [src]);
   if (!src || errored) return <PillPlaceholder />;
   return (
@@ -136,7 +136,7 @@ export default function MedicationViewModal({
           const v = await getMedicationVariants(medication.id);
           setVariants(Array.isArray(v) ? v : v?.data || []);
         }
-      } catch {}
+      } catch { }
     })();
   }, [isModal, open, medication, withVariants]);
 
@@ -368,7 +368,8 @@ export default function MedicationViewModal({
                   >
                     <TableCell>
                       {variantNameById.get(String(inv.medicationVariantId)) ||
-                        String(inv.medicationVariantId).slice(0, 8)}
+                        "Unnamed Variant"}
+
                     </TableCell>
                     <TableCell>{inv.totalQuantity}</TableCell>
                     <TableCell>{inv.totalReserved}</TableCell>
@@ -378,15 +379,15 @@ export default function MedicationViewModal({
               {inventory.filter(
                 (inv) => String(inv.medicationId) === String(medication.id)
               ).length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="text-center text-muted-foreground"
-                  >
-                    No inventory
-                  </TableCell>
-                </TableRow>
-              )}
+                  <TableRow>
+                    <TableCell
+                      colSpan={4}
+                      className="text-center text-muted-foreground"
+                    >
+                      No inventory
+                    </TableCell>
+                  </TableRow>
+                )}
             </TableBody>
           </Table>
         </div>

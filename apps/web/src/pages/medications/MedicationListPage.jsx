@@ -1,5 +1,6 @@
 "use client";
-
+import { useUploadFile } from "@/hooks/useFiles";
+import { instance } from "@/lib/axios";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-
+import MedicationImage from "../../components/MedicationImage";
 import {
   useCreateMedication,
   useDeleteMedication,
@@ -96,42 +97,33 @@ function StatusBadge({ status }) {
 }
 
 /** Inline MedImage (không tạo file mới) */
-function MedImage({
-  medicationId,
-  alt = "",
-  version = 0,
-  className = "h-14 w-14 rounded-xl object-cover border",
-  placeholderClass = "h-14 w-14",
-  onClick,
-}) {
+function MedImage({ medicationId, imageId, alt = "", version = 0, onClick }) {
   const [errored, setErrored] = useState(false);
 
   const src = useMemo(() => {
-    if (!medicationId) return null;
+    if (imageId)
+      return getMedicationImageUrl(medicationId, imageId);
     const local = getMedicationImageLocal(medicationId);
-    if (local) return local;
-    return `/images/medications/${medicationId}.jpg?v=${version}`;
-  }, [medicationId, version]);
+    return local || getMedicationImageUrl(medicationId);
+  }, [medicationId, imageId, version]);
 
   useEffect(() => setErrored(false), [src]);
 
-  if (!src || errored) {
-    return <PillPlaceholder className={placeholderClass} />;
-  }
+  if (!src || errored) return <PillPlaceholder />;
   return (
     <img
       src={src}
       alt={alt}
-      className={`${className} ${onClick ? "cursor-zoom-in" : ""}`}
+      className="h-20 w-20 rounded-xl object-cover border cursor-zoom-in"
       onError={() => setErrored(true)}
-      onClick={onClick}
+      onClick={() => onClick?.(src, alt)}
     />
   );
 }
 
 export default function MedicationListPage() {
   const navigate = useNavigate();
-
+  const uploadFile = useUploadFile();
   /* filters — giống UserListPage: searchInput / appliedSearch + statusFilter */
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
@@ -242,19 +234,22 @@ export default function MedicationListPage() {
       if (savedId) {
         if (removeImage) {
           clearMedicationImage(savedId);
-          bumpImageVersion(savedId);
+          await instance.patch(`/medications/${savedId}`, { imageID: null });
+        } else if (imageFile) {
+          const res = await uploadFile.mutateAsync(imageFile);
+          const fileId = res?.data?.id || res?.id;
+          if (fileId) {
+            await instance.patch(`/medications/${savedId}`, { imageID: fileId });
+          }
         } else if (imagePreview) {
+          // fallback local
           setMedicationImage(savedId, imagePreview);
-          bumpImageVersion(savedId);
         }
+        bumpImageVersion(savedId);
       }
 
       toast.success(editing ? "Medication updated" : "Medication created");
       setMedFormOpen(false);
-      setEditing(null);
-      setImageFile(null);
-      setImagePreview(null);
-      setRemoveImage(false);
       await refetch();
     } catch (e) {
       toast.error("Failed to save medication", {
@@ -479,11 +474,10 @@ export default function MedicationListPage() {
                       className="flex items-center justify-between rounded-xl border bg-card p-4 shadow-sm"
                     >
                       <div className="flex items-center gap-4">
-                        <MedImage
-                          medicationId={m.id}
+                        <MedicationImage
+                          fileId={m.imageId}
                           alt={m.name}
-                          version={imageVersion[m.id] || 0}
-                          onClick={() => openLightbox(src, m.name)}
+                          size={56}
                         />
                         <div>
                           <div className="flex items-center gap-2">

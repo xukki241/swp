@@ -41,27 +41,8 @@ function PillPlaceholder({ className = "h-20 w-20" }) {
     </div>
   );
 }
+import MedicationImage from "../../components/MedicationImage"; 
 
-function MedImage({ id, alt }) {
-  const [src, setSrc] = useState(null);
-  useEffect(() => {
-    if (!id) return;
-    const local = getMedicationImageLocal(id);
-    setSrc(local || getMedicationImageUrl(id));
-  }, [id]);
-  if (!src) return <PillPlaceholder />;
-  return (
-    <img
-      src={src}
-      alt={alt}
-      className="h-20 w-20 rounded-xl object-cover border"
-      onError={(e) => {
-        e.currentTarget.style.display = "none";
-        e.currentTarget.nextElementSibling.style.display = "flex";
-      }}
-    />
-  );
-}
 
 export default function MedicationDetailsPage() {
   const { id } = useParams();
@@ -138,7 +119,7 @@ export default function MedicationDetailsPage() {
         <CardContent>
           <div className="flex items-start gap-4">
             <div className="shrink-0">
-              <MedImage id={id} alt={medication?.name} />
+              <MedicationImage fileId={medication?.imageId} alt={medication?.name} size={80} />
               <div style={{ display: "none" }}>
                 <PillPlaceholder />
               </div>

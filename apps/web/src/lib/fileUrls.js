@@ -1,70 +1,35 @@
 // apps/web/src/lib/fileUrls.js
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
-// Lưu/đọc ảnh mock theo medicationId bằng localStorage (tránh gọi API để không 401)
-const IMG_KEY = (medicationId) => `medimg:${String(medicationId)}`;
+export function getMedicationImageUrl(id, imageId) {
+  return imageId ? `${API_BASE_URL}/files/${imageId}/view` : "/images/no-image.png";
+}
 
-/** Lấy dataURL ảnh đã lưu cục bộ (nếu có) */
-export function getMedicationImageLocal(medicationId) {
+export function getMedicationImageLocal(id) {
   try {
-    const val = localStorage.getItem(IMG_KEY(medicationId));
-    return val || null;
+    const data = localStorage.getItem(`medication_img_${id}`);
+    return data || null;
   } catch {
     return null;
   }
 }
 
-/** Lưu dataURL ảnh cục bộ */
-export function setMedicationImage(medicationId, dataUrl) {
-  try {
-    if (dataUrl) {
-      localStorage.setItem(IMG_KEY(medicationId), dataUrl);
-    }
-  } catch {
-    // ignore quota/private mode
-  }
+export function setMedicationImage(id, dataUrl) {
+  localStorage.setItem(`medication_img_${id}`, dataUrl);
 }
 
-/** Xóa ảnh cục bộ */
-export function clearMedicationImage(medicationId) {
-  try {
-    localStorage.removeItem(IMG_KEY(medicationId));
-  } catch {
-    // ignore
-  }
+export function clearMedicationImage(id) {
+  localStorage.removeItem(`medication_img_${id}`);
 }
 
-/** File -> dataURL để preview/lưu local */
-export function fileToDataURL(file) {
-  return new Promise((resolve, reject) => {
+// chuyển File -> dataURL để preview
+export const fileToDataURL = (file) =>
+  new Promise((resolve, reject) => {
     if (!file) {
-      return resolve(null);
+      resolve(null);
     }
     const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
-}
-
-/** URL fallback ảnh tĩnh trong public (nếu bạn có để sẵn) */
-export function getMedicationImageUrl(medicationId, version = 0) {
-  if (!medicationId) {
-    return null;
-  }
-  return `/images/medications/${medicationId}.jpg?v=${version}`;
-}
-
-/** Giữ sẵn nếu cần dùng theo fileId (không dùng trong mock hiện tại) */
-export function getFileViewUrl(fileId, version = 0) {
-  if (!fileId) {
-    return null;
-  }
-  return `/api/files/${fileId}/view?v=${version}`;
-}
-
-export function getFileDownloadUrl(fileId) {
-  if (!fileId) {
-    return null;
-  }
-  return `/api/files/${fileId}/download`;
-}
