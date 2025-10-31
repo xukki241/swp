@@ -13,7 +13,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 const BANK_INFO = {
-  bankId: "970422", // MB Bank (có thể thay đổi)
+  bankId: "970422", // MB Bank
   accountNo: "0383238586", // Số tài khoản
   accountName: "CONG TY PHARMAFLOW",
 };
@@ -26,38 +26,29 @@ export function VietQRPaymentDialog({
 }) {
   const [isConfirming, setIsConfirming] = useState(false);
 
-  // Don't render if no order data
-  if (!orderData) {
-    return null;
-  }
+  if (!orderData) return null;
 
-  // Format số tiền (VND không có phần thập phân)
   const amount = Math.round(orderData.total);
-
-  // Tạo mã đơn hàng ngắn gọn (8 ký tự cuối của ID)
   const orderId = orderData.id?.substring(0, 8).toUpperCase() || "NEW";
-
-  // Nội dung chuyển khoản
   const transferContent = `PF ${orderId}`;
 
-  // Tạo VietQR URL theo chuẩn
-  // Format: https://img.vietqr.io/image/{BANK_ID}-{ACCOUNT_NO}-{TEMPLATE}.png?amount={AMOUNT}&addInfo={MESSAGE}
-  const vietQRUrl = `https://img.vietqr.io/image/${BANK_INFO.bankId}-${BANK_INFO.accountNo}-compact.png?amount=${amount}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(BANK_INFO.accountName)}`;
+  const vietQRUrl = `https://img.vietqr.io/image/${BANK_INFO.bankId}-${BANK_INFO.accountNo}-compact.png?amount=${amount}&addInfo=${encodeURIComponent(
+    transferContent
+  )}&accountName=${encodeURIComponent(BANK_INFO.accountName)}`;
 
   const handleCopyInfo = (text, label) => {
     navigator.clipboard.writeText(text);
-    toast.success(`${label} copied to clipboard`);
+    toast.success(`${label} đã được sao chép`);
   };
 
   const handleConfirmPayment = async () => {
     setIsConfirming(true);
     try {
-      // Gọi callback để xác nhận thanh toán
       await onPaymentConfirmed();
-      toast.success("Payment confirmed successfully!");
+      toast.success("Xác nhận thanh toán thành công!");
       onOpenChange(false);
     } catch (error) {
-      toast.error("Failed to confirm payment");
+      toast.error("Không thể xác nhận thanh toán");
       console.error(error);
     } finally {
       setIsConfirming(false);
@@ -70,10 +61,10 @@ export function VietQRPaymentDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" />
-            VietQR Payment
+            Thanh toán qua VietQR
           </DialogTitle>
           <DialogDescription>
-            Scan QR code with any banking app to complete payment
+            Quét mã QR bằng ứng dụng ngân hàng để hoàn tất thanh toán
           </DialogDescription>
         </DialogHeader>
 
@@ -82,10 +73,9 @@ export function VietQRPaymentDialog({
           <div className="flex justify-center p-4 bg-white rounded-lg border">
             <img
               src={vietQRUrl}
-              alt="VietQR Code"
+              alt="Mã VietQR"
               className="w-64 h-64 object-contain"
               onError={(e) => {
-                // Fallback to QRCodeSVG if image fails
                 e.target.style.display = "none";
                 e.target.nextSibling.style.display = "block";
               }}
@@ -103,12 +93,12 @@ export function VietQRPaymentDialog({
           {/* Payment Details */}
           <div className="space-y-3 bg-muted p-4 rounded-lg">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Bank:</span>
+              <span className="text-sm font-medium">Ngân hàng:</span>
               <span className="text-sm">{BANK_INFO.accountName}</span>
             </div>
 
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Account Number:</span>
+              <span className="text-sm font-medium">Số tài khoản:</span>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-mono">{BANK_INFO.accountNo}</span>
                 <Button
@@ -116,7 +106,7 @@ export function VietQRPaymentDialog({
                   size="sm"
                   className="h-6 w-6 p-0"
                   onClick={() =>
-                    handleCopyInfo(BANK_INFO.accountNo, "Account number")
+                    handleCopyInfo(BANK_INFO.accountNo, "Số tài khoản")
                   }
                 >
                   <Copy className="h-3 w-3" />
@@ -125,16 +115,16 @@ export function VietQRPaymentDialog({
             </div>
 
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Amount:</span>
+              <span className="text-sm font-medium">Số tiền:</span>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold">
-                  {amount.toLocaleString("vi-VN")} VND
+                  {amount.toLocaleString("vi-VN")} VNĐ
                 </span>
                 <Button
                   variant="ghost"
                   size="sm"
                   className="h-6 w-6 p-0"
-                  onClick={() => handleCopyInfo(amount.toString(), "Amount")}
+                  onClick={() => handleCopyInfo(amount.toString(), "Số tiền")}
                 >
                   <Copy className="h-3 w-3" />
                 </Button>
@@ -142,7 +132,7 @@ export function VietQRPaymentDialog({
             </div>
 
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Transfer Content:</span>
+              <span className="text-sm font-medium">Nội dung chuyển khoản:</span>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-mono bg-yellow-100 px-2 py-1 rounded">
                   {transferContent}
@@ -152,7 +142,7 @@ export function VietQRPaymentDialog({
                   size="sm"
                   className="h-6 w-6 p-0"
                   onClick={() =>
-                    handleCopyInfo(transferContent, "Transfer content")
+                    handleCopyInfo(transferContent, "Nội dung chuyển khoản")
                   }
                 >
                   <Copy className="h-3 w-3" />
@@ -163,13 +153,17 @@ export function VietQRPaymentDialog({
 
           {/* Instructions */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
-            <p className="font-medium text-blue-900 mb-2">Instructions:</p>
+            <p className="font-medium text-blue-900 mb-2">Hướng dẫn thanh toán:</p>
             <ol className="list-decimal list-inside space-y-1 text-blue-800">
-              <li>Open your banking app</li>
-              <li>Scan the QR code or enter details manually</li>
-              <li>Verify the amount and transfer content</li>
-              <li>Complete the payment</li>
-              <li>Click "Payment Received" below after confirmation</li>
+              <li>Mở ứng dụng ngân hàng của bạn</li>
+              <li>Quét mã QR hoặc nhập thủ công thông tin tài khoản</li>
+              <li>Kiểm tra lại số tiền và nội dung chuyển khoản</li>
+              <li>Hoàn tất thanh toán</li>
+              <li>
+                Sau khi đã thanh toán, bấm nút{" "}
+                <span className="font-semibold">"Đã nhận thanh toán"</span> bên
+                dưới
+              </li>
             </ol>
           </div>
         </div>
@@ -181,7 +175,7 @@ export function VietQRPaymentDialog({
             onClick={() => onOpenChange(false)}
             disabled={isConfirming}
           >
-            Cancel
+            Hủy
           </Button>
           <Button
             type="button"
@@ -190,11 +184,11 @@ export function VietQRPaymentDialog({
             className="bg-green-600 hover:bg-green-700"
           >
             {isConfirming ? (
-              <>Processing...</>
+              <>Đang xử lý...</>
             ) : (
               <>
                 <CheckCircle2 className="mr-2 h-4 w-4" />
-                Payment Received
+                Đã nhận thanh toán
               </>
             )}
           </Button>
