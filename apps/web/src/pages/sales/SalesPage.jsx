@@ -117,12 +117,12 @@ export default function SalesPage() {
     };
     setOrders((prev) => [...prev, newOrder]);
     setActiveOrderId(newOrder.id);
-    toast.success("New order created");
+    toast.success("Đã tạo đơn hàng mới");
   };
 
   const deleteOrder = (orderId) => {
     if (orders.length === 1) {
-      toast.error("Must have at least 1 order");
+      toast.error("Phải có ít nhất 1 đơn hàng");
       return;
     }
 
@@ -134,7 +134,7 @@ export default function SalesPage() {
       setActiveOrderId(remainingOrders[0].id);
     }
 
-    toast.success("Order deleted");
+    toast.success("Đã xóa đơn hàng");
     setDeleteConfirmId(null);
   };
 
@@ -152,7 +152,7 @@ export default function SalesPage() {
 
     setOrders((prev) => [...prev, newOrder]);
     setActiveOrderId(newOrder.id);
-    toast.success("Order duplicated");
+    toast.success("Đã nhân bản đơn hàng");
   };
 
   // ========== UPDATE ACTIVE ORDER ==========
@@ -186,7 +186,7 @@ export default function SalesPage() {
 
   const handleCreateCustomer = useCallback(async () => {
     if (!newCustomerData.name.trim()) {
-      toast.error("Please enter customer name");
+      toast.error("Vui lòng nhập tên khách hàng");
       return;
     }
 
@@ -194,7 +194,7 @@ export default function SalesPage() {
       newCustomerData.phone.trim() &&
       !/^\d{10}$/.test(newCustomerData.phone.trim())
     ) {
-      toast.error("Phone number must be 10 digits");
+      toast.error("Số điện thoại phải có 10 chữ số");
       return;
     }
 
@@ -217,13 +217,13 @@ export default function SalesPage() {
       setCustomer(createdCustomer);
       setNewCustomerData({ name: "", email: "", phone: "" });
       setShowNewCustomerForm(false);
-      toast.success("New customer created");
+      toast.success("Đã tạo khách hàng mới");
     } catch (error) {
       console.error("Customer creation error:", error);
       const message =
         error?.response?.data?.message ||
         error?.message ||
-        "Cannot create customer";
+        "Không thể tạo khách hàng";
       toast.error(message);
     } finally {
       setIsCreatingCustomer(false);
@@ -265,7 +265,7 @@ export default function SalesPage() {
       }
     } catch (error) {
       console.error("Medication search error:", error);
-      toast.error("Cannot search products");
+      toast.error("Không thể tìm kiếm sản phẩm");
     } finally {
       setIsSearching(false);
     }
@@ -276,13 +276,13 @@ export default function SalesPage() {
   const handleAddToCart = useCallback(
     (medication) => {
       if (!medication.id || !medication.sellPrice) {
-        toast.error("Invalid product information");
+        toast.error("Thông tin sản phẩm không hợp lệ");
         return;
       }
 
       const availableQty = Number(medication.availableQuantity) || 0;
       if (availableQty <= 0) {
-        toast.error("Product out of stock");
+        toast.error("Sản phẩm hết hàng");
         return;
       }
 
@@ -293,7 +293,7 @@ export default function SalesPage() {
       if (existingItem) {
         const newQuantity = existingItem.quantity + 1;
         if (newQuantity > availableQty) {
-          toast.error(`Cannot exceed stock quantity (${availableQty})`);
+          toast.error(`Không thể vượt quá số lượng tồn kho (${availableQty})`);
           return;
         }
 
@@ -303,7 +303,7 @@ export default function SalesPage() {
             : item
         );
         setCart(updatedCart);
-        toast.success(`Increased quantity to ${newQuantity}`);
+        toast.success(`Đã tăng số lượng lên ${newQuantity}`);
       } else {
         const newItem = {
           medication_variant_id: medication.id,
@@ -314,7 +314,9 @@ export default function SalesPage() {
           quantity: 1,
         };
         setCart([...activeOrder.cart, newItem]);
-        toast.success(`Added ${medication.medicationName || medication.name}`);
+        toast.success(
+          `Đã thêm ${medication.medicationName || medication.name}`
+        );
       }
       setSearchResults([]);
     },
@@ -340,7 +342,9 @@ export default function SalesPage() {
 
       const item = activeOrder.cart[index];
       if (quantity > item.availableQuantity) {
-        toast.error(`Cannot exceed stock quantity (${item.availableQuantity})`);
+        toast.error(
+          `Không thể vượt quá số lượng tồn kho (${item.availableQuantity})`
+        );
         return;
       }
 
@@ -356,7 +360,7 @@ export default function SalesPage() {
       const item = activeOrder.cart[index];
       const newCart = activeOrder.cart.filter((_, i) => i !== index);
       setCart(newCart);
-      toast.success(`Removed ${item.medicationName}`);
+      toast.success(`Đã xóa ${item.medicationName}`);
     },
     [activeOrder]
   );
@@ -365,12 +369,12 @@ export default function SalesPage() {
 
   const handleCompleteOrder = useCallback(async () => {
     if (!activeOrder.customer) {
-      toast.error("Please select a customer");
+      toast.error("Vui lòng chọn khách hàng");
       return;
     }
 
     if (activeOrder.cart.length === 0) {
-      toast.error("Cart is empty");
+      toast.error("Giỏ hàng trống");
       return;
     }
 
@@ -378,7 +382,7 @@ export default function SalesPage() {
       (item) => !item.medication_variant_id || item.quantity <= 0
     );
     if (invalidItems.length > 0) {
-      toast.error("Cart has invalid items");
+      toast.error("Giỏ hàng có sản phẩm không hợp lệ");
       return;
     }
 
@@ -446,7 +450,7 @@ export default function SalesPage() {
       };
 
       setSuccessOrder(enrichedOrder);
-      toast.success("Order created successfully!");
+      toast.success("Đã tạo đơn hàng thành công!");
 
       // Note: Invoice email will be sent automatically when order is marked as "paid"
 
@@ -478,7 +482,7 @@ export default function SalesPage() {
       }, 1500);
     } catch (error) {
       console.error("Order creation error:", error);
-      let message = "Cannot create order";
+      let message = "Không thể tạo đơn hàng";
 
       if (error?.response?.data?.error) {
         const errorData = error.response.data.error;
@@ -494,7 +498,7 @@ export default function SalesPage() {
       }
 
       toast.error(
-        typeof message === "string" ? message : "Cannot create order"
+        typeof message === "string" ? message : "Không thể tạo đơn hàng"
       );
     } finally {
       setIsSubmitting(false);

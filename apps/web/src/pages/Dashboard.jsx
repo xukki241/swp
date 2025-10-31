@@ -63,7 +63,7 @@ export default function DashboardPage() {
     if (!monthlyReport?.data?.data) {
       return [
         {
-          title: "Total Orders",
+          title: "Tổng đơn hàng",
           value: "0",
           icon: ShoppingCart,
           trend: "0%",
@@ -71,7 +71,7 @@ export default function DashboardPage() {
           loading: isLoadingReport,
         },
         {
-          title: "Total Revenue",
+          title: "Tổng doanh thu",
           value: "₫0",
           icon: DollarSign,
           trend: "0%",
@@ -79,7 +79,7 @@ export default function DashboardPage() {
           loading: isLoadingReport,
         },
         {
-          title: "Average Order",
+          title: "Đơn hàng TB",
           value: "₫0",
           icon: TrendingUp,
           trend: "0%",
@@ -87,7 +87,7 @@ export default function DashboardPage() {
           loading: isLoadingReport,
         },
         {
-          title: "Top Products",
+          title: "Sản phẩm bán chạy",
           value: "0",
           icon: Package,
           trend: "0%",
@@ -106,7 +106,7 @@ export default function DashboardPage() {
 
     return [
       {
-        title: "Total Orders",
+        title: "Tổng đơn hàng",
         value: totalOrders.toLocaleString(),
         icon: ShoppingCart,
         trend: "+12.5%",
@@ -114,7 +114,7 @@ export default function DashboardPage() {
         loading: false,
       },
       {
-        title: "Total Revenue",
+        title: "Tổng doanh thu",
         value: new Intl.NumberFormat("vi-VN", {
           style: "currency",
           currency: "VND",
@@ -125,7 +125,7 @@ export default function DashboardPage() {
         loading: false,
       },
       {
-        title: "Average Order",
+        title: "Đơn hàng TB",
         value: new Intl.NumberFormat("vi-VN", {
           style: "currency",
           currency: "VND",
@@ -136,7 +136,7 @@ export default function DashboardPage() {
         loading: false,
       },
       {
-        title: "Top Products",
+        title: "Sản phẩm bán chạy",
         value: topProducts.toString(),
         icon: Package,
         trend: "+3.1%",
@@ -163,32 +163,32 @@ export default function DashboardPage() {
   // Quick action items with navigation
   const quickActions = [
     {
-      title: "New Sale",
-      description: "Create order",
+      title: "Bán hàng",
+      description: "Tạo đơn hàng mới",
       icon: ShoppingCart,
       color: "bg-blue-100",
       iconColor: "text-blue-600",
       path: "/sales",
     },
     {
-      title: "Inventory",
-      description: "Check stock",
+      title: "Kho hàng",
+      description: "Kiểm tra tồn kho",
       icon: Package,
       color: "bg-green-100",
       iconColor: "text-green-600",
       path: "/inventory/stock",
     },
     {
-      title: "Medications",
-      description: "Manage products",
+      title: "Thuốc",
+      description: "Quản lý sản phẩm",
       icon: Activity,
       color: "bg-purple-100",
       iconColor: "text-purple-600",
       path: "/medications",
     },
     {
-      title: "Analytics",
-      description: "AI-powered insights",
+      title: "Báo cáo",
+      description: "Xem báo cáo & phân tích",
       icon: BarChart3,
       color: "bg-gradient-to-br from-orange-100 to-pink-100",
       iconColor: "text-orange-600",
@@ -201,32 +201,32 @@ export default function DashboardPage() {
     {
       id: 1,
       type: "sale",
-      description: "New sale order completed",
-      time: "5 minutes ago",
+      description: "Đơn bán hàng mới hoàn thành",
+      time: "5 phút trước",
       icon: ShoppingCart,
       color: "text-green-600",
     },
     {
       id: 2,
       type: "inventory",
-      description: "Stock updated for Paracetamol",
-      time: "15 minutes ago",
+      description: "Cập nhật tồn kho Paracetamol",
+      time: "15 phút trước",
       icon: Package,
       color: "text-blue-600",
     },
     {
       id: 3,
       type: "alert",
-      description: "Low stock alert: Amoxicillin",
-      time: "1 hour ago",
+      description: "Cảnh báo tồn kho thấp: Amoxicillin",
+      time: "1 giờ trước",
       icon: AlertTriangle,
       color: "text-orange-600",
     },
     {
       id: 4,
       type: "user",
-      description: "New user registration pending",
-      time: "2 hours ago",
+      description: "Đăng ký người dùng mới đang chờ",
+      time: "2 giờ trước",
       icon: Users,
       color: "text-purple-600",
     },
@@ -235,13 +235,13 @@ export default function DashboardPage() {
   // Get time-based greeting
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
+    if (hour < 12) return "Chào buổi sáng";
+    if (hour < 18) return "Chào buổi chiều";
+    return "Chào buổi tối";
   };
 
   return (
-    <AppLayout title="Dashboard">
+    <AppLayout title="Tổng quan">
       <div className="space-y-6 animate-in fade-in duration-500">
         {/* Welcome Section */}
         <WelcomeBanner userName={userName} greeting={getGreeting()} />
@@ -253,9 +253,9 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2 text-red-700">
                 <AlertTriangle className="h-5 w-5" />
                 <div>
-                  <p className="font-semibold">Error Loading Dashboard Data</p>
+                  <p className="font-semibold">Lỗi tải dữ liệu Dashboard</p>
                   <p className="text-sm">
-                    {reportError.message || "Failed to fetch monthly report"}
+                    {reportError.message || "Không thể tải báo cáo tháng"}
                   </p>
                 </div>
               </div>
@@ -278,13 +278,13 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
                   <Package className="h-5 w-5 text-primary" />
-                  Top Selling Medications
+                  Thuốc bán chạy nhất
                 </CardTitle>
                 <Badge
                   variant="secondary"
                   className="bg-primary/10 text-primary"
                 >
-                  This Month
+                  Tháng này
                 </Badge>
               </div>
             </CardHeader>
@@ -302,7 +302,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <Package className="h-12 w-12 text-muted-foreground/50" />
                   <p className="mt-4 text-muted-foreground">
-                    No sales data available
+                    Chưa có dữ liệu bán hàng
                   </p>
                 </div>
               ) : (
@@ -330,8 +330,7 @@ export default function DashboardPage() {
                           {formatCurrency(med.totalRevenue)}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {Number(med.totalQuantity).toLocaleString()} units
-                          sold
+                          {Number(med.totalQuantity).toLocaleString()} đơn vị
                         </p>
                       </div>
                     </div>
@@ -347,13 +346,13 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
                   <Package className="h-5 w-5 text-primary" />
-                  Recent Receipts
+                  Phiếu nhập gần đây
                 </CardTitle>
                 <Badge
                   variant="secondary"
                   className="bg-primary/10 text-primary"
                 >
-                  Latest 5
+                  5 mới nhất
                 </Badge>
               </div>
             </CardHeader>
@@ -371,7 +370,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <Package className="h-12 w-12 text-muted-foreground/50" />
                   <p className="mt-4 text-muted-foreground">
-                    No receipts available
+                    Chưa có phiếu nhập
                   </p>
                 </div>
               ) : (
@@ -419,7 +418,7 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
                 <Activity className="h-5 w-5 text-primary" />
-                Quick Actions
+                Thao tác nhanh
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -444,7 +443,7 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
                 <Clock className="h-5 w-5 text-primary" />
-                Recent Activities
+                Hoạt động gần đây
               </CardTitle>
             </CardHeader>
             <CardContent>

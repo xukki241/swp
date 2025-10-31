@@ -86,8 +86,8 @@ export default function RegistrationRequestsPage() {
         role: "staff", // Auto assign as staff
       });
 
-      toast.success("Request Approved", {
-        description: `${selectedRequest.name}'s registration has been approved as staff.`,
+      toast.success("Đã phê duyệt yêu cầu", {
+        description: `Đăng ký của ${selectedRequest.name} đã được phê duyệt với vai trò nhân viên.`,
       });
 
       setShowApproveDialog(false);
@@ -95,9 +95,9 @@ export default function RegistrationRequestsPage() {
 
       // No need to call refetch() here, the useApproveRegistration hook handles it.
     } catch (err) {
-      toast.error("Error", {
+      toast.error("Lỗi", {
         description:
-          err.response?.data?.message || "Failed to approve registration",
+          err.response?.data?.message || "Không thể phê duyệt đăng ký",
       });
     }
   }
@@ -108,8 +108,8 @@ export default function RegistrationRequestsPage() {
     try {
       await rejectMutation.mutateAsync(selectedRequest.id);
 
-      toast.success("Request Rejected", {
-        description: `${selectedRequest.name}'s registration has been rejected.`,
+      toast.success("Đã từ chối yêu cầu", {
+        description: `Đăng ký của ${selectedRequest.name} đã bị từ chối.`,
       });
 
       setShowRejectDialog(false);
@@ -117,11 +117,11 @@ export default function RegistrationRequestsPage() {
 
       // No need to call refetch() here, the useRejectRegistration hook handles it.
     } catch (err) {
-      toast.error("Error", {
+      toast.error("Lỗi", {
         description:
           err.response?.data?.message ||
           error?.message ||
-          "Failed to reject registration",
+          "Không thể từ chối đăng ký",
       });
     }
   }
@@ -132,10 +132,10 @@ export default function RegistrationRequestsPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Registration Requests
+              Yêu cầu đăng ký
             </h1>
             <p className="text-muted-foreground mt-1">
-              Loading registration requests...
+              Đang tải yêu cầu đăng ký...
             </p>
           </div>
           <Card className="shadow-md rounded-xl border-0">
@@ -156,10 +156,10 @@ export default function RegistrationRequestsPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Registration Requests
+              Yêu cầu đăng ký
             </h1>
             <p className="text-muted-foreground mt-1">
-              Review and manage staff registration requests
+              Xem xét và quản lý yêu cầu đăng ký nhân viên
             </p>
           </div>
           <Card className="shadow-md rounded-xl border-0">
@@ -167,19 +167,19 @@ export default function RegistrationRequestsPage() {
               <div className="text-center py-12">
                 <XCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Error Loading Registrations
+                  Lỗi tải dữ liệu đăng ký
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   {error?.response?.data?.message ||
                     error?.message ||
-                    "Failed to load registration requests"}
+                    "Không thể tải yêu cầu đăng ký"}
                 </p>
                 <Button
                   onClick={() => refetch()}
                   className="mt-4"
                   variant="outline"
                 >
-                  Retry
+                  Thử lại
                 </Button>
               </div>
             </CardContent>
@@ -193,19 +193,17 @@ export default function RegistrationRequestsPage() {
     <AppLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Registration Requests
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900">Yêu cầu đăng ký</h1>
           <p className="text-muted-foreground mt-1">
-            Review and manage staff registration requests
+            Xem xét và quản lý yêu cầu đăng ký nhân viên
           </p>
         </div>
 
         <Card className="shadow-md rounded-xl border-0">
           <CardHeader>
-            <CardTitle>Pending Registrations</CardTitle>
+            <CardTitle>Đăng ký chờ duyệt</CardTitle>
             <CardDescription>
-              Approve or reject staff account registration requests
+              Phê duyệt hoặc từ chối yêu cầu đăng ký tài khoản nhân viên
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -219,7 +217,7 @@ export default function RegistrationRequestsPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by name or email..."
+                  placeholder="Tìm kiếm theo tên hoặc email..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   className="pl-10 h-11 rounded-lg"
@@ -230,7 +228,7 @@ export default function RegistrationRequestsPage() {
                 className="h-11 bg-primary hover:bg-primary/90"
               >
                 <Search className="h-4 w-4 mr-2" />
-                Search
+                Tìm kiếm
               </Button>
               {searchQuery && (
                 <Button
@@ -242,7 +240,7 @@ export default function RegistrationRequestsPage() {
                     setSearchQuery("");
                   }}
                 >
-                  Clear
+                  Xóa
                 </Button>
               )}
             </form>
@@ -251,11 +249,11 @@ export default function RegistrationRequestsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead>Tên</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Address</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>Điện thoại</TableHead>
+                    <TableHead>Địa chỉ</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -265,10 +263,10 @@ export default function RegistrationRequestsPage() {
                         <div className="flex flex-col items-center gap-2">
                           <Clock className="h-10 w-10 text-muted-foreground/50" />
                           <p className="text-muted-foreground font-medium">
-                            No pending registrations
+                            Không có đăng ký chờ duyệt
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            All registration requests have been processed
+                            Tất cả yêu cầu đăng ký đã được xử lý
                           </p>
                         </div>
                       </TableCell>
@@ -279,10 +277,10 @@ export default function RegistrationRequestsPage() {
                         <div className="flex flex-col items-center gap-2">
                           <Search className="h-10 w-10 text-muted-foreground/50" />
                           <p className="text-muted-foreground font-medium">
-                            No results found
+                            Không tìm thấy kết quả
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            Try adjusting your search terms
+                            Thử điều chỉnh từ khóa tìm kiếm
                           </p>
                         </div>
                       </TableCell>
@@ -305,7 +303,7 @@ export default function RegistrationRequestsPage() {
                               className="bg-primary hover:bg-primary/90 text-white"
                             >
                               <CheckCircle className="h-4 w-4 mr-1" />
-                              Approve
+                              Phê duyệt
                             </Button>
                             <Button
                               size="sm"
@@ -314,7 +312,7 @@ export default function RegistrationRequestsPage() {
                               disabled={rejectMutation.isPending}
                             >
                               <XCircle className="h-4 w-4 mr-1" />
-                              Reject
+                              Từ chối
                             </Button>
                           </div>
                         </TableCell>
@@ -332,21 +330,21 @@ export default function RegistrationRequestsPage() {
       <AlertDialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Approve Registration</AlertDialogTitle>
+            <AlertDialogTitle>Phê duyệt đăng ký</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to approve the registration request from{" "}
-              <span className="font-semibold">{selectedRequest?.name}</span>?
-              They will be assigned as a staff member.
+              Bạn có chắc chắn muốn phê duyệt yêu cầu đăng ký từ{" "}
+              <span className="font-semibold">{selectedRequest?.name}</span>? Họ
+              sẽ được gán vai trò nhân viên.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmApprove}
               disabled={approveMutation.isPending}
               className="bg-primary hover:bg-primary/90"
             >
-              {approveMutation.isPending ? "Approving..." : "Approve"}
+              {approveMutation.isPending ? "Đang phê duyệt..." : "Phê duyệt"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -356,21 +354,21 @@ export default function RegistrationRequestsPage() {
       <AlertDialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Reject Registration</AlertDialogTitle>
+            <AlertDialogTitle>Từ chối đăng ký</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to reject the registration request from{" "}
+              Bạn có chắc chắn muốn từ chối yêu cầu đăng ký từ{" "}
               <span className="font-semibold">{selectedRequest?.name}</span>?
-              This action cannot be undone.
+              Hành động này không thể hoàn tác.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmReject}
               disabled={rejectMutation.isPending}
               className="bg-red-600 hover:bg-red-700"
             >
-              {rejectMutation.isPending ? "Rejecting..." : "Reject"}
+              {rejectMutation.isPending ? "Đang từ chối..." : "Từ chối"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

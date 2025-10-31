@@ -71,10 +71,10 @@ export default function ResetPasswordPage() {
             </div>
             <div>
               <CardTitle className="text-3xl font-bold text-gray-800">
-                Password Reset Successfully
+                Đặt lại mật khẩu thành công
               </CardTitle>
               <CardDescription className="text-base mt-2">
-                You can now login with your new password
+                Bây giờ bạn có thể đăng nhập với mật khẩu mới
               </CardDescription>
             </div>
           </CardHeader>
@@ -82,13 +82,13 @@ export default function ResetPasswordPage() {
           <CardContent className="p-8 pt-4">
             <div className="mb-6 p-4 rounded-lg bg-green-50 border border-green-200">
               <p className="text-sm text-green-800 text-center">
-                Redirecting to login page...
+                Đang chuyển đến trang đăng nhập...
               </p>
             </div>
 
             <Link to="/login">
               <Button className="w-full h-11 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium">
-                Go to Login
+                Đến Đăng nhập
               </Button>
             </Link>
           </CardContent>
@@ -108,10 +108,10 @@ export default function ResetPasswordPage() {
           </div>
           <div>
             <CardTitle className="text-3xl font-bold text-gray-800">
-              Reset Password
+              Đặt lại mật khẩu
             </CardTitle>
             <CardDescription className="text-base mt-2">
-              Enter the OTP code and your new password
+              Nhập mã OTP và mật khẩu mới của bạn
             </CardDescription>
           </div>
         </CardHeader>
@@ -122,7 +122,7 @@ export default function ResetPasswordPage() {
               <AlertCircle className="h-4 w-4" />
               <span>
                 {verifyOTPMutation.error?.response?.data?.message ||
-                  "Failed to reset password. Please try again."}
+                  "Không thể đặt lại mật khẩu. Vui lòng thử lại."}
               </span>
             </div>
           )}
@@ -131,17 +131,17 @@ export default function ResetPasswordPage() {
             {/* Email Input */}
             <div className="space-y-2">
               <Label htmlFor="identifier" className="text-sm font-medium">
-                Email Address
+                Địa chỉ Email
               </Label>
               <Input
                 id="identifier"
                 type="email"
-                placeholder="your.email@example.com"
+                placeholder="email.cua.ban@example.com"
                 {...register("identifier", {
-                  required: "Email is required",
+                  required: "Email là bắt buộc",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
+                    message: "Địa chỉ email không hợp lệ",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -156,18 +156,18 @@ export default function ResetPasswordPage() {
             {/* OTP Input */}
             <div className="space-y-2">
               <Label htmlFor="otp" className="text-sm font-medium">
-                OTP Code
+                Mã OTP
               </Label>
               <Input
                 id="otp"
                 type="text"
-                placeholder="Enter 6-digit OTP"
+                placeholder="Nhập mã OTP 6 chữ số"
                 maxLength={6}
                 {...register("otp", {
-                  required: "OTP is required",
+                  required: "Mã OTP là bắt buộc",
                   pattern: {
                     value: /^\d{6}$/,
-                    message: "OTP must be 6 digits",
+                    message: "Mã OTP phải có 6 chữ số",
                   },
                 })}
                 className="h-11 rounded-lg text-center text-lg tracking-widest font-mono"
@@ -180,18 +180,18 @@ export default function ResetPasswordPage() {
             {/* New Password Input */}
             <div className="space-y-2">
               <Label htmlFor="newPassword" className="text-sm font-medium">
-                New Password
+                Mật khẩu mới
               </Label>
               <div className="relative">
                 <Input
                   id="newPassword"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter new password"
+                  placeholder="Nhập mật khẩu mới"
                   {...register("newPassword", {
-                    required: "New password is required",
+                    required: "Mật khẩu mới là bắt buộc",
                     minLength: {
                       value: 6,
-                      message: "Password must be at least 6 characters",
+                      message: "Mật khẩu phải có ít nhất 6 ký tự",
                     },
                   })}
                   className="h-11 rounded-lg pr-10"
@@ -218,17 +218,17 @@ export default function ResetPasswordPage() {
             {/* Confirm Password Input */}
             <div className="space-y-2">
               <Label htmlFor="confirmPassword" className="text-sm font-medium">
-                Confirm New Password
+                Xác nhận mật khẩu mới
               </Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm new password"
+                  placeholder="Xác nhận mật khẩu mới"
                   {...register("confirmPassword", {
-                    required: "Please confirm your password",
+                    required: "Vui lòng xác nhận mật khẩu",
                     validate: (value) =>
-                      value === newPassword || "Passwords do not match",
+                      value === newPassword || "Mật khẩu không khớp",
                   })}
                   className="h-11 rounded-lg pr-10"
                 />
@@ -259,22 +259,22 @@ export default function ResetPasswordPage() {
               {verifyOTPMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <Loading className="h-4 w-4 text-white" />
-                  Resetting Password...
+                  Đang đặt lại mật khẩu...
                 </span>
               ) : (
-                "Reset Password"
+                "Đặt lại mật khẩu"
               )}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Didn't receive the OTP?{" "}
+              Không nhận được OTP?{" "}
               <Link
                 to="/forgot-password"
                 className="text-primary font-medium hover:underline"
               >
-                Resend OTP
+                Gửi lại OTP
               </Link>
             </p>
           </div>
@@ -284,7 +284,7 @@ export default function ResetPasswordPage() {
               to="/login"
               className="text-sm text-muted-foreground hover:text-primary"
             >
-              Back to Login
+              Quay lại Đăng nhập
             </Link>
           </div>
         </CardContent>

@@ -3,6 +3,7 @@ import { Router } from "express";
 import aiAnalysisRouter from "./aiAnalysisRoutes.js";
 import auditRouter from "./auditRoutes.js";
 import { authRouter } from "./authRoutes.js";
+import contractRouter from "./contractRoutes.js";
 import { customerRouter } from "./customerRoutes.js";
 import emailRouter from "./emailRoutes.js";
 import { fileRouter } from "./fileRoutes.js";
@@ -28,6 +29,7 @@ apiRouter.use("/registrations", registrationRouter);
 apiRouter.use("/users", userRouter);
 apiRouter.use("/customers", customerRouter);
 apiRouter.use("/files", fileRouter);
+apiRouter.use("/contracts", contractRouter);
 apiRouter.use("/medications", medicationRouter); // Includes nested /variants routes
 apiRouter.use("/suppliers", supplierRouter); // Includes nested /medications routes
 apiRouter.use("/purchases", purchaseOrderRouter); // Includes nested /receipts routes
