@@ -316,7 +316,9 @@ export const checkInShift = async (id) => {
       .update(shiftAssignments)
       .set({
         checkInTime: new Date(vnTime),
+        checkInTime: new Date(vnTime),
         status: "in_progress",
+        updatedAt: new Date(vnTime),
         updatedAt: new Date(vnTime),
       })
       .where(eq(shiftAssignments.id, id))
@@ -340,7 +342,9 @@ export const checkOutShift = async (id) => {
       .update(shiftAssignments)
       .set({
         checkOutTime: new Date(vnTime),
+        checkOutTime: new Date(vnTime),
         status: "completed",
+        updatedAt: new Date(vnTime),
         updatedAt: new Date(vnTime),
       })
       .where(eq(shiftAssignments.id, id))
