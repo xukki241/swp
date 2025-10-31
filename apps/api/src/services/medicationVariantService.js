@@ -158,6 +158,7 @@ export const searchVariantsForSale = async ({ search } = {}) => {
         isActive: medicationVariants.isActive,
         isForSale: medicationVariants.isForSale,
         medicationName: medications.name,
+        isPrescriptionRequired: medications.isPrescriptionRequired,
       })
       .from(medicationVariants)
       .innerJoin(
@@ -240,6 +241,7 @@ export const searchVariantsForSale = async ({ search } = {}) => {
           unit: variant.unit,
           isActive: variant.isActive,
           isForSale: variant.isForSale,
+          isPrescriptionRequired: variant.isPrescriptionRequired || false,
           availableQuantity: totalAvailable,
           locations: availableLocations, // FEFO sorted locations
         };

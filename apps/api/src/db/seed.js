@@ -1254,6 +1254,26 @@ async function seed() {
         expiryDate: new Date("2027-01-09"),
         quantity: 200,
       },
+      // NEW: Paracetamol 650mg (150 boxes)
+      {
+        medicationVariantId: medicationVariantsResults[1].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[0].id,
+        binId: warehouseBinsResults[0].id,
+        batchNumber: "P2405002",
+        manufactureDate: new Date("2024-01-15"),
+        expiryDate: new Date("2027-01-14"),
+        quantity: 150,
+      },
+      // NEW: Paracetamol Syrup 250mg/5ml (80 bottles)
+      {
+        medicationVariantId: medicationVariantsResults[2].id,
+        purchaseOrderReceiptItemsId: receiptItemsResults[0].id,
+        binId: warehouseBinsResults[1].id,
+        batchNumber: "P2405003",
+        manufactureDate: new Date("2024-02-01"),
+        expiryDate: new Date("2026-01-31"),
+        quantity: 80,
+      },
       // Inventory from PO1 Receipt - Item 1: Amoxicillin 500mg (100 boxes)
       {
         medicationVariantId: medicationVariantsResults[3].id,
@@ -2076,7 +2096,7 @@ async function seed() {
     - Purchase Order Items: 11
     - Purchase Order Receipts: 4 (PO1, PO2, PO3, PO4 received)
     - Receipt Items: 9 (from 4 receipts)
-    - Inventory Entries: 9 (from all receipts)
+    - Inventory Entries: 11 (from all receipts + 2 extra Paracetamol variants)
     - Sales Orders: 15 (5 from June 2024 + 10 from October 2025)
       * Status: pending, paid, cancelled only
       * October 2025: 10 orders - 8 paid, 1 cancelled, 1 pending
