@@ -374,7 +374,7 @@ ALTER TABLE sales ADD COLUMN shift_id UUID REFERENCES shifts(id);
 3. **Cash Difference Thresholds**:
    - < 10,000: Warning
    - 10,000 - 50,000: Require notes
-   - >= 50,000: Manager notification
+   - > = 50,000: Manager notification
 4. **Shift Duration**: Không giới hạn (có thể overnight shifts)
 5. **Force Close**: Chỉ Manager/Admin mới có quyền
 6. **Expected Cash Calculation**: opening_cash + cash_sales
@@ -387,13 +387,13 @@ ALTER TABLE sales ADD COLUMN shift_id UUID REFERENCES shifts(id);
 ### Expected Cash
 
 ```javascript
-expected_cash = opening_cash + cash_sales
+expected_cash = opening_cash + cash_sales;
 ```
 
 ### Cash Difference
 
 ```javascript
-cash_difference = closing_cash - expected_cash
+cash_difference = closing_cash - expected_cash;
 ```
 
 ### Duration

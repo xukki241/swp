@@ -32,17 +32,14 @@ Module Dashboard cung cấp tổng quan về hoạt động kinh doanh của nh�
   - Số tiền: VNĐ
   - % change so với hôm qua
   - Icon: trending up/down
-  
 - **Total Orders (Today)**
   - Số đơn: count
   - % change so với hôm qua
   - Icon: shopping cart
-  
 - **Low Stock Items**
   - Số sản phẩm sắp hết: count
   - Urgent items (< 10): highlight red
   - Icon: alert triangle
-  
 - **Pending Orders**
   - Số đơn đang chờ: count
   - Icon: clock
@@ -91,7 +88,7 @@ Module Dashboard cung cấp tổng quan về hoạt động kinh doanh của nh�
 - **Color coding**:
   - Red: Stock < 10
   - Orange: Stock < Reorder Point
-  - Yellow: Stock < Reorder Point * 1.5
+  - Yellow: Stock < Reorder Point \* 1.5
 
 ### Features
 
@@ -272,17 +269,18 @@ Response:
 #### Revenue Change %
 
 ```javascript
-const revenueChange = ((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100;
+const revenueChange =
+  ((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100;
 ```
 
 #### Urgency Level
 
 ```javascript
 function getUrgency(currentStock, reorderPoint) {
-  if (currentStock < 10) return 'critical';
-  if (currentStock < reorderPoint) return 'high';
-  if (currentStock < reorderPoint * 1.5) return 'medium';
-  return 'normal';
+  if (currentStock < 10) return "critical";
+  if (currentStock < reorderPoint) return "high";
+  if (currentStock < reorderPoint * 1.5) return "medium";
+  return "normal";
 }
 ```
 
@@ -290,7 +288,7 @@ function getUrgency(currentStock, reorderPoint) {
 
 ```sql
 -- Summary Revenue (indexed on sales.created_at)
-SELECT 
+SELECT
   SUM(total_amount) as total_revenue,
   COUNT(*) as total_orders
 FROM sales
@@ -298,7 +296,7 @@ WHERE DATE(created_at) = CURDATE()
   AND status = 'completed';
 
 -- Top Products (indexed on sale_items.medication_variant_id)
-SELECT 
+SELECT
   mv.id,
   m.name,
   SUM(si.quantity) as quantity_sold,
@@ -314,7 +312,7 @@ ORDER BY revenue DESC
 LIMIT 10;
 
 -- Low Stock (indexed on stock_inventories.quantity)
-SELECT 
+SELECT
   m.id,
   m.name,
   si.quantity as current_stock,
@@ -329,13 +327,13 @@ LIMIT 20;
 
 ### Error Handling
 
-| Error Code | Message | Action |
-|------------|---------|--------|
-| DASH_001 | Failed to load summary | Show retry button |
-| DASH_002 | Chart data unavailable | Show empty chart with message |
-| DASH_003 | Invalid date range | Reset to default range |
-| DASH_004 | Export failed | Show error toast, allow retry |
-| DASH_005 | Unauthorized access | Redirect to 403 page |
+| Error Code | Message                | Action                        |
+| ---------- | ---------------------- | ----------------------------- |
+| DASH_001   | Failed to load summary | Show retry button             |
+| DASH_002   | Chart data unavailable | Show empty chart with message |
+| DASH_003   | Invalid date range     | Reset to default range        |
+| DASH_004   | Export failed          | Show error toast, allow retry |
+| DASH_005   | Unauthorized access    | Redirect to 403 page          |
 
 ### Testing Checklist
 

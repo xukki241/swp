@@ -110,9 +110,9 @@ GET /api/medications/:id/variants
 1. Manager click button "Add Medication"
 2. Modal/page hiển thị form:
    - **Required Fields**:
-     - Medication Name *
-     - Category * (dropdown)
-     - Active Ingredients *
+     - Medication Name \*
+     - Category \* (dropdown)
+     - Active Ingredients \*
      - Requires Prescription (checkbox)
    - **Optional Fields**:
      - Description (textarea)
@@ -299,10 +299,10 @@ Content-Type: multipart/form-data
 2. Click "Add Variant" trong variants section
 3. Modal hiển thị form:
    - **Required**:
-     - Dosage * (VD: 500mg)
-     - Form * (Tablet, Capsule, Syrup, etc.)
-     - Unit * (Box, Bottle, Tube, etc.)
-     - Sell Price * (VNĐ)
+     - Dosage \* (VD: 500mg)
+     - Form \* (Tablet, Capsule, Syrup, etc.)
+     - Unit \* (Box, Bottle, Tube, etc.)
+     - Sell Price \* (VNĐ)
    - **Optional**:
      - SKU (auto-generate nếu trống)
      - Quantity per Unit (VD: 10 tablets/box)

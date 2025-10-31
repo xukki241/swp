@@ -597,16 +597,16 @@ CREATE TABLE password_resets (
 
 ## Error Codes
 
-| Code | Message | HTTP Status |
-|------|---------|-------------|
-| AUTH_001 | Invalid credentials | 401 |
-| AUTH_002 | Account not activated | 403 |
-| AUTH_003 | Email already exists | 409 |
-| AUTH_004 | Token expired | 401 |
-| AUTH_005 | Invalid token | 400 |
-| AUTH_006 | Password too weak | 400 |
-| AUTH_007 | Unauthorized | 403 |
-| AUTH_008 | Account locked | 423 |
+| Code     | Message               | HTTP Status |
+| -------- | --------------------- | ----------- |
+| AUTH_001 | Invalid credentials   | 401         |
+| AUTH_002 | Account not activated | 403         |
+| AUTH_003 | Email already exists  | 409         |
+| AUTH_004 | Token expired         | 401         |
+| AUTH_005 | Invalid token         | 400         |
+| AUTH_006 | Password too weak     | 400         |
+| AUTH_007 | Unauthorized          | 403         |
+| AUTH_008 | Account locked        | 423         |
 
 ---
 
