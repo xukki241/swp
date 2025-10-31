@@ -39,15 +39,29 @@ export function MedicationRow({
     useMedicationVariants(selectedMedId || undefined);
   const availableVariants = variantsData?.data || [];
 
+  // Calculate if variant is from contract (not in available variants)
+  const hasVariantFromContract =
+    rowData.medicationVariantId &&
+    !availableVariants.find((v) => v.id === rowData.medicationVariantId);
+
   // Debug logging
   useEffect(() => {
-    if (selectedMedId) {
-      console.log(`🔍 Medication ${index + 1} - ID: ${selectedMedId}`);
-      console.log(`📦 Available variants:`, availableVariants);
-      console.log(`⏳ Loading variants:`, isLoadingVariants);
-      console.log(`📋 Current rowData:`, rowData);
-    }
-  }, [selectedMedId, availableVariants, isLoadingVariants, rowData, index]);
+    console.log(`\n🔍 Medication Row ${index + 1} State:`);
+    console.log(`  - Selected Med ID: ${selectedMedId}`);
+    console.log(`  - Available variants:`, availableVariants);
+    console.log(`  - Loading variants: ${isLoadingVariants}`);
+    console.log(`  - Current rowData:`, rowData);
+    console.log(`  - medicationVariantId: ${rowData.medicationVariantId}`);
+    console.log(`  - variantName: ${rowData.variantName}`);
+    console.log(`  - hasVariantFromContract: ${hasVariantFromContract}`);
+  }, [
+    selectedMedId,
+    availableVariants,
+    isLoadingVariants,
+    rowData,
+    index,
+    hasVariantFromContract,
+  ]);
 
   const medicationOptions = useMemo(() => {
     const options = allMedications.map((med) => ({
@@ -131,10 +145,6 @@ export function MedicationRow({
     onChange(index, { ...rowData, [field]: value });
   };
 
-  const hasVariantFromContract =
-    rowData.medicationVariantId &&
-    !availableVariants.find((v) => v.id === rowData.medicationVariantId);
-
   return (
     <div className="group relative flex flex-col gap-4 p-5 border-2 border-border rounded-xl bg-card hover:border-primary/50 transition-all duration-200 shadow-sm hover:shadow-md">
       {/* Header with Badge */}
@@ -202,6 +212,7 @@ export function MedicationRow({
               Variant <span className="text-destructive">*</span>
             </label>
             <Select
+              key={`variant-${selectedMedId}-${rowData.medicationVariantId || "empty"}`}
               value={rowData.medicationVariantId || undefined}
               onValueChange={handleVariantChange}
               disabled={!selectedMedId || isLoadingVariants}
@@ -215,7 +226,18 @@ export function MedicationRow({
                         ? "Loading variants..."
                         : "Select variant"
                   }
-                />
+                >
+                  {rowData.medicationVariantId && rowData.variantName ? (
+                    <span className="flex items-center gap-2">
+                      {rowData.contractFilename && (
+                        <Badge variant="secondary" className="text-xs">
+                          Contract
+                        </Badge>
+                      )}
+                      {rowData.variantName}
+                    </span>
+                  ) : null}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent className="max-w-[500px]">
                 {isLoadingVariants && (
@@ -226,6 +248,7 @@ export function MedicationRow({
                 )}
                 {!isLoadingVariants &&
                   availableVariants.length === 0 &&
+                  !rowData.medicationVariantId &&
                   selectedMedId && (
                     <div className="p-4 text-center space-y-2">
                       <AlertCircle className="h-8 w-8 mx-auto text-muted-foreground" />
@@ -238,36 +261,43 @@ export function MedicationRow({
                       </p>
                     </div>
                   )}
-                {hasVariantFromContract && (
+                {/* Always show matched variant from contract first */}
+                {rowData.medicationVariantId && rowData.variantName && (
                   <SelectItem
-                    key={rowData.medicationVariantId}
+                    key={`contract-${rowData.medicationVariantId}`}
                     value={rowData.medicationVariantId}
-                    className="whitespace-normal py-3"
+                    className="whitespace-normal py-3 bg-blue-50 dark:bg-blue-950/20"
                   >
                     <div className="flex items-start gap-2">
-                      <Badge variant="secondary" className="text-xs mt-0.5">
-                        Contract
+                      <Badge
+                        variant="secondary"
+                        className="text-xs mt-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                      >
+                        ✓ Matched
                       </Badge>
-                      <span>{rowData.variantName}</span>
+                      <span className="font-medium">{rowData.variantName}</span>
                     </div>
                   </SelectItem>
                 )}
-                {availableVariants.map((variant) => (
-                  <SelectItem
-                    key={variant.id}
-                    value={variant.id}
-                    className="whitespace-normal py-3"
-                  >
-                    <div className="space-y-1">
-                      <div className="font-medium">{variant.name}</div>
-                      {variant.sku && (
-                        <div className="text-xs text-muted-foreground">
-                          SKU: {variant.sku}
-                        </div>
-                      )}
-                    </div>
-                  </SelectItem>
-                ))}
+                {/* Show other available variants */}
+                {availableVariants
+                  .filter((v) => v.id !== rowData.medicationVariantId)
+                  .map((variant) => (
+                    <SelectItem
+                      key={variant.id}
+                      value={variant.id}
+                      className="whitespace-normal py-3"
+                    >
+                      <div className="space-y-1">
+                        <div className="font-medium">{variant.name}</div>
+                        {variant.sku && (
+                          <div className="text-xs text-muted-foreground">
+                            SKU: {variant.sku}
+                          </div>
+                        )}
+                      </div>
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
