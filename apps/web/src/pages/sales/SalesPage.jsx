@@ -49,7 +49,10 @@ export default function SalesPage() {
       customer: null,
       cart: [],
       paymentMethod: "cash",
-      cashReceived: "", // Amount received from customer
+      cashReceived: "",
+      prescriptionNote: "",
+      notes: "",
+      isPrescriptionOrder: false,
       createdAt: new Date(),
     },
   ]);
@@ -107,6 +110,9 @@ export default function SalesPage() {
       cart: [],
       paymentMethod: "cash",
       cashReceived: "",
+      prescriptionNote: "",
+      notes: "",
+      isPrescriptionOrder: false,
       createdAt: new Date(),
     };
     setOrders((prev) => [...prev, newOrder]);
@@ -376,6 +382,15 @@ export default function SalesPage() {
       return;
     }
 
+    // Check if prescription order requires prescription note
+    if (
+      activeOrder.isPrescriptionOrder &&
+      !activeOrder.prescriptionNote?.trim()
+    ) {
+      toast.error("Prescription note is required for prescription orders");
+      return;
+    }
+
     // If payment method is VietQR, show QR dialog first
     if (activeOrder.paymentMethod === "mobile_payment") {
       setPendingOrderData({
@@ -403,6 +418,8 @@ export default function SalesPage() {
       const orderData = pendingOrderData || {
         customer_id: activeOrder.customer.id,
         payment_method: activeOrder.paymentMethod,
+        prescription_note: activeOrder.prescriptionNote || null,
+        notes: activeOrder.notes || null,
         items: activeOrder.cart.map((item) => ({
           medication_variant_id: item.medication_variant_id,
           quantity: item.quantity,
@@ -448,6 +465,8 @@ export default function SalesPage() {
               cart: [],
               paymentMethod: "cash",
               cashReceived: "",
+              prescriptionNote: "",
+              notes: "",
               createdAt: new Date(),
             };
             setActiveOrderId(newOrder.id);
@@ -716,6 +735,90 @@ export default function SalesPage() {
             {/* Payment & Complete */}
             {activeOrder.cart.length > 0 && (
               <div className="border-t border-border p-6 space-y-4">
+                {/* Prescription Checkbox */}
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={activeOrder.isPrescriptionOrder || false}
+                      onChange={(e) =>
+                        updateActiveOrder({
+                          isPrescriptionOrder: e.target.checked,
+                        })
+                      }
+                      className="mt-1 w-4 h-4 text-amber-600 border-amber-300 rounded focus:ring-amber-500"
+                    />
+                    <div className="flex-1">
+                      <span className="text-sm font-semibold text-amber-900 flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Đây là đơn thuốc kê đơn (Prescription Order)
+                      </span>
+                      <p className="text-xs text-amber-700 mt-1">
+                        Tick vào ô này nếu khách hàng mua thuốc kê đơn. Bắt buộc
+                        phải có ghi chú đơn thuốc bên dưới.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Prescription Note - Required if isPrescriptionOrder is checked */}
+                {activeOrder.isPrescriptionOrder && (
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <label className="text-sm font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Thông tin đơn thuốc (Bắt buộc) *
+                    </label>
+                    <textarea
+                      placeholder="Nhập thông tin đơn thuốc: Tên bác sĩ, chẩn đoán, hướng dẫn sử dụng..."
+                      value={activeOrder.prescriptionNote || ""}
+                      onChange={(e) =>
+                        updateActiveOrder({ prescriptionNote: e.target.value })
+                      }
+                      className="w-full min-h-[100px] px-3 py-2 text-sm border border-blue-300 bg-white rounded-md resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                    {activeOrder.isPrescriptionOrder &&
+                      !activeOrder.prescriptionNote?.trim() && (
+                        <p className="text-xs text-red-600 mt-1 font-medium">
+                          ⚠️ Vui lòng nhập thông tin đơn thuốc
+                        </p>
+                      )}
+                  </div>
+                )}
+
+                {/* Prescription Note - Optional if not prescription order */}
+                {!activeOrder.isPrescriptionOrder && (
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Prescription Note (if any)
+                    </label>
+                    <textarea
+                      placeholder="Enter prescription details (doctor name, diagnosis, special instructions...)"
+                      value={activeOrder.prescriptionNote || ""}
+                      onChange={(e) =>
+                        updateActiveOrder({ prescriptionNote: e.target.value })
+                      }
+                      className="w-full min-h-[80px] px-3 py-2 text-sm border border-input bg-background rounded-md resize-y"
+                    />
+                  </div>
+                )}
+
+                {/* General Notes */}
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    Additional Notes
+                  </label>
+                  <textarea
+                    placeholder="Any additional notes for this order..."
+                    value={activeOrder.notes || ""}
+                    onChange={(e) =>
+                      updateActiveOrder({ notes: e.target.value })
+                    }
+                    className="w-full min-h-[60px] px-3 py-2 text-sm border border-input bg-background rounded-md resize-y"
+                  />
+                </div>
+
                 <div>
                   <h3 className="text-sm font-semibold text-foreground mb-3">
                     Payment Method
@@ -800,7 +903,9 @@ export default function SalesPage() {
                     !activeOrder.customer ||
                     isSubmitting ||
                     (activeOrder.paymentMethod === "cash" &&
-                      (!activeOrder.cashReceived || changeAmount < 0))
+                      (!activeOrder.cashReceived || changeAmount < 0)) ||
+                    (activeOrder.isPrescriptionOrder &&
+                      !activeOrder.prescriptionNote?.trim())
                   }
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-base"
                 >

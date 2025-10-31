@@ -312,12 +312,14 @@ export const checkInShift = async (id) => {
       timeZone: "Asia/Ho_Chi_Minh",
     });
 
+    const now = new Date(vnTime);
+
     const result = await db
       .update(shiftAssignments)
       .set({
-        checkInTime: new Date(vnTime),
+        checkInTime: now,
         status: "in_progress",
-        updatedAt: new Date(vnTime),
+        updatedAt: now,
       })
       .where(eq(shiftAssignments.id, id))
       .returning();
@@ -336,12 +338,14 @@ export const checkOutShift = async (id) => {
       timeZone: "Asia/Ho_Chi_Minh",
     });
 
+    const now = new Date(vnTime);
+
     const result = await db
       .update(shiftAssignments)
       .set({
-        checkOutTime: new Date(vnTime),
+        checkOutTime: now,
         status: "completed",
-        updatedAt: new Date(vnTime),
+        updatedAt: now,
       })
       .where(eq(shiftAssignments.id, id))
       .returning();
