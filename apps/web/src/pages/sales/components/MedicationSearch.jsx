@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, MapPin, Plus, Search } from "lucide-react";
@@ -42,9 +43,17 @@ export default function MedicationSearch({
               className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
             >
               <div className="flex-1">
-                <p className="font-semibold text-gray-900">
-                  {medication.medicationName || medication.name}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-gray-900">
+                    {medication.medicationName || medication.name}
+                  </p>
+                  {(medication.isPrescriptionRequired ||
+                    medication.is_prescription_required) && (
+                    <Badge className="bg-amber-500 hover:bg-amber-600 text-white text-xs">
+                      Kê đơn
+                    </Badge>
+                  )}
+                </div>
                 <p className="text-sm text-gray-600">
                   {medication.variantName}
                 </p>
