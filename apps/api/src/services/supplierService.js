@@ -1,6 +1,7 @@
 import { and, eq, ilike, ne, or } from "drizzle-orm";
 
 import { db } from "../db/index.js";
+import { files } from "../db/schema/files.js";
 import { medications } from "../db/schema/medications.js";
 import { medicationVariants } from "../db/schema/medicationVariants.js";
 import { supplierMedicationVariants } from "../db/schema/supplierMedicationVariants.js";
@@ -174,9 +175,12 @@ export const supplierService = {
           medicationVariantId: supplierMedicationVariants.medicationVariantId,
           supplierSku: supplierMedicationVariants.supplierSku,
           leadTimeDays: supplierMedicationVariants.leadTimeDays,
+          medicationId: medicationVariants.medicationId,
           medicationName: medications.name,
           purchasePrice: supplierMedicationVariants.purchasePrice,
           contractId: supplierMedicationVariants.contractId,
+          contractFilename: files.filename,
+          contractFileType: files.fileType,
           variantName: medicationVariants.name,
         })
         .from(supplierMedicationVariants)
@@ -191,6 +195,7 @@ export const supplierService = {
           medications,
           eq(medicationVariants.medicationId, medications.id)
         )
+        .leftJoin(files, eq(supplierMedicationVariants.contractId, files.id))
         .where(eq(supplierMedicationVariants.supplierId, id));
 
       return {
@@ -231,8 +236,8 @@ export const supplierService = {
     if (address !== undefined && !address.trim()) {
       validationErrors.push("Address is required.");
     }
-    if (medicationVariants && Array.isArray(medicationVariants)) {
-      for (const [vIndex, variant] of medicationVariants.entries()) {
+    if (variantsToUpdate && Array.isArray(variantsToUpdate)) {
+      for (const [vIndex, variant] of variantsToUpdate.entries()) {
         if (
           variant.medication_variant_id !== undefined &&
           !variant.medication_variant_id

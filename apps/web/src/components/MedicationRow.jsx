@@ -1,10 +1,7 @@
 "use client";
 
-import { useUploadFile } from "@/hooks/useFiles";
 import { useMedicationVariants } from "@/hooks/useMedications";
-import { FileText, Upload, X } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useMemo, useState } from "react";
 import { AutocompleteCombobox } from "./ui/AutocompleteCombobox";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -20,27 +17,39 @@ export function MedicationRow({
   index,
   rowData,
   allMedications,
+  isLoadingMedications,
   onChange,
   onRemove,
 }) {
   const [selectedMedId, setSelectedMedId] = useState(
     rowData.medicationId || ""
   );
-  const fileInputRef = useRef(null);
 
   const { data: variantsData, isLoading: isLoadingVariants } =
     useMedicationVariants(selectedMedId || undefined);
   const availableVariants = variantsData?.data || [];
-  const uploadFile = useUploadFile();
 
-  const medicationOptions = useMemo(
-    () =>
-      allMedications.map((med) => ({
-        value: med.id,
-        label: med.name,
-      })),
-    [allMedications]
-  );
+  const medicationOptions = useMemo(() => {
+    const options = allMedications.map((med) => ({
+      value: med.id,
+      label: med.name,
+    }));
+
+    // Nếu rowData có medicationId và medicationName nhưng chưa có trong options
+    // (có thể do allMedications chưa load xong), thêm vào để hiển thị
+    if (
+      rowData.medicationId &&
+      rowData.medicationName &&
+      !options.find((opt) => opt.value === rowData.medicationId)
+    ) {
+      options.unshift({
+        value: rowData.medicationId,
+        label: rowData.medicationName,
+      });
+    }
+
+    return options;
+  }, [allMedications, rowData.medicationId, rowData.medicationName, index]);
 
   useEffect(() => {
     if (rowData.medicationId && rowData.medicationId !== selectedMedId) {
@@ -99,71 +108,6 @@ export function MedicationRow({
     onChange(index, { ...rowData, [field]: value });
   };
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    const allowedTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "image/jpeg",
-      "image/png",
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
-      toast.error("Invalid file type", {
-        description: "Please upload PDF, DOC, DOCX, JPG, or PNG files only.",
-      });
-      return;
-    }
-
-    // Validate file size (10MB max)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("File too large", {
-        description: "Maximum file size is 10MB.",
-      });
-      return;
-    }
-
-    try {
-      const result = await uploadFile.mutateAsync(file);
-
-      // Update rowData with contract ID and filename
-      onChange(index, {
-        ...rowData,
-        contractId: result.data.id,
-        contractFilename: result.data.filename,
-      });
-
-      toast.success("Contract uploaded successfully!", {
-        description: file.name,
-      });
-    } catch (error) {
-      console.error("Upload error:", error);
-      toast.error("Upload failed", {
-        description: error.message || "Could not upload contract file.",
-      });
-    } finally {
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    }
-  };
-
-  const handleRemoveContract = () => {
-    onChange(index, {
-      ...rowData,
-      contractId: null,
-      contractFilename: null,
-    });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-    toast.info("Contract removed");
-  };
-
   return (
     <div className="flex flex-col gap-3 p-4 border rounded-lg bg-card">
       {/* Hàng 1: Medication và Variant */}
@@ -173,14 +117,26 @@ export function MedicationRow({
           <label className="text-sm font-medium text-muted-foreground">
             Medication *
           </label>
-          <AutocompleteCombobox
-            options={medicationOptions}
-            value={selectedMedId}
-            onValueChange={handleMedicationChange}
-            placeholder="Select medication"
-            searchPlaceholder="Search for a medication..."
-            emptyMessage="No medication found."
-          />
+          <div className="relative">
+            <AutocompleteCombobox
+              options={medicationOptions}
+              value={selectedMedId}
+              onValueChange={handleMedicationChange}
+              placeholder="Select medication"
+              searchPlaceholder="Search for a medication..."
+              emptyMessage={
+                isLoadingMedications
+                  ? "Loading medications..."
+                  : "No medication found."
+              }
+              className={isLoadingMedications ? "opacity-70" : ""}
+            />
+            {isLoadingMedications && allMedications.length === 0 && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Variant Select */}
@@ -210,9 +166,29 @@ export function MedicationRow({
               {!isLoadingVariants &&
                 availableVariants.length === 0 &&
                 selectedMedId && (
-                  <div className="p-2 text-sm text-center text-muted-foreground">
-                    No variants found
+                  <div className="p-3 text-sm text-center">
+                    <p className="text-muted-foreground font-medium mb-1">
+                      No variants found for this medication
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Please create variant for this medication first in
+                      Medication Management
+                    </p>
                   </div>
+                )}
+              {/* Nếu có variant hiện tại mà chưa có trong availableVariants, hiển thị nó */}
+              {rowData.medicationVariantId &&
+                rowData.variantName &&
+                !availableVariants.find(
+                  (v) => v.id === rowData.medicationVariantId
+                ) && (
+                  <SelectItem
+                    key={rowData.medicationVariantId}
+                    value={rowData.medicationVariantId}
+                    className="whitespace-normal"
+                  >
+                    {rowData.variantName}
+                  </SelectItem>
                 )}
               {availableVariants.map((variant) => (
                 <SelectItem
@@ -271,64 +247,7 @@ export function MedicationRow({
         </div>
       </div>
 
-      {/* Hàng 3: Contract Upload */}
-      <div className="space-y-1.5">
-        <label className="text-sm font-medium text-muted-foreground">
-          Contract Document (Optional)
-        </label>
-        <div className="flex gap-2 items-center">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-
-          {!rowData.contractId ? (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadFile.isPending}
-              className="w-full md:w-auto"
-            >
-              {uploadFile.isPending ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Upload Contract
-                </>
-              )}
-            </Button>
-          ) : (
-            <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-md flex-1">
-              <FileText className="w-4 h-4 text-green-600" />
-              <span className="text-sm text-green-700 flex-1 truncate">
-                {rowData.contractFilename || "Contract uploaded"}
-              </span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleRemoveContract}
-                className="h-6 w-6 p-0 hover:bg-red-100"
-              >
-                <X className="w-4 h-4 text-red-600" />
-              </Button>
-            </div>
-          )}
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Accepted formats: PDF, DOC, DOCX, JPG, PNG (Max 10MB)
-        </p>
-      </div>
-
-      {/* Hàng 4: Remove Button */}
+      {/* Remove Button */}
       <div className="flex justify-end">
         <Button
           type="button"

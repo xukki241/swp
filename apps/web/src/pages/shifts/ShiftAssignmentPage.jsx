@@ -43,12 +43,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 const STATUS_LABELS = {
-  scheduled: { label: "Scheduled", color: "bg-blue-500" },
-  confirmed: { label: "Confirmed", color: "bg-green-500" },
-  in_progress: { label: "In Progress", color: "bg-yellow-500" },
-  completed: { label: "Completed", color: "bg-gray-500" },
-  cancelled: { label: "Cancelled", color: "bg-red-500" },
-  absent: { label: "Absent", color: "bg-orange-500" },
+  scheduled: { label: "Đã lên lịch", color: "bg-blue-500" },
+  confirmed: { label: "Đã xác nhận", color: "bg-green-500" },
+  in_progress: { label: "Đang diễn ra", color: "bg-yellow-500" },
+  completed: { label: "Hoàn thành", color: "bg-gray-500" },
+  cancelled: { label: "Đã hủy", color: "bg-red-500" },
+  absent: { label: "Vắng mặt", color: "bg-orange-500" },
 };
 
 export default function ShiftAssignmentPage() {
@@ -109,7 +109,7 @@ export default function ShiftAssignmentPage() {
       setAssignments(assignmentsRes.data || []);
     } catch (error) {
       console.error("Failed to load data:", error);
-      toast.error("Failed to load data");
+      toast.error("Không thể tải dữ liệu");
     } finally {
       setLoading(false);
     }
@@ -163,7 +163,7 @@ export default function ShiftAssignmentPage() {
     e.preventDefault();
 
     if (!formData.userId || !formData.shiftId || !formData.assignedDate) {
-      toast.error("Please fill in all required fields");
+      toast.error("Vui lòng điền đầy đủ các trường bắt buộc");
       return;
     }
 
@@ -174,7 +174,7 @@ export default function ShiftAssignmentPage() {
     assignedDate.setHours(0, 0, 0, 0);
 
     if (assignedDate < today) {
-      toast.error("Cannot assign shifts for past dates");
+      toast.error("Không thể phân công ca trong quá khứ");
       return;
     }
 
@@ -186,12 +186,14 @@ export default function ShiftAssignmentPage() {
         assignedDate: formData.assignedDate,
         notes: formData.notes || null,
       });
-      toast.success("Shift assigned successfully");
+      toast.success("Đã phân công ca làm việc thành công");
       handleCloseDialog();
       loadData();
     } catch (error) {
       console.error("Failed to create assignment:", error);
-      toast.error(error.response?.data?.message || "Failed to assign shift");
+      toast.error(
+        error.response?.data?.message || "Không thể phân công ca làm việc"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -206,7 +208,7 @@ export default function ShiftAssignmentPage() {
       !batchData.startDate ||
       !batchData.endDate
     ) {
-      toast.error("Please fill in all required fields");
+      toast.error("Vui lòng điền đầy đủ các trường bắt buộc");
       return;
     }
 
@@ -218,7 +220,7 @@ export default function ShiftAssignmentPage() {
 
     if (startDate < today) {
       toast.error(
-        "Cannot assign shifts for past dates. Please select a date from today onwards."
+        "Không thể phân công ca trong quá khứ. Vui lòng chọn ngày từ hôm nay trở đi."
       );
       return;
     }
@@ -241,29 +243,31 @@ export default function ShiftAssignmentPage() {
       });
 
       await shiftService.createShiftAssignment({ assignments });
-      toast.success(`Successfully assigned ${assignments.length} shifts`);
+      toast.success(
+        `Đã phân công thành công ${assignments.length} ca làm việc`
+      );
       handleCloseDialog();
       loadData();
     } catch (error) {
       console.error("Failed to create batch assignments:", error);
-      toast.error(error.response?.data?.message || "Failed to assign shifts");
+      toast.error(
+        error.response?.data?.message || "Không thể phân công ca làm việc"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (assignmentId) => {
-    if (!confirm("Are you sure you want to delete this assignment?")) return;
+    if (!confirm("Bạn có chắc chắn muốn xóa phân công này?")) return;
 
     try {
       await shiftService.deleteShiftAssignment(assignmentId);
-      toast.success("Assignment deleted");
+      toast.success("Đã xóa phân công");
       loadData();
     } catch (error) {
       console.error("Failed to delete assignment:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to delete assignment"
-      );
+      toast.error(error.response?.data?.message || "Không thể xóa phân công");
     }
   };
 
@@ -281,19 +285,19 @@ export default function ShiftAssignmentPage() {
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Shift Assignments</h1>
+            <h1 className="text-3xl font-bold">Phân công ca làm việc</h1>
             <p className="text-muted-foreground mt-1">
-              Assign shifts to staff members
+              Phân công ca làm việc cho nhân viên
             </p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => handleOpenDialog(false)}>
               <Plus className="mr-2 h-4 w-4" />
-              Single Assignment
+              Phân công đơn
             </Button>
             <Button onClick={() => handleOpenDialog(true)}>
               <CalendarDays className="mr-2 h-4 w-4" />
-              Batch Assignment
+              Phân công hàng loạt
             </Button>
           </div>
         </div>
@@ -303,21 +307,21 @@ export default function ShiftAssignmentPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
-                Weekly Schedule
+                Lịch tuần
               </CardTitle>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={handlePrevWeek}>
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleToday}>
-                  Today
+                  Hôm nay
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleNextWeek}>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
                 <span className="ml-4 text-sm font-medium">
-                  {weekRange.start.toLocaleDateString("en-US")} -{" "}
-                  {weekRange.end.toLocaleDateString("en-US")}
+                  {weekRange.start.toLocaleDateString("vi-VN")} -{" "}
+                  {weekRange.end.toLocaleDateString("vi-VN")}
                 </span>
               </div>
             </div>
@@ -329,7 +333,7 @@ export default function ShiftAssignmentPage() {
               </div>
             ) : assignments.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                No assignments this week
+                Không có phân công nào trong tuần này
               </div>
             ) : (
               <div className="space-y-4">
@@ -353,7 +357,7 @@ export default function ShiftAssignmentPage() {
                       return (
                         <div key={date} className="border rounded-lg p-4">
                           <h3 className="font-semibold mb-3">
-                            {dateObj.toLocaleDateString("en-US", {
+                            {dateObj.toLocaleDateString("vi-VN", {
                               weekday: "long",
                               year: "numeric",
                               month: "long",
@@ -433,16 +437,16 @@ export default function ShiftAssignmentPage() {
           {isBatchMode ? (
             <form onSubmit={handleSubmitBatch}>
               <DialogHeader>
-                <DialogTitle>Batch Assignment</DialogTitle>
+                <DialogTitle>Phân công hàng loạt</DialogTitle>
                 <DialogDescription>
-                  Select multiple staff and date range
+                  Chọn nhiều nhân viên và khoảng thời gian
                 </DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
                   <Label>
-                    Select Staff <span className="text-red-500">*</span>
+                    Chọn nhân viên <span className="text-red-500">*</span>
                   </Label>
                   <div className="border rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
                     {staff.map((s) => (
@@ -458,13 +462,13 @@ export default function ShiftAssignmentPage() {
                     ))}
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Selected: {batchData.userIds.length} staff
+                    Đã chọn: {batchData.userIds.length} nhân viên
                   </p>
                 </div>
 
                 <div className="grid gap-2">
                   <Label htmlFor="batch-shift">
-                    Shift <span className="text-red-500">*</span>
+                    Ca làm việc <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     value={batchData.shiftId}
@@ -473,7 +477,7 @@ export default function ShiftAssignmentPage() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select shift" />
+                      <SelectValue placeholder="Chọn ca làm việc" />
                     </SelectTrigger>
                     <SelectContent>
                       {shifts.map((shift) => (
@@ -488,7 +492,7 @@ export default function ShiftAssignmentPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="batch-start">
-                      From Date <span className="text-red-500">*</span>
+                      Từ ngày <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="batch-start"
@@ -506,7 +510,7 @@ export default function ShiftAssignmentPage() {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="batch-end">
-                      To Date <span className="text-red-500">*</span>
+                      Đến ngày <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="batch-end"
@@ -525,7 +529,7 @@ export default function ShiftAssignmentPage() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="batch-notes">Notes</Label>
+                  <Label htmlFor="batch-notes">Ghi chú</Label>
                   <Textarea
                     id="batch-notes"
                     value={batchData.notes}
@@ -544,29 +548,29 @@ export default function ShiftAssignmentPage() {
                   onClick={handleCloseDialog}
                   disabled={isSubmitting}
                 >
-                  Cancel
+                  Hủy
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Assign
+                  Phân công
                 </Button>
               </DialogFooter>
             </form>
           ) : (
             <form onSubmit={handleSubmitSingle}>
               <DialogHeader>
-                <DialogTitle>Single Assignment</DialogTitle>
+                <DialogTitle>Phân công đơn</DialogTitle>
                 <DialogDescription>
-                  Assign one shift to a staff member
+                  Phân công một ca làm việc cho nhân viên
                 </DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
                   <Label htmlFor="userId">
-                    Staff <span className="text-red-500">*</span>
+                    Nhân viên <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     value={formData.userId}
@@ -575,7 +579,7 @@ export default function ShiftAssignmentPage() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select staff" />
+                      <SelectValue placeholder="Chọn nhân viên" />
                     </SelectTrigger>
                     <SelectContent>
                       {staff.map((s) => (
@@ -589,7 +593,7 @@ export default function ShiftAssignmentPage() {
 
                 <div className="grid gap-2">
                   <Label htmlFor="shiftId">
-                    Shift <span className="text-red-500">*</span>
+                    Ca làm việc <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     value={formData.shiftId}
@@ -598,7 +602,7 @@ export default function ShiftAssignmentPage() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select shift" />
+                      <SelectValue placeholder="Chọn ca làm việc" />
                     </SelectTrigger>
                     <SelectContent>
                       {shifts.map((shift) => (
@@ -612,7 +616,7 @@ export default function ShiftAssignmentPage() {
 
                 <div className="grid gap-2">
                   <Label htmlFor="assignedDate">
-                    Date <span className="text-red-500">*</span>
+                    Ngày <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="assignedDate"
@@ -627,7 +631,7 @@ export default function ShiftAssignmentPage() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="notes">Notes</Label>
+                  <Label htmlFor="notes">Ghi chú</Label>
                   <Textarea
                     id="notes"
                     value={formData.notes}
@@ -646,13 +650,13 @@ export default function ShiftAssignmentPage() {
                   onClick={handleCloseDialog}
                   disabled={isSubmitting}
                 >
-                  Cancel
+                  Hủy
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Assign
+                  Phân công
                 </Button>
               </DialogFooter>
             </form>

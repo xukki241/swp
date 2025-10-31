@@ -40,14 +40,12 @@ export default function RegisterPage() {
     const { confirmPassword, ...registerData } = data;
     registerMutation.mutate(registerData, {
       onSuccess: () => {
-        toast.success(
-          "Registration submitted successfully! Please wait for approval."
-        );
+        toast.success("Đăng ký thành công! Vui lòng chờ phê duyệt.");
       },
       onError: (error) => {
         toast.error(
           error?.response?.data?.message ||
-            "Registration failed. Please try again."
+            "Đăng ký thất bại. Vui lòng thử lại."
         );
       },
     });
@@ -64,10 +62,10 @@ export default function RegisterPage() {
           </div>
           <div>
             <CardTitle className="text-3xl font-bold text-gray-800">
-              Create an Account
+              Tạo tài khoản
             </CardTitle>
             <CardDescription className="text-base mt-2">
-              Join PharmaFlow to get started
+              Tham gia PharmaFlow để bắt đầu
             </CardDescription>
           </div>
         </CardHeader>
@@ -76,17 +74,17 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">
-                Full Name
+                Họ và tên
               </Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="John Doe"
+                placeholder="Nguyễn Văn A"
                 {...register("name", {
-                  required: "Name is required",
+                  required: "Họ tên là bắt buộc",
                   minLength: {
                     value: 2,
-                    message: "Name must be at least 2 characters",
+                    message: "Họ tên phải có ít nhất 2 ký tự",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -105,12 +103,12 @@ export default function RegisterPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="your.email@example.com"
+                placeholder="email.cua.ban@example.com"
                 {...register("email", {
-                  required: "Email is required",
+                  required: "Email là bắt buộc",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
+                    message: "Địa chỉ email không hợp lệ",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -124,17 +122,17 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-sm font-medium">
-                Phone Number
+                Số điện thoại
               </Label>
               <Input
                 id="phone"
                 type="tel"
                 placeholder="+84 123 456 789"
                 {...register("phone", {
-                  required: "Phone number is required",
+                  required: "Số điện thoại là bắt buộc",
                   pattern: {
                     value: /^[0-9+\s-()]+$/,
-                    message: "Invalid phone number",
+                    message: "Số điện thoại không hợp lệ",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -148,17 +146,17 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="address" className="text-sm font-medium">
-                Address
+                Địa chỉ
               </Label>
               <Input
                 id="address"
                 type="text"
-                placeholder="123 Main Street, District, City"
+                placeholder="123 Đường ABC, Quận XYZ, TP. HCM"
                 {...register("address", {
-                  required: "Address is required",
+                  required: "Địa chỉ là bắt buộc",
                   minLength: {
                     value: 5,
-                    message: "Address must be at least 5 characters",
+                    message: "Địa chỉ phải có ít nhất 5 ký tự",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -172,17 +170,17 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium">
-                Password
+                Mật khẩu
               </Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a strong password"
+                placeholder="Tạo mật khẩu mạnh"
                 {...register("password", {
-                  required: "Password is required",
+                  required: "Mật khẩu là bắt buộc",
                   minLength: {
                     value: 6,
-                    message: "Password must be at least 6 characters",
+                    message: "Mật khẩu phải có ít nhất 6 ký tự",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -196,16 +194,16 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="confirmPassword" className="text-sm font-medium">
-                Confirm Password
+                Xác nhận mật khẩu
               </Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="Re-enter your password"
+                placeholder="Nhập lại mật khẩu"
                 {...register("confirmPassword", {
-                  required: "Please confirm your password",
+                  required: "Vui lòng xác nhận mật khẩu",
                   validate: (value) =>
-                    value === password || "Passwords do not match",
+                    value === password || "Mật khẩu không khớp",
                 })}
                 className="h-11 rounded-lg"
               />
@@ -223,17 +221,17 @@ export default function RegisterPage() {
                   id="agreePolicy"
                   {...register("agreePolicy", {
                     required:
-                      "You must agree to the policy to continue registration.", // Updated error message to English
+                      "Bạn phải đồng ý với chính sách để tiếp tục đăng ký.",
                   })}
                   className="accent-primary h-4 w-4 mt-0.5 cursor-pointer"
                 />
                 <span className="text-sm text-gray-700">
-                  I agree to the {/* Updated label to English */}
+                  Tôi đồng ý với{" "}
                   <Link
                     to="/policy"
                     className="text-primary underline hover:text-primary/80"
                   >
-                    Privacy Policy & Terms of Service
+                    Chính sách bảo mật & Điều khoản dịch vụ
                   </Link>
                 </span>
               </Label>
@@ -252,22 +250,22 @@ export default function RegisterPage() {
               {registerMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <Loading className="h-4 w-4 text-white" />
-                  Creating account...
+                  Đang tạo tài khoản...
                 </span>
               ) : (
-                "Register"
+                "Đăng ký"
               )}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Already have an account?{" "}
+              Đã có tài khoản?{" "}
               <Link
                 to="/login"
                 className="text-primary font-medium hover:underline"
               >
-                Login
+                Đăng nhập
               </Link>
             </p>
           </div>

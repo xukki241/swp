@@ -59,10 +59,10 @@ export default function ForgotPasswordPage() {
             </div>
             <div>
               <CardTitle className="text-3xl font-bold text-gray-800">
-                OTP Sent Successfully
+                Đã gửi OTP thành công
               </CardTitle>
               <CardDescription className="text-base mt-2">
-                Check your email for the OTP code
+                Kiểm tra email của bạn để lấy mã OTP
               </CardDescription>
             </div>
           </CardHeader>
@@ -70,25 +70,25 @@ export default function ForgotPasswordPage() {
           <CardContent className="p-8 pt-4">
             <div className="mb-6 p-4 rounded-lg bg-blue-50 border border-blue-200">
               <p className="text-sm text-blue-800">
-                We've sent a 6-digit OTP code to your email address. The code
-                will expire in <strong>10 minutes</strong>.
+                Chúng tôi đã gửi mã OTP 6 chữ số đến địa chỉ email của bạn. Mã
+                sẽ hết hạn sau <strong>10 phút</strong>.
               </p>
             </div>
 
             <Link to="/reset-password">
               <Button className="w-full h-11 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium">
-                Continue to Reset Password
+                Tiếp tục đặt lại mật khẩu
               </Button>
             </Link>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                Didn't receive the code?{" "}
+                Không nhận được mã?{" "}
                 <button
                   onClick={() => setShowSuccess(false)}
                   className="text-primary font-medium hover:underline"
                 >
-                  Resend OTP
+                  Gửi lại OTP
                 </button>
               </p>
             </div>
@@ -98,7 +98,7 @@ export default function ForgotPasswordPage() {
                 to="/login"
                 className="text-sm text-muted-foreground hover:text-primary"
               >
-                Back to Login
+                Quay lại Đăng nhập
               </Link>
             </div>
           </CardContent>
@@ -118,10 +118,10 @@ export default function ForgotPasswordPage() {
           </div>
           <div>
             <CardTitle className="text-3xl font-bold text-gray-800">
-              Forgot Password?
+              Quên mật khẩu?
             </CardTitle>
             <CardDescription className="text-base mt-2">
-              Enter your email to receive an OTP
+              Nhập email để nhận mã OTP
             </CardDescription>
           </div>
         </CardHeader>
@@ -132,7 +132,7 @@ export default function ForgotPasswordPage() {
               <AlertCircle className="h-4 w-4" />
               <span>
                 {requestResetMutation.error?.response?.data?.message ||
-                  "Failed to send OTP. Please try again."}
+                  "Không thể gửi OTP. Vui lòng thử lại."}
               </span>
             </div>
           )}
@@ -141,17 +141,17 @@ export default function ForgotPasswordPage() {
             {/* Email Input */}
             <div className="space-y-2">
               <Label htmlFor="identifier" className="text-sm font-medium">
-                Email Address
+                Địa chỉ Email
               </Label>
               <Input
                 id="identifier"
                 type="email"
-                placeholder="your.email@example.com"
+                placeholder="email.cua.ban@example.com"
                 {...register("identifier", {
-                  required: "Email is required",
+                  required: "Email là bắt buộc",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
+                    message: "Địa chỉ email không hợp lệ",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -171,22 +171,22 @@ export default function ForgotPasswordPage() {
               {requestResetMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <Loading className="h-4 w-4 text-white" />
-                  Sending OTP...
+                  Đang gửi OTP...
                 </span>
               ) : (
-                "Send OTP"
+                "Gửi OTP"
               )}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Remember your password?{" "}
+              Nhớ mật khẩu rồi?{" "}
               <Link
                 to="/login"
                 className="text-primary font-medium hover:underline"
               >
-                Back to Login
+                Quay lại Đăng nhập
               </Link>
             </p>
           </div>
