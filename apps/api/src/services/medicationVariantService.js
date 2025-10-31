@@ -136,22 +136,41 @@ export const deleteMedicationVariant = async (id) => {
 };
 
 /**
- * Search medication variants for POS with inventory data
+ * Search medication variants for POS with inventory data and FEFO locations
  * @param {Object} options - Query options
  * @param {string} options.search - Search term
- * @returns {Promise<Array>} List of variants with medication name and available quantity
+ * @returns {Promise<Array>} List of variants with medication name, available quantity, and bin locations (FEFO order)
  */
 export const searchVariantsForSale = async ({ search } = {}) => {
   try {
     const { medications, inventory } = await import("../db/schema/index.js");
-    const { sql } = await import("drizzle-orm");
+    const { asc } = await import("drizzle-orm");
+
+    let variantQuery = db
+      .select({
+        id: medicationVariants.id,
+        medicationId: medicationVariants.medicationId,
+        name: medicationVariants.name,
+        sku: medicationVariants.sku,
+        barcode: medicationVariants.barcode,
+        sellPrice: medicationVariants.sellPrice,
+        unit: medicationVariants.unit,
+        isActive: medicationVariants.isActive,
+        isForSale: medicationVariants.isForSale,
+        medicationName: medications.name,
+      })
+      .from(medicationVariants)
+      .innerJoin(
+        medications,
+        eq(medicationVariants.medicationId, medications.id)
+      );
 
     const conditions = [
       eq(medicationVariants.isActive, true),
       eq(medicationVariants.isForSale, true),
     ];
 
-    // Add search filter if provided
+    // Add search filter if provided - search in both variant name and medication name
     if (search) {
       conditions.push(
         or(
@@ -163,50 +182,71 @@ export const searchVariantsForSale = async ({ search } = {}) => {
       );
     }
 
-    const query = db
-      .select({
-        id: medicationVariants.id,
-        medicationId: medicationVariants.medicationId,
-        medicationName: medications.name,
-        variantName: medicationVariants.name,
-        sku: medicationVariants.sku,
-        barcode: medicationVariants.barcode,
-        sellPrice: medicationVariants.sellPrice,
-        unit: medicationVariants.unit,
-        isActive: medicationVariants.isActive,
-        isForSale: medicationVariants.isForSale,
-        availableQuantity: sql`COALESCE(SUM(${inventory.quantity} - ${inventory.quantityReserved}), 0)`,
+    variantQuery = variantQuery.where(and(...conditions));
+    const variants = await variantQuery;
+
+    // For each variant, get inventory items sorted by FEFO (expiry date ascending)
+    const variantsWithLocations = await Promise.all(
+      variants.map(async (variant) => {
+        const inventoryItems = await db.query.inventory.findMany({
+          where: eq(inventory.medicationVariantId, variant.id),
+          with: {
+            bin: {
+              with: {
+                rack: {
+                  with: {
+                    zone: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: asc(inventory.expiryDate),
+        });
+
+        // Calculate total available quantity
+        const totalAvailable = inventoryItems.reduce((sum, item) => {
+          return sum + (item.quantity - item.quantityReserved);
+        }, 0);
+
+        // Filter to only available stock and format location info
+        const availableLocations = inventoryItems
+          .filter((item) => item.quantity - item.quantityReserved > 0)
+          .map((item) => ({
+            binId: item.binId,
+            quantity: item.quantity - item.quantityReserved,
+            batchNumber: item.batchNumber,
+            expiryDate: item.expiryDate,
+            location: item.bin
+              ? {
+                  zone: item.bin.rack?.zone?.name || "N/A",
+                  rack: item.bin.rack?.code || "N/A",
+                  bin: `${item.bin.level || ""}${item.bin.number || ""}`,
+                  fullLocation: item.bin.rack?.zone?.name
+                    ? `${item.bin.rack.zone.name} - ${item.bin.rack.code} - Bin ${item.bin.level || ""}${item.bin.number || ""}`
+                    : "Location N/A",
+                }
+              : null,
+          }));
+
+        return {
+          id: variant.id,
+          medicationId: variant.medicationId,
+          medicationName: variant.medicationName || "",
+          variantName: variant.name,
+          sku: variant.sku,
+          barcode: variant.barcode,
+          sellPrice: variant.sellPrice,
+          unit: variant.unit,
+          isActive: variant.isActive,
+          isForSale: variant.isForSale,
+          availableQuantity: totalAvailable,
+          locations: availableLocations, // FEFO sorted locations
+        };
       })
-      .from(medicationVariants)
-      .leftJoin(
-        medications,
-        eq(medicationVariants.medicationId, medications.id)
-      )
-      .leftJoin(
-        inventory,
-        eq(medicationVariants.id, inventory.medicationVariantId)
-      )
-      .where(and(...conditions))
-      .groupBy(
-        medicationVariants.id,
-        medicationVariants.medicationId,
-        medications.name,
-        medicationVariants.name,
-        medicationVariants.sku,
-        medicationVariants.barcode,
-        medicationVariants.sellPrice,
-        medicationVariants.unit,
-        medicationVariants.isActive,
-        medicationVariants.isForSale
-      );
+    );
 
-    const result = await query;
-
-    // Convert availableQuantity to number explicitly
-    return result.map((item) => ({
-      ...item,
-      availableQuantity: Number(item.availableQuantity) || 0,
-    }));
+    return variantsWithLocations;
   } catch (error) {
     throw new Error(`Failed to search variants for sale: ${error.message}`);
   }

@@ -2,24 +2,25 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { forwardRef } from "react";
 
-function AlertDialog({ ...props }) {
+const AlertDialog = forwardRef(({ ...props }, ref) => {
   return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />;
-}
+});
 
-function AlertDialogTrigger({ ...props }) {
+const AlertDialogTrigger = forwardRef(({ ...props }, ref) => {
   return (
     <AlertDialogPrimitive.Trigger data-slot="alert-dialog-trigger" {...props} />
   );
-}
+});
 
-function AlertDialogPortal({ ...props }) {
+const AlertDialogPortal = forwardRef(({ ...props }, ref) => {
   return (
     <AlertDialogPrimitive.Portal data-slot="alert-dialog-portal" {...props} />
   );
-}
+});
 
-function AlertDialogOverlay({ className, ...props }) {
+const AlertDialogOverlay = forwardRef(({ className, ...props }, ref) => {
   return (
     <AlertDialogPrimitive.Overlay
       data-slot="alert-dialog-overlay"
@@ -30,7 +31,7 @@ function AlertDialogOverlay({ className, ...props }) {
       {...props}
     />
   );
-}
+});
 
 function AlertDialogContent({ className, ...props }) {
   return (

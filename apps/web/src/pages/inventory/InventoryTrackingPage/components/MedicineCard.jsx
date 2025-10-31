@@ -1,3 +1,4 @@
+import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
 import {
   Card,
   CardContent,
@@ -10,7 +11,7 @@ import { Eye } from "lucide-react";
 import { useState } from "react";
 import MedicineDialog from "./MedicineDialog";
 
-const MedicineCard = ({ medicine, variant }) => {
+const MedicineCard = ({ medicine = {}, variant }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const cardClass = cn(
@@ -31,18 +32,20 @@ const MedicineCard = ({ medicine, variant }) => {
         <CardHeader>
           <div className="flex justify-center mb-2">
             <img
-              src={medicine.image_url}
-              alt={medicine.name}
+              src={medicine?.image_url || MedicinePlaceholder}
+              alt={medicine?.name}
               className="w-24 h-24 object-cover rounded-md"
             />
           </div>
-          <CardTitle className="text-center text-lg">{medicine.name}</CardTitle>
+          <CardTitle className="text-center text-lg">
+            {medicine?.name}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {variant === "low-stock" ? (
             <div className="text-center">
               <p className="text-sm text-gray-500">Stock</p>
-              <p className="text-2xl font-bold">{medicine.stock}</p>
+              <p className="text-2xl font-bold">{medicine?.stock}</p>
             </div>
           ) : (
             <div className="text-center">
@@ -52,7 +55,7 @@ const MedicineCard = ({ medicine, variant }) => {
           )}
         </CardContent>
         <CardFooter className="text-xs text-gray-500 justify-center">
-          {`Zone ${medicine.zone}, Rack ${medicine.rack}, Level ${medicine.level}, Bin ${medicine.bin}`}
+          {`Zone ${medicine?.zone}, Rack ${medicine?.rack}, Level ${medicine?.level}, Bin ${medicine?.bin}`}
         </CardFooter>
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <Eye className="w-5 h-5 text-gray-600" />

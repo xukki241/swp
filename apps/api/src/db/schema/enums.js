@@ -57,7 +57,6 @@ export const purchaseOrderStatus = pgEnum("purchase_order_status", [
 export const salesOrderStatus = pgEnum("sales_order_status", [
   "pending",
   "paid",
-  "delivered",
   "cancelled",
 ]);
 

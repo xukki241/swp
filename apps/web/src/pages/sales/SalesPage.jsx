@@ -49,7 +49,10 @@ export default function SalesPage() {
       customer: null,
       cart: [],
       paymentMethod: "cash",
-      cashReceived: "", // Amount received from customer
+      cashReceived: "",
+      prescriptionNote: "",
+      notes: "",
+      isPrescriptionOrder: false,
       createdAt: new Date(),
     },
   ]);
@@ -107,6 +110,9 @@ export default function SalesPage() {
       cart: [],
       paymentMethod: "cash",
       cashReceived: "",
+      prescriptionNote: "",
+      notes: "",
+      isPrescriptionOrder: false,
       createdAt: new Date(),
     };
     setOrders((prev) => [...prev, newOrder]);
@@ -319,8 +325,18 @@ export default function SalesPage() {
 
   const updateCartItem = useCallback(
     (index, quantity) => {
-      if (quantity <= 0) {
-        removeCartItem(index);
+      // Allow empty string for editing (will be fixed on blur)
+      if (quantity === "" || quantity === 0) {
+        const updatedCart = [...activeOrder.cart];
+        updatedCart[index] = {
+          ...updatedCart[index],
+          quantity: quantity === "" ? "" : 0,
+        };
+        setCart(updatedCart);
+        return;
+      }
+
+      if (quantity < 0) {
         return;
       }
 
@@ -370,6 +386,15 @@ export default function SalesPage() {
       return;
     }
 
+    // Check if prescription order requires prescription note
+    if (
+      activeOrder.isPrescriptionOrder &&
+      !activeOrder.prescriptionNote?.trim()
+    ) {
+      toast.error("Prescription note is required for prescription orders");
+      return;
+    }
+
     // If payment method is VietQR, show QR dialog first
     if (activeOrder.paymentMethod === "mobile_payment") {
       setPendingOrderData({
@@ -397,6 +422,8 @@ export default function SalesPage() {
       const orderData = pendingOrderData || {
         customer_id: activeOrder.customer.id,
         payment_method: activeOrder.paymentMethod,
+        prescription_note: activeOrder.prescriptionNote || null,
+        notes: activeOrder.notes || null,
         items: activeOrder.cart.map((item) => ({
           medication_variant_id: item.medication_variant_id,
           quantity: item.quantity,
@@ -442,6 +469,8 @@ export default function SalesPage() {
               cart: [],
               paymentMethod: "cash",
               cashReceived: "",
+              prescriptionNote: "",
+              notes: "",
               createdAt: new Date(),
             };
             setActiveOrderId(newOrder.id);
@@ -614,19 +643,83 @@ export default function SalesPage() {
                           </p>
                         </div>
                         <div className="flex items-center gap-2 ml-2">
-                          <Input
-                            type="number"
-                            min="1"
-                            max={item.availableQuantity}
-                            value={item.quantity}
-                            onChange={(e) =>
-                              updateCartItem(
-                                index,
-                                Number.parseInt(e.target.value) || 1
-                              )
-                            }
-                            className="w-12 text-center text-sm"
-                          />
+                          <div className="flex items-center border border-border rounded-md overflow-hidden">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                updateCartItem(
+                                  index,
+                                  Math.max(1, item.quantity - 1)
+                                )
+                              }
+                              disabled={item.quantity <= 1}
+                              className="h-8 w-8 p-0 hover:bg-muted rounded-none"
+                            >
+                              <span className="text-lg font-bold">−</span>
+                            </Button>
+                            <Input
+                              type="number"
+                              min="1"
+                              max={item.availableQuantity}
+                              value={item.quantity}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                // Allow empty string for editing
+                                if (value === "" || value === "0") {
+                                  updateCartItem(index, "");
+                                  return;
+                                }
+                                const val = Number.parseInt(value);
+                                if (!isNaN(val)) {
+                                  if (val > item.availableQuantity) {
+                                    toast.warning(
+                                      `Maximum available: ${item.availableQuantity}`
+                                    );
+                                    updateCartItem(
+                                      index,
+                                      item.availableQuantity
+                                    );
+                                  } else {
+                                    updateCartItem(index, val);
+                                  }
+                                }
+                              }}
+                              onBlur={(e) => {
+                                const val = Number.parseInt(e.target.value);
+                                if (
+                                  isNaN(val) ||
+                                  val < 1 ||
+                                  e.target.value === ""
+                                ) {
+                                  updateCartItem(index, 1);
+                                } else if (val > item.availableQuantity) {
+                                  toast.warning(
+                                    `Maximum available: ${item.availableQuantity}`
+                                  );
+                                  updateCartItem(index, item.availableQuantity);
+                                }
+                              }}
+                              className="w-14 h-8 text-center text-sm border-0 border-x border-border focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                updateCartItem(
+                                  index,
+                                  Math.min(
+                                    item.availableQuantity,
+                                    item.quantity + 1
+                                  )
+                                )
+                              }
+                              disabled={item.quantity >= item.availableQuantity}
+                              className="h-8 w-8 p-0 hover:bg-muted rounded-none"
+                            >
+                              <span className="text-lg font-bold">+</span>
+                            </Button>
+                          </div>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -646,6 +739,90 @@ export default function SalesPage() {
             {/* Payment & Complete */}
             {activeOrder.cart.length > 0 && (
               <div className="border-t border-border p-6 space-y-4">
+                {/* Prescription Checkbox */}
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={activeOrder.isPrescriptionOrder || false}
+                      onChange={(e) =>
+                        updateActiveOrder({
+                          isPrescriptionOrder: e.target.checked,
+                        })
+                      }
+                      className="mt-1 w-4 h-4 text-amber-600 border-amber-300 rounded focus:ring-amber-500"
+                    />
+                    <div className="flex-1">
+                      <span className="text-sm font-semibold text-amber-900 flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Đây là đơn thuốc kê đơn (Prescription Order)
+                      </span>
+                      <p className="text-xs text-amber-700 mt-1">
+                        Tick vào ô này nếu khách hàng mua thuốc kê đơn. Bắt buộc
+                        phải có ghi chú đơn thuốc bên dưới.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Prescription Note - Required if isPrescriptionOrder is checked */}
+                {activeOrder.isPrescriptionOrder && (
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <label className="text-sm font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Thông tin đơn thuốc (Bắt buộc) *
+                    </label>
+                    <textarea
+                      placeholder="Nhập thông tin đơn thuốc: Tên bác sĩ, chẩn đoán, hướng dẫn sử dụng..."
+                      value={activeOrder.prescriptionNote || ""}
+                      onChange={(e) =>
+                        updateActiveOrder({ prescriptionNote: e.target.value })
+                      }
+                      className="w-full min-h-[100px] px-3 py-2 text-sm border border-blue-300 bg-white rounded-md resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                    {activeOrder.isPrescriptionOrder &&
+                      !activeOrder.prescriptionNote?.trim() && (
+                        <p className="text-xs text-red-600 mt-1 font-medium">
+                          ⚠️ Vui lòng nhập thông tin đơn thuốc
+                        </p>
+                      )}
+                  </div>
+                )}
+
+                {/* Prescription Note - Optional if not prescription order */}
+                {!activeOrder.isPrescriptionOrder && (
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Prescription Note (if any)
+                    </label>
+                    <textarea
+                      placeholder="Enter prescription details (doctor name, diagnosis, special instructions...)"
+                      value={activeOrder.prescriptionNote || ""}
+                      onChange={(e) =>
+                        updateActiveOrder({ prescriptionNote: e.target.value })
+                      }
+                      className="w-full min-h-[80px] px-3 py-2 text-sm border border-input bg-background rounded-md resize-y"
+                    />
+                  </div>
+                )}
+
+                {/* General Notes */}
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    Additional Notes
+                  </label>
+                  <textarea
+                    placeholder="Any additional notes for this order..."
+                    value={activeOrder.notes || ""}
+                    onChange={(e) =>
+                      updateActiveOrder({ notes: e.target.value })
+                    }
+                    className="w-full min-h-[60px] px-3 py-2 text-sm border border-input bg-background rounded-md resize-y"
+                  />
+                </div>
+
                 <div>
                   <h3 className="text-sm font-semibold text-foreground mb-3">
                     Payment Method
@@ -730,7 +907,9 @@ export default function SalesPage() {
                     !activeOrder.customer ||
                     isSubmitting ||
                     (activeOrder.paymentMethod === "cash" &&
-                      (!activeOrder.cashReceived || changeAmount < 0))
+                      (!activeOrder.cashReceived || changeAmount < 0)) ||
+                    (activeOrder.isPrescriptionOrder &&
+                      !activeOrder.prescriptionNote?.trim())
                   }
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-base"
                 >
