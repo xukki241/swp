@@ -56,6 +56,7 @@ export default function SalesOrderDetailPage() {
             sellPrice: item.unitPrice,
             quantity: item.quantity,
             totalPrice: item.totalPrice,
+            medicationVariant: item.medicationVariant,
           })) || [],
       };
 
@@ -319,14 +320,24 @@ export default function SalesOrderDetailPage() {
                       {order.items?.map((item, index) => (
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="px-6 py-4">
-                            <p className="font-semibold text-gray-900">
-                              {item.medicationName || "Không rõ"}
-                            </p>
-                            {item.variantName && (
-                              <p className="text-sm text-gray-600">
-                                {item.variantName}
-                              </p>
-                            )}
+                            <div className="flex items-start gap-2">
+                              <div className="flex-1">
+                                <p className="font-semibold text-gray-900">
+                                  {item.medicationName || "Không rõ"}
+                                </p>
+                                {item.variantName && (
+                                  <p className="text-sm text-gray-600">
+                                    {item.variantName}
+                                  </p>
+                                )}
+                              </div>
+                              {item.medicationVariant?.medication
+                                ?.isPrescriptionRequired && (
+                                  <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300 rounded">
+                                    Kê đơn
+                                  </span>
+                                )}
+                            </div>
                           </td>
                           <td className="px-6 py-4 text-center text-gray-700">
                             {Number(item.sellPrice || 0).toLocaleString(
