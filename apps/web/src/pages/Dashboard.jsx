@@ -46,11 +46,9 @@ export default function DashboardPage() {
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
 
   // Get current month report with month/year selector
-  const currentDate = new Date();
-  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState(
-    currentDate.getMonth() + 1
-  ); // 1-12
+  // Default to October 2025 (month with seeded data)
+  const [selectedYear, setSelectedYear] = useState(2025);
+  const [selectedMonth, setSelectedMonth] = useState(10); // October has data
 
   const {
     data: monthlyReport,
