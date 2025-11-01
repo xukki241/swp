@@ -7,7 +7,15 @@ import {
 } from "@/components/dashboard";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useCurrentUser } from "@/hooks/useAuth";
 import { usePurchaseOrderReceipts } from "@/hooks/usePurchaseOrders";
 import { useMonthlySalesReport } from "@/hooks/useReports";
@@ -15,6 +23,9 @@ import {
   Activity,
   AlertTriangle,
   BarChart3,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   DollarSign,
   Package,
@@ -34,16 +45,67 @@ export default function DashboardPage() {
   // AI Analytics Dialog state
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
 
-  // Get current month report
-  const currentDate = new Date();
-  const currentYear = currentDate.getFullYear();
-  const currentMonth = currentDate.getMonth() + 1; // API expects 1-12, not 0-11
+  // Get current month report with month/year selector
+  // Default to October 2025 (month with seeded data)
+  const [selectedYear, setSelectedYear] = useState(2025);
+  const [selectedMonth, setSelectedMonth] = useState(10); // October has data
 
   const {
     data: monthlyReport,
     isLoading: isLoadingReport,
     error: reportError,
-  } = useMonthlySalesReport(currentYear, currentMonth);
+  } = useMonthlySalesReport(selectedYear, selectedMonth);
+
+  // Debug logging
+  console.log("Dashboard Debug:", {
+    selectedYear,
+    selectedMonth,
+    monthlyReport,
+    isLoadingReport,
+    reportError,
+  });
+
+  // Month navigation helpers
+  const months = [
+    { value: 1, label: "Tháng 1" },
+    { value: 2, label: "Tháng 2" },
+    { value: 3, label: "Tháng 3" },
+    { value: 4, label: "Tháng 4" },
+    { value: 5, label: "Tháng 5" },
+    { value: 6, label: "Tháng 6" },
+    { value: 7, label: "Tháng 7" },
+    { value: 8, label: "Tháng 8" },
+    { value: 9, label: "Tháng 9" },
+    { value: 10, label: "Tháng 10" },
+    { value: 11, label: "Tháng 11" },
+    { value: 12, label: "Tháng 12" },
+  ];
+
+  const years = [2023, 2024, 2025, 2026];
+
+  const goToPreviousMonth = () => {
+    if (selectedMonth === 1) {
+      setSelectedMonth(12);
+      setSelectedYear(selectedYear - 1);
+    } else {
+      setSelectedMonth(selectedMonth - 1);
+    }
+  };
+
+  const goToNextMonth = () => {
+    if (selectedMonth === 12) {
+      setSelectedMonth(1);
+      setSelectedYear(selectedYear + 1);
+    } else {
+      setSelectedMonth(selectedMonth + 1);
+    }
+  };
+
+  const goToCurrentMonth = () => {
+    const now = new Date();
+    setSelectedYear(now.getFullYear());
+    setSelectedMonth(now.getMonth() + 1);
+  };
 
   // Get Purchase Order Receipts
   const { data: purchaseOrderReceiptsData = [], isLoading: isLoadingReceipts } =
@@ -246,6 +308,79 @@ export default function DashboardPage() {
         {/* Welcome Section */}
         <WelcomeBanner userName={userName} greeting={getGreeting()} />
 
+        {/* Month/Year Selector */}
+        <Card className="border-0 shadow-md">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                <span className="font-semibold text-foreground">
+                  Báo cáo tháng:
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={goToPreviousMonth}
+                  className="h-8 w-8"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Select
+                  value={selectedMonth.toString()}
+                  onValueChange={(value) => setSelectedMonth(parseInt(value))}
+                >
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {months.map((month) => (
+                      <SelectItem
+                        key={month.value}
+                        value={month.value.toString()}
+                      >
+                        {month.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select
+                  value={selectedYear.toString()}
+                  onValueChange={(value) => setSelectedYear(parseInt(value))}
+                >
+                  <SelectTrigger className="w-[100px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={goToNextMonth}
+                  className="h-8 w-8"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={goToCurrentMonth}
+                  className="ml-2"
+                >
+                  Tháng hiện tại
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Error Display */}
         {reportError && (
           <Card className="border-red-200 bg-red-50">
@@ -284,7 +419,7 @@ export default function DashboardPage() {
                   variant="secondary"
                   className="bg-primary/10 text-primary"
                 >
-                  Tháng này
+                  Tháng {selectedMonth}/{selectedYear}
                 </Badge>
               </div>
             </CardHeader>
