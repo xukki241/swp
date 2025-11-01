@@ -11,8 +11,9 @@ import { validateBody, validateQuery } from "../middleware/validate.js";
 
 export const reportRouter = express.Router();
 
-// All routes require authentication
+// All routes require authentication and owner/manager role
 reportRouter.use(authenticate);
+reportRouter.use(authorize(["owner", "manager"]));
 
 // POST /api/reports - Create/generate a new report
 reportRouter.post(
