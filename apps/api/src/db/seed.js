@@ -2102,8 +2102,8 @@ async function seed() {
     - Bản ghi tồn kho: 11 (từ tất cả phiếu nhập + 2 biến thể Paracetamol bổ sung)
     - Đơn bán hàng: 15 (5 từ tháng 6/2024 + 10 từ tháng 10/2025)
       * Trạng thái: chờ xử lý, đã thanh toán, đã hủy
-      * Tháng 10/2025: 10 đơn - 8 đã thanh toán, 1 đã hủy, 1 chờ xử lý
-      * Tổng doanh thu tháng 10: 6.580.000 VND (từ 8 đơn đã thanh toán)
+      * Tháng 10/2025: 10 đơn - 7 đã thanh toán, 1 đã hủy, 2 chờ xử lý
+      * Tổng doanh thu tháng 10: 4.890.000 VND (từ 7 đơn đã thanh toán)
     - Mục đơn bán hàng: 38 (5 từ tháng 6/2024 + 33 từ tháng 10/2025)
       * Mục tháng 10 bao gồm: Paracetamol, Ibuprofen, Amoxicillin, v.v.
     - Tệp tin: 3
