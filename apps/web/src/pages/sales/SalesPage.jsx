@@ -12,12 +12,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { customerService } from "@/services/customerService";
 import { searchMedications } from "@/services/medicationsService";
 import { salesService } from "@/services/salesService";
 import {
-  AlertCircle,
   Banknote,
   CheckCircle,
   Copy,
@@ -59,7 +57,6 @@ export default function SalesPageV3() {
       cart: [],
       paymentMethod: "cash",
       cashReceived: "",
-      prescriptionNote: "",
       createdAt: new Date(),
     },
   ]);
@@ -94,12 +91,6 @@ export default function SalesPageV3() {
       0
     );
   }, [activeOrder.cart]);
-
-  // Check prescription medications
-  const hasPrescriptionMedication = useMemo(
-    () => activeOrder.cart.some((item) => item.isPrescriptionRequired),
-    [activeOrder.cart]
-  );
 
   // Calculate change
   const changeAmount = useMemo(() => {
@@ -153,7 +144,6 @@ export default function SalesPageV3() {
       cart: [],
       paymentMethod: "cash",
       cashReceived: "",
-      prescriptionNote: "",
       createdAt: new Date(),
     };
     setOrders((prev) => [...prev, newOrder]);
@@ -338,11 +328,6 @@ export default function SalesPageV3() {
       return;
     }
 
-    if (hasPrescriptionMedication && !activeOrder.prescriptionNote?.trim()) {
-      toast.error("Vui lòng nhập thông tin đơn thuốc kê đơn");
-      return;
-    }
-
     if (
       activeOrder.paymentMethod === "cash" &&
       (!activeOrder.cashReceived || changeAmount < 0)
@@ -354,7 +339,6 @@ export default function SalesPageV3() {
     const orderData = {
       customer_id: activeOrder.customer.id,
       payment_method: activeOrder.paymentMethod,
-      prescription_note: activeOrder.prescriptionNote || null,
       items: activeOrder.cart.map((item) => ({
         medication_variant_id: item.medication_variant_id,
         quantity: item.quantity,
@@ -369,7 +353,7 @@ export default function SalesPageV3() {
     }
 
     await submitOrder(orderData);
-  }, [activeOrder, hasPrescriptionMedication, changeAmount]);
+  }, [activeOrder, changeAmount]);
 
   // Submit order
   const submitOrder = useCallback(
@@ -398,7 +382,6 @@ export default function SalesPageV3() {
           customer: null,
           paymentMethod: "cash",
           cashReceived: "",
-          prescriptionNote: "",
         });
 
         toast.success("Đơn hàng đã hoàn tất!");
@@ -460,11 +443,10 @@ export default function SalesPageV3() {
               return (
                 <div
                   key={order.id}
-                  className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all ${
-                    isActive
+                  className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all ${isActive
                       ? "border-primary bg-primary/10 text-foreground shadow-sm"
                       : "border-border bg-card hover:border-primary/50 text-muted-foreground"
-                  }`}
+                    }`}
                   onClick={() => setActiveOrderId(order.id)}
                 >
                   <FileText className="h-4 w-4" />
@@ -673,26 +655,6 @@ export default function SalesPageV3() {
             {/* Payment Section */}
             {activeOrder.cart.length > 0 && (
               <div className="bg-card rounded-xl border border-border p-4 space-y-4">
-                {/* Prescription Note */}
-                {hasPrescriptionMedication && (
-                  <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border-2 border-amber-300 rounded-lg">
-                    <div className="flex items-center gap-2 text-amber-900 dark:text-amber-100 mb-2">
-                      <AlertCircle className="w-4 h-4" />
-                      <span className="text-sm font-bold">
-                        Đơn thuốc kê đơn *
-                      </span>
-                    </div>
-                    <Textarea
-                      placeholder="Nhập thông tin: Tên bác sĩ, chẩn đoán..."
-                      value={activeOrder.prescriptionNote || ""}
-                      onChange={(e) =>
-                        updateActiveOrder({ prescriptionNote: e.target.value })
-                      }
-                      className="min-h-[60px] text-sm"
-                    />
-                  </div>
-                )}
-
                 {/* Payment Method */}
                 <div>
                   <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
@@ -704,11 +666,10 @@ export default function SalesPageV3() {
                       <button
                         key={value}
                         onClick={() => setPaymentMethod(value)}
-                        className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${
-                          activeOrder.paymentMethod === value
+                        className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${activeOrder.paymentMethod === value
                             ? "border-primary bg-primary/10 text-primary"
                             : "border-border hover:border-primary/50"
-                        }`}
+                          }`}
                       >
                         <Icon className="h-4 w-4" />
                         <span className="text-sm font-medium">{label}</span>
@@ -777,9 +738,7 @@ export default function SalesPageV3() {
                     !activeOrder.customer ||
                     isSubmitting ||
                     (activeOrder.paymentMethod === "cash" &&
-                      (!activeOrder.cashReceived || changeAmount < 0)) ||
-                    (hasPrescriptionMedication &&
-                      !activeOrder.prescriptionNote?.trim())
+                      (!activeOrder.cashReceived || changeAmount < 0))
                   }
                   className="w-full py-6 text-lg font-bold"
                   size="lg"
