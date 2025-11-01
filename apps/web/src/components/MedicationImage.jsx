@@ -10,19 +10,18 @@ export default function MedicationImage({ fileId, alt = "", size = 56 }) {
 
     const loadImage = async () => {
       try {
-        // ✅ Tạo request có token bằng axios
         const token = localStorage.getItem("token");
         const res = await instance.get(`/files/${fileId}/view`, {
           responseType: "blob",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        const blobUrl = URL.createObjectURL(res.data);
-        setSrc(blobUrl);
+        // 🔥 Convert blob → base64 để không bị CSP hay cross-origin chặn
+        const reader = new FileReader();
+        reader.onloadend = () => setSrc(reader.result);
+        reader.readAsDataURL(res.data);
       } catch (err) {
-        console.warn("❌ Failed to load image", err);
+        console.warn("❌ Load image failed", err);
         setSrc(null);
       }
     };
