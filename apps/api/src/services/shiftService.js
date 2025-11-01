@@ -304,6 +304,46 @@ export const updateShiftAssignment = async (id, assignmentData) => {
 };
 
 /**
+ * Confirm shift (nhân viên xác nhận lịch làm việc)
+ */
+export const confirmShift = async (id) => {
+  try {
+    const vnTime = new Date().toLocaleString("en-US", {
+      timeZone: "Asia/Ho_Chi_Minh",
+    });
+
+    const now = new Date(vnTime);
+
+    // Get current assignment to check status
+    const current = await db
+      .select()
+      .from(shiftAssignments)
+      .where(eq(shiftAssignments.id, id))
+      .limit(1);
+
+    if (!current || current.length === 0) {
+      throw new Error("Shift assignment not found");
+    }
+
+    if (current[0].status !== "scheduled") {
+      throw new Error("Only scheduled shifts can be confirmed");
+    }
+
+    const result = await db
+      .update(shiftAssignments)
+      .set({
+        status: "confirmed",
+        updatedAt: now,
+      })
+      .where(eq(shiftAssignments.id, id))
+      .returning();
+    return result[0] || null;
+  } catch (error) {
+    throw new Error(`Failed to confirm shift: ${error.message}`);
+  }
+};
+
+/**
  * Check-in (nhân viên bắt đầu ca)
  */
 export const checkInShift = async (id) => {
