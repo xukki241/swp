@@ -74,7 +74,7 @@ export const getUserById = async (id) => {
  * @param {string} userData.email - User email
  * @param {string} userData.phone - User phone
  * @param {string} userData.address - User address
- * @param {string} userData.role - User role (admin, manager, staff)
+ * @param {string} userData.role - User role (owner, staff)
  * @param {string} userData.status - User status (active, inactive, suspended)
  * @returns {Promise<Object>} Created user
  */

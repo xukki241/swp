@@ -33,21 +33,11 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { useMemo, useState } from "react";
 
 export default function DashboardPage() {
-  const navigate = useNavigate();
   const { data: currentUser } = useCurrentUser();
   const userName = currentUser?.user?.name || "User";
-  const userRole = currentUser?.user?.role || "staff";
-
-  // Redirect staff to sales page (they don't have access to dashboard/reports)
-  useEffect(() => {
-    if (userRole === "staff") {
-      navigate("/sales", { replace: true });
-    }
-  }, [userRole, navigate]);
 
   // AI Analytics Dialog state
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
