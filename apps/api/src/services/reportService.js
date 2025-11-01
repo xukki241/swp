@@ -128,7 +128,7 @@ export const reportService = {
       : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const end = endDate ? new Date(endDate) : new Date();
 
-    // Total sales and order count
+    // Total sales and order count (only paid orders for revenue)
     const [summary] = await db
       .select({
         totalOrders: count(salesOrders.id),
@@ -136,7 +136,11 @@ export const reportService = {
       })
       .from(salesOrders)
       .where(
-        and(gte(salesOrders.orderDate, start), lte(salesOrders.orderDate, end))
+        and(
+          gte(salesOrders.orderDate, start),
+          lte(salesOrders.orderDate, end),
+          eq(salesOrders.status, "paid")
+        )
       );
 
     // Sales by status
@@ -152,7 +156,7 @@ export const reportService = {
       )
       .groupBy(salesOrders.status);
 
-    // Top selling medications
+    // Top selling medications (only from paid orders)
     const topSellingMeds = await db
       .select({
         medicationId: medications.id,
@@ -174,7 +178,11 @@ export const reportService = {
         eq(medicationVariants.medicationId, medications.id)
       )
       .where(
-        and(gte(salesOrders.orderDate, start), lte(salesOrders.orderDate, end))
+        and(
+          gte(salesOrders.orderDate, start),
+          lte(salesOrders.orderDate, end),
+          eq(salesOrders.status, "paid")
+        )
       )
       .groupBy(medications.id, medications.name, medicationVariants.name)
       .orderBy(desc(sum(salesOrderItems.quantity)))
@@ -506,7 +514,8 @@ export const reportService = {
   async generateMonthlySales(parameters = {}) {
     const { year, month } = parameters;
     const targetYear = year || new Date().getFullYear();
-    const targetMonth = month !== undefined ? month : new Date().getMonth();
+    // If month is provided (1-12), convert to 0-based. Otherwise use current month (0-based)
+    const targetMonth = month !== undefined ? month - 1 : new Date().getMonth();
 
     const startOfMonth = new Date(targetYear, targetMonth, 1);
     const endOfMonth = new Date(

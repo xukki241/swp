@@ -45,6 +45,15 @@ export default function DashboardPage() {
     error: reportError,
   } = useMonthlySalesReport(currentYear, currentMonth);
 
+  // Debug logging
+  console.log("Dashboard Debug:", {
+    currentYear,
+    currentMonth,
+    monthlyReport,
+    isLoadingReport,
+    reportError,
+  });
+
   // Get Purchase Order Receipts
   const { data: purchaseOrderReceiptsData = [], isLoading: isLoadingReceipts } =
     usePurchaseOrderReceipts({ limit: 5 });
