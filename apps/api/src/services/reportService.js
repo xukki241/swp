@@ -514,8 +514,9 @@ export const reportService = {
   async generateMonthlySales(parameters = {}) {
     const { year, month } = parameters;
     const targetYear = year || new Date().getFullYear();
-    // If month is provided (1-12), convert to 0-based. Otherwise use current month (0-based)
-    const targetMonth = month !== undefined ? month - 1 : new Date().getMonth();
+    // If month is provided, use it directly (already 0-based from controller OR test)
+    // Controller converts 1-12 to 0-11 before calling this
+    const targetMonth = month !== undefined ? month : new Date().getMonth();
 
     const startOfMonth = new Date(targetYear, targetMonth, 1);
     const endOfMonth = new Date(
