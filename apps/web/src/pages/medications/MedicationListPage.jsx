@@ -105,7 +105,7 @@ function MedImage({ medicationId, imageId, alt = "", version = 0, onClick }) {
       return getMedicationImageUrl(medicationId, imageId);
     const local = getMedicationImageLocal(medicationId);
     return local || getMedicationImageUrl(medicationId);
-  }, [medicationId, imageId, version]);
+}, [medicationId, imageId, version]);
 
   useEffect(() => setErrored(false), [src]);
 
@@ -124,6 +124,8 @@ function MedImage({ medicationId, imageId, alt = "", version = 0, onClick }) {
 export default function MedicationListPage() {
   const navigate = useNavigate();
   const uploadFile = useUploadFile();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const isOwner = user.role?.toUpperCase() === "OWNER";
   /* filters — giống UserListPage: searchInput / appliedSearch + statusFilter */
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
@@ -200,7 +202,7 @@ export default function MedicationListPage() {
     reset({
       name: med.name ?? "",
       brand: med.brand ?? "",
-      description: med.description ?? "",
+description: med.description ?? "",
       isPrescriptionRequired: !!med.isPrescriptionRequired,
       isControlledSubstance: !!med.isControlledSubstance,
       status: med.status ?? "active",
@@ -221,42 +223,45 @@ export default function MedicationListPage() {
   }
 
   const onSubmitMed = async (data) => {
-    try {
-      let savedId = editing?.id;
+  try {
+    let savedId = editing?.id;
 
-      if (editing) {
-        await updateMed.mutateAsync({ id: editing.id, payload: data });
-      } else {
-        const created = await createMed.mutateAsync(data);
-        savedId = Array.isArray(created) ? created[0]?.id : created?.id;
-      }
-
-      if (savedId) {
-        if (removeImage) {
-          clearMedicationImage(savedId);
-          await instance.patch(`/medications/${savedId}`, { imageID: null });
-        } else if (imageFile) {
-          const res = await uploadFile.mutateAsync(imageFile);
-          const fileId = res?.data?.id || res?.id;
-          if (fileId) {
-            await instance.patch(`/medications/${savedId}`, { imageID: fileId });
-          }
-        } else if (imagePreview) {
-          // fallback local
-          setMedicationImage(savedId, imagePreview);
-        }
-        bumpImageVersion(savedId);
-      }
-
-      toast.success(editing ? "Medication updated" : "Medication created");
-      setMedFormOpen(false);
-      await refetch();
-    } catch (e) {
-      toast.error("Failed to save medication", {
-        description: e?.response?.data?.message || e.message,
-      });
+    if (editing) {
+      await updateMed.mutateAsync({ id: editing.id, payload: data });
+    } else {
+      const created = await createMed.mutateAsync(data);
+      savedId = Array.isArray(created) ? created[0]?.id : created?.id;
     }
-  };
+
+    if (savedId) {
+      if (removeImage) {
+        clearMedicationImage(savedId);
+        await instance.delete(`/medications/${savedId}/image`);
+      } else if (imageFile) {
+        const formData = new FormData();
+        formData.append("image", imageFile);
+        await instance.post(`/medications/${savedId}/upload-image`, formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+      } else if (imagePreview) {
+        setMedicationImage(savedId, imagePreview);
+      }
+      bumpImageVersion(savedId);
+    }
+
+    toast.success(editing ? "Medication updated" : "Medication created");
+    setMedFormOpen(false);
+    
+    // Đợi một chút để backend xử lý xong
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await refetch();
+  } catch (e) {
+    toast.error("Failed to save medication", {
+      description: e?.response?.data?.message || e.message,
+    });
+  }
+};
+
 
   const handleDelete = async (id) => {
     if (confirm("Delete this medication?")) {
@@ -303,7 +308,7 @@ export default function MedicationListPage() {
     });
   };
   const validateBarcodeUnique = async (barcode, currentId) => {
-    if (!barcode) return true;
+if (!barcode) return true;
     const list = await findVariantsByBarcode(barcode);
     const exact = list.filter((v) => String(v.barcode) === String(barcode));
     return exact.every((v) => String(v.id) === String(currentId || ""));
@@ -406,7 +411,7 @@ export default function MedicationListPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Medication Catalog</CardTitle>
+<CardTitle>Medication Catalog</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* FILTER BAR */}
@@ -482,7 +487,7 @@ export default function MedicationListPage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <div className="font-medium">{m.name}</div>
-                            <StatusBadge status={m.status} />
+<StatusBadge status={m.status} />
                           </div>
                           <div className="text-sm text-muted-foreground">
                             Brand: {m.brand || "-"}
@@ -504,37 +509,42 @@ export default function MedicationListPage() {
                           <Eye className="w-4 h-4 mr-1" />
                           View
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(m)}
-                          title="Edit"
-                        >
-                          <Edit className="w-4 h-4 mr-1" />
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            navigate(`/medications/${m.id}/variants`, {
-                              state: { medication: m },
-                            })
-                          }
-                          title="Manage variants"
-                        >
-                          <Package className="w-4 h-4 mr-1" />
-                          Variants
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDelete(m.id)}
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Delete
-                        </Button>
+
+                        {isOwner && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(m)}
+                              title="Edit"
+                            >
+                              <Edit className="w-4 h-4 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                navigate(`/medications/${m.id}/variants`, {
+                                  state: { medication: m },
+                                })
+                              }
+                              title="Manage variants"
+                            >
+                              <Package className="w-4 h-4 mr-1" />
+                              Variants
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDelete(m.id)}
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Delete
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                   );
@@ -546,6 +556,7 @@ export default function MedicationListPage() {
                   </div>
                 )}
               </div>
+
             )}
           </CardContent>
         </Card>
@@ -553,7 +564,7 @@ export default function MedicationListPage() {
         {/* Medication Form (popup) */}
         <Dialog open={medFormOpen} onOpenChange={setMedFormOpen}>
           <DialogContent className="max-w-2xl" aria-describedby="med-form-desc">
-            <p id="med-form-desc" className="sr-only">
+<p id="med-form-desc" className="sr-only">
               Medication form dialog
             </p>
             <DialogHeader>
@@ -624,7 +635,7 @@ export default function MedicationListPage() {
                       checked={removeImage}
                       onCheckedChange={(c) => setRemoveImage(!!c)}
                     />
-                    <span>Remove image</span>
+<span>Remove image</span>
                   </label>
                 </div>
               </div>
@@ -709,7 +720,7 @@ export default function MedicationListPage() {
                   </Button>
                 </DialogClose>
                 <Button type="submit">
-                  {editing ? "Save Changes" : "Add Medication"}
+{editing ? "Save Changes" : "Add Medication"}
                 </Button>
               </DialogFooter>
             </form>

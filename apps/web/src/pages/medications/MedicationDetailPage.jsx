@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getMedicationImageLocal, getMedicationImageUrl } from "@/lib/fileUrls";
+import { customerService } from "@/services/customerService";
 import {
   getInventorySummary,
   getMedicationVariants,
@@ -22,6 +22,7 @@ import {
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
+import MedicationImage from "../../components/MedicationImage";
 
 function PillPlaceholder({ className = "h-20 w-20" }) {
   return (
@@ -41,8 +42,6 @@ function PillPlaceholder({ className = "h-20 w-20" }) {
     </div>
   );
 }
-import MedicationImage from "../../components/MedicationImage"; 
-
 
 export default function MedicationDetailsPage() {
   const { id } = useParams();
@@ -73,16 +72,32 @@ export default function MedicationDetailsPage() {
     if (!id) return;
     (async () => {
       try {
-        const [s, p, sa, i, v] = await Promise.all([
+        const [s, p, sa, i, v, customersRes] = await Promise.all([
           getSuppliersByMedication(id),
           getPurchasesByMedication(id),
           getSalesByMedication(id),
           getInventorySummary(),
           getMedicationVariants(id),
+          customerService.getCustomers(),
         ]);
+
         setSuppliers(s.data || []);
         setPurchases(p.data || []);
-        setSales(sa.data || []);
+
+        // Create customer map
+        const customerMap = {};
+        const customersData = customersRes.data || [];
+        customersData.forEach((c) => {
+          customerMap[c.id] = c.name;
+        });
+
+        // Map customer names to sales
+        const salesWithNames = (sa.data || []).map((sale) => ({
+          ...sale,
+          customerName:
+            customerMap[sale.customerId] || sale.customerName || "Unknown",
+        }));
+        setSales(salesWithNames);
         setInventory(i.data || []);
         setVariants(Array.isArray(v) ? v : v?.data || []);
       } catch {}
@@ -119,7 +134,11 @@ export default function MedicationDetailsPage() {
         <CardContent>
           <div className="flex items-start gap-4">
             <div className="shrink-0">
-              <MedicationImage fileId={medication?.imageId} alt={medication?.name} size={80} />
+              <MedicationImage
+                fileId={medication?.imageId}
+                alt={medication?.name}
+                size={80}
+              />
               <div style={{ display: "none" }}>
                 <PillPlaceholder />
               </div>
