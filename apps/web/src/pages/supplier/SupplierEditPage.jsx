@@ -320,24 +320,36 @@ export default function SupplierEditPage() {
               m.purchasePrice &&
               Number(m.purchasePrice) > 0
           )
-          .map((m) => ({
-            medication_variant_id: m.medicationVariantId,
-            supplier_sku: m.supplierSku.trim(),
-            lead_time_days: m.leadTimeDays
-              ? Number.parseInt(m.leadTimeDays, 10)
-              : null,
-            purchase_price: Number(m.purchasePrice),
-            contract_id: m.contractId || null,
-          }));
+          .map((m) => {
+            const variant = {
+              medication_variant_id: m.medicationVariantId,
+              purchase_price: Number(m.purchasePrice),
+            };
+
+            // Only include optional fields if they have values
+            if (m.supplierSku?.trim()) {
+              variant.supplier_sku = m.supplierSku.trim();
+            }
+            if (m.leadTimeDays) {
+              variant.lead_time_days = Number.parseInt(m.leadTimeDays, 10);
+            }
+            if (m.contractId) {
+              variant.contract_id = m.contractId;
+            }
+
+            return variant;
+          });
 
         payload.medicationVariants = variants;
       }
 
+      console.log("📤 Payload being sent:", JSON.stringify(payload, null, 2));
       await updateSupplier.mutateAsync({ id, ...payload });
       toast.success("Đã cập nhật nhà cung cấp thành công!");
       navigate(`/suppliers`);
     } catch (error) {
       console.error("Submission error:", error);
+      console.error("Error response:", error?.response?.data);
       toast.error("Không thể lưu nhà cung cấp", {
         description:
           error?.response?.data?.error ||
