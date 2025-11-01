@@ -203,6 +203,7 @@ export default function PurchaseOrderCreatePage() {
 
       // Prepare email data
       const emailData = {
+        purchaseOrderId: createdOrder?.id,
         supplierEmail: supplierDetail.email,
         supplierName: supplierDetail.name,
         supplierContact: supplierDetail.contactName,
