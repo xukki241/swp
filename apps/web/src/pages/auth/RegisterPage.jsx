@@ -55,7 +55,7 @@ export default function RegisterPage() {
       onError: (error) => {
         toast.error(
           error?.response?.data?.message ||
-          "Đăng ký thất bại. Vui lòng thử lại."
+            "Đăng ký thất bại. Vui lòng thử lại."
         );
       },
     });
@@ -307,7 +307,9 @@ export default function RegisterPage() {
             </section>
 
             <section>
-              <h3 className="font-semibold text-base mb-2">2. Thu thập thông tin</h3>
+              <h3 className="font-semibold text-base mb-2">
+                2. Thu thập thông tin
+              </h3>
               <p className="text-gray-700 leading-relaxed mb-2">
                 Chúng tôi thu thập các thông tin sau:
               </p>
@@ -320,7 +322,9 @@ export default function RegisterPage() {
             </section>
 
             <section>
-              <h3 className="font-semibold text-base mb-2">3. Sử dụng thông tin</h3>
+              <h3 className="font-semibold text-base mb-2">
+                3. Sử dụng thông tin
+              </h3>
               <p className="text-gray-700 leading-relaxed mb-2">
                 Thông tin của bạn được sử dụng để:
               </p>
@@ -333,16 +337,21 @@ export default function RegisterPage() {
             </section>
 
             <section>
-              <h3 className="font-semibold text-base mb-2">4. Bảo mật thông tin</h3>
+              <h3 className="font-semibold text-base mb-2">
+                4. Bảo mật thông tin
+              </h3>
               <p className="text-gray-700 leading-relaxed">
-                Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn bằng các biện pháp
-                bảo mật hiện đại. Thông tin của bạn sẽ không được chia sẻ với bên thứ ba
-                mà không có sự đồng ý của bạn, trừ khi được yêu cầu bởi pháp luật.
+                Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn bằng các biện
+                pháp bảo mật hiện đại. Thông tin của bạn sẽ không được chia sẻ
+                với bên thứ ba mà không có sự đồng ý của bạn, trừ khi được yêu
+                cầu bởi pháp luật.
               </p>
             </section>
 
             <section>
-              <h3 className="font-semibold text-base mb-2">5. Quyền và trách nhiệm</h3>
+              <h3 className="font-semibold text-base mb-2">
+                5. Quyền và trách nhiệm
+              </h3>
               <p className="text-gray-700 leading-relaxed mb-2">
                 Người dùng có quyền:
               </p>
@@ -362,41 +371,52 @@ export default function RegisterPage() {
             </section>
 
             <section>
-              <h3 className="font-semibold text-base mb-2">6. Chính sách đặt hàng</h3>
+              <h3 className="font-semibold text-base mb-2">
+                6. Chính sách đặt hàng
+              </h3>
               <p className="text-gray-700 leading-relaxed">
-                Đơn hàng sẽ được xử lý sau khi xác nhận thanh toán. Chúng tôi có quyền
-                từ chối hoặc hủy đơn hàng trong trường hợp phát hiện thông tin sai lệch
-                hoặc hành vi gian lận.
+                Đơn hàng sẽ được xử lý sau khi xác nhận thanh toán. Chúng tôi có
+                quyền từ chối hoặc hủy đơn hàng trong trường hợp phát hiện thông
+                tin sai lệch hoặc hành vi gian lận.
               </p>
             </section>
 
             <section>
-              <h3 className="font-semibold text-base mb-2">7. Chính sách đổi trả</h3>
+              <h3 className="font-semibold text-base mb-2">
+                7. Chính sách đổi trả
+              </h3>
               <p className="text-gray-700 leading-relaxed">
-                Khách hàng có thể đổi trả sản phẩm trong vòng 7 ngày kể từ ngày mua hàng,
-                với điều kiện sản phẩm còn nguyên vẹn, chưa sử dụng và có hóa đơn.
-                Thuốc kê đơn không được phép đổi trả.
+                Khách hàng có thể đổi trả sản phẩm trong vòng 7 ngày kể từ ngày
+                mua hàng, với điều kiện sản phẩm còn nguyên vẹn, chưa sử dụng và
+                có hóa đơn. Thuốc kê đơn không được phép đổi trả.
               </p>
             </section>
 
             <section>
-              <h3 className="font-semibold text-base mb-2">8. Điều khoản thay đổi</h3>
+              <h3 className="font-semibold text-base mb-2">
+                8. Điều khoản thay đổi
+              </h3>
               <p className="text-gray-700 leading-relaxed">
-                Chúng tôi có quyền cập nhật điều khoản này bất cứ lúc nào. Các thay đổi
-                sẽ được thông báo qua email hoặc trên trang web. Việc tiếp tục sử dụng
-                dịch vụ sau khi có thay đổi đồng nghĩa với việc bạn chấp nhận các
-                điều khoản mới.
+                Chúng tôi có quyền cập nhật điều khoản này bất cứ lúc nào. Các
+                thay đổi sẽ được thông báo qua email hoặc trên trang web. Việc
+                tiếp tục sử dụng dịch vụ sau khi có thay đổi đồng nghĩa với việc
+                bạn chấp nhận các điều khoản mới.
               </p>
             </section>
 
             <section>
               <h3 className="font-semibold text-base mb-2">9. Liên hệ</h3>
               <p className="text-gray-700 leading-relaxed">
-                Nếu có bất kỳ câu hỏi nào về chính sách này, vui lòng liên hệ với chúng tôi:
+                Nếu có bất kỳ câu hỏi nào về chính sách này, vui lòng liên hệ
+                với chúng tôi:
               </p>
               <ul className="list-none space-y-1 text-gray-700 ml-4 mt-2">
-                <li><strong>Email:</strong> support@pharmaflow.com</li>
-                <li><strong>Hotline:</strong> 1900 1234</li>
+                <li>
+                  <strong>Email:</strong> support@pharmaflow.com
+                </li>
+                <li>
+                  <strong>Hotline:</strong> 1900 1234
+                </li>
               </ul>
             </section>
           </div>

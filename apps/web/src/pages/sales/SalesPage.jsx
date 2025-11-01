@@ -443,10 +443,11 @@ export default function SalesPageV3() {
               return (
                 <div
                   key={order.id}
-                  className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all ${isActive
+                  className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all ${
+                    isActive
                       ? "border-primary bg-primary/10 text-foreground shadow-sm"
                       : "border-border bg-card hover:border-primary/50 text-muted-foreground"
-                    }`}
+                  }`}
                   onClick={() => setActiveOrderId(order.id)}
                 >
                   <FileText className="h-4 w-4" />
@@ -666,10 +667,11 @@ export default function SalesPageV3() {
                       <button
                         key={value}
                         onClick={() => setPaymentMethod(value)}
-                        className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${activeOrder.paymentMethod === value
+                        className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${
+                          activeOrder.paymentMethod === value
                             ? "border-primary bg-primary/10 text-primary"
                             : "border-border hover:border-primary/50"
-                          }`}
+                        }`}
                       >
                         <Icon className="h-4 w-4" />
                         <span className="text-sm font-medium">{label}</span>
