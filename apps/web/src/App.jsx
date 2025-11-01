@@ -9,6 +9,7 @@ import RegistrationRequestsPage from "@/pages/RegistrationRequestsPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import UserListPage from "@/pages/UserListPage";
 import UserProfilePage from "@/pages/UserProfilePage";
+import { useAuth } from "@/contexts/AuthContext";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 // Supplier & Purchase Order imports
 import PurchaseOrderCreatePage from "./pages/purchaseOrder/PurchaseOrderCreatePage";
@@ -36,16 +37,28 @@ import MySchedulePage from "./pages/shifts/MySchedulePage";
 import ShiftAssignmentPage from "./pages/shifts/ShiftAssignmentPage";
 import ShiftManagementPage from "./pages/shifts/ShiftManagementPage";
 
+// Role-based redirect component
+function RoleBasedRedirect() {
+  const { user } = useAuth();
+
+  if (user?.role === "owner") {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Default for staff and any other role
+  return <Navigate to="/sales" replace />;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Redirect root to dashboard */}
+        {/* Redirect root based on user role */}
         <Route
           path="/"
           element={
             <ProtectedRoute>
-              <Navigate to="/dashboard" replace />
+              <RoleBasedRedirect />
             </ProtectedRoute>
           }
         />
