@@ -28,8 +28,13 @@ export const useLogin = () => {
         localStorage.setItem("user", JSON.stringify(data.user));
       }
 
-      // Redirect to dashboard
-      window.location.href = "/dashboard";
+      // Redirect based on user role
+      if (data.user?.role === "owner") {
+        window.location.href = "/dashboard";
+      } else {
+        // Staff and other roles go to sales
+        window.location.href = "/sales";
+      }
     },
     onError: (error) => {
       console.error("Login failed:", error);
