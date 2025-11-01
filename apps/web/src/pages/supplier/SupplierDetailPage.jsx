@@ -82,26 +82,15 @@ export default function SupplierDetailPage() {
     if (!contractId) return;
 
     try {
-      // Debug logging
-      console.log("Download contract params:", {
-        contractId,
-        supplierSku,
-        contractFilename,
-        contractFileType,
-      });
-
-      // Sử dụng tên file gốc nếu có
       let filename = contractFilename;
 
-      // Nếu không có filename, tạo tên mới
+      // If filename not provided, generate one
       if (!filename) {
         filename = `contract-${supplierSku || "document"}`;
-        // Thêm extension từ fileType hoặc mặc định .pdf
-        const extension = contractFileType || "pdf";
-        filename += `.${extension}`;
-      }
 
-      console.log("Final filename for download:", filename);
+        const extension = contractFileType || "pdf";
+        filename = `${filename}.${extension}`;
+      }
 
       await downloadFile.mutateAsync({
         fileId: contractId,
@@ -138,14 +127,6 @@ export default function SupplierDetailPage() {
     );
   }
 
-  // Debug logging for supplier data
-  console.log("Supplier data loaded:", {
-    supplierId: supplier?.id,
-    hasMedicationVariants: !!supplier?.medicationVariants,
-    medicationVariantsCount: supplier?.medicationVariants?.length || 0,
-    firstMedicationVariant: supplier?.medicationVariants?.[0],
-  });
-
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -177,10 +158,33 @@ export default function SupplierDetailPage() {
 
         <Card className="shadow-md rounded-xl border-0">
           <CardHeader>
-            <CardTitle>Thông tin nhà cung cấp</CardTitle>
-            <CardDescription>
-              Chi tiết cơ bản và thông tin liên hệ
-            </CardDescription>
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle>Thông tin nhà cung cấp</CardTitle>
+                <CardDescription>
+                  Chi tiết cơ bản và thông tin liên hệ
+                </CardDescription>
+              </div>
+              {supplier?.medicationVariants?.[0]?.contractId && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const firstVariant = supplier.medicationVariants[0];
+                    handleDownloadContract(
+                      firstVariant.contractId,
+                      supplier.name,
+                      firstVariant.contractFilename,
+                      firstVariant.contractFileType
+                    );
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Tải hợp đồng
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -259,7 +263,6 @@ export default function SupplierDetailPage() {
                       <TableHead>Mã SKU NCC</TableHead>
                       <TableHead>Thời gian giao (ngày)</TableHead>
                       <TableHead>Giá mua</TableHead>
-                      <TableHead className="text-center">Hợp đồng</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -273,30 +276,6 @@ export default function SupplierDetailPage() {
                         <TableCell>{m.leadTimeDays || "N/A"}</TableCell>
                         <TableCell className="font-semibold text-primary">
                           {formatVND(m.purchasePrice)}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {m.contractId ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                handleDownloadContract(
-                                  m.contractId,
-                                  m.supplierSku,
-                                  m.contractFilename,
-                                  m.contractFileType
-                                )
-                              }
-                              className="flex items-center gap-2 mx-auto"
-                            >
-                              <Download className="w-4 h-4" />
-                              Tải xuống
-                            </Button>
-                          ) : (
-                            <span className="text-sm text-muted-foreground">
-                              Không có hợp đồng
-                            </span>
-                          )}
                         </TableCell>
                       </TableRow>
                     ))}

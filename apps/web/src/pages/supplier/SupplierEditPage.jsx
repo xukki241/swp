@@ -3,7 +3,13 @@
 import { AppLayout } from "@/components/layouts/app-layout";
 import { MedicationRow } from "@/components/MedicationRow";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -100,9 +106,20 @@ export default function SupplierEditPage() {
 
         setMeds(mappedMeds);
         setMedsLoaded(true);
+
+        // Set contract file nếu có medication nào có contract
+        const firstWithContract = supplier.medicationVariants.find(
+          (v) => v.contractId && v.contractFilename
+        );
+        if (firstWithContract && !contractFile.id) {
+          setContractFile({
+            id: firstWithContract.contractId,
+            filename: firstWithContract.contractFilename,
+          });
+        }
       }
     }
-  }, [supplier, medsLoaded]);
+  }, [supplier, medsLoaded, contractFile.id]);
 
   const handleAddMed = () =>
     setMeds([
@@ -160,13 +177,20 @@ export default function SupplierEditPage() {
 
       setContractFile({ id: fileId, filename });
 
+      // Update all existing medications to use new contract
+      setMeds((prevMeds) =>
+        prevMeds.map((med) => ({
+          ...med,
+          contractId: fileId,
+          contractFilename: filename,
+        }))
+      );
+
       toast.success("Contract uploaded!", {
         description: "Parsing contract...",
       });
 
       const parseResult = await parseContract.mutateAsync(fileId);
-
-      console.log("📦 Parse result from backend:", parseResult);
 
       if (parseResult.success && parseResult.data.medications.length > 0) {
         const newMeds = parseResult.data.medications.map((med) => {
@@ -176,17 +200,10 @@ export default function SupplierEditPage() {
               med.medicationName.toLowerCase().trim()
           );
 
-          console.log("🔍 Matching medication:", {
-            parsedName: med.medicationName,
-            matchedMed: matchedMed,
-            matchedId: matchedMed?.id,
-            variantIdFromBackend: med.medicationVariantId, // ✅ Log variant ID from backend
-          });
-
           return {
             medicationId: matchedMed?.id || "",
             medicationName: med.medicationName,
-            medicationVariantId: med.medicationVariantId || "", // ✅ Use matched variant from backend
+            medicationVariantId: med.medicationVariantId || "",
             variantName: med.variantName,
             supplierSku: med.supplierSku,
             leadTimeDays: med.leadTimeDays?.toString() || "",
@@ -196,7 +213,6 @@ export default function SupplierEditPage() {
           };
         });
 
-        console.log("📋 New meds array:", newMeds);
         setMeds(newMeds);
 
         // Check if any medication was not found
@@ -289,6 +305,13 @@ export default function SupplierEditPage() {
       });
     }
 
+    // Check if contract exists but no medications
+    if (contractFile.id && meds.length === 0) {
+      validationErrors.push(
+        "Bạn đã upload hợp đồng nhưng chưa có thuốc nào. Vui lòng thêm ít nhất 1 thuốc để lưu hợp đồng."
+      );
+    }
+
     if (validationErrors.length > 0) {
       toast.error("Xác thực thất bại", {
         description: (
@@ -343,13 +366,11 @@ export default function SupplierEditPage() {
         payload.medicationVariants = variants;
       }
 
-      console.log("📤 Payload being sent:", JSON.stringify(payload, null, 2));
       await updateSupplier.mutateAsync({ id, ...payload });
       toast.success("Đã cập nhật nhà cung cấp thành công!");
       navigate(`/suppliers`);
     } catch (error) {
       console.error("Submission error:", error);
-      console.error("Error response:", error?.response?.data);
       toast.error("Không thể lưu nhà cung cấp", {
         description:
           error?.response?.data?.error ||
@@ -381,6 +402,9 @@ export default function SupplierEditPage() {
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle>Sửa nhà cung cấp</CardTitle>
+          <CardDescription>
+            Cập nhật thông tin nhà cung cấp và danh sách thuốc
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

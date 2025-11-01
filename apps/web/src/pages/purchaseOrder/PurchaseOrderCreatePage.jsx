@@ -16,7 +16,7 @@ import { useSupplier, useSuppliers } from "@/hooks/useSuppliers";
 import { instance } from "@/lib/axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2, Loader2, Package, Plus, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
@@ -42,21 +42,6 @@ export default function PurchaseOrderCreatePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Debug: Log supplier medication variants when loaded
-  useEffect(() => {
-    if (supplierDetail?.medicationVariants) {
-      console.log(
-        "🔍 Supplier medication variants loaded:",
-        supplierDetail.medicationVariants.map((v) => ({
-          id: v.id,
-          name: v.medicationName,
-          variant: v.variantName,
-          leadTimeDays: v.leadTimeDays,
-          purchasePrice: v.purchasePrice,
-          type: typeof v.purchasePrice,
-        }))
-      );
-    }
-  }, [supplierDetail]);
 
   const expectedDeliveryDate = useMemo(() => {
     // Chỉ tính khi đã có items được chọn với medication và lead time
@@ -110,12 +95,6 @@ export default function PurchaseOrderCreatePage() {
     // Auto-fill unit price when medication is selected
     if (field === "supplierMedicationVariantId") {
       const selectedMed = meds.find((m) => m.id === value);
-      console.log("📋 Selected medication:", {
-        id: value,
-        medication: selectedMed,
-        purchasePrice: selectedMed?.purchasePrice,
-        type: typeof selectedMed?.purchasePrice,
-      });
 
       if (selectedMed?.purchasePrice) {
         // Parse to number if it's a string
@@ -124,7 +103,6 @@ export default function PurchaseOrderCreatePage() {
             ? parseFloat(selectedMed.purchasePrice)
             : selectedMed.purchasePrice;
         updated[index].unitPrice = price;
-        console.log("💰 Auto-filled unit price:", price);
       }
     }
 
@@ -181,22 +159,6 @@ export default function PurchaseOrderCreatePage() {
           })),
         },
       ];
-
-      console.log("📦 Payload sent:", payload);
-      console.log("📅 Expected Delivery Date:", expectedDeliveryDate);
-      console.log(
-        "🔢 Items with lead time:",
-        selectedItems.map((item) => {
-          const med = meds.find(
-            (m) => m.id === item.supplierMedicationVariantId
-          );
-          return {
-            medication: med?.medicationName,
-            leadTime: med?.leadTimeDays,
-            purchasePrice: med?.purchasePrice,
-          };
-        })
-      );
 
       const response = await instance.post("/purchases", payload);
       const createdOrder = response.data?.data?.[0] || response.data;
