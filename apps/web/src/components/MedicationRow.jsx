@@ -35,33 +35,17 @@ export function MedicationRow({
     rowData.medicationId || ""
   );
 
-  const { data: variantsData, isLoading: isLoadingVariants } =
-    useMedicationVariants(selectedMedId || undefined);
-  const availableVariants = variantsData?.data || [];
+  const {
+    data: variantsData,
+    isLoading: isLoadingVariants,
+    error: variantsError,
+  } = useMedicationVariants(selectedMedId || undefined);
+  const availableVariants = variantsData || [];
 
   // Calculate if variant is from contract (not in available variants)
   const hasVariantFromContract =
     rowData.medicationVariantId &&
     !availableVariants.find((v) => v.id === rowData.medicationVariantId);
-
-  // Debug logging
-  useEffect(() => {
-    console.log(`\n🔍 Medication Row ${index + 1} State:`);
-    console.log(`  - Selected Med ID: ${selectedMedId}`);
-    console.log(`  - Available variants:`, availableVariants);
-    console.log(`  - Loading variants: ${isLoadingVariants}`);
-    console.log(`  - Current rowData:`, rowData);
-    console.log(`  - medicationVariantId: ${rowData.medicationVariantId}`);
-    console.log(`  - variantName: ${rowData.variantName}`);
-    console.log(`  - hasVariantFromContract: ${hasVariantFromContract}`);
-  }, [
-    selectedMedId,
-    availableVariants,
-    isLoadingVariants,
-    rowData,
-    index,
-    hasVariantFromContract,
-  ]);
 
   const medicationOptions = useMemo(() => {
     const options = allMedications.map((med) => ({
