@@ -1,5 +1,3 @@
-"use client";
-
 import { useMedicationVariants } from "@/hooks/useMedications";
 import {
   AlertCircle,

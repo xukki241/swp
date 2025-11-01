@@ -1,5 +1,3 @@
-"use client";
-
 import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";

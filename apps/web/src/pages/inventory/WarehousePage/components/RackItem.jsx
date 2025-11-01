@@ -1,5 +1,3 @@
-"use client";
-
 import { ChevronDown, ChevronUp, Edit2, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {

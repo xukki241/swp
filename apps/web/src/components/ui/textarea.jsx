@@ -1,6 +1,4 @@
 // src/components/ui/textarea.jsx
-"use client";
-
 import { cn } from "@/lib/utils";
 import * as React from "react";
 

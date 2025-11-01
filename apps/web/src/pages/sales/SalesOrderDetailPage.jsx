@@ -36,33 +36,34 @@ export default function SalesOrderDetailPage() {
       const response = await salesService.getSalesOrder(id);
       const orderData = response.data || response;
 
-      // Transform nested data to flat structure for display
       const transformedOrder = {
         ...orderData,
-        customerName: orderData.customer?.name || "N/A",
+        customerName: orderData.customer?.name || "Không có",
         customerPhone: orderData.customer?.phone || "",
         customerEmail: orderData.customer?.email || "",
         salespersonName:
-          orderData.salesperson?.name || orderData.salesperson?.email || "N/A",
-        // Transform items to include medication info
+          orderData.salesperson?.name ||
+          orderData.salesperson?.email ||
+          "Không có",
         items:
           orderData.items?.map((item) => ({
             ...item,
             medicationName:
               item.medicationVariant?.medication?.name ||
               item.medicationVariant?.name ||
-              "Unknown",
+              "Không rõ",
             variantName: item.medicationVariant?.name || "",
-            sellPrice: item.unitPrice, // unitPrice from salesOrderItems table
+            sellPrice: item.unitPrice,
             quantity: item.quantity,
             totalPrice: item.totalPrice,
+            medicationVariant: item.medicationVariant,
           })) || [],
       };
 
       setOrder(transformedOrder);
     } catch (error) {
       console.error("Error fetching order:", error);
-      toast.error("Failed to load order details");
+      toast.error("Không thể tải thông tin đơn hàng");
     } finally {
       setIsLoading(false);
     }
@@ -72,27 +73,29 @@ export default function SalesOrderDetailPage() {
     setIsUpdating(true);
     try {
       await salesService.updateSalesOrder(id, { status: "paid" });
-      toast.success("Order marked as paid");
+      toast.success("Đã đánh dấu đơn hàng là ĐÃ THANH TOÁN");
       fetchOrderDetail();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update order");
+      toast.error(
+        error.response?.data?.message || "Không thể cập nhật đơn hàng"
+      );
     } finally {
       setIsUpdating(false);
     }
   };
 
   const handleCancelOrder = async () => {
-    if (!confirm("Are you sure you want to cancel this order?")) {
+    if (!confirm("Bạn có chắc chắn muốn hủy đơn hàng này không?")) {
       return;
     }
 
     setIsUpdating(true);
     try {
       await salesService.updateSalesOrder(id, { status: "cancelled" });
-      toast.success("Order cancelled");
+      toast.success("Đơn hàng đã được hủy");
       fetchOrderDetail();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to cancel order");
+      toast.error(error.response?.data?.message || "Không thể hủy đơn hàng");
     } finally {
       setIsUpdating(false);
     }
@@ -127,7 +130,7 @@ export default function SalesOrderDetailPage() {
   };
 
   const paymentMethodLabels = {
-    cash: "Cash",
+    cash: "Tiền mặt",
     mobile_payment: "VietQR",
   };
 
@@ -144,13 +147,11 @@ export default function SalesOrderDetailPage() {
   if (!order) {
     return (
       <AppLayout>
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="text-center">
-            <p className="text-gray-600">Order not found</p>
-            <Button onClick={() => navigate("/sales/orders")} className="mt-4">
-              Back to Orders
-            </Button>
-          </div>
+        <div className="max-w-4xl mx-auto px-4 py-8 text-center">
+          <p className="text-gray-600">Không tìm thấy đơn hàng</p>
+          <Button onClick={() => navigate("/sales/orders")} className="mt-4">
+            Quay lại danh sách
+          </Button>
         </div>
       </AppLayout>
     );
@@ -167,21 +168,31 @@ export default function SalesOrderDetailPage() {
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Orders
+            Quay lại danh sách
           </Button>
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Order Details
+                Chi tiết đơn hàng
               </h1>
-              <p className="text-gray-600 mt-1">Order ID: {order.id}</p>
+              <p className="text-gray-600 mt-1">Mã đơn: {order.id}</p>
             </div>
             <div className="flex items-center gap-3">
               <div
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${getStatusColor(order.status)}`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${getStatusColor(
+                  order.status
+                )}`}
               >
                 {getStatusIcon(order.status)}
-                <span className="font-semibold capitalize">{order.status}</span>
+                <span className="font-semibold capitalize">
+                  {order.status === "paid"
+                    ? "Đã thanh toán"
+                    : order.status === "pending"
+                      ? "Chờ thanh toán"
+                      : order.status === "cancelled"
+                        ? "Đã hủy"
+                        : order.status}
+                </span>
               </div>
             </div>
           </div>
@@ -190,18 +201,18 @@ export default function SalesOrderDetailPage() {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Order Information */}
+            {/* Order Info */}
             <Card>
               <CardHeader className="bg-gray-50 border-b">
                 <div className="flex items-center gap-2">
                   <FileText className="w-5 h-5 text-gray-600" />
-                  <CardTitle>Order Information</CardTitle>
+                  <CardTitle>Thông tin đơn hàng</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-600">Order Date</p>
+                    <p className="text-sm text-gray-600">Ngày tạo đơn</p>
                     <div className="flex items-center gap-2 mt-1">
                       <Calendar className="w-4 h-4 text-gray-400" />
                       <p className="font-semibold">
@@ -216,23 +227,25 @@ export default function SalesOrderDetailPage() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Payment Method</p>
+                    <p className="text-sm text-gray-600">
+                      Phương thức thanh toán
+                    </p>
                     <div className="flex items-center gap-2 mt-1">
                       <CreditCard className="w-4 h-4 text-gray-400" />
                       <p className="font-semibold">
-                        {paymentMethodLabels[order.paymentMethod]}
+                        {paymentMethodLabels[order.paymentMethod] || "Không rõ"}
                       </p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Salesperson</p>
+                    <p className="text-sm text-gray-600">Nhân viên bán hàng</p>
                     <div className="flex items-center gap-2 mt-1">
                       <User className="w-4 h-4 text-gray-400" />
                       <p className="font-semibold">{order.salespersonName}</p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Total Amount</p>
+                    <p className="text-sm text-gray-600">Tổng tiền</p>
                     <p className="text-2xl font-bold text-green-600 mt-1">
                       {Number(order.totalAmount || 0).toLocaleString("vi-VN")}{" "}
                       VNĐ
@@ -242,25 +255,25 @@ export default function SalesOrderDetailPage() {
               </CardContent>
             </Card>
 
-            {/* Customer Information */}
+            {/* Customer Info */}
             <Card>
               <CardHeader className="bg-gray-50 border-b">
                 <div className="flex items-center gap-2">
                   <User className="w-5 h-5 text-gray-600" />
-                  <CardTitle>Customer Information</CardTitle>
+                  <CardTitle>Thông tin khách hàng</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-gray-600">Name</p>
+                    <p className="text-sm text-gray-600">Họ và tên</p>
                     <p className="font-semibold text-lg">
                       {order.customerName}
                     </p>
                   </div>
                   {order.customerPhone && (
                     <div>
-                      <p className="text-sm text-gray-600">Phone</p>
+                      <p className="text-sm text-gray-600">Số điện thoại</p>
                       <p className="font-semibold">{order.customerPhone}</p>
                     </div>
                   )}
@@ -280,7 +293,7 @@ export default function SalesOrderDetailPage() {
                 <div className="flex items-center gap-2">
                   <Package className="w-5 h-5 text-gray-600" />
                   <CardTitle>
-                    Order Items ({order.items?.length || 0})
+                    Danh sách sản phẩm ({order.items?.length || 0})
                   </CardTitle>
                 </div>
               </CardHeader>
@@ -290,16 +303,16 @@ export default function SalesOrderDetailPage() {
                     <thead className="bg-gray-50 border-b">
                       <tr>
                         <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">
-                          Product
+                          Sản phẩm
                         </th>
                         <th className="text-center px-6 py-3 text-sm font-semibold text-gray-600">
-                          Unit Price
+                          Đơn giá
                         </th>
                         <th className="text-center px-6 py-3 text-sm font-semibold text-gray-600">
-                          Quantity
+                          Số lượng
                         </th>
                         <th className="text-right px-6 py-3 text-sm font-semibold text-gray-600">
-                          Subtotal
+                          Thành tiền
                         </th>
                       </tr>
                     </thead>
@@ -307,14 +320,24 @@ export default function SalesOrderDetailPage() {
                       {order.items?.map((item, index) => (
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="px-6 py-4">
-                            <p className="font-semibold text-gray-900">
-                              {item.medicationName || "Unknown Product"}
-                            </p>
-                            {item.variantName && (
-                              <p className="text-sm text-gray-600">
-                                {item.variantName}
-                              </p>
-                            )}
+                            <div className="flex items-start gap-2">
+                              <div className="flex-1">
+                                <p className="font-semibold text-gray-900">
+                                  {item.medicationName || "Không rõ"}
+                                </p>
+                                {item.variantName && (
+                                  <p className="text-sm text-gray-600">
+                                    {item.variantName}
+                                  </p>
+                                )}
+                              </div>
+                              {item.medicationVariant?.medication
+                                ?.isPrescriptionRequired && (
+                                  <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300 rounded">
+                                    Kê đơn
+                                  </span>
+                                )}
+                            </div>
                           </td>
                           <td className="px-6 py-4 text-center text-gray-700">
                             {Number(item.sellPrice || 0).toLocaleString(
@@ -342,7 +365,7 @@ export default function SalesOrderDetailPage() {
                           colSpan="3"
                           className="px-6 py-4 text-right font-bold text-gray-900"
                         >
-                          Total:
+                          Tổng cộng:
                         </td>
                         <td className="px-6 py-4 text-right text-xl font-bold text-green-600">
                           {Number(order.totalAmount || 0).toLocaleString(
@@ -362,7 +385,7 @@ export default function SalesOrderDetailPage() {
           <div className="lg:col-span-1">
             <Card className="sticky top-8">
               <CardHeader className="bg-gray-50 border-b">
-                <CardTitle>Actions</CardTitle>
+                <CardTitle>Thao tác</CardTitle>
               </CardHeader>
               <CardContent className="p-6 space-y-3">
                 <Button
@@ -371,7 +394,7 @@ export default function SalesOrderDetailPage() {
                   className="w-full"
                 >
                   <Printer className="w-4 h-4 mr-2" />
-                  Print Invoice
+                  In hóa đơn
                 </Button>
 
                 {order.status === "pending" && (
@@ -384,12 +407,12 @@ export default function SalesOrderDetailPage() {
                       {isUpdating ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Updating...
+                          Đang cập nhật...
                         </>
                       ) : (
                         <>
                           <CheckCircle className="w-4 h-4 mr-2" />
-                          Mark as Paid
+                          Đánh dấu đã thanh toán
                         </>
                       )}
                     </Button>
@@ -403,12 +426,12 @@ export default function SalesOrderDetailPage() {
                       {isUpdating ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Cancelling...
+                          Đang hủy...
                         </>
                       ) : (
                         <>
                           <XCircle className="w-4 h-4 mr-2" />
-                          Cancel Order
+                          Hủy đơn hàng
                         </>
                       )}
                     </Button>
@@ -419,10 +442,10 @@ export default function SalesOrderDetailPage() {
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
                     <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
                     <p className="text-sm font-semibold text-green-800">
-                      Order Paid
+                      Đơn hàng đã thanh toán
                     </p>
                     <p className="text-xs text-green-600 mt-1">
-                      This order has been paid
+                      Đơn hàng này đã được hoàn tất
                     </p>
                   </div>
                 )}
@@ -431,10 +454,10 @@ export default function SalesOrderDetailPage() {
                   <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
                     <XCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
                     <p className="text-sm font-semibold text-red-800">
-                      Order Cancelled
+                      Đơn hàng đã hủy
                     </p>
                     <p className="text-xs text-red-600 mt-1">
-                      This order has been cancelled
+                      Đơn hàng này đã bị hủy bỏ
                     </p>
                   </div>
                 )}

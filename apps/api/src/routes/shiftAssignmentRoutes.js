@@ -56,6 +56,13 @@ shiftAssignmentRouter.patch(
 );
 
 /**
+ * @route   POST /api/shift-assignments/:id/confirm
+ * @desc    Confirm shift assignment (staff accepts the schedule)
+ * @access  Private (self or owner)
+ */
+shiftAssignmentRouter.post("/:id/confirm", shiftController.confirmShift);
+
+/**
  * @route   POST /api/shift-assignments/:id/check-in
  * @desc    Check in to shift (start working)
  * @access  Private (self or owner)
