@@ -42,7 +42,9 @@ export default function SalesOrderDetailPage() {
         customerPhone: orderData.customer?.phone || "",
         customerEmail: orderData.customer?.email || "",
         salespersonName:
-          orderData.salesperson?.name || orderData.salesperson?.email || "Không có",
+          orderData.salesperson?.name ||
+          orderData.salesperson?.email ||
+          "Không có",
         items:
           orderData.items?.map((item) => ({
             ...item,
@@ -73,7 +75,9 @@ export default function SalesOrderDetailPage() {
       toast.success("Đã đánh dấu đơn hàng là ĐÃ THANH TOÁN");
       fetchOrderDetail();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Không thể cập nhật đơn hàng");
+      toast.error(
+        error.response?.data?.message || "Không thể cập nhật đơn hàng"
+      );
     } finally {
       setIsUpdating(false);
     }
@@ -222,7 +226,9 @@ export default function SalesOrderDetailPage() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Phương thức thanh toán</p>
+                    <p className="text-sm text-gray-600">
+                      Phương thức thanh toán
+                    </p>
                     <div className="flex items-center gap-2 mt-1">
                       <CreditCard className="w-4 h-4 text-gray-400" />
                       <p className="font-semibold">
@@ -240,7 +246,8 @@ export default function SalesOrderDetailPage() {
                   <div>
                     <p className="text-sm text-gray-600">Tổng tiền</p>
                     <p className="text-2xl font-bold text-green-600 mt-1">
-                      {Number(order.totalAmount || 0).toLocaleString("vi-VN")} VNĐ
+                      {Number(order.totalAmount || 0).toLocaleString("vi-VN")}{" "}
+                      VNĐ
                     </p>
                   </div>
                 </div>
@@ -259,7 +266,9 @@ export default function SalesOrderDetailPage() {
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm text-gray-600">Họ và tên</p>
-                    <p className="font-semibold text-lg">{order.customerName}</p>
+                    <p className="font-semibold text-lg">
+                      {order.customerName}
+                    </p>
                   </div>
                   {order.customerPhone && (
                     <div>
@@ -320,7 +329,10 @@ export default function SalesOrderDetailPage() {
                             )}
                           </td>
                           <td className="px-6 py-4 text-center text-gray-700">
-                            {Number(item.sellPrice || 0).toLocaleString("vi-VN")} VNĐ
+                            {Number(item.sellPrice || 0).toLocaleString(
+                              "vi-VN"
+                            )}{" "}
+                            VNĐ
                           </td>
                           <td className="px-6 py-4 text-center">
                             <span className="inline-flex items-center justify-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-semibold">
@@ -330,7 +342,8 @@ export default function SalesOrderDetailPage() {
                           <td className="px-6 py-4 text-right font-semibold text-gray-900">
                             {Number(
                               (item.quantity || 0) * (item.sellPrice || 0)
-                            ).toLocaleString("vi-VN")} VNĐ
+                            ).toLocaleString("vi-VN")}{" "}
+                            VNĐ
                           </td>
                         </tr>
                       ))}
@@ -344,7 +357,10 @@ export default function SalesOrderDetailPage() {
                           Tổng cộng:
                         </td>
                         <td className="px-6 py-4 text-right text-xl font-bold text-green-600">
-                          {Number(order.totalAmount || 0).toLocaleString("vi-VN")} VNĐ
+                          {Number(order.totalAmount || 0).toLocaleString(
+                            "vi-VN"
+                          )}{" "}
+                          VNĐ
                         </td>
                       </tr>
                     </tfoot>
@@ -361,7 +377,11 @@ export default function SalesOrderDetailPage() {
                 <CardTitle>Thao tác</CardTitle>
               </CardHeader>
               <CardContent className="p-6 space-y-3">
-                <Button onClick={handlePrint} variant="outline" className="w-full">
+                <Button
+                  onClick={handlePrint}
+                  variant="outline"
+                  className="w-full"
+                >
                   <Printer className="w-4 h-4 mr-2" />
                   In hóa đơn
                 </Button>

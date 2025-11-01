@@ -1,5 +1,3 @@
-"use client";
-
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

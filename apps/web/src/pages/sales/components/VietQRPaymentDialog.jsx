@@ -132,7 +132,9 @@ export function VietQRPaymentDialog({
             </div>
 
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Nội dung chuyển khoản:</span>
+              <span className="text-sm font-medium">
+                Nội dung chuyển khoản:
+              </span>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-mono bg-yellow-100 px-2 py-1 rounded">
                   {transferContent}
@@ -153,7 +155,9 @@ export function VietQRPaymentDialog({
 
           {/* Instructions */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
-            <p className="font-medium text-blue-900 mb-2">Hướng dẫn thanh toán:</p>
+            <p className="font-medium text-blue-900 mb-2">
+              Hướng dẫn thanh toán:
+            </p>
             <ol className="list-decimal list-inside space-y-1 text-blue-800">
               <li>Mở ứng dụng ngân hàng của bạn</li>
               <li>Quét mã QR hoặc nhập thủ công thông tin tài khoản</li>

@@ -1,5 +1,3 @@
-"use client";
-
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";

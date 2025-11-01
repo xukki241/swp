@@ -1,5 +1,3 @@
-"use client";
-
 import { useChangePassword, useCurrentUser } from "@/hooks/useAuth";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

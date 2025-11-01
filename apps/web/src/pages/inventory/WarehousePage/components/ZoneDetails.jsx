@@ -1,5 +1,3 @@
-"use client";
-
 import { Edit2, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
