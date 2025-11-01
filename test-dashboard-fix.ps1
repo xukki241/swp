@@ -70,15 +70,17 @@ try {
     }
     
     if ([decimal]$summary.totalRevenue -eq $expectedRevenue) {
-        Write-Host "✅ Total Revenue: CORRECT ($expectedRevenue VND)" -ForegroundColor Green
+        Write-Host "Total Revenue: CORRECT ($expectedRevenue" -ForegroundColor Green -NoNewline
+        Write-Host " VND) ✅" -ForegroundColor Green
     } else {
-        Write-Host "❌ Total Revenue: INCORRECT (Expected: $expectedRevenue, Got: $($summary.totalRevenue))" -ForegroundColor Red
+        Write-Host "Total Revenue: INCORRECT (Expected: $expectedRevenue, Got: $($summary.totalRevenue)) ❌" -ForegroundColor Red
     }
     
     if ($topMeds.Count -gt 0) {
-        Write-Host "✅ Top Selling Medications: FOUND ($($topMeds.Count) items)" -ForegroundColor Green
+        $medCount = $topMeds.Count
+        Write-Host "Top Selling Medications: FOUND ($medCount items) ✅" -ForegroundColor Green
     } else {
-        Write-Host "❌ Top Selling Medications: NOT FOUND" -ForegroundColor Red
+        Write-Host "Top Selling Medications: NOT FOUND ❌" -ForegroundColor Red
     }
     
     Write-Host ""
