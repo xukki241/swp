@@ -9,6 +9,7 @@ describe("MedicationVariantService", () => {
       const mockVariants = [
         { id: 1, name: "100mg", sku: "ASP-100", medicationId: 1 },
         { id: 2, name: "500mg", sku: "ASP-500", medicationId: 1 },
+        { id: 3, name: "250mg", sku: "PARA-250", medicationId: 2 },
       ];
 
       const mockQuery = {
@@ -41,7 +42,7 @@ describe("MedicationVariantService", () => {
 
     it("should filter variants by medicationId", async () => {
       const mockVariants = [
-        { id: 1, name: "100mg", sku: "ASP-100", medicationId: 1 },
+        { id: 3, name: "250mg", sku: "PARA-250", medicationId: 2 },
       ];
 
       const mockQuery = {

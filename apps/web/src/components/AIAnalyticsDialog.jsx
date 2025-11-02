@@ -64,7 +64,9 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
       ]);
 
       setRecommendations(recData);
+      console.log(recData);
       setQuickInsights(insightsData.data);
+      console.log(insightsData?.data?.summary);
     } catch (error) {
       console.error("Error loading AI analysis:", error);
       toast.error("Failed to load AI analysis");
@@ -357,6 +359,92 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                       </div>
                     </div>
                   </div>
+
+                  {/* Forecasting Methodology */}
+                  {recommendations.data.forecastingMethodology && (
+                    <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                      <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                        <Brain className="w-5 h-5 text-blue-600" />
+                        Phương Pháp Dự Báo
+                      </h3>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-sm font-semibold text-blue-700 mb-1">
+                            Phương pháp:
+                          </p>
+                          <p className="text-gray-700">
+                            {recommendations.data.forecastingMethodology.method}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-semibold text-blue-700 mb-1">
+                            Công thức tính toán:
+                          </p>
+                          <p className="text-gray-700 font-mono text-sm bg-white p-2 rounded border">
+                            {
+                              recommendations.data.forecastingMethodology
+                                .calculation
+                            }
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-semibold text-blue-700 mb-1">
+                            Nguyên tắc áp dụng:
+                          </p>
+                          <ul className="space-y-1">
+                            {recommendations.data.forecastingMethodology.principles?.map(
+                              (principle, idx) => (
+                                <li
+                                  key={idx}
+                                  className="flex items-start gap-2 text-sm"
+                                >
+                                  <span className="text-blue-600">•</span>
+                                  <span className="text-gray-700">
+                                    {principle}
+                                  </span>
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-semibold text-blue-700 mb-1">
+                            Tiêu chuẩn:
+                          </p>
+                          <ul className="space-y-1">
+                            {recommendations.data.forecastingMethodology.standards?.map(
+                              (standard, idx) => (
+                                <li
+                                  key={idx}
+                                  className="flex items-start gap-2 text-sm"
+                                >
+                                  <span className="text-blue-600">•</span>
+                                  <span className="text-gray-700">
+                                    {standard}
+                                  </span>
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-semibold text-blue-700 mb-1">
+                            Lý do chọn phương pháp:
+                          </p>
+                          <p className="text-gray-700 text-sm">
+                            {
+                              recommendations.data.forecastingMethodology
+                                .rationale
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Overall Assessment */}
                   <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200">

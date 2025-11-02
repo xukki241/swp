@@ -145,7 +145,9 @@ export default function StockDetailsDialog({
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Manifacture Date</Label>
+                <Label className="text-muted-foreground">
+                  Manifacture Date
+                </Label>
                 <p className="text-lg font-semibold">
                   {medicationItem?.manufactureDate}
                 </p>

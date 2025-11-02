@@ -1,4 +1,4 @@
-import { index, pgTable } from "drizzle-orm/pg-core";
+import { index, pgTable, text } from "drizzle-orm/pg-core";
 
 import {
   createdAt,
@@ -25,6 +25,8 @@ export const salesOrders = pgTable(
       .default("cash"),
     salespersonId: foreignKey("salesperson_id", users.id),
     prescriptionId: foreignKey("prescription_id", files.id),
+    prescriptionNote: text("prescription_note"),
+    notes: text("notes"),
     searchVector: searchVector(),
   },
   (table) => [

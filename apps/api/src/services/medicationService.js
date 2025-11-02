@@ -91,10 +91,51 @@ export const getMedicationById = async (id) => {
  */
 export const createMedication = async (medicationData) => {
   try {
-    return await db.transaction(async (tx) => {
-      // Extract variants from medication data
-      const { variants, ...medData } = medicationData;
+    // Validate medication data
+    if (!medicationData.name || medicationData.name.trim() === "") {
+      throw new Error("Medication name is required and cannot be empty");
+    }
 
+    if (
+      medicationData.brand !== undefined &&
+      medicationData.brand !== null &&
+      medicationData.brand.trim() === ""
+    ) {
+      throw new Error("Medication brand cannot be empty");
+    }
+
+    // Validate status if provided
+    const validStatuses = ["active", "inactive", "discontinued"];
+    if (
+      medicationData.status &&
+      !validStatuses.includes(medicationData.status)
+    ) {
+      throw new Error(
+        `Invalid status. Must be one of: ${validStatuses.join(", ")}`
+      );
+    }
+
+    // Validate variants if provided
+    const { variants, ...medData } = medicationData;
+    if (variants && Array.isArray(variants) && variants.length > 0) {
+      for (let i = 0; i < variants.length; i++) {
+        const variant = variants[i];
+
+        if (!variant.name || variant.name.trim() === "") {
+          throw new Error(
+            `Variant at index ${i}: name is required and cannot be empty`
+          );
+        }
+
+        if (!variant.sku || variant.sku.trim() === "") {
+          throw new Error(
+            `Variant at index ${i}: SKU is required and cannot be empty`
+          );
+        }
+      }
+    }
+
+    return await db.transaction(async (tx) => {
       // Create medication
       const [medication] = await tx
         .insert(medications)

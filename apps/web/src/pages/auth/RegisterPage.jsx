@@ -6,16 +6,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loading } from "@/components/ui/loading";
 import { useRegister } from "@/hooks/useAuth";
-import { Pill } from "lucide-react";
+import { Pill, ScrollText } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
 import { toast } from "sonner";
 
 export default function RegisterPage() {
+  const [showPolicyDialog, setShowPolicyDialog] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -40,14 +50,12 @@ export default function RegisterPage() {
     const { confirmPassword, ...registerData } = data;
     registerMutation.mutate(registerData, {
       onSuccess: () => {
-        toast.success(
-          "Registration submitted successfully! Please wait for approval."
-        );
+        toast.success("Đăng ký thành công! Vui lòng chờ phê duyệt.");
       },
       onError: (error) => {
         toast.error(
           error?.response?.data?.message ||
-            "Registration failed. Please try again."
+            "Đăng ký thất bại. Vui lòng thử lại."
         );
       },
     });
@@ -64,10 +72,10 @@ export default function RegisterPage() {
           </div>
           <div>
             <CardTitle className="text-3xl font-bold text-gray-800">
-              Create an Account
+              Tạo tài khoản
             </CardTitle>
             <CardDescription className="text-base mt-2">
-              Join PharmaFlow to get started
+              Tham gia PharmaFlow để bắt đầu
             </CardDescription>
           </div>
         </CardHeader>
@@ -76,17 +84,17 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">
-                Full Name
+                Họ và tên
               </Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="John Doe"
+                placeholder="Nguyễn Văn A"
                 {...register("name", {
-                  required: "Name is required",
+                  required: "Họ tên là bắt buộc",
                   minLength: {
                     value: 2,
-                    message: "Name must be at least 2 characters",
+                    message: "Họ tên phải có ít nhất 2 ký tự",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -105,12 +113,12 @@ export default function RegisterPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="your.email@example.com"
+                placeholder="email.cua.ban@example.com"
                 {...register("email", {
-                  required: "Email is required",
+                  required: "Email là bắt buộc",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
+                    message: "Địa chỉ email không hợp lệ",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -124,17 +132,17 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-sm font-medium">
-                Phone Number
+                Số điện thoại
               </Label>
               <Input
                 id="phone"
                 type="tel"
                 placeholder="+84 123 456 789"
                 {...register("phone", {
-                  required: "Phone number is required",
+                  required: "Số điện thoại là bắt buộc",
                   pattern: {
                     value: /^[0-9+\s-()]+$/,
-                    message: "Invalid phone number",
+                    message: "Số điện thoại không hợp lệ",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -148,17 +156,17 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="address" className="text-sm font-medium">
-                Address
+                Địa chỉ
               </Label>
               <Input
                 id="address"
                 type="text"
-                placeholder="123 Main Street, District, City"
+                placeholder="123 Đường ABC, Quận XYZ, TP. HCM"
                 {...register("address", {
-                  required: "Address is required",
+                  required: "Địa chỉ là bắt buộc",
                   minLength: {
                     value: 5,
-                    message: "Address must be at least 5 characters",
+                    message: "Địa chỉ phải có ít nhất 5 ký tự",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -172,17 +180,17 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium">
-                Password
+                Mật khẩu
               </Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a strong password"
+                placeholder="Tạo mật khẩu mạnh"
                 {...register("password", {
-                  required: "Password is required",
+                  required: "Mật khẩu là bắt buộc",
                   minLength: {
                     value: 6,
-                    message: "Password must be at least 6 characters",
+                    message: "Mật khẩu phải có ít nhất 6 ký tự",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -196,16 +204,16 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="confirmPassword" className="text-sm font-medium">
-                Confirm Password
+                Xác nhận mật khẩu
               </Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="Re-enter your password"
+                placeholder="Nhập lại mật khẩu"
                 {...register("confirmPassword", {
-                  required: "Please confirm your password",
+                  required: "Vui lòng xác nhận mật khẩu",
                   validate: (value) =>
-                    value === password || "Passwords do not match",
+                    value === password || "Mật khẩu không khớp",
                 })}
                 className="h-11 rounded-lg"
               />
@@ -223,18 +231,19 @@ export default function RegisterPage() {
                   id="agreePolicy"
                   {...register("agreePolicy", {
                     required:
-                      "You must agree to the policy to continue registration.", // Updated error message to English
+                      "Bạn phải đồng ý với chính sách để tiếp tục đăng ký.",
                   })}
                   className="accent-primary h-4 w-4 mt-0.5 cursor-pointer"
                 />
                 <span className="text-sm text-gray-700">
-                  I agree to the {/* Updated label to English */}
-                  <Link
-                    to="/policy"
-                    className="text-primary underline hover:text-primary/80"
+                  Tôi đồng ý với{" "}
+                  <button
+                    type="button"
+                    onClick={() => setShowPolicyDialog(true)}
+                    className="text-primary underline hover:text-primary/80 font-medium"
                   >
-                    Privacy Policy & Terms of Service
-                  </Link>
+                    Chính sách bảo mật & Điều khoản dịch vụ
+                  </button>
                 </span>
               </Label>
               {errors.agreePolicy && (
@@ -252,27 +261,176 @@ export default function RegisterPage() {
               {registerMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <Loading className="h-4 w-4 text-white" />
-                  Creating account...
+                  Đang tạo tài khoản...
                 </span>
               ) : (
-                "Register"
+                "Đăng ký"
               )}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Already have an account?{" "}
+              Đã có tài khoản?{" "}
               <Link
                 to="/login"
                 className="text-primary font-medium hover:underline"
               >
-                Login
+                Đăng nhập
               </Link>
             </p>
           </div>
         </CardContent>
       </Card>
+
+      {/* Policy Dialog */}
+      <Dialog open={showPolicyDialog} onOpenChange={setShowPolicyDialog}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-2xl">
+              <ScrollText className="w-6 h-6 text-primary" />
+              Chính sách bảo mật & Điều khoản dịch vụ
+            </DialogTitle>
+            <DialogDescription>
+              Vui lòng đọc kỹ các điều khoản trước khi đồng ý
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 text-sm">
+            <section>
+              <h3 className="font-semibold text-base mb-2">1. Giới thiệu</h3>
+              <p className="text-gray-700 leading-relaxed">
+                Chào mừng bạn đến với PharmaFlow - Hệ thống quản lý nhà thuốc.
+                Bằng cách đăng ký tài khoản, bạn đồng ý tuân thủ các điều khoản
+                và điều kiện sau đây.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                2. Thu thập thông tin
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-2">
+                Chúng tôi thu thập các thông tin sau:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                <li>Họ tên, email, số điện thoại</li>
+                <li>Địa chỉ liên lạc</li>
+                <li>Thông tin đăng nhập và mật khẩu (được mã hóa)</li>
+                <li>Lịch sử giao dịch và đơn hàng</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                3. Sử dụng thông tin
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-2">
+                Thông tin của bạn được sử dụng để:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                <li>Xử lý đơn hàng và giao dịch</li>
+                <li>Cung cấp dịch vụ hỗ trợ khách hàng</li>
+                <li>Gửi thông báo về đơn hàng và khuyến mãi</li>
+                <li>Cải thiện chất lượng dịch vụ</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                4. Bảo mật thông tin
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn bằng các biện
+                pháp bảo mật hiện đại. Thông tin của bạn sẽ không được chia sẻ
+                với bên thứ ba mà không có sự đồng ý của bạn, trừ khi được yêu
+                cầu bởi pháp luật.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                5. Quyền và trách nhiệm
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-2">
+                Người dùng có quyền:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                <li>Truy cập và cập nhật thông tin cá nhân</li>
+                <li>Yêu cầu xóa tài khoản và dữ liệu</li>
+                <li>Từ chối nhận email marketing</li>
+              </ul>
+              <p className="text-gray-700 leading-relaxed mt-2">
+                Người dùng có trách nhiệm:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                <li>Cung cấp thông tin chính xác và đầy đủ</li>
+                <li>Bảo mật thông tin đăng nhập</li>
+                <li>Tuân thủ quy định và pháp luật hiện hành</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                6. Chính sách đặt hàng
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Đơn hàng sẽ được xử lý sau khi xác nhận thanh toán. Chúng tôi có
+                quyền từ chối hoặc hủy đơn hàng trong trường hợp phát hiện thông
+                tin sai lệch hoặc hành vi gian lận.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                7. Chính sách đổi trả
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Khách hàng có thể đổi trả sản phẩm trong vòng 7 ngày kể từ ngày
+                mua hàng, với điều kiện sản phẩm còn nguyên vẹn, chưa sử dụng và
+                có hóa đơn. Thuốc kê đơn không được phép đổi trả.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                8. Điều khoản thay đổi
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Chúng tôi có quyền cập nhật điều khoản này bất cứ lúc nào. Các
+                thay đổi sẽ được thông báo qua email hoặc trên trang web. Việc
+                tiếp tục sử dụng dịch vụ sau khi có thay đổi đồng nghĩa với việc
+                bạn chấp nhận các điều khoản mới.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">9. Liên hệ</h3>
+              <p className="text-gray-700 leading-relaxed">
+                Nếu có bất kỳ câu hỏi nào về chính sách này, vui lòng liên hệ
+                với chúng tôi:
+              </p>
+              <ul className="list-none space-y-1 text-gray-700 ml-4 mt-2">
+                <li>
+                  <strong>Email:</strong> support@pharmaflow.com
+                </li>
+                <li>
+                  <strong>Hotline:</strong> 1900 1234
+                </li>
+              </ul>
+            </section>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={() => setShowPolicyDialog(false)}
+            >
+              Đóng
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

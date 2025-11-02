@@ -6,19 +6,19 @@ import { forwardRef } from "react";
 
 const AlertDialog = forwardRef(({ ...props }, ref) => {
   return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />;
-})
+});
 
 const AlertDialogTrigger = forwardRef(({ ...props }, ref) => {
   return (
     <AlertDialogPrimitive.Trigger data-slot="alert-dialog-trigger" {...props} />
   );
-})
+});
 
 const AlertDialogPortal = forwardRef(({ ...props }, ref) => {
   return (
     <AlertDialogPrimitive.Portal data-slot="alert-dialog-portal" {...props} />
   );
-})
+});
 
 const AlertDialogOverlay = forwardRef(({ className, ...props }, ref) => {
   return (
@@ -31,7 +31,7 @@ const AlertDialogOverlay = forwardRef(({ className, ...props }, ref) => {
       {...props}
     />
   );
-})
+});
 
 function AlertDialogContent({ className, ...props }) {
   return (

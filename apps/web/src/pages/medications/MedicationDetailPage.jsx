@@ -1,5 +1,6 @@
 "use client";
 
+import { customerService } from "@/services/customerService";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { customerService } from "@/services/customerService";
 import {
   getInventorySummary,
   getMedicationVariants,
@@ -22,7 +22,8 @@ import {
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
-import MedicationImage from "../../components/MedicationImage";
+import MedicationImage from "@/components/MedicationImage";
+
 
 function PillPlaceholder({ className = "h-20 w-20" }) {
   return (
@@ -48,13 +49,14 @@ export default function MedicationDetailsPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const passedMedication = location.state?.medication;
-
   const [medication, setMedication] = useState(passedMedication || null);
   const [suppliers, setSuppliers] = useState([]);
   const [purchases, setPurchases] = useState([]);
   const [sales, setSales] = useState([]);
   const [inventory, setInventory] = useState([]);
-  const [variants, setVariants] = useState([]);
+  const [variantsRaw, setVariantsRaw] = useState([]); 
+  const [statusFilter, setStatusFilter] = useState("all"); 
+  const [appliedSearch, setAppliedSearch] = useState(""); 
 
   useEffect(() => {
     if (!medication && id) {
@@ -84,31 +86,43 @@ export default function MedicationDetailsPage() {
         setSuppliers(s.data || []);
         setPurchases(p.data || []);
 
-        // Create customer map
         const customerMap = {};
         const customersData = customersRes.data || [];
-        customersData.forEach((c) => {
+        customersData.forEach(c => {
           customerMap[c.id] = c.name;
         });
 
-        // Map customer names to sales
-        const salesWithNames = (sa.data || []).map((sale) => ({
+        const salesWithNames = (sa.data || []).map(sale => ({
           ...sale,
-          customerName:
-            customerMap[sale.customerId] || sale.customerName || "Unknown",
+          customerName: customerMap[sale.customerId] || sale.customerName || "Unknown"
         }));
         setSales(salesWithNames);
-        setInventory(i.data || []);
-        setVariants(Array.isArray(v) ? v : v?.data || []);
-      } catch {}
+setInventory(i.data || []);
+        setVariantsRaw(Array.isArray(v) ? v : v?.data || []); 
+      } catch { }
     })();
   }, [id]);
 
-  const variantNameById = useMemo(() => {
-    const m = new Map();
-    (variants || []).forEach((v) => m.set(String(v.id), v.name));
-    return m;
-  }, [variants]);
+  // Computed variants với filter
+  const variants = useMemo(() => {
+    let v = variantsRaw;
+    if (statusFilter !== "all") {
+      const wantActive = statusFilter === "active";
+      v = v.filter((x) => !!x.isActive === wantActive);
+    }
+    if (appliedSearch.trim()) {
+      const q = appliedSearch.trim().toLowerCase();
+      v = v.filter(
+        (x) =>
+          String(x.sku || "").toLowerCase().includes(q) ||
+          String(x.name || "").toLowerCase().includes(q) ||
+          String(x.barcode || "").toLowerCase().includes(q)
+      );
+    }
+    return v;
+  }, [variantsRaw, appliedSearch, statusFilter]);
+
+
 
   return (
     <AppLayout>
@@ -134,11 +148,7 @@ export default function MedicationDetailsPage() {
         <CardContent>
           <div className="flex items-start gap-4">
             <div className="shrink-0">
-              <MedicationImage
-                fileId={medication?.imageId}
-                alt={medication?.name}
-                size={80}
-              />
+              <MedicationImage fileId={medication?.imageId} alt={medication?.name} size={80} />
               <div style={{ display: "none" }}>
                 <PillPlaceholder />
               </div>
@@ -178,7 +188,7 @@ export default function MedicationDetailsPage() {
                   <TableHead>Name</TableHead>
                   <TableHead>Contact</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>Phone</TableHead>
+<TableHead>Phone</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -263,7 +273,7 @@ export default function MedicationDetailsPage() {
                   <TableHead>Expected Date</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Total</TableHead>
-                </TableRow>
+</TableRow>
               </TableHeader>
               <TableBody>
                 {purchases.map((p) => (
@@ -297,6 +307,7 @@ export default function MedicationDetailsPage() {
           </CardContent>
         </Card>
 
+        {/* Inventory Summary */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Inventory Summary</CardTitle>
@@ -313,40 +324,36 @@ export default function MedicationDetailsPage() {
               </TableHeader>
               <TableBody>
                 {inventory
-                  .filter(
-                    (inv) =>
-                      !inv.medicationId ||
-                      String(inv.medicationId) === String(id)
-                  )
-                  .map((inv) => (
-                    <TableRow
-                      key={`${inv.medicationVariantId}-${inv.locationId || "all"}`}
-                    >
-                      <TableCell>
-                        {variantNameById.get(String(inv.medicationVariantId)) ||
-                          (inv.medicationVariantId
-                            ? String(inv.medicationVariantId).slice(0, 8)
-                            : "-")}
+                  .filter((inv) => {
+                    const variant = variants.find(v => String(v.id) === String(inv.medicationVariantId));
+                    return variant && String(variant.medicationId) === String(id);
+                  })
+                  .map((inv) => {
+                    const variant = variants.find(v => String(v.id) === String(inv.medicationVariantId));
+                    return (
+                      <TableRow key={inv.medicationVariantId}>
+                        <TableCell>{variant?.name || String(inv.medicationVariantId).slice(0, 8)}</TableCell>
+                        <TableCell>{inv.totalQuantity}</TableCell>
+                        <TableCell>{inv.totalReserved}</TableCell>
+                        <TableCell>{inv.availableQuantity}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                {inventory.filter((inv) => {
+                  const variant = variants.find(v => String(v.id) === String(inv.medicationVariantId));
+                  return variant && String(variant.medicationId) === String(id);
+                }).length === 0 && (
+                    <TableRow>
+<TableCell colSpan={4} className="text-center text-muted-foreground">
+                        No inventory
                       </TableCell>
-                      <TableCell>{inv.totalQuantity}</TableCell>
-                      <TableCell>{inv.totalReserved}</TableCell>
-                      <TableCell>{inv.availableQuantity}</TableCell>
                     </TableRow>
-                  ))}
-                {inventory.length === 0 && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="text-center text-muted-foreground"
-                    >
-                      No inventory found
-                    </TableCell>
-                  </TableRow>
-                )}
+                  )}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
+
       </div>
     </AppLayout>
   );

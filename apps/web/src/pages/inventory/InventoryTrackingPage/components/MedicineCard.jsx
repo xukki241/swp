@@ -1,3 +1,4 @@
+import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
 import {
   Card,
   CardContent,
@@ -9,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { Eye } from "lucide-react";
 import { useState } from "react";
 import MedicineDialog from "./MedicineDialog";
-import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg"
 
 const MedicineCard = ({ medicine = {}, variant }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -37,7 +37,9 @@ const MedicineCard = ({ medicine = {}, variant }) => {
               className="w-24 h-24 object-cover rounded-md"
             />
           </div>
-          <CardTitle className="text-center text-lg">{medicine?.name}</CardTitle>
+          <CardTitle className="text-center text-lg">
+            {medicine?.name}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {variant === "low-stock" ? (

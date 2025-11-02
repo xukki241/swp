@@ -264,11 +264,11 @@ description: med.description ?? "",
 
 
   const handleDelete = async (id) => {
-    if (confirm("Delete this medication?")) {
+    if (confirm("Xóa thuốc này?")) {
       await deleteMed.mutateAsync(id);
       clearMedicationImage(id);
       bumpImageVersion(id);
-      toast.success("Deleted");
+      toast.success("Đã xóa");
       await refetch();
     }
   };
@@ -465,7 +465,7 @@ if (!barcode) return true;
             </div>
 
             {isLoading ? (
-              <p>Loading...</p>
+              <p>Đang tải...</p>
             ) : (
               <div className="space-y-3">
                 {medications.map((m) => {
@@ -490,7 +490,7 @@ if (!barcode) return true;
 <StatusBadge status={m.status} />
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            Brand: {m.brand || "-"}
+                            Thương hiệu: {m.brand || "-"}
                           </div>
                         </div>
                       </div>
@@ -507,7 +507,7 @@ if (!barcode) return true;
                           title="View"
                         >
                           <Eye className="w-4 h-4 mr-1" />
-                          View
+                          Xem
                         </Button>
 
                         {isOwner && (

@@ -11,80 +11,80 @@ import {
 
 export const sidebarConfig = [
   {
-    title: "Dashboard",
+    title: "Tổng quan",
     icon: LayoutDashboard,
     path: "/dashboard",
-    roles: ["owner", "manager", "staff"],
+    roles: ["owner"],
   },
   {
-    title: "Suppliers",
+    title: "Bán hàng",
+    icon: ShoppingCart,
+    roles: ["owner", "staff"],
+    children: [
+      { label: "Bán hàng (POS)", path: "/sales" },
+      { label: "Đơn bán hàng", path: "/sales/orders" },
+    ],
+  },
+  {
+    title: "Mua hàng",
+    icon: ClipboardList,
+    roles: ["owner"],
+    children: [
+      { label: "Đơn đặt hàng", path: "/procurement/purchase-orders" },
+      { label: "Phiếu nhập", path: "/procurement/receipts" },
+    ],
+  },
+  {
+    title: "Kho hàng",
+    icon: Package,
+    roles: ["owner", "staff"],
+    children: [
+      { label: "Tồn kho", path: "/inventory/stock" },
+      { label: "Sơ đồ kho", path: "/inventory/warehouse" },
+      { label: "Theo dõi nhập/xuất", path: "/inventory/tracking" },
+    ],
+  },
+  {
+    title: "Nhà cung cấp",
     icon: Truck,
     path: "/suppliers",
-    roles: ["owner", "manager"],
+    roles: ["owner"],
   },
   {
-    title: "Medications",
+    title: "Thuốc",
     icon: Pill,
     path: "/medications",
-    roles: ["owner", "manager", "staff"],
+    roles: ["owner", "staff"],
   },
   {
-    title: "Procurement",
-    icon: ClipboardList,
-    roles: ["owner", "manager"],
+    title: "Ca làm việc",
+    icon: Calendar,
+    roles: ["owner", "staff"],
     children: [
-      { label: "Purchase Orders", path: "/procurement/purchase-orders" },
-      { label: "Receipts", path: "/procurement/receipts" },
+      {
+        label: "Quản lý ca",
+        path: "/shifts/management",
+        roles: ["owner"],
+      },
+      {
+        label: "Phân công ca",
+        path: "/shifts/assignments",
+        roles: ["owner"],
+      },
+      {
+        label: "Lịch của tôi",
+        path: "/shifts/my-schedule",
+        roles: ["owner", "staff"],
+      },
     ],
   },
   {
-    title: "Inventory",
-    icon: Package,
-    roles: ["owner", "manager", "staff"],
-    children: [
-      { label: "Stock Overview", path: "/inventory/stock" },
-      { label: "Warehouse Map", path: "/inventory/warehouse" },
-      { label: "Inventory Tracking", path: "/inventory/tracking" },
-    ],
-  },
-  {
-    title: "Sales",
-    icon: ShoppingCart,
-    roles: ["owner", "manager", "staff"],
-    children: [
-      { label: "Point of Sale (POS)", path: "/sales" },
-      { label: "Sales Orders", path: "/sales/orders" },
-    ],
-  },
-  {
-    title: "Users",
+    title: "Người dùng",
     icon: Users,
     roles: ["owner"],
     children: [
-      { label: "User List", path: "/users/list" },
-      { label: "Registrations", path: "/users/registrations" },
-    ],
-  },
-  {
-    title: "Shifts",
-    icon: Calendar,
-    roles: ["owner", "manager", "staff"],
-    children: [
-      {
-        label: "Shift Management",
-        path: "/shifts/management",
-        roles: ["owner", "manager"],
-      },
-      {
-        label: "Shift Assignments",
-        path: "/shifts/assignments",
-        roles: ["owner", "manager"],
-      },
-      {
-        label: "My Schedule",
-        path: "/shifts/my-schedule",
-        roles: ["owner", "manager", "staff"],
-      },
+      { label: "Danh sách", path: "/users/list" },
+      { label: "Đăng ký chờ duyệt", path: "/users/registrations" },
     ],
   },
 ];
