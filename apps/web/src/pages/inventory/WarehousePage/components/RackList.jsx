@@ -1,5 +1,3 @@
-"use client";
-
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -82,7 +80,9 @@ export function RackList({ racks, selectedZoneId, refetch }) {
     return (
       <Card className="shadow-md rounded-xl border-0">
         <CardContent className="py-12 text-center">
-          <p className="text-muted-foreground">No racks found in this zone</p>
+          <p className="text-muted-foreground">
+            Không tìm thấy giá trong khu vực này
+          </p>
         </CardContent>
       </Card>
     );
@@ -91,11 +91,11 @@ export function RackList({ racks, selectedZoneId, refetch }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Racks</h2>
+        <h2 className="text-lg font-semibold">Giá</h2>
         <div className="flex gap-2">
           <Button size="sm" onClick={() => setShowAddRackDialog(true)}>
             <Plus className="h-4 w-4" />
-            Add Rack
+            Thêm giá
           </Button>
           <Button
             size="sm"
@@ -103,7 +103,7 @@ export function RackList({ racks, selectedZoneId, refetch }) {
             onClick={collapseAll}
             disabled={expandedRacks.size === 0}
           >
-            Collapse All
+            Thu gọn tất cả
           </Button>
         </div>
       </div>
@@ -124,16 +124,14 @@ export function RackList({ racks, selectedZoneId, refetch }) {
       <Dialog open={showAddRackDialog} onOpenChange={setShowAddRackDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Add New Rack</DialogTitle>
-            <DialogDescription>
-              Create a new rack in this zone
-            </DialogDescription>
+            <DialogTitle>Thêm giá mới</DialogTitle>
+            <DialogDescription>Tạo giá mới trong khu vực này</DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleAddRackSubmit} className="space-y-4">
             <div>
               <Label className="mb-2" htmlFor="rackName">
-                Rack Name *
+                Tên giá *
               </Label>
               <Input
                 id="rackName"
@@ -146,7 +144,7 @@ export function RackList({ racks, selectedZoneId, refetch }) {
 
             <div>
               <Label className="mb-2" htmlFor="rackCode">
-                Rack Code *
+                Mã giá *
               </Label>
               <Input
                 id="rackCode"
@@ -159,7 +157,7 @@ export function RackList({ racks, selectedZoneId, refetch }) {
 
             <div>
               <Label className="mb-2" htmlFor="description">
-                Description
+                Mô tả
               </Label>
               <Textarea
                 id="description"
@@ -177,10 +175,10 @@ export function RackList({ racks, selectedZoneId, refetch }) {
                 onClick={() => setShowAddRackDialog(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                Hủy
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Creating..." : "Create Rack"}
+                {isSubmitting ? "Đang tạo..." : "Tạo giá"}
               </Button>
             </DialogFooter>
           </form>

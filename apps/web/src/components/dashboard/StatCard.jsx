@@ -46,7 +46,7 @@ export function StatCard({ stat }) {
               >
                 {stat.trend}
               </span>
-              <span className="text-muted-foreground">from last month</span>
+              <span className="text-muted-foreground">so với tháng trước</span>
             </div>
           </>
         )}

@@ -125,7 +125,7 @@ export const warehouseBinService = {
         inventoryEntries: {
           where: ({ quantity, quantityReserved }) =>
             gt(quantity, quantityReserved),
-          orderBy: (entry) => [entry.createdAt.desc()],
+          orderBy: (entry, { asc }) => [asc(entry.expiryDate)],
           limit: 1,
         },
         rack: {

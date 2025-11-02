@@ -1,4 +1,4 @@
-import { and, eq, ilike, or } from "drizzle-orm";
+import { and, eq, gt, ilike, or } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import { warehouseBins } from "../db/schema/warehouseBins.js";
@@ -75,7 +75,23 @@ export const warehouseRackService = {
       where: conditions.length > 0 ? and(...conditions) : undefined,
       with: {
         zone: true,
-        bins: true,
+        bins: {
+          with: {
+            inventoryEntries: {
+              with: {
+                medicationVariant: {
+                  with: {
+                    medication: true,
+                  },
+                },
+              },
+              where: ({ quantity, quantityReserved }) =>
+                gt(quantity, quantityReserved),
+              orderBy: (entry, { asc }) => [asc(entry.expiryDate)],
+              limit: 1,
+            },
+          },
+        },
       },
       limit,
       offset,
@@ -89,7 +105,23 @@ export const warehouseRackService = {
       where: eq(warehouseRacks.id, id),
       with: {
         zone: true,
-        bins: true,
+        bins: {
+          with: {
+            inventoryEntries: {
+              with: {
+                medicationVariant: {
+                  with: {
+                    medication: true,
+                  },
+                },
+              },
+              where: ({ quantity, quantityReserved }) =>
+                gt(quantity, quantityReserved),
+              orderBy: (entry, { asc }) => [asc(entry.expiryDate)],
+              limit: 1,
+            },
+          },
+        },
       },
     });
 
@@ -101,7 +133,23 @@ export const warehouseRackService = {
       where: eq(warehouseRacks.zoneId, zoneId),
       with: {
         zone: true,
-        bins: true,
+        bins: {
+          with: {
+            inventoryEntries: {
+              with: {
+                medicationVariant: {
+                  with: {
+                    medication: true,
+                  },
+                },
+              },
+              where: ({ quantity, quantityReserved }) =>
+                gt(quantity, quantityReserved),
+              orderBy: (entry, { asc }) => [asc(entry.expiryDate)],
+              limit: 1,
+            },
+          },
+        },
       },
     });
 

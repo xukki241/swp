@@ -1,12 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
 import { instance } from "@/lib/axios";
+import placeholderImg from "@/assets/medicine-placeholder.jpg";
 
 export default function MedicationImage({ fileId, alt = "", size = 56 }) {
   const [src, setSrc] = useState(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (!fileId) return setSrc(null);
+    if (!fileId) {
+      setSrc(null);
+      setError(false);
+      return;
+    }
 
     const loadImage = async () => {
       try {
@@ -16,13 +22,16 @@ export default function MedicationImage({ fileId, alt = "", size = 56 }) {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // 🔥 Convert blob → base64 để không bị CSP hay cross-origin chặn
         const reader = new FileReader();
-        reader.onloadend = () => setSrc(reader.result);
+        reader.onloadend = () => {
+          setSrc(reader.result);
+          setError(false);
+        };
         reader.readAsDataURL(res.data);
       } catch (err) {
         console.warn("❌ Load image failed", err);
         setSrc(null);
+        setError(true);
       }
     };
 
@@ -36,13 +45,14 @@ export default function MedicationImage({ fileId, alt = "", size = 56 }) {
         height: size,
         background: "#f3f4f6",
         borderRadius: 8,
-        border: "1px solid #ccc",
+        border: "1px solid #e5e7eb",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        overflow: "hidden",
       }}
     >
-      {src ? (
+      {src && !error ? (
         <img
           src={src}
           alt={alt}
@@ -50,11 +60,20 @@ export default function MedicationImage({ fileId, alt = "", size = 56 }) {
             width: size,
             height: size,
             objectFit: "cover",
-            borderRadius: 8,
           }}
+          onError={() => setError(true)}
         />
       ) : (
-        <span style={{ fontSize: 12, color: "#999" }}>No Image</span>
+        <img
+          src={placeholderImg}
+          alt={alt || "Medication placeholder"}
+          style={{
+            width: size,
+            height: size,
+            objectFit: "cover",
+            opacity: 0.6,
+          }}
+        />
       )}
     </div>
   );

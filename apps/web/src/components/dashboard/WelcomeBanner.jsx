@@ -17,13 +17,13 @@ export function WelcomeBanner({ userName, greeting }) {
             {greeting}, {userName}! 👋
           </h2>
           <p className="mt-2 text-base md:text-lg text-primary-foreground/90 animate-in slide-in-from-left duration-700">
-            Here's what's happening with your pharmacy today
+            Tình hình hoạt động nhà thuốc của bạn hôm nay
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-4 text-sm animate-in slide-in-from-left duration-1000">
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5">
               <Calendar className="h-4 w-4" />
               <span>
-                {currentDate.toLocaleDateString("en-US", {
+                {currentDate.toLocaleDateString("vi-VN", {
                   weekday: "long",
                   year: "numeric",
                   month: "long",
@@ -34,7 +34,7 @@ export function WelcomeBanner({ userName, greeting }) {
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5">
               <Clock className="h-4 w-4" />
               <span>
-                {currentDate.toLocaleTimeString("en-US", {
+                {currentDate.toLocaleTimeString("vi-VN", {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}

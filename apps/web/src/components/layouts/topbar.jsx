@@ -52,7 +52,7 @@ export function Topbar({ title, onToggleSidebar, sidebarCollapsed }) {
           size="icon"
           onClick={onToggleSidebar}
           className="rounded-xl hover:bg-primary cursor-pointer"
-          title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={sidebarCollapsed ? "Mở rộng thanh bên" : "Thu gọn thanh bên"}
         >
           <PanelLeft className="h-5 w-5" />
         </Button>
@@ -64,6 +64,7 @@ export function Topbar({ title, onToggleSidebar, sidebarCollapsed }) {
           variant="ghost"
           size="icon"
           className="relative rounded-xl hover:bg-secondary cursor-pointer"
+          title="Thông báo"
         >
           <Bell className="h-5 w-5" />
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent" />
@@ -73,6 +74,7 @@ export function Topbar({ title, onToggleSidebar, sidebarCollapsed }) {
           variant="ghost"
           size="icon"
           className="rounded-xl hover:bg-secondary cursor-pointer"
+          title="Cài đặt"
         >
           <Settings className="h-5 w-5" />
         </Button>
@@ -95,12 +97,12 @@ export function Topbar({ title, onToggleSidebar, sidebarCollapsed }) {
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium">
-                  {isLoading ? "Loading..." : userName}
+                  {isLoading ? "Đang tải..." : userName}
                 </p>
                 <p className="text-xs text-muted-foreground">{userEmail}</p>
                 {userRole && (
                   <p className="text-xs text-muted-foreground capitalize">
-                    Role: {userRole}
+                    Vai trò: {userRole}
                   </p>
                 )}
               </div>
@@ -110,13 +112,13 @@ export function Topbar({ title, onToggleSidebar, sidebarCollapsed }) {
               className="rounded-lg cursor-pointer"
               onClick={handleProfileClick}
             >
-              Profile
+              Hồ sơ
             </DropdownMenuItem>
             <DropdownMenuItem
               className="rounded-lg cursor-pointer"
               onClick={handleSettingClick}
             >
-              Settings
+              Cài đặt
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -124,7 +126,7 @@ export function Topbar({ title, onToggleSidebar, sidebarCollapsed }) {
               onClick={handleLogout}
               disabled={logoutMutation.isPending}
             >
-              {logoutMutation.isPending ? "Logging out..." : "Logout"}
+              {logoutMutation.isPending ? "Đang đăng xuất..." : "Đăng xuất"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

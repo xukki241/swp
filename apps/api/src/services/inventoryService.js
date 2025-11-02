@@ -271,7 +271,8 @@ export const inventoryService = {
 
   /**
    * Get expiring inventory items with pagination
-   * Returns items that will expire within the specified number of days
+   * Returns ALL items that have age >= 1 year since manufacture date
+   * Expiry date: uses actual expiry date or defaults to manufacture_date + 1 year
    */
   async getExpiring(filters = {}) {
     const {
@@ -286,22 +287,8 @@ export const inventoryService = {
     const futureDate = new Date();
     futureDate.setDate(today.getDate() + daysUntilExpiry);
 
-    const conditions = and(
-      gte(inventory.expiryDate, today.toISOString().split("T")[0]),
-      lte(inventory.expiryDate, futureDate.toISOString().split("T")[0])
-    );
-
-    // Get total count
-    const countResult = await db
-      .select({ count: sql`count(*)`.as("count") })
-      .from(inventory)
-      .where(conditions);
-
-    const totalCount = Number(countResult[0]?.count || 0);
-
-    // Build query with nested relations
-    const data = await db.query.inventory.findMany({
-      where: conditions,
+    // Get all inventory items with nested relations
+    const allItems = await db.query.inventory.findMany({
       with: {
         medicationVariant: {
           with: {
@@ -318,14 +305,48 @@ export const inventoryService = {
           },
         },
       },
-      orderBy:
-        sortOrder === "asc"
-          ? inventory[sortBy] || inventory.expiryDate
-          : desc(inventory[sortBy] || inventory.expiryDate),
-      limit,
-      offset,
     });
 
+    // Filter items that are >= 1 year old from manufacture date
+    const filteredData = allItems.filter((item) => {
+      if (!item.manufactureDate) {
+        // No manufacture date, skip
+        return false;
+      }
+
+      // Calculate the date that is 1 year after manufacture
+      const oneYearAfterMfg = new Date(item.manufactureDate);
+      oneYearAfterMfg.setFullYear(oneYearAfterMfg.getFullYear() + 1);
+
+      // Return items that have reached or passed 1 year from manufacture date
+      return today >= oneYearAfterMfg;
+    });
+
+    // Sort the filtered data by calculated expiry date
+    filteredData.sort((a, b) => {
+      const aDate = a.expiryDate
+        ? new Date(a.expiryDate)
+        : new Date(a.manufactureDate);
+      if (!a.expiryDate && a.manufactureDate) {
+        aDate.setFullYear(aDate.getFullYear() + 1);
+      }
+
+      const bDate = b.expiryDate
+        ? new Date(b.expiryDate)
+        : new Date(b.manufactureDate);
+      if (!b.expiryDate && b.manufactureDate) {
+        bDate.setFullYear(bDate.getFullYear() + 1);
+      }
+
+      if (sortOrder === "asc") {
+        return aDate - bDate;
+      } else {
+        return bDate - aDate;
+      }
+    });
+
+    const totalCount = filteredData.length;
+    const data = filteredData.slice(offset, offset + limit);
     return {
       data,
       total: totalCount,
@@ -335,11 +356,12 @@ export const inventoryService = {
   /**
    * Get low stock items with pagination
    * Returns items where available quantity is below the threshold
+   * Default threshold: 250 units
    * Note: Uses query API for nested relations, with aggregation query to filter variants
    */
   async getLowStock(filters = {}) {
     const {
-      threshold = 10,
+      threshold = 250,
       sortBy = "medicationVariantId",
       sortOrder = "asc",
       limit = 100,

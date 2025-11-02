@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { customerService } from "@/services/customerService";
@@ -29,7 +27,6 @@ export default function CustomerSelector({ onSelectCustomer }) {
         search: term,
       });
 
-      // Handle different response formats
       let data = response.data || response;
       if (data.data) {
         data = data.data;
@@ -38,7 +35,7 @@ export default function CustomerSelector({ onSelectCustomer }) {
       setCustomers(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("[v0] Customer search error:", error);
-      toast.error("Unable to search customers");
+      toast.error("Không thể tìm kiếm khách hàng");
       setCustomers([]);
     } finally {
       setIsLoading(false);
@@ -51,7 +48,6 @@ export default function CustomerSelector({ onSelectCustomer }) {
   };
 
   const handleEditSuccess = (updatedCustomer) => {
-    // Update customer in the list
     setCustomers((prev) =>
       prev.map((c) => (c.id === updatedCustomer.id ? updatedCustomer : c))
     );
@@ -66,7 +62,7 @@ export default function CustomerSelector({ onSelectCustomer }) {
       <div className="relative">
         <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
         <Input
-          placeholder="Search existing customers..."
+          placeholder="Tìm kiếm khách hàng hiện có..."
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
           className="pl-10"
@@ -76,6 +72,7 @@ export default function CustomerSelector({ onSelectCustomer }) {
       {isLoading && (
         <div className="flex items-center justify-center py-4">
           <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+          <span className="ml-2 text-gray-500">Đang tìm kiếm...</span>
         </div>
       )}
 
@@ -102,12 +99,12 @@ export default function CustomerSelector({ onSelectCustomer }) {
                       </p>
                       {customer.phone && (
                         <p className="text-xs text-gray-600">
-                          {customer.phone}
+                          SĐT: {customer.phone}
                         </p>
                       )}
                       {customer.email && (
                         <p className="text-xs text-blue-600">
-                          {customer.email}
+                          Email: {customer.email}
                         </p>
                       )}
                     </div>
@@ -117,7 +114,7 @@ export default function CustomerSelector({ onSelectCustomer }) {
                     size="icon"
                     onClick={(e) => handleEditClick(e, customer.id)}
                     className="shrink-0 h-auto"
-                    title="Edit customer"
+                    title="Chỉnh sửa thông tin khách hàng"
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
@@ -130,7 +127,7 @@ export default function CustomerSelector({ onSelectCustomer }) {
 
       {searchTerm && customers.length === 0 && !isLoading && (
         <p className="text-sm text-gray-500 text-center py-4">
-          No customers found
+          Không tìm thấy khách hàng nào
         </p>
       )}
     </div>

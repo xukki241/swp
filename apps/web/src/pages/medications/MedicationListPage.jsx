@@ -105,7 +105,7 @@ function MedImage({ medicationId, imageId, alt = "", version = 0, onClick }) {
       return getMedicationImageUrl(medicationId, imageId);
     const local = getMedicationImageLocal(medicationId);
     return local || getMedicationImageUrl(medicationId);
-}, [medicationId, imageId, version]);
+  }, [medicationId, imageId, version]);
 
   useEffect(() => setErrored(false), [src]);
 
@@ -202,7 +202,7 @@ export default function MedicationListPage() {
     reset({
       name: med.name ?? "",
       brand: med.brand ?? "",
-description: med.description ?? "",
+      description: med.description ?? "",
       isPrescriptionRequired: !!med.isPrescriptionRequired,
       isControlledSubstance: !!med.isControlledSubstance,
       status: med.status ?? "active",
@@ -223,52 +223,52 @@ description: med.description ?? "",
   }
 
   const onSubmitMed = async (data) => {
-  try {
-    let savedId = editing?.id;
+    try {
+      let savedId = editing?.id;
 
-    if (editing) {
-      await updateMed.mutateAsync({ id: editing.id, payload: data });
-    } else {
-      const created = await createMed.mutateAsync(data);
-      savedId = Array.isArray(created) ? created[0]?.id : created?.id;
-    }
-
-    if (savedId) {
-      if (removeImage) {
-        clearMedicationImage(savedId);
-        await instance.delete(`/medications/${savedId}/image`);
-      } else if (imageFile) {
-        const formData = new FormData();
-        formData.append("image", imageFile);
-        await instance.post(`/medications/${savedId}/upload-image`, formData, {
-          headers: { "Content-Type": "multipart/form-data" }
-        });
-      } else if (imagePreview) {
-        setMedicationImage(savedId, imagePreview);
+      if (editing) {
+        await updateMed.mutateAsync({ id: editing.id, payload: data });
+      } else {
+        const created = await createMed.mutateAsync(data);
+        savedId = Array.isArray(created) ? created[0]?.id : created?.id;
       }
-      bumpImageVersion(savedId);
-    }
 
-    toast.success(editing ? "Medication updated" : "Medication created");
-    setMedFormOpen(false);
-    
-    // Đợi một chút để backend xử lý xong
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await refetch();
-  } catch (e) {
-    toast.error("Failed to save medication", {
-      description: e?.response?.data?.message || e.message,
-    });
-  }
-};
+      if (savedId) {
+        if (removeImage) {
+          clearMedicationImage(savedId);
+          await instance.delete(`/medications/${savedId}/image`);
+        } else if (imageFile) {
+          const formData = new FormData();
+          formData.append("image", imageFile);
+          await instance.post(`/medications/${savedId}/upload-image`, formData, {
+            headers: { "Content-Type": "multipart/form-data" }
+          });
+        } else if (imagePreview) {
+          setMedicationImage(savedId, imagePreview);
+        }
+        bumpImageVersion(savedId);
+      }
+
+      toast.success(editing ? "Medication updated" : "Medication created");
+      setMedFormOpen(false);
+
+      // Đợi một chút để backend xử lý xong
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await refetch();
+    } catch (e) {
+      toast.error("Failed to save medication", {
+        description: e?.response?.data?.message || e.message,
+      });
+    }
+  };
 
 
   const handleDelete = async (id) => {
-    if (confirm("Delete this medication?")) {
+    if (confirm("Xóa thuốc này?")) {
       await deleteMed.mutateAsync(id);
       clearMedicationImage(id);
       bumpImageVersion(id);
-      toast.success("Deleted");
+      toast.success("Đã xóa");
       await refetch();
     }
   };
@@ -308,7 +308,7 @@ description: med.description ?? "",
     });
   };
   const validateBarcodeUnique = async (barcode, currentId) => {
-if (!barcode) return true;
+    if (!barcode) return true;
     const list = await findVariantsByBarcode(barcode);
     const exact = list.filter((v) => String(v.barcode) === String(barcode));
     return exact.every((v) => String(v.id) === String(currentId || ""));
@@ -406,12 +406,12 @@ if (!barcode) return true;
     <AppLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Medications</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Quản lý Thuốc</h1>
         </div>
 
         <Card>
           <CardHeader>
-<CardTitle>Medication Catalog</CardTitle>
+            <CardTitle>Danh mục Thuốc</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* FILTER BAR */}
@@ -427,14 +427,14 @@ if (!barcode) return true;
                     className="h-9 rounded-md border border-input bg-background px-3 text-sm"
                     title="Filter by status"
                   >
-                    <option value="all">All status</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="all">Tất cả trạng thái</option>
+                    <option value="active">Đang hoạt động</option>
+                    <option value="inactive">Ngừng hoạt động</option>
                   </select>
 
                   <Input
                     className="w-64"
-                    placeholder="Search by name or brand…"
+                    placeholder="Tìm theo tên hoặc thương hiệu…"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                   />
@@ -443,7 +443,7 @@ if (!barcode) return true;
                 <div className="flex gap-2">
                   <Button type="submit">
                     <Search className="w-4 h-4 mr-1" />
-                    Search
+                    Tìm kiếm
                   </Button>
                   <Button
                     type="button"
@@ -451,7 +451,7 @@ if (!barcode) return true;
                     onClick={handleClearFilters}
                   >
                     <X className="w-4 h-4 mr-1" />
-                    Clear
+                    Xóa bộ lọc
                   </Button>
                 </div>
               </form>
@@ -459,13 +459,13 @@ if (!barcode) return true;
               <div className="flex gap-2">
                 <Button onClick={openAdd}>
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  Add
+                  Thêm mới
                 </Button>
               </div>
             </div>
 
             {isLoading ? (
-              <p>Loading...</p>
+              <p>Đang tải...</p>
             ) : (
               <div className="space-y-3">
                 {medications.map((m) => {
@@ -487,10 +487,10 @@ if (!barcode) return true;
                         <div>
                           <div className="flex items-center gap-2">
                             <div className="font-medium">{m.name}</div>
-<StatusBadge status={m.status} />
+                            <StatusBadge status={m.status} />
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            Brand: {m.brand || "-"}
+                            Thương hiệu: {m.brand || "-"}
                           </div>
                         </div>
                       </div>
@@ -507,7 +507,7 @@ if (!barcode) return true;
                           title="View"
                         >
                           <Eye className="w-4 h-4 mr-1" />
-                          View
+                          Xem
                         </Button>
 
                         {isOwner && (
@@ -516,10 +516,10 @@ if (!barcode) return true;
                               size="sm"
                               variant="outline"
                               onClick={() => handleEdit(m)}
-                              title="Edit"
+                              title="Chỉnh sửa"
                             >
                               <Edit className="w-4 h-4 mr-1" />
-                              Edit
+                              Sửa
                             </Button>
                             <Button
                               size="sm"
@@ -529,19 +529,19 @@ if (!barcode) return true;
                                   state: { medication: m },
                                 })
                               }
-                              title="Manage variants"
+                              title="Quản lý biến thể"
                             >
                               <Package className="w-4 h-4 mr-1" />
-                              Variants
+                              Biến thể
                             </Button>
                             <Button
                               size="sm"
                               variant="destructive"
                               onClick={() => handleDelete(m.id)}
-                              title="Delete"
+                              title="Xóa"
                             >
                               <Trash2 className="w-4 h-4 mr-1" />
-                              Delete
+                              Xóa
                             </Button>
                           </>
                         )}
@@ -552,7 +552,7 @@ if (!barcode) return true;
 
                 {medications.length === 0 && (
                   <div className="rounded-xl border p-10 text-center text-sm text-muted-foreground">
-                    No medications found
+                    Không tìm thấy thuốc nào
                   </div>
                 )}
               </div>
@@ -564,12 +564,12 @@ if (!barcode) return true;
         {/* Medication Form (popup) */}
         <Dialog open={medFormOpen} onOpenChange={setMedFormOpen}>
           <DialogContent className="max-w-2xl" aria-describedby="med-form-desc">
-<p id="med-form-desc" className="sr-only">
+            <p id="med-form-desc" className="sr-only">
               Medication form dialog
             </p>
             <DialogHeader>
               <DialogTitle>
-                {editing ? "Edit Medication" : "Add Medication"}
+                {editing ? "Chỉnh sửa Thuốc" : "Thêm Thuốc mới"}
               </DialogTitle>
             </DialogHeader>
 
@@ -626,7 +626,7 @@ if (!barcode) return true;
                     />
                     <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm">
                       <ImageIcon className="w-4 h-4" />
-                      Choose image…
+                      Chọn ảnh…
                     </span>
                   </label>
 
@@ -635,7 +635,7 @@ if (!barcode) return true;
                       checked={removeImage}
                       onCheckedChange={(c) => setRemoveImage(!!c)}
                     />
-<span>Remove image</span>
+                    <span>Xóa ảnh</span>
                   </label>
                 </div>
               </div>
@@ -645,12 +645,12 @@ if (!barcode) return true;
                 name="name"
                 control={control}
                 rules={{ required: true }}
-                render={({ field }) => <Input {...field} placeholder="Name" />}
+                render={({ field }) => <Input {...field} placeholder="Tên thuốc" />}
               />
               <Controller
                 name="brand"
                 control={control}
-                render={({ field }) => <Input {...field} placeholder="Brand" />}
+                render={({ field }) => <Input {...field} placeholder="Thương hiệu" />}
               />
               <Controller
                 name="description"
@@ -659,7 +659,7 @@ if (!barcode) return true;
                   <Input
                     {...field}
                     className="md:col-span-2"
-                    placeholder="Description"
+                    placeholder="Mô tả"
                   />
                 )}
               />
@@ -674,7 +674,7 @@ if (!barcode) return true;
                         checked={!!value}
                         onCheckedChange={(c) => onChange(!!c)}
                       />
-                      <span>Prescription required</span>
+                      <span>Cần đơn thuốc</span>
                     </>
                   )}
                 />
@@ -690,7 +690,7 @@ if (!barcode) return true;
                         checked={!!value}
                         onCheckedChange={(c) => onChange(!!c)}
                       />
-                      <span>Controlled substance</span>
+                      <span>Chất kiểm soát</span>
                     </>
                   )}
                 />
@@ -706,8 +706,8 @@ if (!barcode) return true;
                       onChange={(e) => onChange(e.target.value)}
                       className="h-9 w-40 rounded-md border border-input bg-background px-3 text-sm"
                     >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
+                      <option value="active">Đang hoạt động</option>
+                      <option value="inactive">Ngừng hoạt động</option>
                     </select>
                   )}
                 />
@@ -716,11 +716,11 @@ if (!barcode) return true;
               <DialogFooter className="md:col-span-2 flex gap-2 justify-end">
                 <DialogClose asChild>
                   <Button type="button" variant="outline">
-                    Cancel
+                    Hủy
                   </Button>
                 </DialogClose>
                 <Button type="submit">
-{editing ? "Save Changes" : "Add Medication"}
+                  {editing ? "Lưu thay đổi" : "Thêm thuốc"}
                 </Button>
               </DialogFooter>
             </form>
@@ -743,7 +743,7 @@ if (!barcode) return true;
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Close</Button>
+              <Button variant="outline">Đóng</Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>

@@ -90,15 +90,16 @@ export default function UserListPage() {
           ...data,
         });
 
-        toast.success("User Updated", {
-          description: `${data.name}'s information has been updated.`,
+        toast.success("Đã cập nhật người dùng", {
+          description: `Thông tin của ${data.name} đã được cập nhật.`,
         });
 
         setShowEditDialog(false);
         setSelectedUser(null);
       } catch (err) {
-        toast.error("Error", {
-          description: err.response?.data?.message || "Failed to update user",
+        toast.error("Lỗi", {
+          description:
+            err.response?.data?.message || "Không thể cập nhật người dùng",
         });
       }
     },
@@ -110,24 +111,25 @@ export default function UserListPage() {
       try {
         if (action === "activate") {
           await activateMutation.mutateAsync(userId);
-          toast.success("User Activated", {
-            description: "User can now login.",
+          toast.success("Đã kích hoạt người dùng", {
+            description: "Người dùng giờ có thể đăng nhập.",
           });
         } else if (action === "deactivate") {
           await deactivateMutation.mutateAsync(userId);
-          toast.success("User Deactivated", {
-            description: "User cannot login.",
+          toast.success("Đã vô hiệu hóa người dùng", {
+            description: "Người dùng không thể đăng nhập.",
           });
         } else if (action === "suspend") {
           await suspendMutation.mutateAsync(userId);
-          toast.warning("User Suspended", {
-            description: "User has been suspended.",
+          toast.warning("Đã đình chỉ người dùng", {
+            description: "Người dùng đã bị đình chỉ.",
           });
         }
       } catch (err) {
-        toast.error("Error", {
+        toast.error("Lỗi", {
           description:
-            err.response?.data?.message || "Failed to update user status",
+            err.response?.data?.message ||
+            "Không thể cập nhật trạng thái người dùng",
         });
       }
     },
@@ -141,9 +143,9 @@ export default function UserListPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              User Management
+              Quản lý người dùng
             </h1>
-            <p className="text-muted-foreground mt-1">Loading users...</p>
+            <p className="text-muted-foreground mt-1">Đang tải người dùng...</p>
           </div>
           <LoadingState />
         </div>
@@ -158,10 +160,10 @@ export default function UserListPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              User Management
+              Quản lý người dùng
             </h1>
             <p className="text-muted-foreground mt-1">
-              Manage staff accounts and permissions
+              Quản lý tài khoản và quyền hạn nhân viên
             </p>
           </div>
           <ErrorState error={error} onRetry={() => window.location.reload()} />
@@ -176,19 +178,19 @@ export default function UserListPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              User Management
+              Quản lý người dùng
             </h1>
             <p className="text-muted-foreground mt-1">
-              Manage staff accounts and permissions
+              Quản lý tài khoản và quyền hạn nhân viên
             </p>
           </div>
         </div>
 
         <Card className="shadow-md rounded-xl border-0">
           <CardHeader>
-            <CardTitle>Staff Accounts</CardTitle>
+            <CardTitle>Tài khoản nhân viên</CardTitle>
             <CardDescription>
-              View, search, and manage user accounts
+              Xem, tìm kiếm và quản lý tài khoản người dùng
             </CardDescription>
           </CardHeader>
           <CardContent>

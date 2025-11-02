@@ -23,7 +23,18 @@ import {
 
 export const purchaseOrderRouter = express.Router();
 
-// All routes require authentication
+/**
+ * @route   GET /api/purchases/confirm/:id
+ * @desc    Confirm purchase order by supplier (public, no auth required)
+ * @access  Public
+ */
+purchaseOrderRouter.get(
+  "/confirm/:id",
+  validateParams(z.object({ id: uuidSchema })),
+  purchaseOrderController.confirm
+);
+
+// All other routes require authentication
 purchaseOrderRouter.use(authenticate);
 
 // Mount standalone receipt routes FIRST (must be before /:id route)

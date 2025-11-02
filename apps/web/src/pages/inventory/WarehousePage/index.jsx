@@ -1,5 +1,3 @@
-"use client";
-
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -31,6 +29,7 @@ import {
 import { Skeleton } from "../../../components/ui/skeleton";
 import { Textarea } from "../../../components/ui/textarea";
 import { useWarehouse } from "../../../hooks/useWarehouse";
+import { zoneTypeMap } from "../../../utils/zoneTypeMap";
 import { RackList } from "./components/RackList";
 import ZoneDetailsCard from "./components/ZoneDetails";
 
@@ -44,7 +43,7 @@ export default function WarehousePage() {
     refetchZone,
     createZoneData,
   } = useWarehouse();
-  const [selectedZoneId, setSelectedZoneId] = useState(null);
+  const [selectedZoneId, setSelectedZoneId] = useState("");
   const [showAddZoneDialog, setShowAddZoneDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -55,15 +54,27 @@ export default function WarehousePage() {
     description: "",
   });
 
-  function handleZoneChange(zoneId) {
-    setSelectedZoneId(zoneId);
-  }
-
+  // Debug: Log zones when they change
   useEffect(() => {
-    if (selectedZoneId) {
-      selectZone(selectedZoneId);
+    console.info("Zones loaded:", zones);
+    console.info("Zones length:", zones?.length);
+    console.info("Zones is array:", Array.isArray(zones));
+  }, [zones]);
+
+  const handleZoneChange = (zoneId) => {
+    console.info("Zone selected:", zoneId);
+    setSelectedZoneId(zoneId);
+    if (zoneId) {
+      selectZone(zoneId);
     }
-  }, [selectedZoneId]);
+  };
+
+  // Remove the useEffect since we're calling selectZone directly in handleZoneChange
+  // useEffect(() => {
+  //   if (selectedZoneId) {
+  //     selectZone(selectedZoneId);
+  //   }
+  // }, [selectedZoneId, selectZone]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -112,11 +123,9 @@ export default function WarehousePage() {
     <AppLayout>
       <div className="min-h-screen p-6 space-y-6">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">
-            Warehouse Management
-          </h2>
+          <h2 className="text-3xl font-bold text-gray-900">Quản lý kho</h2>
           <p className="text-muted-foreground mt-1">
-            View and manage warehouse zones, racks, and bins
+            Xem và quản lý khu vực, giá và ô chứa trong kho
           </p>
         </div>
 
@@ -125,7 +134,7 @@ export default function WarehousePage() {
           <Card className="shadow-md rounded-xl border-0">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-lg font-semibold">
-                Select Zone
+                Chọn khu vực
               </CardTitle>
               <Button size="sm" onClick={() => setShowAddZoneDialog(true)}>
                 <Plus className="h-4 w-4" />
@@ -133,19 +142,22 @@ export default function WarehousePage() {
               </Button>
             </CardHeader>
             <CardContent>
-              <Select
-                value={selectedZoneId || ""}
-                onValueChange={handleZoneChange}
-              >
+              <Select value={selectedZoneId} onValueChange={handleZoneChange}>
                 <SelectTrigger className="w-full md:w-90">
-                  <SelectValue placeholder="Choose a zone..." />
+                  <SelectValue placeholder="Chọn khu vực..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {zones.map((zone) => (
-                    <SelectItem key={zone.id} value={zone.id}>
-                      {zone.name} ({zone.code})
-                    </SelectItem>
-                  ))}
+                  {zones && zones.length > 0 ? (
+                    zones.map((zone) => (
+                      <SelectItem key={zone.id} value={zone.id}>
+                        {zone.name} ({zone.code})
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="px-2 py-1 text-sm text-muted-foreground">
+                      Không có khu vực nào
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             </CardContent>
@@ -175,7 +187,7 @@ export default function WarehousePage() {
             <Card className="shadow-md rounded-xl border-0">
               <CardContent className="py-12 text-center">
                 <p className="text-muted-foreground">
-                  Select a zone to view its details and racks
+                  Chọn khu vực để xem chi tiết và giá
                 </p>
               </CardContent>
             </Card>
@@ -186,14 +198,14 @@ export default function WarehousePage() {
       <Dialog open={showAddZoneDialog} onOpenChange={setShowAddZoneDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Add New Zone</DialogTitle>
-            <DialogDescription>Create a new warehouse zone</DialogDescription>
+            <DialogTitle>Thêm khu vực mới</DialogTitle>
+            <DialogDescription>Tạo khu vực kho mới</DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleAddZoneSubmit} className="space-y-4">
             <div>
               <Label className="mb-2" htmlFor="zoneName">
-                Zone Name *
+                Tên khu vực *
               </Label>
               <Input
                 id="zoneName"
@@ -206,7 +218,7 @@ export default function WarehousePage() {
 
             <div>
               <Label className="mb-2" htmlFor="zoneCode">
-                Zone Code *
+                Mã khu vực *
               </Label>
               <Input
                 id="zoneCode"
@@ -219,20 +231,30 @@ export default function WarehousePage() {
 
             <div>
               <Label className="mb-2" htmlFor="zoneType">
-                Zone Type *
+                Loại khu vực *
               </Label>
-              <Input
-                id="zoneType"
-                name="zoneType"
+              <Select
                 value={formData.zoneType}
-                onChange={handleInputChange}
-                required
-              />
+                onValueChange={(val) =>
+                  setFormData((prev) => ({ ...prev, zoneType: val }))
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Chọn loại khu vực..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(zoneTypeMap).map((key) => (
+                    <SelectItem key={key} value={key}>
+                      {zoneTypeMap[key]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
               <Label className="mb-2" htmlFor="location">
-                Location *
+                Vị trí *
               </Label>
               <Input
                 id="location"
@@ -245,7 +267,7 @@ export default function WarehousePage() {
 
             <div>
               <Label className="mb-2" htmlFor="description">
-                Description
+                Mô tả
               </Label>
               <Textarea
                 id="description"
@@ -263,10 +285,10 @@ export default function WarehousePage() {
                 onClick={() => setShowAddZoneDialog(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                Hủy
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Creating..." : "Create Zone"}
+                {isSubmitting ? "Đang tạo..." : "Tạo khu vực"}
               </Button>
             </DialogFooter>
           </form>

@@ -16,7 +16,7 @@ export default function PolicyPage() {
         <Link to="/register">
           <Button variant="ghost" className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Registration {/* Updated to English */}
+            Quay lại Đăng ký
           </Button>
         </Link>
 
@@ -28,10 +28,10 @@ export default function PolicyPage() {
               </div>
               <div>
                 <CardTitle className="text-3xl font-bold text-gray-800">
-                  Privacy Policy & Terms of Service
+                  Chính sách bảo mật & Điều khoản dịch vụ
                 </CardTitle>
                 <CardDescription className="text-base mt-1">
-                  PharmaFlow Privacy & Terms Policy
+                  Chính sách Bảo mật & Điều khoản PharmaFlow
                 </CardDescription>
               </div>
             </div>
@@ -40,68 +40,67 @@ export default function PolicyPage() {
           <CardContent className="p-8 pt-0 space-y-6">
             <section>
               <h2 className="text-xl font-semibold text-gray-800 mb-3">
-                1. Introduction
+                1. Giới thiệu
               </h2>
               <p className="text-gray-600 leading-relaxed">
-                Welcome to PharmaFlow - Smart Inventory and Sales Management
-                System. By registering and using our service, you agree to
-                comply with the terms and policies outlined in this document.
+                Chào mừng đến với PharmaFlow - Hệ thống Quản lý Kho hàng và Bán
+                hàng Thông minh. Bằng việc đăng ký và sử dụng dịch vụ của chúng
+                tôi, bạn đồng ý tuân thủ các điều khoản và chính sách được nêu
+                trong tài liệu này.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-gray-800 mb-3">
-                2. Terms of Use
+                2. Điều khoản sử dụng
               </h2>
               <p className="text-gray-600 leading-relaxed mb-2">
-                When using PharmaFlow, you commit to:
+                Khi sử dụng PharmaFlow, bạn cam kết:
               </p>
               <ul className="list-disc list-inside text-gray-600 space-y-1 ml-4">
-                <li>
-                  Provide accurate and complete information during registration
-                </li>
-                <li>Keep your login credentials secure</li>
-                <li>Use the system for lawful purposes only</li>
-                <li>Comply with pharmaceutical management regulations</li>
+                <li>Cung cấp thông tin chính xác và đầy đủ khi đăng ký</li>
+                <li>Bảo mật thông tin đăng nhập của bạn</li>
+                <li>Chỉ sử dụng hệ thống cho các mục đích hợp pháp</li>
+                <li>Tuân thủ các quy định về quản lý dược phẩm</li>
               </ul>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-gray-800 mb-3">
-                3. Privacy Policy
+                3. Chính sách bảo mật
               </h2>
               <p className="text-gray-600 leading-relaxed">
-                We are committed to protecting your personal information. Your
-                data is encrypted and stored securely. We do not share your
-                information with third parties without your consent.
+                Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn. Dữ liệu của
+                bạn được mã hóa và lưu trữ an toàn. Chúng tôi không chia sẻ
+                thông tin của bạn với bên thứ ba mà không có sự đồng ý của bạn.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-gray-800 mb-3">
-                4. Rights and Responsibilities
+                4. Quyền và trách nhiệm
               </h2>
               <p className="text-gray-600 leading-relaxed">
-                PharmaFlow provides an inventory and sales management platform.
-                Users are responsible for the accuracy of data entered into the
-                system and compliance with laws related to pharmaceutical
-                business operations.
+                PharmaFlow cung cấp nền tảng quản lý kho hàng và bán hàng. Người
+                dùng chịu trách nhiệm về tính chính xác của dữ liệu nhập vào hệ
+                thống và tuân thủ các luật liên quan đến hoạt động kinh doanh
+                dược phẩm.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-gray-800 mb-3">
-                5. Contact
+                5. Liên hệ
               </h2>
               <p className="text-gray-600 leading-relaxed">
-                If you have any questions about this policy, please contact us
-                via email: support@pharmaflow.com
+                Nếu bạn có bất kỳ câu hỏi nào về chính sách này, vui lòng liên
+                hệ với chúng tôi qua email: support@pharmaflow.com
               </p>
             </section>
 
             <div className="pt-4 border-t border-gray-200">
               <p className="text-sm text-gray-500">
-                Last updated: {new Date().toLocaleDateString("en-US")}
+                Cập nhật lần cuối: {new Date().toLocaleDateString("vi-VN")}
               </p>
             </div>
           </CardContent>

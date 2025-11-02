@@ -162,7 +162,7 @@ export async function searchMedications(search) {
   const res = await instance.get("/medications/variants/search-for-sale", {
     params: { search },
   });
-  return res.data;
+  return res.data?.data ?? res.data;
 }
 
 export async function findVariantsByBarcode(barcode) {
