@@ -22,14 +22,22 @@ export const sendPurchaseOrder = async (req, res) => {
       });
     }
 
+    logger.info(
+      "📧 Attempting to send purchase order email to:",
+      emailData.supplierEmail
+    );
+
     await sendPurchaseOrderEmail(emailData);
+
+    logger.info("✅ Purchase order email sent successfully");
 
     res.status(200).json({
       success: true,
       message: "Purchase order email sent successfully",
     });
   } catch (error) {
-    logger.error("Error sending purchase order email:", error);
+    logger.error("❌ Error sending purchase order email:", error);
+    logger.error("Error details:", error.stack);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to send purchase order email",
