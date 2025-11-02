@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useInventory } from "@/hooks/useInventory";
 import { useSuppliers } from "@/hooks/useSuppliers";
-import "bootstrap-icons/font/bootstrap-icons.css";
 import { Eye, Search, Settings2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import AddStockDialog from "./components/dialogs/AddStockDialog";
