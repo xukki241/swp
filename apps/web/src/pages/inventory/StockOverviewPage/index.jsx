@@ -104,7 +104,9 @@ export default function StockOverviewPage() {
       {/* Main Layout of Page */}
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Tổng quan tồn kho</h2>
+          <h2 className="text-3xl font-bold text-gray-900">
+            Tổng quan tồn kho
+          </h2>
           <p className="text-muted-foreground mt-1">
             Duyệt và quản lý tất cả thuốc trong kho
           </p>
@@ -145,10 +147,10 @@ export default function StockOverviewPage() {
                               Tồn kho: {medication.quantity}
                             </p>
                             <p className="text-sm text-muted-foreground mt-1">
-                              Giá: {" "}
+                              Giá:{" "}
                               {Number(
                                 medication.medicationVariant.sellPrice
-                              ).toLocaleString("vi-VN")} {" "}
+                              ).toLocaleString("vi-VN")}{" "}
                               VND
                             </p>
                           </div>

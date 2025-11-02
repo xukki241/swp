@@ -44,9 +44,7 @@ export default function InventorySearching({ onSearch, suppliers }) {
       new Date(filters.manufactureDateMin) >
         new Date(filters.manufactureDateMax)
     ) {
-      toast.error(
-        "Ngày sản xuất bắt đầu không được sau ngày kết thúc."
-      );
+      toast.error("Ngày sản xuất bắt đầu không được sau ngày kết thúc.");
       return;
     }
     if (

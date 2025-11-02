@@ -76,8 +76,8 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  console.log("Stock added:", stockFormData);
-  toast.success("Thêm tồn kho thành công!");
+      console.log("Stock added:", stockFormData);
+      toast.success("Thêm tồn kho thành công!");
       onOpenChange(false);
       setStockFormData({
         medication: "",
