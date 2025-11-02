@@ -1,7 +1,15 @@
-"use client";
-
-import { ChevronDown, ChevronUp, Edit2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Edit2, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../../../components/ui/alert-dialog";
 import { Button } from "../../../../components/ui/button";
 import { Card, CardContent, CardHeader } from "../../../../components/ui/card";
 import {
@@ -18,14 +26,29 @@ import { Textarea } from "../../../../components/ui/textarea";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
 import { BinGrid } from "./BinGrid";
 
-export function RackItem({ rack, isExpanded, onToggle }) {
-  const { bins, updateRackData } = useWarehouse();
+export function RackItem({
+  rack,
+  isExpanded,
+  onToggle,
+  selectedZoneId,
+  refetch,
+}) {
+  const { updateRackData, deleteRackData, createBinData } = useWarehouse();
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showAddBinDialog, setShowAddBinDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     code: rack.code || "",
     name: rack.name || "",
     description: rack.description || "",
+  });
+  const [createBinForm, setCreateBinForm] = useState({
+    binCode: "",
+    binName: "",
+    level: "",
+    number: "",
+    description: "",
   });
 
   useEffect(() => {
@@ -34,21 +57,92 @@ export function RackItem({ rack, isExpanded, onToggle }) {
       name: rack.name || "",
       description: rack.description || "",
     });
+    setCreateBinForm({
+      binCode: "",
+      binName: "",
+      level: "",
+      number: "",
+      description: "",
+    });
   }, [rack]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setEditRackForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleBinInputChange = (e) => {
+    const { name, value } = e.target;
+    setCreateBinForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditRackSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
       await updateRackData(rack.id, formData);
       setShowEditDialog(false);
+      if (refetch) refetch();
     } catch (error) {
       console.error("Failed to update rack:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteRack = async () => {
+    setIsSubmitting(true);
+    try {
+      await deleteRackData(selectedZoneId, rack.id);
+      setShowDeleteDialog(false);
+      if (refetch) refetch();
+    } catch (error) {
+      console.error("Failed to delete rack:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleAddBinSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate all required fields
+    if (
+      !createBinForm.binCode ||
+      !createBinForm.binName ||
+      createBinForm.level === "" ||
+      createBinForm.number === ""
+    ) {
+      console.error("All fields are required");
+      return;
+    }
+
+    // Validate that level and number are numeric
+    if (isNaN(createBinForm.level) || isNaN(createBinForm.number)) {
+      console.error("Level and number must be numeric values");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await createBinData(rack.id, {
+        code: createBinForm.binCode,
+        name: createBinForm.binName,
+        level: Number.parseInt(createBinForm.level),
+        number: Number.parseInt(createBinForm.number),
+        description: createBinForm.description,
+      });
+      setShowAddBinDialog(false);
+      setCreateBinForm({
+        binCode: "",
+        binName: "",
+        level: "",
+        number: "",
+        description: "",
+      });
+      if (refetch) refetch();
+    } catch (error) {
+      console.error("Failed to create bin:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -79,14 +173,33 @@ export function RackItem({ rack, isExpanded, onToggle }) {
                 <p className="text-sm text-muted-foreground">{rack.code}</p>
               </div>
             </div>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setShowEditDialog(true)}
-            >
-              <Edit2 className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowAddBinDialog(true)}
+              >
+                <Plus className="h-4 w-4" />
+                Add Bin
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowEditDialog(true)}
+              >
+                <Edit2 className="h-4 w-4" />
+                Edit Rack
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowDeleteDialog(true)}
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete Rack
+              </Button>
+            </div>
           </div>
           {rack.description && (
             <p className="text-sm text-muted-foreground mt-2">
@@ -97,10 +210,105 @@ export function RackItem({ rack, isExpanded, onToggle }) {
 
         {isExpanded && (
           <CardContent>
-            <BinGrid rackId={rack.id} bins={rackBins} />
+            <BinGrid rackId={rack.id} bins={rack.bins} refetch={refetch} />
           </CardContent>
         )}
       </Card>
+
+      {/* Add Bin Dialog */}
+      <Dialog open={showAddBinDialog} onOpenChange={setShowAddBinDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Bin</DialogTitle>
+            <DialogDescription>Create a new bin in this rack</DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleAddBinSubmit} className="space-y-4">
+            <div>
+              <Label className="mb-2" htmlFor="binName">
+                Bin Name *
+              </Label>
+              <Input
+                id="binName"
+                name="binName"
+                value={createBinForm.binName}
+                onChange={handleBinInputChange}
+                required
+              />
+            </div>
+
+            <div>
+              <Label className="mb-2" htmlFor="binCode">
+                Bin Code *
+              </Label>
+              <Input
+                id="binCode"
+                name="binCode"
+                value={createBinForm.binCode}
+                onChange={handleBinInputChange}
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="mb-2" htmlFor="level">
+                  Level *
+                </Label>
+                <Input
+                  id="level"
+                  name="level"
+                  type="number"
+                  value={createBinForm.level}
+                  onChange={handleBinInputChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label className="mb-2" htmlFor="number">
+                  Number *
+                </Label>
+                <Input
+                  id="number"
+                  name="number"
+                  type="number"
+                  value={createBinForm.number}
+                  onChange={handleBinInputChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label className="mb-2" htmlFor="binDescription">
+                Description
+              </Label>
+              <Textarea
+                id="binDescription"
+                name="description"
+                value={createBinForm.description}
+                onChange={handleBinInputChange}
+                rows={3}
+              />
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowAddBinDialog(false)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Creating..." : "Create Bin"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Rack Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
@@ -112,25 +320,29 @@ export function RackItem({ rack, isExpanded, onToggle }) {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="code">Rack Code</Label>
-              <Input
-                id="code"
-                name="code"
-                value={formData.code}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
+          <form onSubmit={handleEditRackSubmit} className="space-y-4">
             <div>
               <Label htmlFor="name">Rack Name</Label>
               <Input
                 id="name"
                 name="name"
                 value={formData.name}
-                onChange={handleInputChange}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="code">Rack Code</Label>
+              <Input
+                id="code"
+                name="code"
+                value={formData.code}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, code: e.target.value }))
+                }
                 required
               />
             </div>
@@ -141,7 +353,12 @@ export function RackItem({ rack, isExpanded, onToggle }) {
                 id="description"
                 name="description"
                 value={formData.description}
-                onChange={handleInputChange}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
                 rows={3}
               />
             </div>
@@ -162,6 +379,31 @@ export function RackItem({ rack, isExpanded, onToggle }) {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Rack Warning */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Rack</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this rack? This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSubmitting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteRack}
+              disabled={isSubmitting}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isSubmitting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

@@ -1,5 +1,3 @@
-"use client";
-
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";

@@ -1,5 +1,3 @@
-"use client";
-
 import { useChangePassword, useCurrentUser } from "@/hooks/useAuth";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -51,29 +49,29 @@ export default function UserProfile() {
 
     // validate reset password form
     if (!passwordData.oldPassword.trim()) {
-      toast.error("Validation Error", {
-        description: "Old password is required",
+      toast.error("Lỗi xác thực", {
+        description: "Vui lòng nhập mật khẩu cũ",
       });
       return;
     }
 
     if (!passwordData.newPassword.trim()) {
-      toast.error("Validation Error", {
-        description: "New password is required",
+      toast.error("Lỗi xác thực", {
+        description: "Vui lòng nhập mật khẩu mới",
       });
       return;
     }
 
     if (passwordData.newPassword.length < 8) {
-      toast.error("Validation Error", {
-        description: "New password must be at least 8 characters long",
+      toast.error("Lỗi xác thực", {
+        description: "Mật khẩu mới phải có ít nhất 8 ký tự",
       });
       return;
     }
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error("Validation Error", {
-        description: "New password and confirm password do not match",
+      toast.error("Lỗi xác thực", {
+        description: "Mật khẩu mới và xác nhận mật khẩu không khớp",
       });
       return;
     }
@@ -86,9 +84,9 @@ export default function UserProfile() {
         newPassword: passwordData.newPassword,
       });
 
-      toast.success("Password Reset", {
+      toast.success("Đổi mật khẩu thành công", {
         description:
-          data?.message || "Your password has been reset successfully.",
+          data?.message || "Mật khẩu của bạn đã được thay đổi thành công.",
       });
 
       setIsResetPasswordOpen(false);
@@ -102,8 +100,8 @@ export default function UserProfile() {
       const errorMessage =
         error?.response?.data?.message ||
         error?.message ||
-        "Failed to reset password. Please try again.";
-      toast.error("Change Failed", { description: errorMessage });
+        "Không thể đổi mật khẩu. Vui lòng thử lại.";
+      toast.error("Đổi mật khẩu thất bại", { description: errorMessage });
     } finally {
       setIsSubmitting(false);
     }
@@ -176,8 +174,8 @@ export default function UserProfile() {
             <Loading className="h-8 w-8" />
             <p className="text-sm font-medium text-gray-700">
               {isResetPasswordOpen
-                ? "Resetting password..."
-                : "Updating profile..."}
+                ? "Đang đổi mật khẩu..."
+                : "Đang cập nhật hồ sơ..."}
             </p>
           </div>
         </div>
@@ -186,9 +184,11 @@ export default function UserProfile() {
       <div className="max-w-4xl mx-auto p-4 md:p-6 lg:p-8">
         <Card className="rounded-2xl border-border shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="text-2xl font-bold">User Profile</CardTitle>
+            <CardTitle className="text-2xl font-bold">
+              Hồ sơ người dùng
+            </CardTitle>
             <CardDescription className="text-md">
-              Your personal information and account settings
+              Thông tin cá nhân và cài đặt tài khoản của bạn
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -212,7 +212,7 @@ export default function UserProfile() {
                   </h2>
                   <p className="text-sm text-muted-foreground capitalize flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    {user.role || "User"}
+                    {user.role || "Người dùng"}
                   </p>
                 </div>
 
@@ -222,7 +222,11 @@ export default function UserProfile() {
                     variant={getStatusVariant(user.status)}
                     className="capitalize"
                   >
-                    {user.status}
+                    {user.status === "active"
+                      ? "Hoạt động"
+                      : user.status === "inactive"
+                        ? "Không hoạt động"
+                        : user.status}
                   </Badge>
                 )}
               </div>
@@ -250,7 +254,7 @@ export default function UserProfile() {
                   <Phone className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                      Phone
+                      Điện thoại
                     </p>
                     <p className="text-sm text-foreground">{user.phone}</p>
                   </div>
@@ -271,27 +275,27 @@ export default function UserProfile() {
                     className="w-full sm:w-auto gap-2 bg-transparent"
                   >
                     <KeyRound className="h-4 w-4" />
-                    Change Password
+                    Đổi mật khẩu
                   </Button>
                 </DialogTrigger>
 
                 <DialogContent className="sm:max-w-[500px]">
                   <form onSubmit={handlePasswordReset}>
                     <DialogHeader className="mb-4">
-                      <DialogTitle>Change Password</DialogTitle>
+                      <DialogTitle>Đổi mật khẩu</DialogTitle>
                       <DialogDescription>
-                        Enter your current password and choose a new password.
+                        Nhập mật khẩu hiện tại và chọn mật khẩu mới.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid gap-2 mb-2">
                         <Label className="mb-1" htmlFor="oldPassword">
-                          Old Password
+                          Mật khẩu cũ
                         </Label>
                         <Input
                           id="oldPassword"
                           type="password"
-                          placeholder="Enter your current password"
+                          placeholder="Nhập mật khẩu hiện tại"
                           value={passwordData.oldPassword}
                           onChange={(e) =>
                             handlePasswordInputChange(
@@ -306,12 +310,12 @@ export default function UserProfile() {
                       </div>
                       <div className="grid gap-2 mb-2">
                         <Label className="mb-1" htmlFor="newPassword">
-                          New Password
+                          Mật khẩu mới
                         </Label>
                         <Input
                           id="newPassword"
                           type="password"
-                          placeholder="Enter your new password"
+                          placeholder="Nhập mật khẩu mới"
                           value={passwordData.newPassword}
                           onChange={(e) =>
                             handlePasswordInputChange(
@@ -324,17 +328,17 @@ export default function UserProfile() {
                           minLength={8}
                         />
                         <p className="text-xs text-muted-foreground">
-                          Must be at least 8 characters long
+                          Phải có ít nhất 8 ký tự
                         </p>
                       </div>
                       <div className="grid gap-2 mb-2">
                         <Label className="mb-1" htmlFor="confirmPassword">
-                          Confirm New Password
+                          Xác nhận mật khẩu mới
                         </Label>
                         <Input
                           id="confirmPassword"
                           type="password"
-                          placeholder="Confirm your new password"
+                          placeholder="Xác nhận mật khẩu mới"
                           value={passwordData.confirmPassword}
                           onChange={(e) =>
                             handlePasswordInputChange(
@@ -361,15 +365,15 @@ export default function UserProfile() {
                         }}
                         disabled={changePasswordMutation.isPending}
                       >
-                        Cancel
+                        Hủy
                       </Button>
                       <Button
                         type="submit"
                         disabled={changePasswordMutation.isPending}
                       >
                         {changePasswordMutation.isPending
-                          ? "Changing..."
-                          : "Reset Password"}
+                          ? "Đang đổi..."
+                          : "Đổi mật khẩu"}
                       </Button>
                     </DialogFooter>
                   </form>

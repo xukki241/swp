@@ -25,7 +25,7 @@ export const shiftAssignments = pgTable(
     checkInTime: timestamp("check_in_time"), // Giờ check-in thực tế
     checkOutTime: timestamp("check_out_time"), // Giờ check-out thực tế
     notes: text("notes"), // Ghi chú (lý do vắng mặt, thay ca, v.v.)
-    createdBy: foreignKey("created_by", users.id), // Người tạo lịch (owner/manager)
+    createdBy: foreignKey("created_by", users.id), // Người tạo lịch (owner)
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },

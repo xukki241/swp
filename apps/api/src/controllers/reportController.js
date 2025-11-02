@@ -131,7 +131,7 @@ export const reportController = {
       type: "monthly_sales",
       parameters: {
         year: year ? parseInt(year) : undefined,
-        month: month ? parseInt(month) - 1 : undefined, // Convert to 0-based
+        month: month ? parseInt(month) - 1 : undefined, // Convert 1-12 to 0-11 for service
       },
     });
 

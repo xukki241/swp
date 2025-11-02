@@ -6,12 +6,10 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useInventoryTracking } from "@/hooks/useInventoryTracking";
-import MedicineCard from "./components/MedicineCard";
-
 import { Card } from "@/components/ui/card";
-import { expiringItems, lowStockItems } from "@/hooks/useInventoryTracking";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useInventory } from "@/hooks/useInventory";
+import MedicineCard from "./components/MedicineCard";
 
 const InventoryTracking = () => {
   const {
@@ -21,7 +19,7 @@ const InventoryTracking = () => {
     error,
     refetchLowStock,
     refetchExpiring,
-  } = useInventoryTracking();
+  } = useInventory();
 
   function renderLowStock() {
     if (loading.lowStock) {
@@ -40,9 +38,13 @@ const InventoryTracking = () => {
       );
     }
 
+    if (lowStock.length === 0) {
+      return <div className="text-red-500">No low-stock items yet.</div>;
+    }
+
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {lowStockItems.map((item) => (
+        {lowStock.map((item) => (
           <MedicineCard key={item.id} medicine={item} variant="low-stock" />
         ))}
       </div>
@@ -64,9 +66,13 @@ const InventoryTracking = () => {
       return <div className="text-red-500">Failed to load expiring items.</div>;
     }
 
+    if (expiring.length === 0) {
+      return <div className="text-red-500">No expiring items yet.</div>;
+    }
+
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {expiringItems.map((item) => (
+        {expiring.map((item) => (
           <MedicineCard key={item.id} medicine={item} variant="expiring" />
         ))}
       </div>
@@ -94,11 +100,15 @@ const InventoryTracking = () => {
             className="w-full"
           >
             <AccordionItem value="low-stock">
-              <AccordionTrigger>Low Stock Tracking</AccordionTrigger>
+              <AccordionTrigger className="text-lg">
+                Low Stock Tracking
+              </AccordionTrigger>
               <AccordionContent>{renderLowStock()}</AccordionContent>
             </AccordionItem>
             <AccordionItem value="expiry-tracking">
-              <AccordionTrigger>Expiry Tracking</AccordionTrigger>
+              <AccordionTrigger className="text-lg">
+                Expiry Tracking
+              </AccordionTrigger>
               <AccordionContent>{renderExpiring()}</AccordionContent>
             </AccordionItem>
           </Accordion>

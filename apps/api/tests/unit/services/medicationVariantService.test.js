@@ -406,29 +406,56 @@ describe("MedicationVariantService", () => {
 
   describe("searchVariantsForSale", () => {
     it("should search variants for sale with search term", async () => {
-      const mockResult = [
+      const mockVariants = [
         {
           id: 1,
           medicationId: 1,
           medicationName: "Aspirin",
-          variantName: "100mg",
+          name: "100mg",
           sku: "ASP-100",
           barcode: "1234567890",
           sellPrice: 10.5,
           unit: "tablet",
           isActive: true,
           isForSale: true,
-          availableQuantity: "100",
         },
       ];
 
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        groupBy: vi.fn().mockResolvedValue(mockResult),
+        innerJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue(mockVariants),
+        then: function (resolve) {
+          return resolve(mockVariants);
+        },
       };
       db.select = vi.fn().mockReturnValue(mockQuery);
+
+      // Mock db.query.inventory.findMany for inventory lookup
+      db.query = {
+        inventory: {
+          findMany: vi.fn().mockResolvedValue([
+            {
+              medicationVariantId: 1,
+              quantity: 100,
+              quantityReserved: 0,
+              batchNumber: "BATCH001",
+              expiryDate: new Date("2025-12-31"),
+              binId: 1,
+              bin: {
+                level: "A",
+                number: "1",
+                rack: {
+                  code: "R1",
+                  zone: {
+                    name: "Zone A",
+                  },
+                },
+              },
+            },
+          ]),
+        },
+      };
 
       const result = await medicationVariantService.searchVariantsForSale({
         search: "Aspirin",
@@ -439,29 +466,56 @@ describe("MedicationVariantService", () => {
     });
 
     it("should search variants for sale without search term", async () => {
-      const mockResult = [
+      const mockVariants = [
         {
           id: 1,
           medicationId: 1,
           medicationName: "Aspirin",
-          variantName: "100mg",
+          name: "100mg",
           sku: "ASP-100",
           barcode: "1234567890",
           sellPrice: 10.5,
           unit: "tablet",
           isActive: true,
           isForSale: true,
-          availableQuantity: "50",
         },
       ];
 
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        groupBy: vi.fn().mockResolvedValue(mockResult),
+        innerJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue(mockVariants),
+        then: function (resolve) {
+          return resolve(mockVariants);
+        },
       };
       db.select = vi.fn().mockReturnValue(mockQuery);
+
+      // Mock db.query.inventory.findMany
+      db.query = {
+        inventory: {
+          findMany: vi.fn().mockResolvedValue([
+            {
+              medicationVariantId: 1,
+              quantity: 60,
+              quantityReserved: 10,
+              batchNumber: "BATCH002",
+              expiryDate: new Date("2025-11-30"),
+              binId: 2,
+              bin: {
+                level: "B",
+                number: "2",
+                rack: {
+                  code: "R2",
+                  zone: {
+                    name: "Zone B",
+                  },
+                },
+              },
+            },
+          ]),
+        },
+      };
 
       const result = await medicationVariantService.searchVariantsForSale();
 
@@ -470,29 +524,37 @@ describe("MedicationVariantService", () => {
     });
 
     it("should handle variants with null available quantity", async () => {
-      const mockResult = [
+      const mockVariants = [
         {
           id: 1,
           medicationId: 1,
           medicationName: "Aspirin",
-          variantName: "100mg",
+          name: "100mg",
           sku: "ASP-100",
           barcode: "1234567890",
           sellPrice: 10.5,
           unit: "tablet",
           isActive: true,
           isForSale: true,
-          availableQuantity: null,
         },
       ];
 
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        groupBy: vi.fn().mockResolvedValue(mockResult),
+        innerJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue(mockVariants),
+        then: function (resolve) {
+          return resolve(mockVariants);
+        },
       };
       db.select = vi.fn().mockReturnValue(mockQuery);
+
+      // Mock db.query.inventory.findMany with no inventory
+      db.query = {
+        inventory: {
+          findMany: vi.fn().mockResolvedValue([]),
+        },
+      };
 
       const result = await medicationVariantService.searchVariantsForSale();
 
@@ -503,9 +565,8 @@ describe("MedicationVariantService", () => {
     it("should handle database errors", async () => {
       const mockQuery = {
         from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        groupBy: vi.fn().mockRejectedValue(new Error("Database error")),
+        innerJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockRejectedValue(new Error("Database error")),
       };
       db.select = vi.fn().mockReturnValue(mockQuery);
 

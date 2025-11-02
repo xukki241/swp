@@ -1,8 +1,6 @@
-"use client";
-
 import { BinCard } from "./BinCard";
 
-export function BinGrid({ rackId, bins }) {
+export function BinGrid({ rackId, bins, refetch }) {
   if (!bins || bins.length === 0) {
     return (
       <div className="py-8 text-center">
@@ -58,6 +56,7 @@ export function BinGrid({ rackId, bins }) {
                   level={levelIndex + 1}
                   number={numberIndex + 1}
                   rackId={rackId}
+                  refetch={refetch}
                 />
               ))}
             </div>

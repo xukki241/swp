@@ -11,8 +11,9 @@ import { validateBody, validateQuery } from "../middleware/validate.js";
 
 export const reportRouter = express.Router();
 
-// All routes require authentication
+// All routes require authentication and owner role
 reportRouter.use(authenticate);
+reportRouter.use(authorize("owner"));
 
 // POST /api/reports - Create/generate a new report
 reportRouter.post(
@@ -44,7 +45,7 @@ reportRouter.get("/:id", reportController.getById);
 // DELETE /api/reports/:id - Delete a report
 reportRouter.delete(
   "/:id",
-  authorize(["owner"]),
+  authorize("owner"),
   createAuditLog("DELETE", "report"),
   reportController.delete
 );

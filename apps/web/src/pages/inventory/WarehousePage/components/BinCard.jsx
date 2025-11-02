@@ -1,7 +1,9 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
+import { truncateWords } from "@/lib/utils";
+import { Edit2, Eye, Trash2 } from "lucide-react";
 import { useState } from "react";
+import MedicinePlaceholder from "../../../../assets/medicine-placeholder.jpg";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +32,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../../../../components/ui/tooltip";
+import { Card, CardContent } from "../../../../components/ui/card";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
 
 // Convert number to column letter (1 = A, 2 = B, ..., 27 = AA, 28 = AB, ...)
@@ -43,8 +46,9 @@ function numberToColumn(num) {
   return result;
 }
 
-export function BinCard({ bin, level, number, rackId }) {
+export function BinCard({ bin, level, number, rackId, refetch }) {
   const { updateBinData, deleteBinData } = useWarehouse();
+  const [showBinDetails, setShowBinDetails] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,6 +71,7 @@ export function BinCard({ bin, level, number, rackId }) {
     try {
       await updateBinData(bin.id, formData);
       setShowEditDialog(false);
+      if (refetch) refetch();
     } catch (error) {
       console.error("Failed to update bin:", error);
     } finally {
@@ -80,6 +85,7 @@ export function BinCard({ bin, level, number, rackId }) {
       await deleteBinData(bin.id, rackId);
       setShowDeleteDialog(false);
       setShowEditDialog(false);
+      if (refetch) refetch();
     } catch (error) {
       console.error("Failed to delete bin:", error);
     } finally {
@@ -167,6 +173,81 @@ export function BinCard({ bin, level, number, rackId }) {
         </Tooltip>
       </TooltipProvider>
 
+      {/* Bin Details Dialog */}
+      <Dialog open={showBinDetails} onOpenChange={setShowBinDetails}>
+        <DialogContent className="max-w-2xl" aria-describedby={undefined}>
+          <DialogHeader>
+            <DialogTitle>Bin Details</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <div className="flex items-start gap-6">
+              <img
+                src={
+                  bin?.medication?.medicationVariant?.img_url ||
+                  MedicinePlaceholder ||
+                  "/placeholder.svg"
+                }
+                alt={bin?.name}
+                className="w-32 h-32 rounded-lg object-cover border"
+              />
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {bin?.name || "N/A"}
+                </h3>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Code</Label>
+                <p className="text-lg font-semibold capitalize">
+                  {bin?.code || "N/A"}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Storage Area</Label>
+                <p className="text-lg font-semibold">
+                  {bin?.rack?.zone?.name || "N/A"}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Rack</Label>
+                <p className="text-lg font-semibold">
+                  {bin?.rack?.name || "N/A"}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Level</Label>
+                <p className="text-lg font-semibold">{bin?.level || "N/A"}</p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Number</Label>
+                <p className="text-lg font-semibold">{bin?.number || "N/A"}</p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Medication</Label>
+                <p className="text-lg font-semibold capitalize">
+                  {bin?.medicationVariant?.name || "N/A"}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Stock</Label>
+                <p className="text-lg font-semibold capitalize">
+                  {bin?.medicationVariant?.quantity
+                    ? `${bin?.medicationVariant?.quantity} ${bin?.medicationVariant?.unit}`
+                    : "N/A"}
+                </p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBinDetails(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Bin Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="max-w-md">
@@ -179,22 +260,22 @@ export function BinCard({ bin, level, number, rackId }) {
 
           <form onSubmit={handleEditSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="code">Bin Code</Label>
+              <Label htmlFor="name">Bin Name</Label>
               <Input
-                id="code"
-                name="code"
-                value={formData.code}
+                id="name"
+                name="name"
+                value={formData.name}
                 onChange={handleInputChange}
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="name">Bin Name</Label>
+              <Label htmlFor="code">Bin Code</Label>
               <Input
-                id="name"
-                name="name"
-                value={formData.name}
+                id="code"
+                name="code"
+                value={formData.code}
                 onChange={handleInputChange}
                 required
               />
@@ -228,7 +309,9 @@ export function BinCard({ bin, level, number, rackId }) {
             </div>
 
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label className="mb-2" htmlFor="description">
+                Description
+              </Label>
               <Textarea
                 id="description"
                 name="description"
@@ -341,7 +424,7 @@ export function BinCard({ bin, level, number, rackId }) {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Bin</AlertDialogTitle>
+            <AlertDialogTitle>Delete Bin {bin.name}</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete {bin.name} at position {position}?
               This action cannot be undone.
