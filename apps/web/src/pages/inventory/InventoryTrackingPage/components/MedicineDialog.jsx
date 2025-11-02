@@ -92,40 +92,40 @@ const MedicineDialog = ({ medicine, open, onOpenChange, variant }) => {
 
           {/* Priority Alert Section */}
           {isLowStock && (
-            <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-500 rounded-lg p-4">
+            <div className="bg-yellow-50 dark:bg-yellow-950/30 border-2 border-yellow-500 rounded-lg p-4">
               <div className="flex items-center gap-3 mb-3">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
+                <AlertTriangle className="w-6 h-6 text-yellow-600" />
                 <div>
-                  <h3 className="font-semibold text-red-700 dark:text-red-400 text-lg">
+                  <h3 className="font-semibold text-yellow-700 dark:text-yellow-400 text-lg">
                     Cảnh Báo Tồn Kho Thấp
                   </h3>
-                  <p className="text-sm text-red-600 dark:text-red-500">
+                  <p className="text-sm text-yellow-600 dark:text-yellow-500">
                     Cần chú ý ngay lập tức
                   </p>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-4 mt-3">
                 <div>
-                  <p className="text-xs text-red-600 dark:text-red-500">
+                  <p className="text-xs text-yellow-600 dark:text-yellow-500">
                     Tổng Tồn Kho
                   </p>
-                  <p className="text-2xl font-bold text-red-700 dark:text-red-400">
+                  <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">
                     {quantity}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-red-600 dark:text-red-500">
+                  <p className="text-xs text-yellow-600 dark:text-yellow-500">
                     Đã Sử Dụng
                   </p>
-                  <p className="text-2xl font-bold text-red-700 dark:text-red-400">
+                  <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">
                     {quantityReserved}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-red-600 dark:text-red-500">
+                  <p className="text-xs text-yellow-600 dark:text-yellow-500">
                     Có Sẵn
                   </p>
-                  <p className="text-2xl font-bold text-red-700 dark:text-red-400">
+                  <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">
                     {availableQuantity}
                   </p>
                 </div>
@@ -134,36 +134,72 @@ const MedicineDialog = ({ medicine, open, onOpenChange, variant }) => {
           )}
 
           {isExpiring && daysRemaining !== null && (
-            <div className="bg-yellow-50 dark:bg-yellow-950/30 border-2 border-yellow-500 rounded-lg p-4">
+            <div className={`border-2 rounded-lg p-4 ${
+              daysRemaining < 0
+                ? "bg-red-50 dark:bg-red-950/30 border-red-500"
+                : "bg-orange-50 dark:bg-orange-950/30 border-orange-500"
+            }`}>
               <div className="flex items-center gap-3 mb-3">
-                <AlertTriangle className="w-6 h-6 text-yellow-600" />
+                <AlertTriangle className={`w-6 h-6 ${
+                  daysRemaining < 0 ? "text-red-600" : "text-orange-600"
+                }`} />
                 <div>
-                  <h3 className="font-semibold text-yellow-700 dark:text-yellow-400 text-lg">
-                    Sắp Hết Hạn
+                  <h3 className={`font-semibold text-lg ${
+                    daysRemaining < 0
+                      ? "text-red-700 dark:text-red-400"
+                      : "text-orange-700 dark:text-orange-400"
+                  }`}>
+                    {daysRemaining < 0 ? "Đã Quá Hạn" : "Sắp Hết Hạn"}
                   </h3>
-                  <p className="text-sm text-yellow-600 dark:text-yellow-500">
-                    Cần hành động trong {daysRemaining} ngày
+                  <p className={`text-sm ${
+                    daysRemaining < 0
+                      ? "text-red-600 dark:text-red-500"
+                      : "text-orange-600 dark:text-orange-500"
+                  }`}>
+                    {daysRemaining < 0
+                      ? `Đã quá hạn ${Math.abs(daysRemaining)} ngày`
+                      : `Cần hành động trong ${daysRemaining} ngày`}
                   </p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 mt-3">
                 <div>
-                  <p className="text-xs text-yellow-600 dark:text-yellow-500">
-                    Ngày Còn Lại
+                  <p className={`text-xs ${
+                    daysRemaining < 0
+                      ? "text-red-600 dark:text-red-500"
+                      : "text-orange-600 dark:text-orange-500"
+                  }`}>
+                    {daysRemaining < 0 ? "Số Ngày Quá Hạn" : "Ngày Còn Lại"}
                   </p>
-                  <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">
-                    {daysRemaining}
+                  <p className={`text-2xl font-bold ${
+                    daysRemaining < 0
+                      ? "text-red-700 dark:text-red-400"
+                      : "text-orange-700 dark:text-orange-400"
+                  }`}>
+                    {Math.abs(daysRemaining)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-yellow-600 dark:text-yellow-500">
+                  <p className={`text-xs ${
+                    daysRemaining < 0
+                      ? "text-red-600 dark:text-red-500"
+                      : "text-orange-600 dark:text-orange-500"
+                  }`}>
                     Ngày Hết Hạn
                   </p>
-                  <p className="text-lg font-semibold text-yellow-700 dark:text-yellow-400">
+                  <p className={`text-lg font-semibold ${
+                    daysRemaining < 0
+                      ? "text-red-700 dark:text-red-400"
+                      : "text-orange-700 dark:text-orange-400"
+                  }`}>
                     {new Date(expiryDate).toLocaleDateString()}
                   </p>
                   {isCalculatedExpiry && (
-                    <p className="text-xs text-yellow-600 dark:text-yellow-500 italic">
+                    <p className={`text-xs italic ${
+                      daysRemaining < 0
+                        ? "text-red-600 dark:text-red-500"
+                        : "text-orange-600 dark:text-orange-500"
+                    }`}>
                       (Tính toán: SX + 1 năm)
                     </p>
                   )}

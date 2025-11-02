@@ -47,9 +47,11 @@ const MedicineCard = ({ medicine = {}, variant }) => {
   const cardClass = cn(
     "relative group cursor-pointer hover:shadow-lg transition-all duration-200 h-full",
     {
-      "border-red-500 bg-red-50 dark:bg-red-950/20": variant === "low-stock",
-      "border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20":
-        variant === "expiring",
+      "border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20": variant === "low-stock",
+      "border-orange-500 bg-orange-50 dark:bg-orange-950/20":
+        variant === "expiring" && daysRemaining >= 0,
+      "border-red-500 bg-red-50 dark:bg-red-950/20":
+        variant === "expiring" && daysRemaining < 0,
     }
   );
 
@@ -84,46 +86,74 @@ const MedicineCard = ({ medicine = {}, variant }) => {
         <CardContent className="space-y-3 pt-0">
           {/* Priority Info */}
           {variant === "low-stock" ? (
-            <div className="bg-red-100 dark:bg-red-900/30 rounded-lg p-3 border border-red-300">
+            <div className="bg-yellow-100 dark:bg-yellow-900/30 rounded-lg p-3 border border-yellow-300">
               <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle className="w-4 h-4 text-red-600" />
-                <span className="text-xs font-medium text-red-700 dark:text-red-400">
+                <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                <span className="text-xs font-medium text-yellow-700 dark:text-yellow-400">
                   Cảnh Báo Tồn Kho Thấp
                 </span>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-bold text-red-700 dark:text-red-400">
+                <span className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">
                   {availableQuantity}
                 </span>
-                <span className="text-sm text-red-600 dark:text-red-500">
+                <span className="text-sm text-yellow-600 dark:text-yellow-500">
                   {variantUnit} có sẵn
                 </span>
               </div>
               {quantityReserved > 0 && (
-                <p className="text-xs text-red-600 dark:text-red-500 mt-1">
+                <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-1">
                   ({quantityReserved} Đã Sử Dụng)
                 </p>
               )}
             </div>
           ) : (
-            <div className="bg-yellow-100 dark:bg-yellow-900/30 rounded-lg p-3 border border-yellow-300">
+            <div className={cn(
+              "rounded-lg p-3 border",
+              daysRemaining < 0
+                ? "bg-red-100 dark:bg-red-900/30 border-red-300"
+                : "bg-orange-100 dark:bg-orange-900/30 border-orange-300"
+            )}>
               <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                <span className="text-xs font-medium text-yellow-700 dark:text-yellow-400">
-                  Sắp Hết Hạn
+                <AlertTriangle className={cn(
+                  "w-4 h-4",
+                  daysRemaining < 0 ? "text-red-600" : "text-orange-600"
+                )} />
+                <span className={cn(
+                  "text-xs font-medium",
+                  daysRemaining < 0
+                    ? "text-red-700 dark:text-red-400"
+                    : "text-orange-700 dark:text-orange-400"
+                )}>
+                  {daysRemaining < 0 ? "Đã Quá Hạn" : "Sắp Hết Hạn"}
                 </span>
               </div>
               {daysRemaining !== null && (
                 <>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">
-                      {daysRemaining}
+                    <span className={cn(
+                      "text-2xl font-bold",
+                      daysRemaining < 0
+                        ? "text-red-700 dark:text-red-400"
+                        : "text-orange-700 dark:text-orange-400"
+                    )}>
+                      {Math.abs(daysRemaining)}
                     </span>
-                    <span className="text-sm text-yellow-600 dark:text-yellow-500">
-                      ngày còn lại
+                    <span className={cn(
+                      "text-sm",
+                      daysRemaining < 0
+                        ? "text-red-600 dark:text-red-500"
+                        : "text-orange-600 dark:text-orange-500"
+                    )}>
+                      {daysRemaining < 0 ? "ngày quá hạn" : "ngày còn lại"}
                     </span>
                   </div>
-                  <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-1">
+                  <p className={cn(
+                    "text-xs mt-1",
+                    daysRemaining < 0
+                      ? "text-red-600 dark:text-red-500"
+                      : "text-orange-600 dark:text-orange-500"
+                  )}>
                     Hết hạn: {new Date(expiryDate).toLocaleDateString()}
                   </p>
                 </>
@@ -142,7 +172,11 @@ const MedicineCard = ({ medicine = {}, variant }) => {
             {variant === "expiring" && daysRemaining !== null && (
               <div className="flex items-center gap-2">
                 <Calendar className="w-3.5 h-3.5" />
-                <span>Hết hạn trong {daysRemaining} ngày</span>
+                <span>
+                  {daysRemaining < 0
+                    ? `Đã quá hạn ${Math.abs(daysRemaining)} ngày`
+                    : `Hết hạn trong ${daysRemaining} ngày`}
+                </span>
               </div>
             )}
             <div className="flex items-center gap-2">

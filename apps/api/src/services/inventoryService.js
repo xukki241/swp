@@ -347,7 +347,6 @@ export const inventoryService = {
 
     const totalCount = filteredData.length;
     const data = filteredData.slice(offset, offset + limit);
-
     return {
       data,
       total: totalCount,
