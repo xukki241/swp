@@ -47,7 +47,8 @@ const MedicineCard = ({ medicine = {}, variant }) => {
   const cardClass = cn(
     "relative group cursor-pointer hover:shadow-lg transition-all duration-200 h-full",
     {
-      "border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20": variant === "low-stock",
+      "border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20":
+        variant === "low-stock",
       "border-orange-500 bg-orange-50 dark:bg-orange-950/20":
         variant === "expiring" && daysRemaining >= 0,
       "border-red-500 bg-red-50 dark:bg-red-950/20":
@@ -108,52 +109,64 @@ const MedicineCard = ({ medicine = {}, variant }) => {
               )}
             </div>
           ) : (
-            <div className={cn(
-              "rounded-lg p-3 border",
-              daysRemaining < 0
-                ? "bg-red-100 dark:bg-red-900/30 border-red-300"
-                : "bg-orange-100 dark:bg-orange-900/30 border-orange-300"
-            )}>
+            <div
+              className={cn(
+                "rounded-lg p-3 border",
+                daysRemaining < 0
+                  ? "bg-red-100 dark:bg-red-900/30 border-red-300"
+                  : "bg-orange-100 dark:bg-orange-900/30 border-orange-300"
+              )}
+            >
               <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle className={cn(
-                  "w-4 h-4",
-                  daysRemaining < 0 ? "text-red-600" : "text-orange-600"
-                )} />
-                <span className={cn(
-                  "text-xs font-medium",
-                  daysRemaining < 0
-                    ? "text-red-700 dark:text-red-400"
-                    : "text-orange-700 dark:text-orange-400"
-                )}>
+                <AlertTriangle
+                  className={cn(
+                    "w-4 h-4",
+                    daysRemaining < 0 ? "text-red-600" : "text-orange-600"
+                  )}
+                />
+                <span
+                  className={cn(
+                    "text-xs font-medium",
+                    daysRemaining < 0
+                      ? "text-red-700 dark:text-red-400"
+                      : "text-orange-700 dark:text-orange-400"
+                  )}
+                >
                   {daysRemaining < 0 ? "Đã Quá Hạn" : "Sắp Hết Hạn"}
                 </span>
               </div>
               {daysRemaining !== null && (
                 <>
                   <div className="flex items-baseline gap-1">
-                    <span className={cn(
-                      "text-2xl font-bold",
-                      daysRemaining < 0
-                        ? "text-red-700 dark:text-red-400"
-                        : "text-orange-700 dark:text-orange-400"
-                    )}>
+                    <span
+                      className={cn(
+                        "text-2xl font-bold",
+                        daysRemaining < 0
+                          ? "text-red-700 dark:text-red-400"
+                          : "text-orange-700 dark:text-orange-400"
+                      )}
+                    >
                       {Math.abs(daysRemaining)}
                     </span>
-                    <span className={cn(
-                      "text-sm",
-                      daysRemaining < 0
-                        ? "text-red-600 dark:text-red-500"
-                        : "text-orange-600 dark:text-orange-500"
-                    )}>
+                    <span
+                      className={cn(
+                        "text-sm",
+                        daysRemaining < 0
+                          ? "text-red-600 dark:text-red-500"
+                          : "text-orange-600 dark:text-orange-500"
+                      )}
+                    >
                       {daysRemaining < 0 ? "ngày quá hạn" : "ngày còn lại"}
                     </span>
                   </div>
-                  <p className={cn(
-                    "text-xs mt-1",
-                    daysRemaining < 0
-                      ? "text-red-600 dark:text-red-500"
-                      : "text-orange-600 dark:text-orange-500"
-                  )}>
+                  <p
+                    className={cn(
+                      "text-xs mt-1",
+                      daysRemaining < 0
+                        ? "text-red-600 dark:text-red-500"
+                        : "text-orange-600 dark:text-orange-500"
+                    )}
+                  >
                     Hết hạn: {new Date(expiryDate).toLocaleDateString()}
                   </p>
                 </>
