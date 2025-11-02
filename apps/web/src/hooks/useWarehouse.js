@@ -28,25 +28,29 @@ export const useWarehouse = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch all zones on mount
-  useEffect(() => {
-    fetchZones();
-  }, []);
-
   // Fetch zones
   const fetchZones = useCallback(async () => {
     try {
       setLoading(true);
       const responseData = await getAllZones();
-      setZones(responseData.data || []);
+      console.info("Fetched zones response:", responseData);
+      const zonesData = responseData.data || [];
+      console.info("Setting zones:", zonesData);
+      setZones(zonesData);
       setError(null);
     } catch (err) {
+      console.error("Error fetching zones:", err);
       setError(err.message);
       toast.error("Failed to fetch zones");
     } finally {
       setLoading(false);
     }
   }, []);
+
+  // Fetch all zones on mount
+  useEffect(() => {
+    fetchZones();
+  }, [fetchZones]);
 
   const refetchZone = useCallback(async (zoneId) => {
     try {

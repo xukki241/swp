@@ -42,7 +42,7 @@ export default function WarehousePage() {
     refetchZone,
     createZoneData,
   } = useWarehouse();
-  const [selectedZoneId, setSelectedZoneId] = useState(null);
+  const [selectedZoneId, setSelectedZoneId] = useState("");
   const [showAddZoneDialog, setShowAddZoneDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -53,15 +53,27 @@ export default function WarehousePage() {
     description: "",
   });
 
-  function handleZoneChange(zoneId) {
-    setSelectedZoneId(zoneId);
-  }
-
+  // Debug: Log zones when they change
   useEffect(() => {
-    if (selectedZoneId) {
-      selectZone(selectedZoneId);
+    console.info("Zones loaded:", zones);
+    console.info("Zones length:", zones?.length);
+    console.info("Zones is array:", Array.isArray(zones));
+  }, [zones]);
+
+  const handleZoneChange = (zoneId) => {
+    console.info("Zone selected:", zoneId);
+    setSelectedZoneId(zoneId);
+    if (zoneId) {
+      selectZone(zoneId);
     }
-  }, [selectedZoneId]);
+  };
+
+  // Remove the useEffect since we're calling selectZone directly in handleZoneChange
+  // useEffect(() => {
+  //   if (selectedZoneId) {
+  //     selectZone(selectedZoneId);
+  //   }
+  // }, [selectedZoneId, selectZone]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -131,19 +143,22 @@ export default function WarehousePage() {
               </Button>
             </CardHeader>
             <CardContent>
-              <Select
-                value={selectedZoneId || ""}
-                onValueChange={handleZoneChange}
-              >
+              <Select value={selectedZoneId} onValueChange={handleZoneChange}>
                 <SelectTrigger className="w-full md:w-90">
                   <SelectValue placeholder="Choose a zone..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {zones.map((zone) => (
-                    <SelectItem key={zone.id} value={zone.id}>
-                      {zone.name} ({zone.code})
-                    </SelectItem>
-                  ))}
+                  {zones && zones.length > 0 ? (
+                    zones.map((zone) => (
+                      <SelectItem key={zone.id} value={zone.id}>
+                        {zone.name} ({zone.code})
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="px-2 py-1 text-sm text-muted-foreground">
+                      No zones available
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             </CardContent>

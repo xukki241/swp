@@ -1,7 +1,6 @@
 "use client";
 
-import { truncateWords } from "@/lib/utils";
-import { Edit2, Eye, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import MedicinePlaceholder from "../../../../assets/medicine-placeholder.jpg";
 import {
@@ -32,7 +31,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../../../../components/ui/tooltip";
-import { Card, CardContent } from "../../../../components/ui/card";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
 
 // Convert number to column letter (1 = A, 2 = B, ..., 27 = AA, 28 = AB, ...)
