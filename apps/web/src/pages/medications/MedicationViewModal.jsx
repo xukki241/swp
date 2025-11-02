@@ -158,20 +158,20 @@ export default function MedicationViewModal({
         />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm flex-1">
           <div>
-            <b>Brand:</b> {medication.brand || "-"}
+            <b>Thương hiệu:</b> {medication.brand || "-"}
           </div>
           <div>
-            <b>Status:</b> {medication.status || "-"}
+            <b>Trạng thái:</b> {medication.status || "-"}
           </div>
           <div>
-            <b>Prescription:</b>{" "}
-            {medication.isPrescriptionRequired ? "Yes" : "No"}
+            <b>Đơn thuốc:</b>{" "}
+            {medication.isPrescriptionRequired ? "Cần" : "Không"}
           </div>
           <div>
-            <b>Controlled:</b> {medication.isControlledSubstance ? "Yes" : "No"}
+            <b>Kiểm soát:</b> {medication.isControlledSubstance ? "Có" : "Không"}
           </div>
           <div className="col-span-2 md:col-span-4">
-            <b>Description:</b> {medication.description || "-"}
+            <b>Mô tả:</b> {medication.description || "-"}
           </div>
         </div>
       </div>
@@ -179,19 +179,19 @@ export default function MedicationViewModal({
       {/* Variants */}
       {withVariants && (
         <div>
-          <h3 className="font-semibold mb-2">Variants</h3>
+          <h3 className="font-semibold mb-2">Biến thể</h3>
           <div className="rounded-md border overflow-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>SKU</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Unit</TableHead>
-                  <TableHead>Factor</TableHead>
-                  <TableHead>Barcode</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Active</TableHead>
-                  <TableHead>For Sale</TableHead>
+                  <TableHead>Tên</TableHead>
+                  <TableHead>Đơn vị</TableHead>
+                  <TableHead>Hệ số</TableHead>
+                  <TableHead>Mã vạch</TableHead>
+                  <TableHead>Giá</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead>Bán</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -203,8 +203,8 @@ export default function MedicationViewModal({
                     <TableCell>{v.unitFactor}</TableCell>
                     <TableCell>{v.barcode || "-"}</TableCell>
                     <TableCell>{v.sellPrice}</TableCell>
-                    <TableCell>{v.isActive ? "Active" : "Inactive"}</TableCell>
-                    <TableCell>{v.isForSale ? "Yes" : "No"}</TableCell>
+                    <TableCell>{v.isActive ? "Hoạt động" : "Ngừng"}</TableCell>
+                    <TableCell>{v.isForSale ? "Có" : "Không"}</TableCell>
                   </TableRow>
                 ))}
                 {variants.length === 0 && (
@@ -213,7 +213,7 @@ export default function MedicationViewModal({
                       colSpan={8}
                       className="text-center text-muted-foreground"
                     >
-                      No variants
+                      Không có biến thể
                     </TableCell>
                   </TableRow>
                 )}
@@ -225,15 +225,15 @@ export default function MedicationViewModal({
 
       {/* Suppliers */}
       <div>
-        <h3 className="font-semibold mb-2">Suppliers</h3>
+        <h3 className="font-semibold mb-2">Nhà cung cấp</h3>
         <div className="rounded-md border overflow-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Contact</TableHead>
+                <TableHead>Tên</TableHead>
+                <TableHead>Liên hệ</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
+                <TableHead>Điện thoại</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -251,7 +251,7 @@ export default function MedicationViewModal({
                     colSpan={4}
                     className="text-center text-muted-foreground"
                   >
-                    No suppliers
+                    Không có nhà cung cấp
                   </TableCell>
                 </TableRow>
               )}
@@ -262,16 +262,16 @@ export default function MedicationViewModal({
 
       {/* Purchases */}
       <div>
-        <h3 className="font-semibold mb-2">Purchase Orders</h3>
+        <h3 className="font-semibold mb-2">Đơn đặt hàng</h3>
         <div className="rounded-md border overflow-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Supplier</TableHead>
-                <TableHead>Order Date</TableHead>
-                <TableHead>Expected</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Total</TableHead>
+                <TableHead>Nhà cung cấp</TableHead>
+                <TableHead>Ngày đặt</TableHead>
+                <TableHead>Dự kiến</TableHead>
+                <TableHead>Trạng thái</TableHead>
+                <TableHead>Tổng</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -294,7 +294,7 @@ export default function MedicationViewModal({
                     colSpan={5}
                     className="text-center text-muted-foreground"
                   >
-                    No purchases
+                    Không có đơn đặt hàng
                   </TableCell>
                 </TableRow>
               )}
@@ -305,16 +305,16 @@ export default function MedicationViewModal({
 
       {/* Sales (customerName / short id) */}
       <div>
-        <h3 className="font-semibold mb-2">Sales Orders</h3>
+        <h3 className="font-semibold mb-2">Đơn bán hàng</h3>
         <div className="rounded-md border overflow-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Order Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Payment</TableHead>
-                <TableHead>Total</TableHead>
+                <TableHead>Khách hàng</TableHead>
+                <TableHead>Ngày đặt</TableHead>
+                <TableHead>Trạng thái</TableHead>
+                <TableHead>Thanh toán</TableHead>
+                <TableHead>Tổng</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -335,7 +335,7 @@ export default function MedicationViewModal({
                     colSpan={5}
                     className="text-center text-muted-foreground"
                   >
-                    No sales
+                    Không có đơn bán hàng
                   </TableCell>
                 </TableRow>
               )}
@@ -346,15 +346,15 @@ export default function MedicationViewModal({
 
       {/* Inventory — hiển thị Variant Name thay vì ID */}
       <div>
-        <h3 className="font-semibold mb-2">Inventory Summary</h3>
+        <h3 className="font-semibold mb-2">Tồn kho</h3>
         <div className="rounded-md border overflow-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Variant</TableHead>
-                <TableHead>Total Qty</TableHead>
-                <TableHead>Reserved</TableHead>
-                <TableHead>Available</TableHead>
+                <TableHead>Biến thể</TableHead>
+                <TableHead>Tổng số</TableHead>
+                <TableHead>Đã đặt</TableHead>
+                <TableHead>Còn lại</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -384,7 +384,7 @@ export default function MedicationViewModal({
                       colSpan={4}
                       className="text-center text-muted-foreground"
                     >
-                      No inventory
+                      Không có tồn kho
                     </TableCell>
                   </TableRow>
                 )}
@@ -401,7 +401,7 @@ export default function MedicationViewModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl" aria-describedby="med-view-desc">
         <DialogHeader>
-          <DialogTitle>Medication • {medication.name}</DialogTitle>
+          <DialogTitle>Thuốc • {medication.name}</DialogTitle>
           <DialogDescription id="med-view-desc" className="sr-only">
             Medication details view
           </DialogDescription>
@@ -411,7 +411,7 @@ export default function MedicationViewModal({
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Close</Button>
+            <Button variant="outline">Đóng</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
@@ -434,7 +434,7 @@ export default function MedicationViewModal({
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Close</Button>
+              <Button variant="outline">Đóng</Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>

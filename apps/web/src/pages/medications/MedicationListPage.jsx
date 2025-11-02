@@ -406,12 +406,12 @@ if (!barcode) return true;
     <AppLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Medications</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Quản lý Thuốc</h1>
         </div>
 
         <Card>
           <CardHeader>
-<CardTitle>Medication Catalog</CardTitle>
+<CardTitle>Danh mục Thuốc</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* FILTER BAR */}
@@ -427,14 +427,14 @@ if (!barcode) return true;
                     className="h-9 rounded-md border border-input bg-background px-3 text-sm"
                     title="Filter by status"
                   >
-                    <option value="all">All status</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="all">Tất cả trạng thái</option>
+                    <option value="active">Đang hoạt động</option>
+                    <option value="inactive">Ngừng hoạt động</option>
                   </select>
 
                   <Input
                     className="w-64"
-                    placeholder="Search by name or brand…"
+                    placeholder="Tìm theo tên hoặc thương hiệu…"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                   />
@@ -443,7 +443,7 @@ if (!barcode) return true;
                 <div className="flex gap-2">
                   <Button type="submit">
                     <Search className="w-4 h-4 mr-1" />
-                    Search
+                    Tìm kiếm
                   </Button>
                   <Button
                     type="button"
@@ -451,7 +451,7 @@ if (!barcode) return true;
                     onClick={handleClearFilters}
                   >
                     <X className="w-4 h-4 mr-1" />
-                    Clear
+                    Xóa bộ lọc
                   </Button>
                 </div>
               </form>
@@ -459,7 +459,7 @@ if (!barcode) return true;
               <div className="flex gap-2">
                 <Button onClick={openAdd}>
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  Add
+                  Thêm mới
                 </Button>
               </div>
             </div>
@@ -516,10 +516,10 @@ if (!barcode) return true;
                               size="sm"
                               variant="outline"
                               onClick={() => handleEdit(m)}
-                              title="Edit"
+                              title="Chỉnh sửa"
                             >
                               <Edit className="w-4 h-4 mr-1" />
-                              Edit
+                              Sửa
                             </Button>
                             <Button
                               size="sm"
@@ -529,19 +529,19 @@ if (!barcode) return true;
                                   state: { medication: m },
                                 })
                               }
-                              title="Manage variants"
+                              title="Quản lý biến thể"
                             >
                               <Package className="w-4 h-4 mr-1" />
-                              Variants
+                              Biến thể
                             </Button>
                             <Button
                               size="sm"
                               variant="destructive"
                               onClick={() => handleDelete(m.id)}
-                              title="Delete"
+                              title="Xóa"
                             >
                               <Trash2 className="w-4 h-4 mr-1" />
-                              Delete
+                              Xóa
                             </Button>
                           </>
                         )}
@@ -552,7 +552,7 @@ if (!barcode) return true;
 
                 {medications.length === 0 && (
                   <div className="rounded-xl border p-10 text-center text-sm text-muted-foreground">
-                    No medications found
+                    Không tìm thấy thuốc nào
                   </div>
                 )}
               </div>
@@ -569,7 +569,7 @@ if (!barcode) return true;
             </p>
             <DialogHeader>
               <DialogTitle>
-                {editing ? "Edit Medication" : "Add Medication"}
+                {editing ? "Chỉnh sửa Thuốc" : "Thêm Thuốc mới"}
               </DialogTitle>
             </DialogHeader>
 
@@ -626,7 +626,7 @@ if (!barcode) return true;
                     />
                     <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm">
                       <ImageIcon className="w-4 h-4" />
-                      Choose image…
+                      Chọn ảnh…
                     </span>
                   </label>
 
@@ -635,7 +635,7 @@ if (!barcode) return true;
                       checked={removeImage}
                       onCheckedChange={(c) => setRemoveImage(!!c)}
                     />
-<span>Remove image</span>
+<span>Xóa ảnh</span>
                   </label>
                 </div>
               </div>
@@ -645,12 +645,12 @@ if (!barcode) return true;
                 name="name"
                 control={control}
                 rules={{ required: true }}
-                render={({ field }) => <Input {...field} placeholder="Name" />}
+                render={({ field }) => <Input {...field} placeholder="Tên thuốc" />}
               />
               <Controller
                 name="brand"
                 control={control}
-                render={({ field }) => <Input {...field} placeholder="Brand" />}
+                render={({ field }) => <Input {...field} placeholder="Thương hiệu" />}
               />
               <Controller
                 name="description"
@@ -659,7 +659,7 @@ if (!barcode) return true;
                   <Input
                     {...field}
                     className="md:col-span-2"
-                    placeholder="Description"
+                    placeholder="Mô tả"
                   />
                 )}
               />
@@ -674,7 +674,7 @@ if (!barcode) return true;
                         checked={!!value}
                         onCheckedChange={(c) => onChange(!!c)}
                       />
-                      <span>Prescription required</span>
+                      <span>Cần đơn thuốc</span>
                     </>
                   )}
                 />
@@ -690,7 +690,7 @@ if (!barcode) return true;
                         checked={!!value}
                         onCheckedChange={(c) => onChange(!!c)}
                       />
-                      <span>Controlled substance</span>
+                      <span>Chất kiểm soát</span>
                     </>
                   )}
                 />
@@ -706,8 +706,8 @@ if (!barcode) return true;
                       onChange={(e) => onChange(e.target.value)}
                       className="h-9 w-40 rounded-md border border-input bg-background px-3 text-sm"
                     >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
+                      <option value="active">Đang hoạt động</option>
+                      <option value="inactive">Ngừng hoạt động</option>
                     </select>
                   )}
                 />
@@ -716,11 +716,11 @@ if (!barcode) return true;
               <DialogFooter className="md:col-span-2 flex gap-2 justify-end">
                 <DialogClose asChild>
                   <Button type="button" variant="outline">
-                    Cancel
+                    Hủy
                   </Button>
                 </DialogClose>
                 <Button type="submit">
-{editing ? "Save Changes" : "Add Medication"}
+{editing ? "Lưu thay đổi" : "Thêm thuốc"}
                 </Button>
               </DialogFooter>
             </form>
@@ -743,7 +743,7 @@ if (!barcode) return true;
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Close</Button>
+              <Button variant="outline">Đóng</Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>

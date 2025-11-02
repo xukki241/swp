@@ -218,10 +218,10 @@ export default function MedicationVariantsPage() {
             })
           }
         >
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Details
+          <ArrowLeft className="w-4 h-4 mr-2" /> Quay lại Chi tiết
         </Button>
         <Button variant="outline" onClick={() => navigate("/medications")}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Medications
+          <ArrowLeft className="w-4 h-4 mr-2" /> Quay lại Danh sách Thuốc
         </Button>
       </div>
 
@@ -244,14 +244,14 @@ export default function MedicationVariantsPage() {
                   className="h-9 rounded-md border border-input bg-background px-3 text-sm"
                   title="Filter by status"
                 >
-                  <option value="all">All status</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  <option value="all">Tất cả trạng thái</option>
+                  <option value="active">Đang hoạt động</option>
+                  <option value="inactive">Ngừng hoạt động</option>
                 </select>
 
                 <Input
                   className="w-64"
-                  placeholder="Search by SKU / Name / Barcode…"
+                  placeholder="Tìm theo SKU / Tên / Mã vạch…"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                 />
@@ -260,7 +260,7 @@ export default function MedicationVariantsPage() {
               <div className="flex gap-2">
                 <Button type="submit">
                   <Search className="w-4 h-4 mr-1" />
-                  Search
+                  Tìm kiếm
                 </Button>
                 <Button
                   type="button"
@@ -268,14 +268,14 @@ export default function MedicationVariantsPage() {
                   onClick={handleClearFilters}
                 >
                   <X className="w-4 h-4 mr-1" />
-                  Clear
+                  Xóa bộ lọc
                 </Button>
               </div>
             </form>
 
             <div className="flex gap-2">
               <Button onClick={openAdd}>
-                <PlusCircle className="mr-2 h-4 w-4" /> Add Variant
+                <PlusCircle className="mr-2 h-4 w-4" /> Thêm Biến thể
               </Button>
             </div>
           </div>
@@ -286,13 +286,13 @@ export default function MedicationVariantsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>SKU</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Unit</TableHead>
-                  <TableHead>Factor</TableHead>
-                  <TableHead>Barcode</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Active</TableHead>
-                  <TableHead>For Sale</TableHead>
+                  <TableHead>Tên</TableHead>
+                  <TableHead>Đơn vị</TableHead>
+                  <TableHead>Hệ số</TableHead>
+                  <TableHead>Mã vạch</TableHead>
+                  <TableHead>Giá</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead>Bán</TableHead>
                   <TableHead className="text-right" />
                 </TableRow>
               </TableHeader>
@@ -309,13 +309,13 @@ export default function MedicationVariantsPage() {
                         ? v.sellPrice.toLocaleString()
                         : v.sellPrice}
                     </TableCell>
-                    <TableCell>{v.isActive ? "Active" : "Inactive"}</TableCell>
-                    <TableCell>{v.isForSale ? "Yes" : "No"}</TableCell>
+                    <TableCell>{v.isActive ? "Đang hoạt động" : "Ngừng"}</TableCell>
+                    <TableCell>{v.isForSale ? "Có" : "Không"}</TableCell>
                     <TableCell className="text-right space-x-2">
                       <Button
                         size="sm"
                         onClick={() => openEdit(v)}
-                        title="Edit"
+                        title="Chỉnh sửa"
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -323,7 +323,7 @@ export default function MedicationVariantsPage() {
                         size="sm"
                         variant="destructive"
                         onClick={() => onDeleteVariant(v.id)}
-                        title="Delete"
+                        title="Xóa"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -336,7 +336,7 @@ export default function MedicationVariantsPage() {
                       colSpan={9}
                       className="text-center text-sm text-muted-foreground"
                     >
-                      No variants
+                      Không có biến thể nào
                     </TableCell>
                   </TableRow>
                 )}
@@ -357,7 +357,7 @@ export default function MedicationVariantsPage() {
           </p>
           <DialogHeader>
             <DialogTitle>
-              {editingVar ? "Edit Variant" : "Add Variant"}
+              {editingVar ? "Chỉnh sửa Biến thể" : "Thêm Biến thể"}
             </DialogTitle>
           </DialogHeader>
 
@@ -373,28 +373,28 @@ export default function MedicationVariantsPage() {
             <Controller
               name="name"
               control={control}
-              render={({ field }) => <Input {...field} placeholder="Name" />}
+              render={({ field }) => <Input {...field} placeholder="Tên" />}
             />
             <Controller
               name="unit"
               control={control}
-              render={({ field }) => <Input {...field} placeholder="Unit" />}
+              render={({ field }) => <Input {...field} placeholder="Đơn vị" />}
             />
             <Controller
               name="unitFactor"
               control={control}
-              render={({ field }) => <Input {...field} placeholder="Factor" />}
+              render={({ field }) => <Input {...field} placeholder="Hệ số" />}
             />
             <Controller
               name="barcode"
               control={control}
-              render={({ field }) => <Input {...field} placeholder="Barcode" />}
+              render={({ field }) => <Input {...field} placeholder="Mã vạch" />}
             />
             <Controller
               name="sellPrice"
               control={control}
               render={({ field }) => (
-                <Input {...field} placeholder="Sell Price" type="number" />
+                <Input {...field} placeholder="Giá bán" type="number" />
               )}
             />
             <div className="flex items-center gap-2">
@@ -407,7 +407,7 @@ export default function MedicationVariantsPage() {
                       checked={!!value}
                       onCheckedChange={(c) => onChange(!!c)}
                     />
-                    <span>Active</span>
+                    <span>Hoạt động</span>
                   </>
                 )}
               />
@@ -422,7 +422,7 @@ export default function MedicationVariantsPage() {
                       checked={!!value}
                       onCheckedChange={(c) => onChange(!!c)}
                     />
-                    <span>For Sale</span>
+                    <span>Có bán</span>
                   </>
                 )}
               />
@@ -431,11 +431,11 @@ export default function MedicationVariantsPage() {
             <DialogFooter className="md:col-span-2 lg:col-span-3 flex gap-2 justify-end">
               <DialogClose asChild>
                 <Button type="button" variant="outline">
-                  Cancel
+                  Hủy
                 </Button>
               </DialogClose>
               <Button type="submit">
-                {editingVar ? "Save Changes" : "Add Variant"}
+                {editingVar ? "Lưu thay đổi" : "Thêm biến thể"}
               </Button>
             </DialogFooter>
           </form>

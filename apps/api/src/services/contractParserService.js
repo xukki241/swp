@@ -1,4 +1,4 @@
-import mammoth from "mammoth";
+// import mammoth from "mammoth"; // Temporarily disabled
 
 import logger from "../utils/logger.js";
 
@@ -24,12 +24,7 @@ async function extractTextFromPDF(dataBuffer) {
  * @returns {Promise<string>} Extracted text
  */
 async function extractTextFromDOC(dataBuffer) {
-  try {
-    const result = await mammoth.extractRawText({ buffer: dataBuffer });
-    return result.value;
-  } catch (error) {
-    throw new Error(`Failed to extract DOC text: ${error.message}`);
-  }
+  throw new Error('Contract parsing is temporarily disabled. Please install mammoth package.');
 }
 
 /**
