@@ -104,7 +104,7 @@ export const login = async (req, res, _next) => {
  * Logout user (User Story 4)
  * @route POST /api/auth/logout
  */
-export const logout = async (req, res, next) => {
+export const logout = async (req, res, _next) => {
   try {
     const { refreshToken } = req.body;
 
@@ -306,16 +306,16 @@ export const verifyOTPAndResetPassword = async (req, res, _next) => {
  */
 export const refreshToken = async (req, res, _next) => {
   try {
-    const { refreshToken } = req.body;
+    const { refreshToken: token } = req.body;
 
-    if (!refreshToken) {
+    if (!token) {
       return res.status(400).json({
         success: false,
         message: "Refresh token is required",
       });
     }
 
-    const result = await authService.refreshAccessToken(refreshToken);
+    const result = await authService.refreshAccessToken(token);
 
     res.status(200).json(result);
   } catch (error) {

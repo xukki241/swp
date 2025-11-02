@@ -30,8 +30,10 @@ export const logoutUser = async () => {
 };
 
 // Refresh token
-export const refreshToken = async (refreshToken) => {
-  const response = await instance.post("/auth/refresh", { refreshToken });
+export const refreshToken = async (token) => {
+  const response = await instance.post("/auth/refresh", {
+    refreshToken: token,
+  });
   return response.data;
 };
 
