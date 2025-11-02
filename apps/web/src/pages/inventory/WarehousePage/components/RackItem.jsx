@@ -23,15 +23,15 @@ export function RackItem({ rack, isExpanded, onToggle }) {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    rackCode: rack.rackCode || "",
-    rackName: rack.rackName || "",
+    code: rack.code || "",
+    name: rack.name || "",
     description: rack.description || "",
   });
 
   useEffect(() => {
     setFormData({
-      rackCode: rack.rackCode || "",
-      rackName: rack.rackName || "",
+      code: rack.code || "",
+      name: rack.name || "",
       description: rack.description || "",
     });
   }, [rack]);
@@ -54,7 +54,7 @@ export function RackItem({ rack, isExpanded, onToggle }) {
     }
   };
 
-  const rackBins = bins[rack.id] || [];
+  const rackBins = rack.bins || [];
 
   return (
     <>
@@ -75,8 +75,8 @@ export function RackItem({ rack, isExpanded, onToggle }) {
                 )}
               </Button>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">{rack.rackName}</h3>
-                <p className="text-sm text-muted-foreground">{rack.rackCode}</p>
+                <h3 className="font-semibold text-gray-900">{rack.name}</h3>
+                <p className="text-sm text-muted-foreground">{rack.code}</p>
               </div>
             </div>
             <Button
@@ -114,22 +114,22 @@ export function RackItem({ rack, isExpanded, onToggle }) {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="rackCode">Rack Code</Label>
+              <Label htmlFor="code">Rack Code</Label>
               <Input
-                id="rackCode"
-                name="rackCode"
-                value={formData.rackCode}
+                id="code"
+                name="code"
+                value={formData.code}
                 onChange={handleInputChange}
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="rackName">Rack Name</Label>
+              <Label htmlFor="name">Rack Name</Label>
               <Input
-                id="rackName"
-                name="rackName"
-                value={formData.rackName}
+                id="name"
+                name="name"
+                value={formData.name}
                 onChange={handleInputChange}
                 required
               />

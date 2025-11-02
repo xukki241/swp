@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -13,7 +13,6 @@ import {
   AlertDialogTitle,
 } from "../../../../components/ui/alert-dialog";
 import { Button } from "../../../../components/ui/button";
-import { Card, CardContent } from "../../../../components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -25,19 +24,36 @@ import {
 import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
 import { Textarea } from "../../../../components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../../../../components/ui/tooltip";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
 
-export function BinCard({ bin, rackId }) {
+// Convert number to column letter (1 = A, 2 = B, ..., 27 = AA, 28 = AB, ...)
+function numberToColumn(num) {
+  let result = "";
+  while (num > 0) {
+    const remainder = (num - 1) % 26;
+    result = String.fromCharCode(65 + remainder) + result;
+    num = Math.floor((num - 1) / 26);
+  }
+  return result;
+}
+
+export function BinCard({ bin, level, number, rackId }) {
   const { updateBinData, deleteBinData } = useWarehouse();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    binCode: bin.binCode || "",
-    binName: bin.binName || "",
-    binLevel: bin.binLevel || "",
-    binNumber: bin.binNumber || "",
-    description: bin.description || "",
+    code: bin?.code || "",
+    name: bin?.name || "",
+    level: bin?.level || level || "",
+    number: bin?.number || number || "",
+    description: bin?.description || "",
   });
 
   const handleInputChange = (e) => {
@@ -63,6 +79,7 @@ export function BinCard({ bin, rackId }) {
     try {
       await deleteBinData(bin.id, rackId);
       setShowDeleteDialog(false);
+      setShowEditDialog(false);
     } catch (error) {
       console.error("Failed to delete bin:", error);
     } finally {
@@ -70,58 +87,91 @@ export function BinCard({ bin, rackId }) {
     }
   };
 
+  const position = `${level}${numberToColumn(number)}`;
+  const isEmpty = !bin;
+  const hasInventory = bin?.inventoryEntries && bin.inventoryEntries.length > 0;
+  const inventoryItem = hasInventory ? bin.inventoryEntries[0] : null;
+
+  // Helper function to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  // Empty cell (no bin)
+  if (isEmpty) {
+    return (
+      <div className="w-16 h-16 flex items-center justify-center border-2 border-dashed border-gray-300 rounded bg-gray-50 text-xs text-gray-400">
+        {position}
+      </div>
+    );
+  }
+
   return (
     <>
-      <Card className="shadow-sm rounded-lg border hover:shadow-md transition-shadow overflow-hidden group">
-        <CardContent className="p-0">
-          {/* Bin Image */}
-          <div className="relative h-32 bg-gray-100 overflow-hidden">
-            <img
-              src="/placeholder.svg"
-              alt={bin.binName}
-              className="w-full h-full object-cover"
-            />
-            {/* Action Buttons - Show on Hover */}
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => setShowEditDialog(true)}
-                className="rounded-full p-2 h-auto"
-              >
-                <Edit2 className="h-4 w-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => setShowDeleteDialog(true)}
-                className="rounded-full p-2 h-auto"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={() => setShowEditDialog(true)}
+              className={`w-16 h-16 flex flex-col items-center justify-center border-2 rounded transition-all hover:shadow-md hover:scale-105 ${
+                hasInventory
+                  ? "bg-green-100 border-green-500 hover:bg-green-200"
+                  : "bg-blue-100 border-blue-500 hover:bg-blue-200"
+              }`}
+            >
+              <span className="text-xs font-bold">{position}</span>
+              <span className="text-[10px] text-gray-600 truncate max-w-full px-1">
+                {bin.code}
+              </span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-xs">
+            <div className="space-y-2">
+              <div>
+                <p className="font-semibold">{bin.name}</p>
+                <p className="text-xs">Code: {bin.code}</p>
+                <p className="text-xs">
+                  Position: Level {bin.level}, {numberToColumn(bin.number)}
+                </p>
+                {bin.description && (
+                  <p className="text-xs text-gray-500">{bin.description}</p>
+                )}
+              </div>
+              {hasInventory && inventoryItem && (
+                <div className="pt-2 border-t">
+                  <p className="text-sm font-medium mb-1">Inventory Details</p>
+                  <div className="text-xs space-y-0.5">
+                    <p>
+                      <span className="font-medium">Batch:</span>{" "}
+                      {inventoryItem.batchNumber}
+                    </p>
+                    <p>
+                      <span className="font-medium">Qty:</span>{" "}
+                      {inventoryItem.quantity} (Reserved:{" "}
+                      {inventoryItem.quantityReserved})
+                    </p>
+                    <p>
+                      <span className="font-medium">MFG Date:</span>{" "}
+                      {formatDate(inventoryItem.manufactureDate)}
+                    </p>
+                    <p>
+                      <span className="font-medium">EXP Date:</span>{" "}
+                      {formatDate(inventoryItem.expiryDate)}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-
-          {/* Bin Info */}
-          <div className="p-3">
-            <h4 className="font-semibold text-sm text-gray-900 truncate">
-              {bin.binName}
-            </h4>
-            <p className="text-xs text-muted-foreground mt-1">
-              Code: {bin.binCode}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Position: Level {bin.binLevel}, Bin {bin.binNumber}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
       {/* Edit Bin Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Bin</DialogTitle>
+            <DialogTitle>Edit Bin - {position}</DialogTitle>
             <DialogDescription>
               Update the bin information below
             </DialogDescription>
@@ -129,22 +179,22 @@ export function BinCard({ bin, rackId }) {
 
           <form onSubmit={handleEditSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="binCode">Bin Code</Label>
+              <Label htmlFor="code">Bin Code</Label>
               <Input
-                id="binCode"
-                name="binCode"
-                value={formData.binCode}
+                id="code"
+                name="code"
+                value={formData.code}
                 onChange={handleInputChange}
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="binName">Bin Name</Label>
+              <Label htmlFor="name">Bin Name</Label>
               <Input
-                id="binName"
-                name="binName"
-                value={formData.binName}
+                id="name"
+                name="name"
+                value={formData.name}
                 onChange={handleInputChange}
                 required
               />
@@ -152,25 +202,27 @@ export function BinCard({ bin, rackId }) {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="binLevel">Level</Label>
+                <Label htmlFor="level">Level (Row)</Label>
                 <Input
-                  id="binLevel"
-                  name="binLevel"
+                  id="level"
+                  name="level"
                   type="number"
-                  value={formData.binLevel}
+                  value={formData.level}
                   onChange={handleInputChange}
                   required
+                  disabled
                 />
               </div>
               <div>
-                <Label htmlFor="binNumber">Bin Number</Label>
+                <Label htmlFor="number">Number (Column)</Label>
                 <Input
-                  id="binNumber"
-                  name="binNumber"
+                  id="number"
+                  name="number"
                   type="number"
-                  value={formData.binNumber}
+                  value={formData.number}
                   onChange={handleInputChange}
                   required
+                  disabled
                 />
               </div>
             </div>
@@ -186,18 +238,100 @@ export function BinCard({ bin, rackId }) {
               />
             </div>
 
-            <DialogFooter>
+            {hasInventory && inventoryItem && (
+              <div className="border-t pt-4 space-y-3">
+                <Label className="text-sm font-semibold">
+                  Inventory Information
+                </Label>
+
+                <div>
+                  <Label htmlFor="batchNumber" className="text-xs">
+                    Batch Number
+                  </Label>
+                  <Input
+                    id="batchNumber"
+                    value={inventoryItem.batchNumber || ""}
+                    disabled
+                    className="mt-1"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="quantity" className="text-xs">
+                      Quantity
+                    </Label>
+                    <Input
+                      id="quantity"
+                      value={inventoryItem.quantity || ""}
+                      disabled
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="quantityReserved" className="text-xs">
+                      Reserved
+                    </Label>
+                    <Input
+                      id="quantityReserved"
+                      value={inventoryItem.quantityReserved || ""}
+                      disabled
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="manufactureDate" className="text-xs">
+                      Manufacture Date
+                    </Label>
+                    <Input
+                      id="manufactureDate"
+                      value={formatDate(inventoryItem.manufactureDate)}
+                      disabled
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="expiryDate" className="text-xs">
+                      Expiry Date
+                    </Label>
+                    <Input
+                      id="expiryDate"
+                      value={formatDate(inventoryItem.expiryDate)}
+                      disabled
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <DialogFooter className="gap-2 sm:gap-0">
               <Button
                 type="button"
-                variant="outline"
-                onClick={() => setShowEditDialog(false)}
+                variant="destructive"
+                onClick={() => setShowDeleteDialog(true)}
                 disabled={isSubmitting}
+                className="sm:mr-auto"
               >
-                Cancel
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Bin
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Changes"}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowEditDialog(false)}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -209,8 +343,8 @@ export function BinCard({ bin, rackId }) {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Bin</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {bin.binName}? This action cannot
-              be undone.
+              Are you sure you want to delete {bin.name} at position {position}?
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
