@@ -1,5 +1,3 @@
-"use client";
-
 import { AppLayout } from "@/components/layouts/app-layout";
 import {
   AlertDialog,
@@ -18,44 +16,60 @@ import { customerService } from "@/services/customerService";
 import { searchMedications } from "@/services/medicationsService";
 import { salesService } from "@/services/salesService";
 import {
+  Banknote,
   CheckCircle,
   Copy,
+  CreditCard,
   FileText,
   Loader2,
+  Minus,
+  Pill,
   Plus,
   ShoppingCart,
+  Smartphone,
   Trash2,
   Users,
   X,
 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
-import CartSummary from "./components/CartSummary";
 import CustomerSelector from "./components/CustomerSelector";
 import MedicationSearch from "./components/MedicationSearch";
 import OrderSuccessModal from "./components/OrderSuccessModal";
-import PaymentMethodSelector from "./components/PaymentMethodSelector";
 import { VietQRPaymentDialog } from "./components/VietQRPaymentDialog";
 
-// Generate unique order ID
+// Payment methods
+const PAYMENT_METHODS = [
+  { value: "cash", label: "Tiền mặt", icon: Banknote },
+  { value: "mobile_payment", label: "VietQR", icon: Smartphone },
+];
+
+// Generate order ID
 const generateOrderId = () =>
   `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-export default function SalesPage() {
-  // Multi-order state
+export default function SalesPageV3() {
+  // Orders state
   const [orders, setOrders] = useState([
     {
       id: generateOrderId(),
       customer: null,
       cart: [],
       paymentMethod: "cash",
-      cashReceived: "", // Amount received from customer
+      cashReceived: "",
       createdAt: new Date(),
     },
   ]);
   const [activeOrderId, setActiveOrderId] = useState(orders[0].id);
 
   // UI state
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successOrder, setSuccessOrder] = useState(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [showVietQRDialog, setShowVietQRDialog] = useState(false);
+  const [pendingOrderData, setPendingOrderData] = useState(null);
   const [showNewCustomerForm, setShowNewCustomerForm] = useState(false);
   const [newCustomerData, setNewCustomerData] = useState({
     name: "",
@@ -63,14 +77,6 @@ export default function SalesPage() {
     phone: "",
   });
   const [isCreatingCustomer, setIsCreatingCustomer] = useState(false);
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successOrder, setSuccessOrder] = useState(null);
-  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
-  const [showCustomerPanel, setShowCustomerPanel] = useState(false);
-  const [showVietQRDialog, setShowVietQRDialog] = useState(false);
-  const [pendingOrderData, setPendingOrderData] = useState(null);
 
   // Get active order
   const activeOrder = useMemo(
@@ -78,29 +84,60 @@ export default function SalesPage() {
     [orders, activeOrderId]
   );
 
-  // Calculate total for active order
-  const totalAmount = useMemo(
-    () =>
-      activeOrder?.cart.reduce(
-        (sum, item) => sum + item.quantity * item.sellPrice,
-        0
-      ) || 0,
-    [activeOrder]
-  );
+  // Calculate total
+  const totalAmount = useMemo(() => {
+    return activeOrder.cart.reduce(
+      (sum, item) => sum + item.sellPrice * item.quantity,
+      0
+    );
+  }, [activeOrder.cart]);
 
-  // Calculate change amount for cash payment
+  // Calculate change
   const changeAmount = useMemo(() => {
-    if (activeOrder?.paymentMethod !== "cash" || !activeOrder?.cashReceived) {
+    if (activeOrder.paymentMethod !== "cash" || !activeOrder.cashReceived) {
       return 0;
     }
-    // cashReceived is in thousands (nghìn đồng), multiply by 1000
-    const received = Number(activeOrder.cashReceived) * 1000 || 0;
-    return Math.max(0, received - totalAmount);
-  }, [activeOrder, totalAmount]);
+    return Number(activeOrder.cashReceived) * 1000 - totalAmount;
+  }, [activeOrder.paymentMethod, activeOrder.cashReceived, totalAmount]);
 
-  // ========== ORDER MANAGEMENT ==========
+  // Update active order
+  const updateActiveOrder = useCallback(
+    (updates) => {
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === activeOrderId ? { ...order, ...updates } : order
+        )
+      );
+    },
+    [activeOrderId]
+  );
 
-  const createNewOrder = () => {
+  // Set cart
+  const setCart = useCallback(
+    (cart) => {
+      updateActiveOrder({ cart });
+    },
+    [updateActiveOrder]
+  );
+
+  // Set customer
+  const setCustomer = useCallback(
+    (customer) => {
+      updateActiveOrder({ customer });
+    },
+    [updateActiveOrder]
+  );
+
+  // Set payment method
+  const setPaymentMethod = useCallback(
+    (method) => {
+      updateActiveOrder({ paymentMethod: method, cashReceived: "" });
+    },
+    [updateActiveOrder]
+  );
+
+  // Create new order
+  const createNewOrder = useCallback(() => {
     const newOrder = {
       id: generateOrderId(),
       customer: null,
@@ -111,174 +148,81 @@ export default function SalesPage() {
     };
     setOrders((prev) => [...prev, newOrder]);
     setActiveOrderId(newOrder.id);
-    toast.success("New order created");
-  };
+    toast.success("Đã tạo đơn hàng mới");
+  }, []);
 
-  const deleteOrder = (orderId) => {
-    if (orders.length === 1) {
-      toast.error("Must have at least 1 order");
-      return;
-    }
-
-    setOrders((prev) => prev.filter((o) => o.id !== orderId));
-
-    // Switch to another order if deleting active one
-    if (activeOrderId === orderId) {
-      const remainingOrders = orders.filter((o) => o.id !== orderId);
-      setActiveOrderId(remainingOrders[0].id);
-    }
-
-    toast.success("Order deleted");
-    setDeleteConfirmId(null);
-  };
-
-  const duplicateOrder = (orderId) => {
-    const orderToDuplicate = orders.find((o) => o.id === orderId);
-    if (!orderToDuplicate) return;
-
-    const newOrder = {
-      ...orderToDuplicate,
-      id: generateOrderId(),
-      createdAt: new Date(),
-      // Deep copy cart to avoid reference issues
-      cart: orderToDuplicate.cart.map((item) => ({ ...item })),
-    };
-
-    setOrders((prev) => [...prev, newOrder]);
-    setActiveOrderId(newOrder.id);
-    toast.success("Order duplicated");
-  };
-
-  // ========== UPDATE ACTIVE ORDER ==========
-
-  const updateActiveOrder = (updates) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === activeOrderId ? { ...order, ...updates } : order
-      )
-    );
-  };
-
-  const setCustomer = (customer) => {
-    updateActiveOrder({ customer });
-  };
-
-  const setPaymentMethod = (method) => {
-    // Reset cashReceived when switching to non-cash payment
-    const updates = { paymentMethod: method };
-    if (method !== "cash") {
-      updates.cashReceived = "";
-    }
-    updateActiveOrder(updates);
-  };
-
-  const setCart = (cart) => {
-    updateActiveOrder({ cart });
-  };
-
-  // ========== CUSTOMER MANAGEMENT ==========
-
-  const handleCreateCustomer = useCallback(async () => {
-    if (!newCustomerData.name.trim()) {
-      toast.error("Please enter customer name");
-      return;
-    }
-
-    if (
-      newCustomerData.phone.trim() &&
-      !/^\d{10}$/.test(newCustomerData.phone.trim())
-    ) {
-      toast.error("Phone number must be 10 digits");
-      return;
-    }
-
-    setIsCreatingCustomer(true);
-    try {
-      const customerData = {
-        name: newCustomerData.name.trim(),
-        email: newCustomerData.email.trim() || null,
-        phone: newCustomerData.phone.trim() || null,
-        address: null,
-      };
-
-      const response = await customerService.createCustomer(customerData);
-      const createdCustomer = response.data || response;
-
-      if (!createdCustomer.id) {
-        throw new Error("Invalid customer response");
+  // Delete order
+  const deleteOrder = useCallback(
+    (orderId) => {
+      if (orders.length === 1) {
+        toast.error("Không thể xóa đơn hàng cuối cùng");
+        return;
       }
+      setOrders((prev) => prev.filter((o) => o.id !== orderId));
+      if (activeOrderId === orderId) {
+        setActiveOrderId(
+          orders[0].id === orderId ? orders[1].id : orders[0].id
+        );
+      }
+      setDeleteConfirmId(null);
+      toast.success("Đã xóa đơn hàng");
+    },
+    [orders, activeOrderId]
+  );
 
-      setCustomer(createdCustomer);
-      setNewCustomerData({ name: "", email: "", phone: "" });
-      setShowNewCustomerForm(false);
-      toast.success("New customer created");
-    } catch (error) {
-      console.error("Customer creation error:", error);
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Cannot create customer";
-      toast.error(message);
-    } finally {
-      setIsCreatingCustomer(false);
-    }
-  }, [newCustomerData]);
+  // Duplicate order
+  const duplicateOrder = useCallback(
+    (orderId) => {
+      const orderToDuplicate = orders.find((o) => o.id === orderId);
+      const newOrder = {
+        ...orderToDuplicate,
+        id: generateOrderId(),
+        createdAt: new Date(),
+      };
+      setOrders((prev) => [...prev, newOrder]);
+      setActiveOrderId(newOrder.id);
+      toast.success("Đã nhân bản đơn hàng");
+    },
+    [orders]
+  );
 
-  // ========== MEDICATION SEARCH ==========
-
+  // Search medications
   const handleSearchMedications = useCallback(async (searchTerm) => {
-    if (!searchTerm.trim()) {
+    if (!searchTerm || searchTerm.length < 1) {
       setSearchResults([]);
       return;
     }
 
     setIsSearching(true);
     try {
-      const response = await searchMedications(searchTerm);
-      const medications = Array.isArray(response)
-        ? response
-        : response.data || [];
-
-      const normalizedMedications = medications.map((m) => ({
-        ...m,
-        availableQuantity: m.availableQuantity || m.available_quantity || 0,
-        medicationName: m.medicationName || m.medication_name || m.name,
-        variantName: m.variantName || m.variant_name || m.name,
-        sellPrice: m.sellPrice || m.sell_price || 0,
-      }));
-
-      const availableMedications = normalizedMedications.filter((m) => {
-        const qty = Number(m.availableQuantity) || 0;
-        return qty > 0;
-      });
-
-      setSearchResults(availableMedications);
-
-      if (availableMedications.length === 0 && medications.length > 0) {
-        toast.info("Products found but out of stock");
-      }
+      const results = await searchMedications(searchTerm);
+      setSearchResults(results);
     } catch (error) {
-      console.error("Medication search error:", error);
-      toast.error("Cannot search products");
+      toast.error("Lỗi tìm kiếm: " + error.message);
+      setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
   }, []);
 
-  // ========== CART MANAGEMENT ==========
-
+  // Add to cart
   const handleAddToCart = useCallback(
     (medication) => {
       if (!medication.id || !medication.sellPrice) {
-        toast.error("Invalid product information");
+        toast.error("Thông tin sản phẩm không hợp lệ");
         return;
       }
 
       const availableQty = Number(medication.availableQuantity) || 0;
       if (availableQty <= 0) {
-        toast.error("Product out of stock");
+        toast.error("Sản phẩm hết hàng");
         return;
       }
+
+      const isPrescriptionRequired =
+        medication.isPrescriptionRequired ||
+        medication.is_prescription_required ||
+        false;
 
       const existingItem = activeOrder.cart.find(
         (item) => item.medication_variant_id === medication.id
@@ -287,51 +231,49 @@ export default function SalesPage() {
       if (existingItem) {
         const newQuantity = existingItem.quantity + 1;
         if (newQuantity > availableQty) {
-          toast.error(`Cannot exceed stock quantity (${availableQty})`);
+          toast.error(`Không thể vượt quá số lượng tồn kho (${availableQty})`);
           return;
         }
-
         const updatedCart = activeOrder.cart.map((item) =>
           item.medication_variant_id === medication.id
             ? { ...item, quantity: newQuantity }
             : item
         );
         setCart(updatedCart);
-        toast.success(`Increased quantity to ${newQuantity}`);
+        toast.success(`Đã tăng số lượng lên ${newQuantity}`);
       } else {
         const newItem = {
           medication_variant_id: medication.id,
           medicationName: medication.medicationName || medication.name,
           variantName: medication.variantName || "",
           sellPrice: Number(medication.sellPrice),
+          unit: medication.unit || "đơn vị",
           availableQuantity: availableQty,
           quantity: 1,
+          isPrescriptionRequired: isPrescriptionRequired,
         };
         setCart([...activeOrder.cart, newItem]);
-        toast.success(`Added ${medication.medicationName || medication.name}`);
+        toast.success(
+          `Đã thêm ${medication.medicationName || medication.name}`
+        );
       }
       setSearchResults([]);
     },
-    [activeOrder]
+    [activeOrder.cart, setCart]
   );
 
+  // Update cart item
   const updateCartItem = useCallback(
     (index, quantity) => {
-      // Allow empty string for editing (will be fixed on blur)
-      if (quantity === "" || quantity === 0) {
-        const updatedCart = [...activeOrder.cart];
-        updatedCart[index] = { ...updatedCart[index], quantity: quantity === "" ? "" : 0 };
-        setCart(updatedCart);
-        return;
-      }
-
-      if (quantity < 0) {
-        return;
-      }
-
       const item = activeOrder.cart[index];
+
+      if (quantity < 1) {
+        toast.error("Số lượng tối thiểu là 1");
+        return;
+      }
+
       if (quantity > item.availableQuantity) {
-        toast.error(`Cannot exceed stock quantity (${item.availableQuantity})`);
+        toast.error(`Tối đa ${item.availableQuantity}`);
         return;
       }
 
@@ -339,198 +281,177 @@ export default function SalesPage() {
       updatedCart[index] = { ...updatedCart[index], quantity };
       setCart(updatedCart);
     },
-    [activeOrder]
+    [activeOrder.cart, setCart]
   );
 
+  // Remove cart item
   const removeCartItem = useCallback(
     (index) => {
       const item = activeOrder.cart[index];
       const newCart = activeOrder.cart.filter((_, i) => i !== index);
       setCart(newCart);
-      toast.success(`Removed ${item.medicationName}`);
+      toast.success(`Đã xóa ${item.medicationName}`);
     },
-    [activeOrder]
+    [activeOrder.cart, setCart]
   );
 
-  // ========== COMPLETE ORDER ==========
+  // Create customer
+  const handleCreateCustomer = useCallback(async () => {
+    if (!newCustomerData.name.trim()) {
+      toast.error("Vui lòng nhập tên khách hàng");
+      return;
+    }
 
+    setIsCreatingCustomer(true);
+    try {
+      const customer = await customerService.createCustomer(newCustomerData);
+      setCustomer(customer);
+      setShowNewCustomerForm(false);
+      setNewCustomerData({ name: "", email: "", phone: "" });
+      toast.success("Đã tạo khách hàng mới");
+    } catch (error) {
+      toast.error("Lỗi tạo khách hàng: " + error.message);
+    } finally {
+      setIsCreatingCustomer(false);
+    }
+  }, [newCustomerData, setCustomer]);
+
+  // Complete order
   const handleCompleteOrder = useCallback(async () => {
     if (!activeOrder.customer) {
-      toast.error("Please select a customer");
+      toast.error("Vui lòng chọn khách hàng");
       return;
     }
 
     if (activeOrder.cart.length === 0) {
-      toast.error("Cart is empty");
+      toast.error("Giỏ hàng trống");
       return;
     }
 
-    const invalidItems = activeOrder.cart.filter(
-      (item) => !item.medication_variant_id || item.quantity <= 0
-    );
-    if (invalidItems.length > 0) {
-      toast.error("Cart has invalid items");
+    if (
+      activeOrder.paymentMethod === "cash" &&
+      (!activeOrder.cashReceived || changeAmount < 0)
+    ) {
+      toast.error("Số tiền khách đưa không đủ");
       return;
     }
 
-    // If payment method is VietQR, show QR dialog first
+    const orderData = {
+      customer_id: activeOrder.customer.id,
+      payment_method: activeOrder.paymentMethod,
+      items: activeOrder.cart.map((item) => ({
+        medication_variant_id: item.medication_variant_id,
+        quantity: item.quantity,
+        unit_price: item.sellPrice,
+      })),
+    };
+
     if (activeOrder.paymentMethod === "mobile_payment") {
-      setPendingOrderData({
-        id: generateOrderId(),
-        customer_id: activeOrder.customer.id,
-        payment_method: activeOrder.paymentMethod,
-        total: totalAmount,
-        items: activeOrder.cart.map((item) => ({
-          medication_variant_id: item.medication_variant_id,
-          quantity: item.quantity,
-        })),
-      });
+      setPendingOrderData(orderData);
       setShowVietQRDialog(true);
       return;
     }
 
-    // For cash payment, proceed directly
-    await submitOrder();
-  }, [activeOrder, totalAmount]);
+    await submitOrder(orderData);
+  }, [activeOrder, changeAmount]);
 
-  const submitOrder = useCallback(async () => {
-    setIsSubmitting(true);
+  // Submit order
+  const submitOrder = useCallback(
+    async (orderData) => {
+      setIsSubmitting(true);
+      try {
+        const response = await salesService.createSalesOrder(orderData);
 
-    try {
-      const orderData = pendingOrderData || {
-        customer_id: activeOrder.customer.id,
-        payment_method: activeOrder.paymentMethod,
-        items: activeOrder.cart.map((item) => ({
-          medication_variant_id: item.medication_variant_id,
-          quantity: item.quantity,
-        })),
-      };
+        // Extract data from response
+        const orderResult = response?.data || response;
 
-      const response = await salesService.createSalesOrder(orderData);
-      const createdOrder = response.data || response;
-
-      const enrichedOrder = {
-        ...createdOrder,
-        items:
-          createdOrder.items?.map((orderItem) => {
-            const cartItem = activeOrder.cart.find(
-              (c) => c.medication_variant_id === orderItem.medicationVariantId
-            );
-            return {
-              ...orderItem,
-              medicationName: cartItem?.medicationName || "Unknown",
-              variantName: cartItem?.variantName || "",
-              sellPrice: orderItem.sellPrice || cartItem?.sellPrice || 0,
-            };
-          }) || [],
-      };
-
-      setSuccessOrder(enrichedOrder);
-      toast.success("Order created successfully!");
-
-      // Note: Invoice email will be sent automatically when order is marked as "paid"
-
-      setPendingOrderData(null);
-      setShowVietQRDialog(false);
-
-      // Remove completed order from list
-      setTimeout(() => {
-        setOrders((prev) => {
-          const filtered = prev.filter((o) => o.id !== activeOrderId);
-          // Create new order if this was the last one
-          if (filtered.length === 0) {
-            const newOrder = {
-              id: generateOrderId(),
-              customer: null,
-              cart: [],
-              paymentMethod: "cash",
-              cashReceived: "",
-              createdAt: new Date(),
-            };
-            setActiveOrderId(newOrder.id);
-            return [newOrder];
-          }
-          setActiveOrderId(filtered[0].id);
-          return filtered;
+        // Set success order with proper format
+        setSuccessOrder({
+          ...orderResult,
+          paymentMethod: orderData.payment_method,
+          totalAmount: activeOrder.cart.reduce(
+            (sum, item) => sum + item.sellPrice * item.quantity,
+            0
+          ),
+          items: activeOrder.cart,
         });
-      }, 1500);
-    } catch (error) {
-      console.error("Order creation error:", error);
-      let message = "Cannot create order";
 
-      if (error?.response?.data?.error) {
-        const errorData = error.response.data.error;
-        if (typeof errorData === "object" && errorData.message) {
-          message = errorData.message;
-        } else if (typeof errorData === "string") {
-          message = errorData;
-        }
-      } else if (error?.response?.data?.message) {
-        message = error.response.data.message;
-      } else if (error?.message) {
-        message = error.message;
+        // Reset order
+        updateActiveOrder({
+          cart: [],
+          customer: null,
+          paymentMethod: "cash",
+          cashReceived: "",
+        });
+
+        toast.success("Đơn hàng đã hoàn tất!");
+      } catch (error) {
+        toast.error("Lỗi tạo đơn hàng: " + error.message);
+      } finally {
+        setIsSubmitting(false);
+        setShowVietQRDialog(false);
+        setPendingOrderData(null);
       }
+    },
+    [updateActiveOrder, activeOrder.cart]
+  );
 
-      toast.error(
-        typeof message === "string" ? message : "Cannot create order"
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [activeOrder, activeOrderId, pendingOrderData, changeAmount]);
-
+  // Close success modal
   const handleCloseSuccessModal = useCallback(() => {
     setSuccessOrder(null);
   }, []);
 
-  // ========== ORDER COUNT BADGE ==========
+  // Get order badge text
   const getOrderBadgeText = (order) => {
-    const itemCount = order.cart.length;
-    if (itemCount === 0) return "Empty";
-    return `${itemCount} item${itemCount > 1 ? "s" : ""}`;
+    if (order.cart.length === 0) return "Trống";
+    return `${order.cart.length} SP`;
   };
-
-  if (!activeOrder) return null;
 
   return (
     <AppLayout>
-      <div className="h-screen flex flex-col bg-background">
+      <div className="h-full flex flex-col overflow-hidden bg-background">
         {/* Header */}
-        <div className="border-b border-border bg-card px-6 py-4">
-          <div className="flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-border bg-card">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <ShoppingCart className="w-6 h-6 text-primary" />
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <ShoppingCart className="w-6 h-6 text-primary" />
+              </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Sales</h1>
+                <h1 className="text-2xl font-bold text-foreground">
+                  Bán hàng - POS
+                </h1>
                 <p className="text-sm text-muted-foreground">
-                  Manage multiple orders simultaneously
+                  Quản lý nhiều đơn hàng cùng lúc
                 </p>
               </div>
             </div>
             <Button
               onClick={createNewOrder}
               className="bg-primary hover:bg-primary/90"
+              size="lg"
             >
-              <Plus className="mr-2 h-4 w-4" />
-              New Order
+              <Plus className="mr-2 h-5 w-5" />
+              Đơn hàng mới
             </Button>
           </div>
 
           {/* Order Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto mt-4 pb-2">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2">
             {orders.map((order, index) => {
               const isActive = order.id === activeOrderId;
               return (
                 <div
                   key={order.id}
-                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${isActive
-                      ? "border-primary bg-primary/10 text-foreground"
+                  className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all ${
+                    isActive
+                      ? "border-primary bg-primary/10 text-foreground shadow-sm"
                       : "border-border bg-card hover:border-primary/50 text-muted-foreground"
-                    }`}
+                  }`}
                   onClick={() => setActiveOrderId(order.id)}
                 >
                   <FileText className="h-4 w-4" />
-                  <span className="font-medium">Order #{index + 1}</span>
+                  <span className="font-medium">Đơn #{index + 1}</span>
                   <Badge
                     variant={isActive ? "default" : "outline"}
                     className="ml-1"
@@ -538,17 +459,16 @@ export default function SalesPage() {
                     {getOrderBadgeText(order)}
                   </Badge>
 
-                  {/* Order Actions */}
                   <div className="flex items-center gap-1 ml-2">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-5 w-5"
+                      className="h-6 w-6"
                       onClick={(e) => {
                         e.stopPropagation();
                         duplicateOrder(order.id);
                       }}
-                      title="Duplicate order"
+                      title="Nhân bản"
                     >
                       <Copy className="h-3 w-3" />
                     </Button>
@@ -556,12 +476,12 @@ export default function SalesPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-5 w-5 text-destructive hover:text-destructive"
+                        className="h-6 w-6 text-destructive hover:text-destructive hover:bg-destructive/10"
                         onClick={(e) => {
                           e.stopPropagation();
                           setDeleteConfirmId(order.id);
                         }}
-                        title="Delete order"
+                        title="Xóa"
                       >
                         <X className="h-3 w-3" />
                       </Button>
@@ -575,207 +495,245 @@ export default function SalesPage() {
 
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
-          {/* Left: Product Search & Cart */}
-          <div className="flex-1 flex flex-col overflow-hidden border-r border-border">
-            {/* Product Search */}
-            <div className="flex-1 flex flex-col overflow-hidden p-6 space-y-4">
-              <div>
-                <h2 className="text-lg font-semibold text-foreground mb-3">
-                  Search Products
+          {/* Left: Search & Cart */}
+          <div className="flex-1 flex flex-col p-6 gap-4 overflow-hidden">
+            {/* Search */}
+            <div className="bg-card rounded-xl border border-border p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Pill className="h-5 w-5 text-primary" />
+                <h2 className="font-semibold text-foreground">
+                  Tìm kiếm sản phẩm
                 </h2>
-                <MedicationSearch
-                  onSearch={handleSearchMedications}
-                  isSearching={isSearching}
-                  results={searchResults}
-                  onSelectMedication={handleAddToCart}
-                />
               </div>
+              <MedicationSearch
+                onSearch={handleSearchMedications}
+                isSearching={isSearching}
+                results={searchResults}
+                onSelectMedication={handleAddToCart}
+              />
+            </div>
 
-              {/* Cart Items */}
-              {activeOrder.cart.length > 0 && (
-                <div className="flex-1 flex flex-col overflow-hidden">
-                  <h2 className="text-lg font-semibold text-foreground mb-3">
-                    Cart ({activeOrder.cart.length})
+            {/* Cart */}
+            {activeOrder.cart.length > 0 ? (
+              <div className="flex-1 bg-card rounded-xl border border-border overflow-hidden flex flex-col min-h-0">
+                <div className="p-4 bg-primary/5 border-b border-border flex items-center justify-between">
+                  <h2 className="font-semibold text-foreground flex items-center gap-2">
+                    <ShoppingCart className="h-5 w-5 text-primary" />
+                    Giỏ hàng
                   </h2>
-                  <div className="flex-1 overflow-y-auto space-y-2 pr-2">
-                    {activeOrder.cart.map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-3 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors"
+                  <Badge variant="secondary" className="font-semibold">
+                    {activeOrder.cart.length} SP •{" "}
+                    {totalAmount.toLocaleString("vi-VN")} ₫
+                  </Badge>
+                </div>
+
+                <div className="flex-1 overflow-y-auto">
+                  <table className="w-full">
+                    <thead className="bg-muted/50 sticky top-0">
+                      <tr className="border-b">
+                        <th className="text-left p-3 font-medium text-sm">
+                          Sản phẩm
+                        </th>
+                        <th className="text-right p-3 font-medium text-sm w-24">
+                          Đơn giá
+                        </th>
+                        <th className="text-center p-3 font-medium text-sm w-32">
+                          Số lượng
+                        </th>
+                        <th className="text-right p-3 font-medium text-sm w-28">
+                          Tổng
+                        </th>
+                        <th className="w-12"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {activeOrder.cart.map((item, index) => (
+                        <tr key={index} className="hover:bg-muted/30">
+                          <td className="p-3">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">
+                                  {item.medicationName}
+                                </span>
+                                {item.isPrescriptionRequired && (
+                                  <Badge
+                                    variant="destructive"
+                                    className="text-xs"
+                                  >
+                                    Kê đơn
+                                  </Badge>
+                                )}
+                              </div>
+                              {item.variantName && (
+                                <div className="text-sm text-muted-foreground">
+                                  {item.variantName}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className="p-3 text-right">
+                            <div className="font-semibold text-primary">
+                              {item.sellPrice.toLocaleString("vi-VN")}₫
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              / {item.unit}
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex items-center justify-center gap-1">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() =>
+                                  updateCartItem(index, item.quantity - 1)
+                                }
+                                disabled={item.quantity <= 1}
+                              >
+                                <Minus className="h-3 w-3" />
+                              </Button>
+                              <Input
+                                type="number"
+                                value={item.quantity}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value);
+                                  if (!isNaN(val)) updateCartItem(index, val);
+                                }}
+                                className="w-14 h-8 text-center font-semibold"
+                                min="1"
+                                max={item.availableQuantity}
+                              />
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() =>
+                                  updateCartItem(index, item.quantity + 1)
+                                }
+                                disabled={
+                                  item.quantity >= item.availableQuantity
+                                }
+                              >
+                                <Plus className="h-3 w-3" />
+                              </Button>
+                            </div>
+                            <div className="text-xs text-center text-muted-foreground mt-1">
+                              Max: {item.availableQuantity}
+                            </div>
+                          </td>
+                          <td className="p-3 text-right font-bold text-primary">
+                            {(item.sellPrice * item.quantity).toLocaleString(
+                              "vi-VN"
+                            )}
+                            ₫
+                          </td>
+                          <td className="p-3">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                              onClick={() => removeCartItem(index)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div className="flex-1 bg-card rounded-xl border border-border flex items-center justify-center">
+                <div className="text-center text-muted-foreground">
+                  <ShoppingCart className="h-16 w-16 mx-auto mb-4 opacity-20" />
+                  <p className="font-medium">Giỏ hàng trống</p>
+                  <p className="text-sm mt-1">Tìm kiếm và thêm sản phẩm</p>
+                </div>
+              </div>
+            )}
+
+            {/* Payment Section */}
+            {activeOrder.cart.length > 0 && (
+              <div className="bg-card rounded-xl border border-border p-4 space-y-4">
+                {/* Payment Method */}
+                <div>
+                  <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    Phương thức thanh toán
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {PAYMENT_METHODS.map(({ value, label, icon: Icon }) => (
+                      <button
+                        key={value}
+                        onClick={() => setPaymentMethod(value)}
+                        className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${
+                          activeOrder.paymentMethod === value
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border hover:border-primary/50"
+                        }`}
                       >
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-foreground truncate">
-                            {item.medicationName}
-                          </p>
-                          <p className="text-xs text-muted-foreground truncate">
-                            {item.variantName}
-                          </p>
-                          <p className="text-sm text-foreground mt-1">
-                            {item.sellPrice.toLocaleString("vi-VN")} đ ×{" "}
-                            {item.quantity}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 ml-2">
-                          <div className="flex items-center border border-border rounded-md overflow-hidden">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                updateCartItem(
-                                  index,
-                                  Math.max(1, item.quantity - 1)
-                                )
-                              }
-                              disabled={item.quantity <= 1}
-                              className="h-8 w-8 p-0 hover:bg-muted rounded-none"
-                            >
-                              <span className="text-lg font-bold">−</span>
-                            </Button>
-                            <Input
-                              type="number"
-                              min="1"
-                              max={item.availableQuantity}
-                              value={item.quantity}
-                              onChange={(e) => {
-                                const value = e.target.value;
-                                // Allow empty string for editing
-                                if (value === "" || value === "0") {
-                                  updateCartItem(index, "");
-                                  return;
-                                }
-                                const val = Number.parseInt(value);
-                                if (!isNaN(val)) {
-                                  if (val > item.availableQuantity) {
-                                    toast.warning(`Maximum available: ${item.availableQuantity}`);
-                                    updateCartItem(index, item.availableQuantity);
-                                  } else {
-                                    updateCartItem(index, val);
-                                  }
-                                }
-                              }}
-                              onBlur={(e) => {
-                                const val = Number.parseInt(e.target.value);
-                                if (isNaN(val) || val < 1 || e.target.value === "") {
-                                  updateCartItem(index, 1);
-                                } else if (val > item.availableQuantity) {
-                                  toast.warning(`Maximum available: ${item.availableQuantity}`);
-                                  updateCartItem(index, item.availableQuantity);
-                                }
-                              }}
-                              className="w-14 h-8 text-center text-sm border-0 border-x border-border focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
-                            />
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                updateCartItem(
-                                  index,
-                                  Math.min(item.availableQuantity, item.quantity + 1)
-                                )
-                              }
-                              disabled={item.quantity >= item.availableQuantity}
-                              className="h-8 w-8 p-0 hover:bg-muted rounded-none"
-                            >
-                              <span className="text-lg font-bold">+</span>
-                            </Button>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeCartItem(index)}
-                            className="text-destructive hover:bg-destructive/10"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
+                        <Icon className="h-4 w-4" />
+                        <span className="text-sm font-medium">{label}</span>
+                      </button>
                     ))}
                   </div>
                 </div>
-              )}
-            </div>
 
-            {/* Payment & Complete */}
-            {activeOrder.cart.length > 0 && (
-              <div className="border-t border-border p-6 space-y-4">
-                <div>
-                  <h3 className="text-sm font-semibold text-foreground mb-3">
-                    Payment Method
-                  </h3>
-                  <PaymentMethodSelector
-                    value={activeOrder.paymentMethod}
-                    onChange={setPaymentMethod}
-                  />
-                </div>
-
-                {/* Cash Payment Details */}
+                {/* Cash Payment */}
                 {activeOrder.paymentMethod === "cash" && (
-                  <div className="space-y-3 p-4 bg-muted rounded-lg border">
+                  <div className="p-3 bg-muted/50 rounded-lg space-y-2">
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">
-                        Cash Received (in thousands VNĐ)
+                      <label className="text-sm font-medium mb-1 block">
+                        Tiền khách đưa (nghìn đồng)
                       </label>
                       <div className="relative">
                         <Input
                           type="number"
-                          placeholder="Enter amount (e.g., 100 = 100,000 VNĐ)"
+                          placeholder="VD: 100 = 100,000₫"
                           value={activeOrder.cashReceived}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            updateActiveOrder({ cashReceived: value });
-                          }}
-                          className="text-lg pr-16"
-                          min="0"
-                          step="1"
+                          onChange={(e) =>
+                            updateActiveOrder({ cashReceived: e.target.value })
+                          }
+                          className="pr-16"
                         />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                           × 1,000
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Example: Enter "100" for 100,000 VNĐ
-                      </p>
                     </div>
 
                     {activeOrder.cashReceived && (
-                      <div className="space-y-2 pt-2 border-t">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Total:</span>
+                      <div className="space-y-1 pt-2 border-t text-sm">
+                        <div className="flex justify-between">
+                          <span>Tổng tiền:</span>
                           <span className="font-semibold">
-                            {totalAmount.toLocaleString("vi-VN")} VNĐ
+                            {totalAmount.toLocaleString("vi-VN")}₫
                           </span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">
-                            Received:
-                          </span>
+                        <div className="flex justify-between">
+                          <span>Khách đưa:</span>
                           <span className="font-semibold">
                             {(
-                              Number(activeOrder.cashReceived || 0) * 1000
-                            ).toLocaleString("vi-VN")}{" "}
-                            VNĐ
+                              Number(activeOrder.cashReceived) * 1000
+                            ).toLocaleString("vi-VN")}
+                            ₫
                           </span>
                         </div>
-                        <div className="flex justify-between text-base pt-2 border-t">
-                          <span className="font-semibold">Change:</span>
+                        <div className="flex justify-between pt-2 border-t">
+                          <span className="font-semibold">Tiền thừa:</span>
                           <span
                             className={`font-bold text-lg ${changeAmount < 0 ? "text-red-600" : "text-green-600"}`}
                           >
-                            {changeAmount.toLocaleString("vi-VN")} VNĐ
+                            {changeAmount.toLocaleString("vi-VN")}₫
                           </span>
                         </div>
-                        {changeAmount < 0 && (
-                          <p className="text-xs text-red-600 mt-1">
-                            Insufficient payment! Need{" "}
-                            {Math.abs(changeAmount).toLocaleString("vi-VN")} VNĐ
-                            more
-                          </p>
-                        )}
                       </div>
                     )}
                   </div>
                 )}
 
+                {/* Complete Button */}
                 <Button
                   onClick={handleCompleteOrder}
                   disabled={
@@ -784,168 +742,166 @@ export default function SalesPage() {
                     (activeOrder.paymentMethod === "cash" &&
                       (!activeOrder.cashReceived || changeAmount < 0))
                   }
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-base"
+                  className="w-full py-6 text-lg font-bold"
+                  size="lg"
                 >
                   {isSubmitting ? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Processing...
-                    </div>
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Đang xử lý...
+                    </>
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5" />
-                      Complete Order
-                    </div>
+                    <>
+                      <CheckCircle className="w-5 h-5 mr-2" />
+                      Hoàn tất đơn hàng
+                    </>
                   )}
                 </Button>
               </div>
             )}
           </div>
 
-          {/* Right Sidebar: Customer & Summary */}
-          <div className="w-80 flex flex-col overflow-hidden border-l border-border bg-card">
-            {/* Customer Section */}
-            <div className="flex-1 flex flex-col overflow-hidden border-b border-border">
-              <div className="p-4 border-b border-border">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-primary" />
-                    <h3 className="font-semibold text-foreground">Customer</h3>
-                  </div>
-                  {activeOrder.customer && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setCustomer(null)}
-                      className="text-xs"
-                    >
-                      Change
-                    </Button>
-                  )}
+          {/* Right: Customer */}
+          <div className="w-96 border-l border-border bg-card flex flex-col">
+            <div className="p-4 border-b border-border bg-muted/30">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-primary" />
+                  <h3 className="font-semibold">Khách hàng</h3>
                 </div>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-4">
-                {activeOrder.customer ? (
-                  <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
-                    <p className="font-semibold text-foreground">
-                      {activeOrder.customer.name}
-                    </p>
-                    {activeOrder.customer.phone && (
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {activeOrder.customer.phone}
-                      </p>
-                    )}
-                    {activeOrder.customer.email && (
-                      <p className="text-sm text-muted-foreground">
-                        {activeOrder.customer.email}
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <CustomerSelector onSelectCustomer={setCustomer} />
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-border"></div>
-                      </div>
-                      <div className="relative flex justify-center text-xs">
-                        <span className="px-2 bg-card text-muted-foreground">
-                          or
-                        </span>
-                      </div>
-                    </div>
-                    {showNewCustomerForm ? (
-                      <div className="space-y-2">
-                        <Input
-                          placeholder="Customer name"
-                          value={newCustomerData.name}
-                          onChange={(e) =>
-                            setNewCustomerData({
-                              ...newCustomerData,
-                              name: e.target.value,
-                            })
-                          }
-                          className="text-sm"
-                        />
-                        <Input
-                          placeholder="Email (optional)"
-                          type="email"
-                          value={newCustomerData.email}
-                          onChange={(e) =>
-                            setNewCustomerData({
-                              ...newCustomerData,
-                              email: e.target.value,
-                            })
-                          }
-                          className="text-sm"
-                        />
-                        <Input
-                          placeholder="Phone (optional)"
-                          value={newCustomerData.phone}
-                          onChange={(e) =>
-                            setNewCustomerData({
-                              ...newCustomerData,
-                              phone: e.target.value,
-                            })
-                          }
-                          className="text-sm"
-                        />
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={handleCreateCustomer}
-                            disabled={isCreatingCustomer}
-                            size="sm"
-                            className="flex-1 bg-primary hover:bg-primary/90"
-                          >
-                            {isCreatingCustomer ? (
-                              <>
-                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                                Creating...
-                              </>
-                            ) : (
-                              "Create"
-                            )}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            onClick={() => setShowNewCustomerForm(false)}
-                            size="sm"
-                            className="flex-1"
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowNewCustomerForm(true)}
-                        className="w-full text-sm"
-                      >
-                        <Plus className="w-3 h-3 mr-2" />
-                        New Customer
-                      </Button>
-                    )}
-                  </div>
+                {activeOrder.customer && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCustomer(null)}
+                  >
+                    Đổi
+                  </Button>
                 )}
               </div>
             </div>
 
-            {/* Order Summary */}
-            <div className="flex-1 flex flex-col overflow-hidden border-t border-border">
-              <CartSummary
-                cart={activeOrder.cart}
-                totalAmount={totalAmount}
-                selectedCustomer={activeOrder.customer}
-                paymentMethod={activeOrder.paymentMethod}
-              />
+            <div className="flex-1 overflow-y-auto p-4">
+              {activeOrder.customer ? (
+                <div className="p-4 bg-primary/10 rounded-xl border-2 border-primary/20">
+                  <p className="font-semibold text-lg">
+                    {activeOrder.customer.name}
+                  </p>
+                  {activeOrder.customer.phone && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      📞 {activeOrder.customer.phone}
+                    </p>
+                  )}
+                  {activeOrder.customer.email && (
+                    <p className="text-sm text-muted-foreground">
+                      ✉️ {activeOrder.customer.email}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <CustomerSelector onSelectCustomer={setCustomer} />
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs">
+                      <span className="px-2 bg-card text-muted-foreground">
+                        hoặc
+                      </span>
+                    </div>
+                  </div>
+
+                  {showNewCustomerForm ? (
+                    <div className="space-y-2 p-3 bg-muted/50 rounded-lg">
+                      <Input
+                        placeholder="Tên khách hàng *"
+                        value={newCustomerData.name}
+                        onChange={(e) =>
+                          setNewCustomerData({
+                            ...newCustomerData,
+                            name: e.target.value,
+                          })
+                        }
+                      />
+                      <Input
+                        placeholder="Email (tùy chọn)"
+                        value={newCustomerData.email}
+                        onChange={(e) =>
+                          setNewCustomerData({
+                            ...newCustomerData,
+                            email: e.target.value,
+                          })
+                        }
+                      />
+                      <Input
+                        placeholder="SĐT (tùy chọn)"
+                        value={newCustomerData.phone}
+                        onChange={(e) =>
+                          setNewCustomerData({
+                            ...newCustomerData,
+                            phone: e.target.value,
+                          })
+                        }
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={handleCreateCustomer}
+                          disabled={isCreatingCustomer}
+                          className="flex-1"
+                        >
+                          {isCreatingCustomer ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            "Tạo"
+                          )}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowNewCustomerForm(false)}
+                          className="flex-1"
+                        >
+                          Hủy
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowNewCustomerForm(true)}
+                      className="w-full"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Thêm khách hàng mới
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Summary */}
+            <div className="border-t border-border p-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Số sản phẩm:</span>
+                  <span className="font-semibold">
+                    {activeOrder.cart.length}
+                  </span>
+                </div>
+                <div className="flex justify-between pt-2 border-t">
+                  <span className="font-semibold">Tổng cộng:</span>
+                  <span className="text-xl font-bold text-primary">
+                    {totalAmount.toLocaleString("vi-VN")}₫
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Success Modal */}
+      {/* Modals */}
       {successOrder && (
         <OrderSuccessModal
           order={successOrder}
@@ -953,7 +909,6 @@ export default function SalesPage() {
         />
       )}
 
-      {/* VietQR Payment Dialog */}
       {showVietQRDialog && pendingOrderData && (
         <VietQRPaymentDialog
           open={showVietQRDialog}
@@ -963,26 +918,25 @@ export default function SalesPage() {
         />
       )}
 
-      {/* Delete Confirmation */}
       <AlertDialog
         open={deleteConfirmId !== null}
         onOpenChange={() => setDeleteConfirmId(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Delete Order</AlertDialogTitle>
+            <AlertDialogTitle>Xác nhận xóa đơn hàng</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this order? This action cannot be
-              undone.
+              Bạn có chắc chắn muốn xóa đơn hàng này? Hành động này không thể
+              hoàn tác.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteOrder(deleteConfirmId)}
               className="bg-destructive hover:bg-destructive/90"
             >
-              Delete
+              Xóa
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

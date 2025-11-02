@@ -45,7 +45,11 @@ export const warehouseZoneService = {
     const results = await db.query.warehouseZones.findMany({
       where: conditions.length > 0 ? and(...conditions) : undefined,
       with: {
-        racks: true,
+        racks: {
+          with: {
+            bins: true,
+          },
+        },
       },
       limit,
       offset,
@@ -58,7 +62,11 @@ export const warehouseZoneService = {
     const zone = await db.query.warehouseZones.findFirst({
       where: eq(warehouseZones.id, id),
       with: {
-        racks: true,
+        racks: {
+          with: {
+            bins: true,
+          },
+        },
       },
     });
 
@@ -69,7 +77,11 @@ export const warehouseZoneService = {
     const zone = await db.query.warehouseZones.findFirst({
       where: eq(warehouseZones.code, code),
       with: {
-        racks: true,
+        racks: {
+          with: {
+            bins: true,
+          },
+        },
       },
     });
 

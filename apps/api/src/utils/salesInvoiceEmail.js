@@ -95,13 +95,19 @@ export const sendSalesInvoiceEmail = async (invoiceData) => {
         const quantity = Number(item.quantity) || 0;
         const sellingPrice = Number(item.sellingPrice) || 0;
         const subtotal = quantity * sellingPrice;
+        const isPrescription = item.isPrescriptionRequired || false;
 
         return `
         <tr style="border-bottom: 1px solid #e5e7eb;">
           <td style="padding: 12px; text-align: center;">${index + 1}</td>
           <td style="padding: 12px;">
-            <strong>${medicationName}</strong>
-            ${variantName ? `<br/><span style="color: #6b7280; font-size: 13px;">${variantName}</span>` : ""}
+            <div style="display: flex; align-items: flex-start; gap: 8px;">
+              <div style="flex: 1;">
+                <strong>${medicationName}</strong>
+                ${variantName ? `<br/><span style="color: #6b7280; font-size: 13px;">${variantName}</span>` : ""}
+              </div>
+              ${isPrescription ? `<span style="display: inline-block; background-color: #fef3c7; color: #92400e; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; border: 1px solid #fcd34d; white-space: nowrap;">Kê đơn</span>` : ""}
+            </div>
           </td>
           <td style="padding: 12px; text-align: center;">${quantity}</td>
           <td style="padding: 12px; text-align: right;">${sellingPrice.toLocaleString()} ₫</td>

@@ -33,10 +33,10 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const SHIFT_TYPES = [
-  { value: "morning", label: "Morning" },
-  { value: "afternoon", label: "Afternoon" },
-  { value: "night", label: "Night" },
-  { value: "full_day", label: "Full Day" },
+  { value: "morning", label: "Sáng" },
+  { value: "afternoon", label: "Chiều" },
+  { value: "night", label: "Tối" },
+  { value: "full_day", label: "Cả ngày" },
 ];
 
 export default function ShiftManagementPage() {
@@ -61,7 +61,7 @@ export default function ShiftManagementPage() {
       setShifts(response.data || []);
     } catch (error) {
       console.error("Failed to load shifts:", error);
-      toast.error("Failed to load shifts");
+      toast.error("Không thể tải danh sách ca làm việc");
     } finally {
       setLoading(false);
     }
@@ -103,7 +103,7 @@ export default function ShiftManagementPage() {
     e.preventDefault();
 
     if (!formData.name.trim() || !formData.startTime || !formData.endTime) {
-      toast.error("Please fill in all required fields");
+      toast.error("Vui lòng điền đầy đủ các trường bắt buộc");
       return;
     }
 
@@ -111,31 +111,31 @@ export default function ShiftManagementPage() {
     try {
       if (editingShift) {
         await shiftService.updateShift(editingShift.id, formData);
-        toast.success("Shift updated successfully");
+        toast.success("Đã cập nhật ca làm việc thành công");
       } else {
         await shiftService.createShift(formData);
-        toast.success("Shift created successfully");
+        toast.success("Đã tạo ca làm việc thành công");
       }
       handleCloseDialog();
       loadShifts();
     } catch (error) {
       console.error("Failed to save shift:", error);
-      toast.error(error.response?.data?.message || "Failed to save shift");
+      toast.error(error.response?.data?.message || "Không thể lưu ca làm việc");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (shiftId) => {
-    if (!confirm("Are you sure you want to delete this shift?")) return;
+    if (!confirm("Bạn có chắc chắn muốn xóa ca làm việc này?")) return;
 
     try {
       await shiftService.deleteShift(shiftId);
-      toast.success("Shift deleted");
+      toast.success("Đã xóa ca làm việc");
       loadShifts();
     } catch (error) {
       console.error("Failed to delete shift:", error);
-      toast.error(error.response?.data?.message || "Failed to delete shift");
+      toast.error(error.response?.data?.message || "Không thể xóa ca làm việc");
     }
   };
 
@@ -144,14 +144,14 @@ export default function ShiftManagementPage() {
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Shift Management</h1>
+            <h1 className="text-3xl font-bold">Quản lý ca làm việc</h1>
             <p className="text-muted-foreground mt-1">
-              Create and manage work shifts for employees
+              Tạo và quản lý ca làm việc cho nhân viên
             </p>
           </div>
           <Button onClick={() => handleOpenDialog()}>
             <Plus className="mr-2 h-4 w-4" />
-            Create Shift
+            Tạo ca làm việc
           </Button>
         </div>
 
@@ -159,7 +159,7 @@ export default function ShiftManagementPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              Shift List
+              Danh sách ca làm việc
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -169,18 +169,18 @@ export default function ShiftManagementPage() {
               </div>
             ) : shifts.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                No shifts yet. Click "Create Shift" to get started.
+                Chưa có ca làm việc nào. Nhấn "Tạo ca làm việc" để bắt đầu.
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Start Time</TableHead>
-                    <TableHead>End Time</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>Tên</TableHead>
+                    <TableHead>Loại</TableHead>
+                    <TableHead>Giờ bắt đầu</TableHead>
+                    <TableHead>Giờ kết thúc</TableHead>
+                    <TableHead>Mô tả</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -232,15 +232,15 @@ export default function ShiftManagementPage() {
           <form onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle>
-                {editingShift ? "Edit Shift" : "Create New Shift"}
+                {editingShift ? "Sửa ca làm việc" : "Tạo ca làm việc mới"}
               </DialogTitle>
-              <DialogDescription>Enter shift information</DialogDescription>
+              <DialogDescription>Nhập thông tin ca làm việc</DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">
-                  Shift Name <span className="text-red-500">*</span>
+                  Tên ca làm việc <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="name"
@@ -248,14 +248,14 @@ export default function ShiftManagementPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  placeholder="e.g. Morning Shift Mon-Fri"
+                  placeholder="VD: Ca sáng Thứ 2 - Thứ 6"
                   required
                 />
               </div>
 
               <div className="grid gap-2">
                 <Label htmlFor="shiftType">
-                  Shift Type <span className="text-red-500">*</span>
+                  Loại ca <span className="text-red-500">*</span>
                 </Label>
                 <Select
                   value={formData.shiftType}
@@ -279,7 +279,7 @@ export default function ShiftManagementPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="startTime">
-                    Start Time <span className="text-red-500">*</span>
+                    Giờ bắt đầu <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="startTime"
@@ -293,7 +293,7 @@ export default function ShiftManagementPage() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="endTime">
-                    End Time <span className="text-red-500">*</span>
+                    Giờ kết thúc <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="endTime"
@@ -308,14 +308,14 @@ export default function ShiftManagementPage() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Mô tả</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
                   }
-                  placeholder="Additional notes..."
+                  placeholder="Ghi chú thêm..."
                   rows={3}
                 />
               </div>
@@ -328,13 +328,13 @@ export default function ShiftManagementPage() {
                 onClick={handleCloseDialog}
                 disabled={isSubmitting}
               >
-                Cancel
+                Hủy
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                {editingShift ? "Update" : "Create"}
+                {editingShift ? "Cập nhật" : "Tạo mới"}
               </Button>
             </DialogFooter>
           </form>

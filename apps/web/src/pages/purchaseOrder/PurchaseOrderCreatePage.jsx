@@ -1,5 +1,3 @@
-"use client";
-
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +14,7 @@ import { useSupplier, useSuppliers } from "@/hooks/useSuppliers";
 import { instance } from "@/lib/axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2, Loader2, Package, Plus, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
@@ -42,21 +40,6 @@ export default function PurchaseOrderCreatePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Debug: Log supplier medication variants when loaded
-  useEffect(() => {
-    if (supplierDetail?.medicationVariants) {
-      console.log(
-        "🔍 Supplier medication variants loaded:",
-        supplierDetail.medicationVariants.map((v) => ({
-          id: v.id,
-          name: v.medicationName,
-          variant: v.variantName,
-          leadTimeDays: v.leadTimeDays,
-          purchasePrice: v.purchasePrice,
-          type: typeof v.purchasePrice,
-        }))
-      );
-    }
-  }, [supplierDetail]);
 
   const expectedDeliveryDate = useMemo(() => {
     // Chỉ tính khi đã có items được chọn với medication và lead time
@@ -90,9 +73,7 @@ export default function PurchaseOrderCreatePage() {
 
   const handleAddItem = () => {
     if (!supplierId)
-      return toast.warning(
-        "Please select a supplier before adding medications!"
-      );
+      return toast.warning("Vui lòng chọn nhà cung cấp trước khi thêm thuốc!");
     setSelectedItems([
       ...selectedItems,
       { supplierMedicationVariantId: "", quantity: 1, unitPrice: 0 },
@@ -110,12 +91,6 @@ export default function PurchaseOrderCreatePage() {
     // Auto-fill unit price when medication is selected
     if (field === "supplierMedicationVariantId") {
       const selectedMed = meds.find((m) => m.id === value);
-      console.log("📋 Selected medication:", {
-        id: value,
-        medication: selectedMed,
-        purchasePrice: selectedMed?.purchasePrice,
-        type: typeof selectedMed?.purchasePrice,
-      });
 
       if (selectedMed?.purchasePrice) {
         // Parse to number if it's a string
@@ -124,7 +99,6 @@ export default function PurchaseOrderCreatePage() {
             ? parseFloat(selectedMed.purchasePrice)
             : selectedMed.purchasePrice;
         updated[index].unitPrice = price;
-        console.log("💰 Auto-filled unit price:", price);
       }
     }
 
@@ -143,21 +117,21 @@ export default function PurchaseOrderCreatePage() {
 
     const errors = [];
 
-    if (!supplierId) errors.push("Supplier is required.");
+    if (!supplierId) errors.push("Nhà cung cấp là bắt buộc.");
     if (selectedItems.length === 0)
-      errors.push("At least one item must be added to the order.");
+      errors.push("Phải thêm ít nhất một mặt hàng vào đơn đặt hàng.");
 
     selectedItems.forEach((item, index) => {
       if (!item.supplierMedicationVariantId)
-        errors.push(`Line #${index + 1}: Medication not selected.`);
+        errors.push(`Dòng #${index + 1}: Chưa chọn thuốc.`);
       if (!item.quantity || item.quantity <= 0)
-        errors.push(`Line #${index + 1}: Quantity must be greater than 0.`);
+        errors.push(`Dòng #${index + 1}: Số lượng phải lớn hơn 0.`);
       if (!item.unitPrice || item.unitPrice <= 0)
-        errors.push(`Line #${index + 1}: Unit price must be greater than 0.`);
+        errors.push(`Dòng #${index + 1}: Đơn giá phải lớn hơn 0.`);
     });
 
     if (errors.length > 0) {
-      toast.error("Validation Failed", {
+      toast.error("Xác thực thất bại", {
         description: (
           <pre className="text-sm text-left whitespace-pre-wrap">
             {errors.join("\n")}
@@ -182,27 +156,12 @@ export default function PurchaseOrderCreatePage() {
         },
       ];
 
-      console.log("📦 Payload sent:", payload);
-      console.log("📅 Expected Delivery Date:", expectedDeliveryDate);
-      console.log(
-        "🔢 Items with lead time:",
-        selectedItems.map((item) => {
-          const med = meds.find(
-            (m) => m.id === item.supplierMedicationVariantId
-          );
-          return {
-            medication: med?.medicationName,
-            leadTime: med?.leadTimeDays,
-            purchasePrice: med?.purchasePrice,
-          };
-        })
-      );
-
       const response = await instance.post("/purchases", payload);
       const createdOrder = response.data?.data?.[0] || response.data;
 
       // Prepare email data
       const emailData = {
+        purchaseOrderId: createdOrder?.id,
         supplierEmail: supplierDetail.email,
         supplierName: supplierDetail.name,
         supplierContact: supplierDetail.contactName,
@@ -242,10 +201,12 @@ export default function PurchaseOrderCreatePage() {
       // Send email notification
       try {
         await instance.post("/send-purchase-order-email", emailData);
-        toast.success("✅ Purchase order created and email sent successfully!");
+        toast.success("✅ Đã tạo đơn đặt hàng và gửi email thành công!");
       } catch (emailError) {
         console.error("⚠️ Email sending failed:", emailError);
-        toast.warning("Purchase order created, but email notification failed.");
+        toast.warning(
+          "Đã tạo đơn đặt hàng, nhưng gửi email thông báo thất bại."
+        );
       }
 
       // Invalidate purchase orders query to refresh the list
@@ -255,8 +216,8 @@ export default function PurchaseOrderCreatePage() {
     } catch (error) {
       console.error("❌ Error creating PO:", error);
       const message =
-        error?.response?.data?.error || "Failed to create purchase order.";
-      toast.error("Error", { description: message });
+        error?.response?.data?.error || "Không thể tạo đơn đặt hàng.";
+      toast.error("Lỗi", { description: message });
     } finally {
       setIsSubmitting(false);
     }

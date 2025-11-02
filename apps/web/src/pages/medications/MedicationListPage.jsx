@@ -1,5 +1,3 @@
-"use client";
-
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -253,7 +251,7 @@ export default function MedicationListPage() {
         }
       }
 
-      toast.success(editing ? "Medication updated" : "Medication created");
+      toast.success(editing ? "Đã cập nhật thuốc" : "Đã tạo thuốc mới");
       setMedFormOpen(false);
       setEditing(null);
       setImageFile(null);
@@ -261,18 +259,18 @@ export default function MedicationListPage() {
       setRemoveImage(false);
       await refetch();
     } catch (e) {
-      toast.error("Failed to save medication", {
+      toast.error("Không thể lưu thuốc", {
         description: e?.response?.data?.message || e.message,
       });
     }
   };
 
   const handleDelete = async (id) => {
-    if (confirm("Delete this medication?")) {
+    if (confirm("Xóa thuốc này?")) {
       await deleteMed.mutateAsync(id);
       clearMedicationImage(id);
       bumpImageVersion(id);
-      toast.success("Deleted");
+      toast.success("Đã xóa");
       await refetch();
     }
   };
@@ -402,31 +400,31 @@ export default function MedicationListPage() {
       <div className="space-y-6">
         <Card>
           <CardHeader className="flex items-center justify-between">
-            <CardTitle>Medications</CardTitle>
+            <CardTitle>Thuốc</CardTitle>
             <div className="flex gap-2">
               <Input
-                placeholder="Search by name or brand..."
+                placeholder="Tìm theo tên hoặc thương hiệu..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-64"
               />
               {search && (
                 <Button variant="outline" onClick={resetSearch}>
-                  <X className="w-4 h-4 mr-1" /> Reset
+                  <X className="w-4 h-4 mr-1" /> Xóa
                 </Button>
               )}
               <Button onClick={() => refetch()}>
-                <Search className="w-4 h-4 mr-1" /> Search
+                <Search className="w-4 h-4 mr-1" /> Tìm kiếm
               </Button>
               <Button onClick={openAdd}>
-                <PlusCircle className="mr-2 h-4 w-4" /> Add
+                <PlusCircle className="mr-2 h-4 w-4" /> Thêm
               </Button>
             </div>
           </CardHeader>
 
           <CardContent>
             {isLoading ? (
-              <p>Loading...</p>
+              <p>Đang tải...</p>
             ) : (
               <div className="space-y-3">
                 {medications.map((m) => {
@@ -453,7 +451,7 @@ export default function MedicationListPage() {
                             <StatusBadge status={m.status} />
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            Brand: {m.brand || "-"}
+                            Thương hiệu: {m.brand || "-"}
                           </div>
                         </div>
                       </div>
@@ -463,37 +461,37 @@ export default function MedicationListPage() {
                           size="sm"
                           variant="outline"
                           onClick={() => setViewMed(m)}
-                          title="View"
+                          title="Xem"
                         >
                           <Eye className="w-4 h-4 mr-1" />
-                          View
+                          Xem
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => handleEdit(m)}
-                          title="Edit"
+                          title="Sửa"
                         >
                           <Edit className="w-4 h-4 mr-1" />
-                          Edit
+                          Sửa
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => setManageMed(m)}
-                          title="Manage variants"
+                          title="Quản lý phiên bản"
                         >
                           <Package className="w-4 h-4 mr-1" />
-                          Variants
+                          Phiên bản
                         </Button>
                         <Button
                           size="sm"
                           variant="destructive"
                           onClick={() => handleDelete(m.id)}
-                          title="Delete"
+                          title="Xóa"
                         >
                           <Trash2 className="w-4 h-4 mr-1" />
-                          Delete
+                          Xóa
                         </Button>
                       </div>
                     </div>

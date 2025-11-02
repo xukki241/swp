@@ -15,10 +15,10 @@ export default function NotFoundPage() {
         <div className="space-y-2">
           <h1 className="text-5xl font-bold text-gray-800">404</h1>
           <h2 className="text-2xl font-semibold text-gray-700">
-            Page Not Found
+            Không tìm thấy trang
           </h2>
           <p className="text-muted-foreground text-base">
-            The page you're looking for doesn't exist or has been moved.
+            Trang bạn đang tìm kiếm không tồn tại hoặc đã được chuyển đi.
           </p>
         </div>
 
@@ -29,7 +29,7 @@ export default function NotFoundPage() {
           >
             <Link to="/dashboard">
               <Home className="h-4 w-4 mr-2" />
-              Back to Dashboard
+              Về Tổng quan
             </Link>
           </Button>
 
@@ -38,7 +38,7 @@ export default function NotFoundPage() {
             variant="outline"
             className="rounded-lg h-11 px-6 bg-transparent"
           >
-            <Link to="/">Go to Home</Link>
+            <Link to="/">Về Trang chủ</Link>
           </Button>
         </div>
       </div>

@@ -64,7 +64,9 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
       ]);
 
       setRecommendations(recData);
+      console.log(recData);
       setQuickInsights(insightsData.data);
+      console.log(insightsData?.data?.summary);
     } catch (error) {
       console.error("Error loading AI analysis:", error);
       toast.error("Failed to load AI analysis");
@@ -117,14 +119,16 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-none w-[90vw] max-h-[90vh] overflow-y-auto"
-        style={{ minWidth: '1600px' }}
+        className="max-w-none w-[50vw] max-h-[90vh] overflow-y-auto"
+        style={{ minWidth: "1200px" }}
       >
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Brain className="w-6 h-6 text-purple-600" />
-              <DialogTitle className="text-xl">AI-Powered Purchase Analytics</DialogTitle>
+              <DialogTitle className="text-xl">
+                AI-Powered Purchase Analytics
+              </DialogTitle>
             </div>
             <div className="flex items-center gap-2">
               <select
@@ -189,14 +193,21 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                       <div className="mb-2">
                         <div className="flex items-baseline gap-1.5">
                           <p className="text-2xl font-bold text-blue-900">
-                            {formatCompactNumber(quickInsights?.summary.totalRevenue)}
+                            {formatCompactNumber(
+                              quickInsights?.summary.totalRevenue
+                            )}
                           </p>
-                          <span className="text-sm text-blue-700 font-medium">đ</span>
+                          <span className="text-sm text-blue-700 font-medium">
+                            đ
+                          </span>
                         </div>
                       </div>
                       <div className="pt-2 border-t border-blue-200/50">
                         <p className="text-[10px] text-blue-600 leading-tight">
-                          {quickInsights?.summary.totalRevenue?.toLocaleString("vi-VN")} VND
+                          {quickInsights?.summary.totalRevenue?.toLocaleString(
+                            "vi-VN"
+                          )}{" "}
+                          VND
                         </p>
                         <p className="text-[10px] text-blue-500 mt-0.5">
                           {quickInsights?.summary.totalOrders || 0} orders
@@ -214,14 +225,19 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                       <div className="mb-2">
                         <div className="flex items-baseline gap-1.5">
                           <p className="text-2xl font-bold text-green-900">
-                            {formatCompactNumber(quickInsights?.summary.totalQuantitySold)}
+                            {formatCompactNumber(
+                              quickInsights?.summary.totalQuantitySold
+                            )}
                           </p>
-                          <span className="text-sm text-green-700 font-medium">units</span>
+                          <span className="text-sm text-green-700 font-medium">
+                            units
+                          </span>
                         </div>
                       </div>
                       <div className="pt-2 border-t border-green-200/50">
                         <p className="text-[10px] text-green-600 leading-tight">
-                          {quickInsights?.summary.totalQuantitySold?.toLocaleString()} total
+                          {quickInsights?.summary.totalQuantitySold?.toLocaleString()}{" "}
+                          total
                         </p>
                         <p className="text-[10px] text-green-500 mt-0.5">
                           {quickInsights?.summary.totalProducts || 0} variants
@@ -239,14 +255,22 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                       <div className="mb-2">
                         <div className="flex items-baseline gap-1.5">
                           <p className="text-2xl font-bold text-orange-900">
-                            {formatCompactNumber(quickInsights?.summary.averageOrderValue)}
+                            {formatCompactNumber(
+                              quickInsights?.summary.averageOrderValue
+                            )}
                           </p>
-                          <span className="text-sm text-orange-700 font-medium">đ</span>
+                          <span className="text-sm text-orange-700 font-medium">
+                            đ
+                          </span>
                         </div>
                       </div>
                       <div className="pt-2 border-t border-orange-200/50">
                         <p className="text-[10px] text-orange-600 leading-tight">
-                          {quickInsights?.summary.averageOrderValue?.toLocaleString("vi-VN", { maximumFractionDigits: 0 })} VND
+                          {quickInsights?.summary.averageOrderValue?.toLocaleString(
+                            "vi-VN",
+                            { maximumFractionDigits: 0 }
+                          )}{" "}
+                          VND
                         </p>
                         <p className="text-[10px] text-orange-500 mt-0.5">
                           per transaction
@@ -264,21 +288,117 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
                       <div className="mb-2">
                         <div className="flex items-baseline gap-1.5">
                           <p className="text-2xl font-bold text-purple-900">
-                            {formatCompactNumber(recommendations.data.financialProjection?.estimatedTotalInvestment)}
+                            {formatCompactNumber(
+                              recommendations.data.financialProjection
+                                ?.estimatedTotalInvestment
+                            )}
                           </p>
-                          <span className="text-sm text-purple-700 font-medium">đ</span>
+                          <span className="text-sm text-purple-700 font-medium">
+                            đ
+                          </span>
                         </div>
                       </div>
                       <div className="pt-2 border-t border-purple-200/50">
                         <p className="text-[10px] text-purple-600 leading-tight">
-                          {recommendations.data.financialProjection?.estimatedTotalInvestment?.toLocaleString("vi-VN") || "N/A"} VND
+                          {recommendations.data.financialProjection?.estimatedTotalInvestment?.toLocaleString(
+                            "vi-VN"
+                          ) || "N/A"}{" "}
+                          VND
                         </p>
                         <p className="text-[10px] text-purple-500 mt-0.5">
-                          {recommendations.data.priorityRecommendations?.length || 0} items
+                          {recommendations.data.priorityRecommendations
+                            ?.length || 0}{" "}
+                          items
                         </p>
                       </div>
                     </div>
                   </div>
+
+                  {/* Forecasting Methodology */}
+                  {recommendations.data.forecastingMethodology && (
+                    <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                      <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                        <Brain className="w-5 h-5 text-blue-600" />
+                        Phương Pháp Dự Báo
+                      </h3>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-sm font-semibold text-blue-700 mb-1">
+                            Phương pháp:
+                          </p>
+                          <p className="text-gray-700">
+                            {recommendations.data.forecastingMethodology.method}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-semibold text-blue-700 mb-1">
+                            Công thức tính toán:
+                          </p>
+                          <p className="text-gray-700 font-mono text-sm bg-white p-2 rounded border">
+                            {
+                              recommendations.data.forecastingMethodology
+                                .calculation
+                            }
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-semibold text-blue-700 mb-1">
+                            Nguyên tắc áp dụng:
+                          </p>
+                          <ul className="space-y-1">
+                            {recommendations.data.forecastingMethodology.principles?.map(
+                              (principle, idx) => (
+                                <li
+                                  key={idx}
+                                  className="flex items-start gap-2 text-sm"
+                                >
+                                  <span className="text-blue-600">•</span>
+                                  <span className="text-gray-700">
+                                    {principle}
+                                  </span>
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-semibold text-blue-700 mb-1">
+                            Tiêu chuẩn:
+                          </p>
+                          <ul className="space-y-1">
+                            {recommendations.data.forecastingMethodology.standards?.map(
+                              (standard, idx) => (
+                                <li
+                                  key={idx}
+                                  className="flex items-start gap-2 text-sm"
+                                >
+                                  <span className="text-blue-600">•</span>
+                                  <span className="text-gray-700">
+                                    {standard}
+                                  </span>
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-semibold text-blue-700 mb-1">
+                            Lý do chọn phương pháp:
+                          </p>
+                          <p className="text-gray-700 text-sm">
+                            {
+                              recommendations.data.forecastingMethodology
+                                .rationale
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Overall Assessment */}
                   <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200">

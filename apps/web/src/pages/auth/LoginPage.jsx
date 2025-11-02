@@ -42,16 +42,17 @@ export default function LoginPage() {
       },
       {
         onError: (error) => {
-          toast.error("Login Failed", {
+          toast.error("Đăng nhập thất bại", {
             description:
               error?.response?.data?.message ||
               error?.message ||
-              "Invalid email or password. Please try again.",
+              "Email hoặc mật khẩu không đúng. Vui lòng thử lại.",
           });
         },
         onSuccess: () => {
-          toast.success("Login Successful", {
-            description: "Welcome back! Redirecting to dashboard...",
+          toast.success("Đăng nhập thành công", {
+            description:
+              "Chào mừng trở lại! Đang chuyển đến trang tổng quan...",
           });
         },
       }
@@ -69,10 +70,10 @@ export default function LoginPage() {
           </div>
           <div>
             <CardTitle className="text-3xl font-bold text-gray-800">
-              Welcome Back 👋
+              Chào mừng trở lại 👋
             </CardTitle>
             <CardDescription className="text-base mt-2">
-              Sign in to continue to PharmaFlow
+              Đăng nhập để tiếp tục sử dụng PharmaFlow
             </CardDescription>
           </div>
         </CardHeader>
@@ -86,12 +87,12 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="your.email@example.com"
+                placeholder="email.cua.ban@example.com"
                 {...register("email", {
-                  required: "Email is required",
+                  required: "Email là bắt buộc",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
+                    message: "Địa chỉ email không hợp lệ",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -105,17 +106,17 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium">
-                Password
+                Mật khẩu
               </Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Nhập mật khẩu"
                 {...register("password", {
-                  required: "Password is required",
+                  required: "Mật khẩu là bắt buộc",
                   minLength: {
                     value: 6,
-                    message: "Password must be at least 6 characters",
+                    message: "Mật khẩu phải có ít nhất 6 ký tự",
                   },
                 })}
                 className="h-11 rounded-lg"
@@ -137,7 +138,7 @@ export default function LoginPage() {
                 htmlFor="remember"
                 className="text-sm font-medium leading-none cursor-pointer"
               >
-                Remember me
+                Ghi nhớ đăng nhập
               </Label>
             </div>
 
@@ -149,10 +150,10 @@ export default function LoginPage() {
               {loginMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <Loading className="h-4 w-4 text-white" />
-                  Signing in...
+                  Đang đăng nhập...
                 </span>
               ) : (
-                "Login"
+                "Đăng nhập"
               )}
             </Button>
           </form>
@@ -161,17 +162,17 @@ export default function LoginPage() {
               to="/forgot-password"
               className="text-sm text-primary font-medium hover:underline"
             >
-              Forgot Password?
+              Quên mật khẩu?
             </Link>
           </div>
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Don't have an account?{" "}
+              Chưa có tài khoản?{" "}
               <Link
                 to="/register"
                 className="text-primary font-medium hover:underline"
               >
-                Register
+                Đăng ký
               </Link>
             </p>
           </div>

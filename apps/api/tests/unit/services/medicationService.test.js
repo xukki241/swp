@@ -111,6 +111,7 @@ describe("MedicationService", () => {
   });
 
   describe("createMedication", () => {
+    // UTCID01: Test case đã có
     it("should create medication with variants", async () => {
       const medicationData = {
         name: "Aspirin",
@@ -146,6 +147,7 @@ describe("MedicationService", () => {
       expect(result.variants).toHaveLength(2);
     });
 
+    // UTCID02: Test case đã có
     it("should create medication without variants", async () => {
       const medicationData = {
         name: "Aspirin",

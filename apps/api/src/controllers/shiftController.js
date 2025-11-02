@@ -276,6 +276,35 @@ export const updateShiftAssignment = async (req, res, next) => {
 };
 
 /**
+ * @route POST /api/shift-assignments/:id/confirm
+ * @desc Confirm shift assignment
+ * @access Private (self or owner)
+ */
+export const confirmShift = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const assignment = await shiftService.confirmShift(id);
+
+    if (!assignment) {
+      return res.status(404).json({
+        success: false,
+        message: "Shift assignment not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Shift confirmed successfully",
+      data: assignment,
+    });
+  } catch (error) {
+    logger.error("Error confirming shift:", error);
+    next(error);
+  }
+};
+
+/**
  * @route POST /api/shift-assignments/:id/check-in
  * @desc Check in to shift
  * @access Private (self or owner)

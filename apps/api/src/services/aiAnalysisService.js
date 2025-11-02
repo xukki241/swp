@@ -187,7 +187,14 @@ export const aiAnalysisService = {
       // Create prompt for Gemini
       const prompt = `
 Bạn là một chuyên gia phân tích dữ liệu và quản lý tồn kho cho nhà thuốc. 
-Dựa trên dữ liệu bán hàng và tồn kho sau đây, hãy đưa ra các khuyến nghị chi tiết về việc nhập hàng:
+Dựa trên dữ liệu bán hàng và tồn kho sau đây, hãy đưa ra các khuyến nghị chi tiết về việc nhập hàng.
+
+**QUAN TRỌNG - YÊU CẦU VỀ PHƯƠNG PHÁP DỰ BÁO:**
+Trong phần phân tích, hãy LÝ GIẢI RÕ RÀNG:
+- Phương pháp dự báo cụ thể được sử dụng (ví dụ: Moving Average, Trend Analysis, Demand Forecasting)
+- Nguyên tắc, tiêu chuẩn nào được áp dụng (ví dụ: EOQ - Economic Order Quantity, Safety Stock Formula, Lead Time Analysis)
+- Công thức hoặc quy tắc tính toán cụ thể
+- Tại sao phương pháp đó phù hợp với dữ liệu hiện tại
 
 **DỮ LIỆU PHÂN TÍCH:**
 - Thời gian phân tích: ${dataContext.analysisperiod}
@@ -196,41 +203,50 @@ Dựa trên dữ liệu bán hàng và tồn kho sau đây, hãy đưa ra các k
 
 **TOP SẢN PHẨM BÁN CHẠY:**
 ${dataContext.topSellingProducts
-          .map(
-            (p, i) =>
-              `${i + 1}. ${p.name}
+  .map(
+    (p, i) =>
+      `${i + 1}. ${p.name}
    - Số lượng bán: ${p.quantitySold}
    - Doanh thu: ${p.revenue.toLocaleString("vi-VN")} VNĐ
    - Số đơn hàng: ${p.orderCount}`
-          )
-          .join("\n")}
+  )
+  .join("\n")}
 
 **SẢN PHẨM TỒN KHO THẤP:**
-${dataContext.lowStockProducts.length > 0
-          ? dataContext.lowStockProducts
-            .map((p) => `- ${p.name}: ${p.currentStock} đơn vị còn lại`)
-            .join("\n")
-          : "Không có sản phẩm tồn kho thấp"
-        }
+${
+  dataContext.lowStockProducts.length > 0
+    ? dataContext.lowStockProducts
+        .map((p) => `- ${p.name}: ${p.currentStock} đơn vị còn lại`)
+        .join("\n")
+    : "Không có sản phẩm tồn kho thấp"
+}
 
 **SẢN PHẨM SẮP HẾT HẠN (trong 90 ngày):**
-${dataContext.expiringSoonProducts.length > 0
-          ? dataContext.expiringSoonProducts
-            .map(
-              (p) =>
-                `- ${p.name}: ${p.stock} đơn vị, hết hạn ${new Date(p.expiryDate).toLocaleDateString("vi-VN")}`
-            )
-            .join("\n")
-          : "Không có sản phẩm sắp hết hạn"
-        }
+${
+  dataContext.expiringSoonProducts.length > 0
+    ? dataContext.expiringSoonProducts
+        .map(
+          (p) =>
+            `- ${p.name}: ${p.stock} đơn vị, hết hạn ${new Date(p.expiryDate).toLocaleDateString("vi-VN")}`
+        )
+        .join("\n")
+    : "Không có sản phẩm sắp hết hạn"
+}
 
 **YÊU CẦU PHÂN TÍCH:**
 
 Hãy phân tích và đưa ra khuyến nghị chi tiết theo format JSON sau:
 
 {
+  "forecastingMethodology": {
+    "method": "Tên phương pháp dự báo chính được sử dụng (ví dụ: Time Series Analysis, Moving Average, Exponential Smoothing)",
+    "principles": ["Nguyên tắc 1", "Nguyên tắc 2", "Nguyên tắc 3"],
+    "standards": ["Tiêu chuẩn 1 (ví dụ: EOQ, Safety Stock Level)", "Tiêu chuẩn 2"],
+    "calculation": "Công thức hoặc cách tính toán cụ thể (ví dụ: Demand Rate = Total Sold / Days Analyzed)",
+    "rationale": "Lý do chọn phương pháp này cho dữ liệu hiện tại"
+  },
   "summary": {
-    "overallAssessment": "Đánh giá tổng quan về tình hình kinh doanh",
+    "overallAssessment": "Đánh giá tổng quan về tình hình kinh doanh dựa trên phân tích dữ liệu",
     "keyInsights": ["Insight 1", "Insight 2", "Insight 3"]
   },
   "priorityRecommendations": [
@@ -267,9 +283,12 @@ Hãy phân tích và đưa ra khuyến nghị chi tiết theo format JSON sau:
 }
 
 Lưu ý:
+- BẮT BUỘC phải có section "forecastingMethodology" với đầy đủ thông tin về phương pháp, nguyên tắc, tiêu chuẩn
+- Giải thích cụ thể công thức tính toán được sử dụng (ví dụ: Average Daily Demand = Total Sold / Days)
+- Nêu rõ các tiêu chuẩn quản lý tồn kho áp dụng (EOQ, Reorder Point, Safety Stock)
 - Ưu tiên các sản phẩm bán chạy nhưng tồn kho thấp
 - Cảnh báo về sản phẩm sắp hết hạn (không nên nhập thêm)
-- Đưa ra số lượng cụ thể dựa trên tốc độ bán hàng
+- Đưa ra số lượng cụ thể dựa trên tốc độ bán hàng đã tính toán
 - Đánh giá xu hướng và đưa ra chiến lược dài hạn
 - Tính toán chi phí và lợi nhuận dự kiến
 

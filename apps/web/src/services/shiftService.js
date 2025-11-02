@@ -93,6 +93,14 @@ export const updateShiftAssignment = async (id, assignmentData) => {
 };
 
 /**
+ * Confirm shift assignment
+ */
+export const confirmShift = async (id) => {
+  const response = await instance.post(`${ASSIGNMENT_BASE_URL}/${id}/confirm`);
+  return response.data;
+};
+
+/**
  * Check-in to shift
  */
 export const checkInShift = async (id) => {
@@ -142,6 +150,7 @@ const shiftService = {
   getShiftAssignmentById,
   createShiftAssignment,
   updateShiftAssignment,
+  confirmShift,
   checkInShift,
   checkOutShift,
   deleteShiftAssignment,

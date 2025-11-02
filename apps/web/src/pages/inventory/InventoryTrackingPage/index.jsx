@@ -5,6 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useInventory } from "@/hooks/useInventory";
@@ -25,9 +26,9 @@ const InventoryTracking = () => {
   function renderLowStock() {
     if (loading.lowStock) {
       return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-64" />
+            <Skeleton key={i} className="h-72" />
           ))}
         </div>
       );
@@ -35,16 +36,32 @@ const InventoryTracking = () => {
 
     if (error.lowStock) {
       return (
-        <div className="text-red-500">Failed to load low stock items.</div>
+        <div className="text-center py-8">
+          <p className="text-red-500 font-medium">
+            Không thể tải các mặt hàng tồn kho thấp.
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Vui lòng thử lại sau.
+          </p>
+        </div>
       );
     }
 
     if (lowStock.length === 0) {
-      return <div className="text-red-500">No low-stock items yet.</div>;
+      return (
+        <div className="text-center py-12 bg-muted/50 rounded-lg">
+          <p className="text-muted-foreground text-lg">
+            Không tìm thấy mặt hàng tồn kho thấp
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Tất cả mặt hàng đều trên ngưỡng 250 đơn vị
+          </p>
+        </div>
+      );
     }
 
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {lowStock.map((item) => (
           <MedicineCard key={item.id} medicine={item} variant="low-stock" />
         ))}
@@ -56,24 +73,42 @@ const InventoryTracking = () => {
   function renderExpiring() {
     if (loading.expiring) {
       return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-64" />
+            <Skeleton key={i} className="h-72" />
           ))}
         </div>
       );
     }
 
     if (error.expiring) {
-      return <div className="text-red-500">Failed to load expiring items.</div>;
+      return (
+        <div className="text-center py-8">
+          <p className="text-red-500 font-medium">
+            Không thể tải các mặt hàng sắp hết hạn.
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Vui lòng thử lại sau.
+          </p>
+        </div>
+      );
     }
 
     if (expiring.length === 0) {
-      return <div className="text-red-500">No expiring items yet.</div>;
+      return (
+        <div className="text-center py-12 bg-muted/50 rounded-lg">
+          <p className="text-muted-foreground text-lg">
+            Không tìm thấy mặt hàng sắp hết hạn
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Tất cả mặt hàng có ngày hết hạn sau 30 ngày
+          </p>
+        </div>
+      );
     }
 
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {expiring.map((item) => (
           <MedicineCard key={item.id} medicine={item} variant="expiring" />
         ))}
@@ -86,14 +121,12 @@ const InventoryTracking = () => {
       <div className="min-h-screenp-6 space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">
-              Inventory Tracking
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-900">Theo dõi Kho</h2>
             <p className="text-muted-foreground mt-1">
-              View low-stock and near expiry items
+              Xem các mặt hàng tồn kho thấp và sắp hết hạn
             </p>
           </div>
-          {/* <Button className="w-50">Create Purchase Order</Button> */}
+          <Button className="w-50">Tạo Đơn Mua Hàng</Button>
         </div>
         <Card className="relative shadow-md rounded-xl border-0 p-6">
           <Accordion
@@ -103,13 +136,13 @@ const InventoryTracking = () => {
           >
             <AccordionItem value="low-stock">
               <AccordionTrigger className="text-lg">
-                Low Stock Tracking
+                Theo dõi Tồn Kho Thấp
               </AccordionTrigger>
               <AccordionContent>{renderLowStock()}</AccordionContent>
             </AccordionItem>
             <AccordionItem value="expiry-tracking">
               <AccordionTrigger className="text-lg">
-                Expiry Tracking
+                Theo dõi Hết Hạn
               </AccordionTrigger>
               <AccordionContent>{renderExpiring()}</AccordionContent>
             </AccordionItem>

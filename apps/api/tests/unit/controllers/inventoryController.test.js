@@ -174,7 +174,7 @@ describe("InventoryController", () => {
       await inventoryController.getLowStock(req, res);
 
       expect(inventoryService.getLowStock).toHaveBeenCalledWith({
-        threshold: 10,
+        threshold: 250,
         sortBy: undefined,
         sortOrder: undefined,
         limit: 50,

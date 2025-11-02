@@ -130,6 +130,8 @@ export const salesOrderService = {
           status: "pending",
           salespersonId: userId || null,
           prescriptionId: soData.prescription_id || null,
+          prescriptionNote: soData.prescription_note || null,
+          notes: soData.notes || null,
           orderDate: new Date(),
         })
         .returning();

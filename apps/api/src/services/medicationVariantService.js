@@ -158,6 +158,7 @@ export const searchVariantsForSale = async ({ search } = {}) => {
         isActive: medicationVariants.isActive,
         isForSale: medicationVariants.isForSale,
         medicationName: medications.name,
+        isPrescriptionRequired: medications.isPrescriptionRequired,
       })
       .from(medicationVariants)
       .innerJoin(
@@ -219,13 +220,13 @@ export const searchVariantsForSale = async ({ search } = {}) => {
             expiryDate: item.expiryDate,
             location: item.bin
               ? {
-                zone: item.bin.rack?.zone?.name || "N/A",
-                rack: item.bin.rack?.code || "N/A",
-                bin: `${item.bin.level || ""}${item.bin.number || ""}`,
-                fullLocation: item.bin.rack?.zone?.name
-                  ? `${item.bin.rack.zone.name} - ${item.bin.rack.code} - Bin ${item.bin.level || ""}${item.bin.number || ""}`
-                  : "Location N/A",
-              }
+                  zone: item.bin.rack?.zone?.name || "N/A",
+                  rack: item.bin.rack?.code || "N/A",
+                  bin: `${item.bin.level || ""}${item.bin.number || ""}`,
+                  fullLocation: item.bin.rack?.zone?.name
+                    ? `${item.bin.rack.zone.name} - ${item.bin.rack.code} - Bin ${item.bin.level || ""}${item.bin.number || ""}`
+                    : "Location N/A",
+                }
               : null,
           }));
 
@@ -240,6 +241,7 @@ export const searchVariantsForSale = async ({ search } = {}) => {
           unit: variant.unit,
           isActive: variant.isActive,
           isForSale: variant.isForSale,
+          isPrescriptionRequired: variant.isPrescriptionRequired || false,
           availableQuantity: totalAvailable,
           locations: availableLocations, // FEFO sorted locations
         };

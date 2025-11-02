@@ -40,7 +40,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Redirect root to dashboard */}
+        {/* Redirect root to dashboard - staff will be redirected to sales by Dashboard.jsx */}
         <Route
           path="/"
           element={
@@ -48,8 +48,7 @@ function App() {
               <Navigate to="/dashboard" replace />
             </ProtectedRoute>
           }
-        />
-
+        />{" "}
         {/* Protected routes - require authentication */}
         <Route
           path="/dashboard"
@@ -83,7 +82,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         {/* Supplier Routes */}
         <Route
           path="/suppliers"
@@ -117,7 +115,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         {/* Purchase Order Routes */}
         <Route
           path="/procurement/purchase-orders"
@@ -167,7 +164,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         {/* Inventory Routes */}
         <Route
           path="/inventory/stock"
@@ -193,7 +189,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/sales"
           element={
@@ -202,7 +197,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/sales/orders"
           element={
@@ -211,7 +205,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/sales/orders/:id"
           element={
@@ -220,7 +213,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         {/* Shift Management Routes */}
         <Route
           path="/shifts/management"
@@ -246,7 +238,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         {/* Public routes - redirect to dashboard if already logged in */}
         <Route
           path="/login"
@@ -321,7 +312,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         {/* 404 page - accessible to everyone */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

@@ -1,6 +1,7 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { instance } from "@/lib/axios";
 import * as api from "@/services/medicationsService";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const FIVE_MIN = 5 * 60 * 1000;
 
@@ -106,15 +107,17 @@ export const useMedicationVariants = (medicationId) =>
     queryKey: ["medicationVariants", medicationId],
     queryFn: async () => {
       if (!medicationId) {
-        return [];
+        return { data: [] };
       }
+
       if (typeof api.getMedicationVariants === "function") {
         return api.getMedicationVariants(medicationId);
       }
       if (typeof api.getMedicationById === "function") {
         const med = await api.getMedicationById(medicationId);
-        return med?.variants ?? [];
+        return { data: med?.variants ?? [] };
       }
+
       const res = await instance.get(`/medications/${medicationId}/variants`);
       return res.data;
     },

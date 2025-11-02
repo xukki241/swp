@@ -230,7 +230,7 @@ describe("InventoryService", () => {
       expect(result.total).toBe(1);
     });
 
-    it("should use default threshold of 10", async () => {
+    it("should use default threshold of 250", async () => {
       db.query = {
         inventory: {
           findMany: vi.fn().mockResolvedValue([]),
@@ -253,10 +253,12 @@ describe("InventoryService", () => {
 
   describe("getExpiring", () => {
     it("should fetch items expiring within specified days", async () => {
+      // Mock item that is >= 1 year old from manufacture date (manufactured Nov 2023)
       const mockItems = [
         {
           id: 1,
           expiryDate: "2025-11-10",
+          manufactureDate: "2023-11-01",
           daysUntilExpiry: 30,
         },
       ];
@@ -303,7 +305,10 @@ describe("InventoryService", () => {
 
   describe("getExpiringSoon", () => {
     it("should call getExpiring method", async () => {
-      const mockItems = [{ id: 1, expiryDate: "2025-11-10" }];
+      // Mock item that is >= 1 year old from manufacture date (manufactured Nov 2023)
+      const mockItems = [
+        { id: 1, expiryDate: "2025-11-10", manufactureDate: "2023-11-01" },
+      ];
 
       db.query = {
         inventory: {

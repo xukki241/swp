@@ -1,5 +1,3 @@
-"use client";
-
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useDownloadFile } from "@/hooks/useFiles";
-import { useSupplier, useSupplierMedications } from "@/hooks/useSuppliers";
+import { useSupplier } from "@/hooks/useSuppliers";
 import {
   ArrowLeft,
   Ban,
@@ -35,8 +33,8 @@ export default function SupplierDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: supplier, isLoading } = useSupplier(id);
-  const { data: medications = [], isLoading: isLoadingMedications } =
-    useSupplierMedications(id);
+  // Lấy medications từ supplier.medicationVariants thay vì gọi API riêng
+  const medications = supplier?.medicationVariants || [];
   const downloadFile = useDownloadFile();
 
   function getStatusBadge(status) {
@@ -73,18 +71,33 @@ export default function SupplierDetailPage() {
     return new Intl.NumberFormat("vi-VN").format(Math.round(num)) + "₫";
   }
 
-  const handleDownloadContract = async (contractId, supplierSku) => {
+  const handleDownloadContract = async (
+    contractId,
+    supplierSku,
+    contractFilename,
+    contractFileType
+  ) => {
     if (!contractId) return;
 
     try {
+      let filename = contractFilename;
+
+      // If filename not provided, generate one
+      if (!filename) {
+        filename = `contract-${supplierSku || "document"}`;
+
+        const extension = contractFileType || "pdf";
+        filename = `${filename}.${extension}`;
+      }
+
       await downloadFile.mutateAsync({
         fileId: contractId,
-        filename: `contract-${supplierSku || "document"}.pdf`,
+        filename: filename,
       });
-      toast.success("Contract downloaded successfully!");
+      toast.success("Đã tải hợp đồng thành công!");
     } catch (error) {
       console.error("Error downloading contract:", error);
-      toast.error("Failed to download contract file");
+      toast.error("Không thể tải file hợp đồng");
     }
   };
 
@@ -94,10 +107,10 @@ export default function SupplierDetailPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Supplier Details
+              Chi tiết nhà cung cấp
             </h1>
             <p className="text-muted-foreground mt-1">
-              Loading supplier information...
+              Đang tải thông tin nhà cung cấp...
             </p>
           </div>
           <Card className="shadow-md rounded-xl border-0">
@@ -118,10 +131,10 @@ export default function SupplierDetailPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Supplier Details
+              Chi tiết nhà cung cấp
             </h1>
             <p className="text-muted-foreground mt-1">
-              View and manage supplier information
+              Xem và quản lý thông tin nhà cung cấp
             </p>
           </div>
           <div className="flex gap-2">
@@ -130,37 +143,58 @@ export default function SupplierDetailPage() {
               className="flex items-center gap-2 bg-transparent"
               onClick={() => navigate(-1)}
             >
-              <ArrowLeft className="w-4 h-4" /> Back
+              <ArrowLeft className="w-4 h-4" /> Quay lại
             </Button>
             <Button
               className="flex items-center gap-2"
               onClick={() => navigate(`/suppliers/${id}/edit`)}
             >
-              <Pencil className="w-4 h-4" /> Edit
+              <Pencil className="w-4 h-4" /> Sửa
             </Button>
           </div>
         </div>
 
         <Card className="shadow-md rounded-xl border-0">
           <CardHeader>
-            <CardTitle>Supplier Information</CardTitle>
-            <CardDescription>
-              Basic details and contact information
-            </CardDescription>
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle>Thông tin nhà cung cấp</CardTitle>
+                <CardDescription>
+                  Chi tiết cơ bản và thông tin liên hệ
+                </CardDescription>
+              </div>
+              {supplier?.medicationVariants?.[0]?.contractId && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const firstVariant = supplier.medicationVariants[0];
+                    handleDownloadContract(
+                      firstVariant.contractId,
+                      supplier.name,
+                      firstVariant.contractFilename,
+                      firstVariant.contractFileType
+                    );
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Tải hợp đồng
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Name
-                </p>
+                <p className="text-sm font-medium text-muted-foreground">Tên</p>
                 <p className="text-base font-semibold mt-1">
                   {supplier?.name || "N/A"}
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
-                  Contact Name
+                  Tên người liên hệ
                 </p>
                 <p className="text-base font-semibold mt-1">
                   {supplier?.contactName || "N/A"}
@@ -176,7 +210,7 @@ export default function SupplierDetailPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
-                  Phone
+                  Điện thoại
                 </p>
                 <p className="text-base font-semibold mt-1">
                   {supplier?.phone || "N/A"}
@@ -184,7 +218,7 @@ export default function SupplierDetailPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
-                  Address
+                  Địa chỉ
                 </p>
                 <p className="text-base font-semibold mt-1">
                   {supplier?.address || "N/A"}
@@ -192,7 +226,7 @@ export default function SupplierDetailPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
-                  Status
+                  Trạng thái
                 </p>
                 <div className="mt-1">{getStatusBadge(supplier?.status)}</div>
               </div>
@@ -202,23 +236,19 @@ export default function SupplierDetailPage() {
 
         <Card className="shadow-md rounded-xl border-0">
           <CardHeader>
-            <CardTitle>Supplied Medications</CardTitle>
+            <CardTitle>Thuốc cung cấp</CardTitle>
             <CardDescription>
-              List of medications provided by this supplier
+              Danh sách thuốc do nhà cung cấp này cung cấp
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {isLoadingMedications ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : medications.length === 0 ? (
+            {medications.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-muted-foreground font-medium">
-                  No medications found
+                  Không tìm thấy thuốc
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  This supplier has no medications assigned yet
+                  Nhà cung cấp này chưa có thuốc nào được phân công
                 </p>
               </div>
             ) : (
@@ -226,12 +256,11 @@ export default function SupplierDetailPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Medication Name</TableHead>
-                      <TableHead>Variant</TableHead>
-                      <TableHead>Supplier SKU</TableHead>
-                      <TableHead>Lead Time (days)</TableHead>
-                      <TableHead>Purchase Price</TableHead>
-                      <TableHead className="text-center">Contract</TableHead>
+                      <TableHead>Tên thuốc</TableHead>
+                      <TableHead>Phiên bản</TableHead>
+                      <TableHead>Mã SKU NCC</TableHead>
+                      <TableHead>Thời gian giao (ngày)</TableHead>
+                      <TableHead>Giá mua</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -245,28 +274,6 @@ export default function SupplierDetailPage() {
                         <TableCell>{m.leadTimeDays || "N/A"}</TableCell>
                         <TableCell className="font-semibold text-primary">
                           {formatVND(m.purchasePrice)}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {m.contractId ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                handleDownloadContract(
-                                  m.contractId,
-                                  m.supplierSku
-                                )
-                              }
-                              className="flex items-center gap-2 mx-auto"
-                            >
-                              <Download className="w-4 h-4" />
-                              Download
-                            </Button>
-                          ) : (
-                            <span className="text-sm text-muted-foreground">
-                              No contract
-                            </span>
-                          )}
                         </TableCell>
                       </TableRow>
                     ))}

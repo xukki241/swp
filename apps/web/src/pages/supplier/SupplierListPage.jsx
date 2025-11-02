@@ -1,5 +1,3 @@
-"use client";
-
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -75,16 +73,16 @@ export default function SupplierListPage() {
   const confirmDelete = () => {
     deleteSupplier(selectedId, {
       onSuccess: () => {
-        toast.success("Supplier deleted successfully!", {
-          description: "The supplier has been removed.",
+        toast.success("Đã xóa nhà cung cấp thành công!", {
+          description: "Nhà cung cấp đã được xóa.",
         });
       },
       onError: (error) => {
-        toast.error("Failed to delete supplier!", {
+        toast.error("Không thể xóa nhà cung cấp!", {
           description:
             error?.response?.data?.error ||
             error?.message ||
-            "Please try again.",
+            "Vui lòng thử lại.",
         });
       },
     });
@@ -123,9 +121,11 @@ export default function SupplierListPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Supplier Management
+              Quản lý nhà cung cấp
             </h1>
-            <p className="text-muted-foreground mt-1">Loading suppliers...</p>
+            <p className="text-muted-foreground mt-1">
+              Đang tải nhà cung cấp...
+            </p>
           </div>
           <Card className="shadow-md rounded-xl border-0">
             <CardContent className="pt-6">
@@ -145,10 +145,10 @@ export default function SupplierListPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Supplier Management
+              Quản lý nhà cung cấp
             </h1>
             <p className="text-muted-foreground mt-1">
-              Manage supplier accounts and relationships
+              Quản lý tài khoản và quan hệ nhà cung cấp
             </p>
           </div>
         </div>
@@ -156,16 +156,16 @@ export default function SupplierListPage() {
         <Card className="shadow-md rounded-xl border-0">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Supplier List</CardTitle>
+              <CardTitle>Danh sách nhà cung cấp</CardTitle>
               <CardDescription>
-                View, search, and manage all supplier information
+                Xem, tìm kiếm và quản lý thông tin nhà cung cấp
               </CardDescription>
             </div>
             <Button
               onClick={() => navigate("/suppliers/create")}
               className="flex items-center gap-2"
             >
-              <PlusCircle className="w-4 h-4" /> Add New Supplier
+              <PlusCircle className="w-4 h-4" /> Thêm nhà cung cấp
             </Button>
           </CardHeader>
           <CardContent>
@@ -179,7 +179,7 @@ export default function SupplierListPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by name, email, or phone..."
+                  placeholder="Tìm theo tên, email hoặc số điện thoại..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   className="pl-10 h-11 rounded-lg"
@@ -190,7 +190,7 @@ export default function SupplierListPage() {
                 className="h-11 bg-primary/90 hover:bg-primary"
               >
                 <Search className="h-4 w-4 mr-2" />
-                Search
+                Tìm kiếm
               </Button>
               {searchQuery && (
                 <Button
@@ -202,18 +202,18 @@ export default function SupplierListPage() {
                     setSearchQuery("");
                   }}
                 >
-                  Clear
+                  Xóa
                 </Button>
               )}
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full md:w-[180px] h-11">
-                  <SelectValue placeholder="Filter by status" />
+                  <SelectValue placeholder="Lọc theo trạng thái" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="blacklisted">Blacklisted</SelectItem>
+                  <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                  <SelectItem value="active">Hoạt động</SelectItem>
+                  <SelectItem value="inactive">Không hoạt động</SelectItem>
+                  <SelectItem value="blacklisted">Danh sách đen</SelectItem>
                 </SelectContent>
               </Select>
             </form>
@@ -222,11 +222,11 @@ export default function SupplierListPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead>Tên</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>Điện thoại</TableHead>
+                    <TableHead>Trạng thái</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -236,12 +236,12 @@ export default function SupplierListPage() {
                         <div className="flex flex-col items-center gap-2">
                           <Search className="h-10 w-10 text-muted-foreground/50" />
                           <p className="text-muted-foreground font-medium">
-                            No suppliers found
+                            Không tìm thấy nhà cung cấp
                           </p>
                           <p className="text-sm text-muted-foreground">
                             {searchQuery || statusFilter !== "all"
-                              ? "Try adjusting your filters"
-                              : "Get started by adding your first supplier"}
+                              ? "Thử điều chỉnh bộ lọc"
+                              : "Bắt đầu bằng cách thêm nhà cung cấp đầu tiên"}
                           </p>
                         </div>
                       </TableCell>
@@ -259,7 +259,7 @@ export default function SupplierListPage() {
                               size="sm"
                               variant="outline"
                               onClick={() => navigate(`/suppliers/${s.id}`)}
-                              title="View Details"
+                              title="Xem chi tiết"
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
@@ -267,7 +267,7 @@ export default function SupplierListPage() {
                               size="sm"
                               variant="destructive"
                               onClick={() => handleDelete(s.id)}
-                              title="Delete"
+                              title="Xóa"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
@@ -286,18 +286,18 @@ export default function SupplierListPage() {
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogTitle>Xác nhận xóa</DialogTitle>
           </DialogHeader>
           <p className="text-muted-foreground">
-            Are you sure you want to delete this supplier? This action cannot be
-            undone.
+            Bạn có chắc chắn muốn xóa nhà cung cấp này? Hành động này không thể
+            hoàn tác.
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>
-              Cancel
+              Hủy
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
-              Delete
+              Xóa
             </Button>
           </DialogFooter>
         </DialogContent>

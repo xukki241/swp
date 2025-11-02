@@ -17,12 +17,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 const STATUS_LABELS = {
-  scheduled: { label: "Scheduled", color: "bg-blue-500" },
-  confirmed: { label: "Confirmed", color: "bg-green-500" },
-  in_progress: { label: "In Progress", color: "bg-yellow-500" },
-  completed: { label: "Completed", color: "bg-gray-500" },
-  cancelled: { label: "Cancelled", color: "bg-red-500" },
-  absent: { label: "Absent", color: "bg-orange-500" },
+  scheduled: { label: "Đã lên lịch", color: "bg-blue-500" },
+  confirmed: { label: "Đã xác nhận", color: "bg-green-500" },
+  in_progress: { label: "Đang diễn ra", color: "bg-yellow-500" },
+  completed: { label: "Hoàn thành", color: "bg-gray-500" },
+  cancelled: { label: "Đã hủy", color: "bg-red-500" },
+  absent: { label: "Vắng mặt", color: "bg-orange-500" },
 };
 
 export default function MySchedulePage() {
@@ -56,7 +56,7 @@ export default function MySchedulePage() {
   const loadSchedule = useCallback(async () => {
     const userId = getUserId();
     if (!userId) {
-      toast.error("User not found");
+      toast.error("Không tìm thấy người dùng");
       return;
     }
 
@@ -74,7 +74,7 @@ export default function MySchedulePage() {
       setSchedule(response.data || []);
     } catch (error) {
       console.error("Failed to load schedule:", error);
-      toast.error("Failed to load schedule");
+      toast.error("Không thể tải lịch làm việc");
     } finally {
       setLoading(false);
     }
@@ -102,11 +102,13 @@ export default function MySchedulePage() {
     setProcessingId(assignmentId);
     try {
       await shiftService.checkInShift(assignmentId);
-      toast.success("Checked in successfully");
+      toast.success("Đã điểm danh vào ca thành công");
       loadSchedule();
     } catch (error) {
       console.error("Failed to check in:", error);
-      toast.error(error.response?.data?.message || "Failed to check in");
+      toast.error(
+        error.response?.data?.message || "Không thể điểm danh vào ca"
+      );
     } finally {
       setProcessingId(null);
     }
@@ -116,14 +118,37 @@ export default function MySchedulePage() {
     setProcessingId(assignmentId);
     try {
       await shiftService.checkOutShift(assignmentId);
-      toast.success("Checked out successfully");
+      toast.success("Đã điểm danh kết thúc ca thành công");
       loadSchedule();
     } catch (error) {
       console.error("Failed to check out:", error);
-      toast.error(error.response?.data?.message || "Failed to check out");
+      toast.error(
+        error.response?.data?.message || "Không thể điểm danh kết thúc ca"
+      );
     } finally {
       setProcessingId(null);
     }
+  };
+
+  const handleConfirm = async (assignmentId) => {
+    setProcessingId(assignmentId);
+    try {
+      await shiftService.confirmShift(assignmentId);
+      toast.success("Đã xác nhận lịch làm việc thành công");
+      loadSchedule();
+    } catch (error) {
+      console.error("Failed to confirm shift:", error);
+      toast.error(
+        error.response?.data?.message || "Không thể xác nhận lịch làm việc"
+      );
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const canConfirm = (item) => {
+    const assignment = item.assignment;
+    return assignment.status === "scheduled";
   };
 
   const canCheckIn = (item) => {
@@ -164,9 +189,9 @@ export default function MySchedulePage() {
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">My Schedule</h1>
+            <h1 className="text-3xl font-bold">Lịch làm việc của tôi</h1>
             <p className="text-muted-foreground mt-1">
-              View your work schedule and check-in/out
+              Xem lịch làm việc và điểm danh vào/ra ca
             </p>
           </div>
         </div>
@@ -176,21 +201,21 @@ export default function MySchedulePage() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
-                Work Week
+                Tuần làm việc
               </CardTitle>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={handlePrevWeek}>
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleToday}>
-                  Today
+                  Hôm nay
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleNextWeek}>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
                 <span className="ml-4 text-sm font-medium">
-                  {weekRange.start.toLocaleDateString("en-US")} -{" "}
-                  {weekRange.end.toLocaleDateString("en-US")}
+                  {weekRange.start.toLocaleDateString("vi-VN")} -{" "}
+                  {weekRange.end.toLocaleDateString("vi-VN")}
                 </span>
               </div>
             </div>
@@ -216,18 +241,18 @@ export default function MySchedulePage() {
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                           <h3 className="font-semibold flex items-center gap-2">
-                            {date.toLocaleDateString("en-US", {
+                            {date.toLocaleDateString("vi-VN", {
                               weekday: "long",
                               day: "numeric",
                               month: "long",
                             })}
                             {isToday && (
-                              <Badge className="bg-blue-500">Today</Badge>
+                              <Badge className="bg-blue-500">Hôm nay</Badge>
                             )}
                           </h3>
                           {dayAssignments.length > 0 && (
                             <Badge variant="outline">
-                              {dayAssignments.length} shift(s)
+                              {dayAssignments.length} ca
                             </Badge>
                           )}
                         </div>
@@ -235,7 +260,7 @@ export default function MySchedulePage() {
                       <CardContent>
                         {dayAssignments.length === 0 ? (
                           <p className="text-sm text-muted-foreground">
-                            No shifts
+                            Không có ca làm việc
                           </p>
                         ) : (
                           <div className="space-y-3">
@@ -276,10 +301,10 @@ export default function MySchedulePage() {
                                     <div className="flex items-center gap-2 text-sm">
                                       <LogIn className="h-4 w-4 text-green-500" />
                                       <span>
-                                        Check-in:{" "}
+                                        Điểm danh vào:{" "}
                                         {new Date(
                                           assignment.checkInTime
-                                        ).toLocaleTimeString()}
+                                        ).toLocaleTimeString("vi-VN")}
                                       </span>
                                     </div>
                                   )}
@@ -288,15 +313,35 @@ export default function MySchedulePage() {
                                     <div className="flex items-center gap-2 text-sm">
                                       <LogOut className="h-4 w-4 text-red-500" />
                                       <span>
-                                        Check-out:{" "}
+                                        Điểm danh ra:{" "}
                                         {new Date(
                                           assignment.checkOutTime
-                                        ).toLocaleTimeString()}
+                                        ).toLocaleTimeString("vi-VN")}
                                       </span>
                                     </div>
                                   )}
 
                                   <div className="flex gap-2 pt-2">
+                                    {canConfirm(item) && (
+                                      <Button
+                                        size="sm"
+                                        variant="default"
+                                        className="bg-blue-600 hover:bg-blue-700"
+                                        onClick={() =>
+                                          handleConfirm(assignment.id)
+                                        }
+                                        disabled={
+                                          processingId === assignment.id
+                                        }
+                                      >
+                                        {processingId === assignment.id ? (
+                                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        ) : (
+                                          <CheckCircle className="mr-2 h-4 w-4" />
+                                        )}
+                                        Xác nhận lịch
+                                      </Button>
+                                    )}
                                     {canCheckIn(item) && (
                                       <Button
                                         size="sm"
@@ -312,7 +357,7 @@ export default function MySchedulePage() {
                                         ) : (
                                           <LogIn className="mr-2 h-4 w-4" />
                                         )}
-                                        Check-in
+                                        Điểm danh vào
                                       </Button>
                                     )}
                                     {canCheckOut(item) && (
@@ -331,13 +376,13 @@ export default function MySchedulePage() {
                                         ) : (
                                           <LogOut className="mr-2 h-4 w-4" />
                                         )}
-                                        Check-out
+                                        Điểm danh ra
                                       </Button>
                                     )}
                                     {assignment.status === "completed" && (
                                       <div className="flex items-center gap-2 text-sm text-green-600">
                                         <CheckCircle className="h-4 w-4" />
-                                        Shift completed
+                                        Ca làm việc đã hoàn thành
                                       </div>
                                     )}
                                   </div>
