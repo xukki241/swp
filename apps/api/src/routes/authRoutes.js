@@ -81,4 +81,12 @@ authRouter.post(
   authController.verifyOTPAndResetPassword
 );
 
+/**
+ * @route   POST /api/auth/refresh
+ * @desc    Refresh access token using refresh token
+ * @access  Public
+ * @body    { refreshToken }
+ */
+authRouter.post("/refresh", authController.refreshToken);
+
 export default authRouter;
