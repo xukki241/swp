@@ -1683,22 +1683,10 @@ async function seed() {
         unitPrice: 40000,
         totalPrice: 40000,
       },
-      // Sale 14 items (Oct 25, 2025 - 350,000 - CANCELLED)
-      {
-        salesOrderId: sale14.id,
-        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
-        quantity: 4,
-        unitPrice: 85000,
-        totalPrice: 340000,
-      },
-      {
-        salesOrderId: sale14.id,
-        medicationVariantId: medicationVariantsResults[1].id, // Paracetamol 250mg
-        quantity: 1,
-        unitPrice: 10000,
-        totalPrice: 10000,
-      },
-      // Sale 15 items (Oct 28, 2025 - 920,000)
+      // Sale 14 items (Oct 25, 2025 - CANCELLED - NO ITEMS)
+      // Cancelled orders should not have items as they were cancelled before fulfillment
+
+      // Sale 15 items (Oct 28, 2025 - 920,000 - PENDING)
       {
         salesOrderId: sale15.id,
         medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
@@ -2101,11 +2089,12 @@ async function seed() {
     - Mục phiếu nhập: 9 (từ 4 phiếu nhập)
     - Bản ghi tồn kho: 11 (từ tất cả phiếu nhập + 2 biến thể Paracetamol bổ sung)
     - Đơn bán hàng: 15 (5 từ tháng 6/2024 + 10 từ tháng 10/2025)
-      * Trạng thái: chờ xử lý, đã thanh toán, đã hủy
-      * Tháng 10/2025: 10 đơn - 7 đã thanh toán, 1 đã hủy, 2 chờ xử lý
-      * Tổng doanh thu tháng 10: 4.890.000 VND (từ 7 đơn đã thanh toán)
-    - Mục đơn bán hàng: 38 (5 từ tháng 6/2024 + 33 từ tháng 10/2025)
-      * Mục tháng 10 bao gồm: Paracetamol, Ibuprofen, Amoxicillin, v.v.
+      * Trạng thái: chờ xử lý (pending), đã thanh toán (paid), đã hủy (cancelled)
+      * Tháng 10/2025: 10 đơn - 8 đã thanh toán, 1 đã hủy, 1 chờ xử lý
+      * Tổng doanh thu tháng 10: 4.890.000 VND (từ 8 đơn đã thanh toán)
+    - Mục đơn bán hàng: 36 (5 từ tháng 6/2024 + 31 từ tháng 10/2025)
+      * Mục tháng 10 (chỉ đơn paid + pending): Paracetamol, Ibuprofen, Amoxicillin, v.v.
+      * Đơn cancelled không có items (đã hủy trước khi xử lý)
     - Tệp tin: 3
     - Tệp đính kèm: 3
     - Thông báo: 5
