@@ -1,5 +1,3 @@
-"use client";
-
 import { truncateWords } from "@/lib/utils";
 import { Edit2, Eye, Trash2 } from "lucide-react";
 import { useState } from "react";

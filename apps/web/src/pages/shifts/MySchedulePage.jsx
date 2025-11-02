@@ -130,6 +130,27 @@ export default function MySchedulePage() {
     }
   };
 
+  const handleConfirm = async (assignmentId) => {
+    setProcessingId(assignmentId);
+    try {
+      await shiftService.confirmShift(assignmentId);
+      toast.success("Đã xác nhận lịch làm việc thành công");
+      loadSchedule();
+    } catch (error) {
+      console.error("Failed to confirm shift:", error);
+      toast.error(
+        error.response?.data?.message || "Không thể xác nhận lịch làm việc"
+      );
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const canConfirm = (item) => {
+    const assignment = item.assignment;
+    return assignment.status === "scheduled";
+  };
+
   const canCheckIn = (item) => {
     const assignment = item.assignment;
     if (assignment.status !== "scheduled" && assignment.status !== "confirmed")
@@ -301,6 +322,26 @@ export default function MySchedulePage() {
                                   )}
 
                                   <div className="flex gap-2 pt-2">
+                                    {canConfirm(item) && (
+                                      <Button
+                                        size="sm"
+                                        variant="default"
+                                        className="bg-blue-600 hover:bg-blue-700"
+                                        onClick={() =>
+                                          handleConfirm(assignment.id)
+                                        }
+                                        disabled={
+                                          processingId === assignment.id
+                                        }
+                                      >
+                                        {processingId === assignment.id ? (
+                                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        ) : (
+                                          <CheckCircle className="mr-2 h-4 w-4" />
+                                        )}
+                                        Xác nhận lịch
+                                      </Button>
+                                    )}
                                     {canCheckIn(item) && (
                                       <Button
                                         size="sm"

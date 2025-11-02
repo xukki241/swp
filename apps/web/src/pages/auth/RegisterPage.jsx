@@ -6,16 +6,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loading } from "@/components/ui/loading";
 import { useRegister } from "@/hooks/useAuth";
-import { Pill } from "lucide-react";
+import { Pill, ScrollText } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
 import { toast } from "sonner";
 
 export default function RegisterPage() {
+  const [showPolicyDialog, setShowPolicyDialog] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -227,12 +237,13 @@ export default function RegisterPage() {
                 />
                 <span className="text-sm text-gray-700">
                   Tôi đồng ý với{" "}
-                  <Link
-                    to="/policy"
-                    className="text-primary underline hover:text-primary/80"
+                  <button
+                    type="button"
+                    onClick={() => setShowPolicyDialog(true)}
+                    className="text-primary underline hover:text-primary/80 font-medium"
                   >
                     Chính sách bảo mật & Điều khoản dịch vụ
-                  </Link>
+                  </button>
                 </span>
               </Label>
               {errors.agreePolicy && (
@@ -271,6 +282,155 @@ export default function RegisterPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Policy Dialog */}
+      <Dialog open={showPolicyDialog} onOpenChange={setShowPolicyDialog}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-2xl">
+              <ScrollText className="w-6 h-6 text-primary" />
+              Chính sách bảo mật & Điều khoản dịch vụ
+            </DialogTitle>
+            <DialogDescription>
+              Vui lòng đọc kỹ các điều khoản trước khi đồng ý
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 text-sm">
+            <section>
+              <h3 className="font-semibold text-base mb-2">1. Giới thiệu</h3>
+              <p className="text-gray-700 leading-relaxed">
+                Chào mừng bạn đến với PharmaFlow - Hệ thống quản lý nhà thuốc.
+                Bằng cách đăng ký tài khoản, bạn đồng ý tuân thủ các điều khoản
+                và điều kiện sau đây.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                2. Thu thập thông tin
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-2">
+                Chúng tôi thu thập các thông tin sau:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                <li>Họ tên, email, số điện thoại</li>
+                <li>Địa chỉ liên lạc</li>
+                <li>Thông tin đăng nhập và mật khẩu (được mã hóa)</li>
+                <li>Lịch sử giao dịch và đơn hàng</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                3. Sử dụng thông tin
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-2">
+                Thông tin của bạn được sử dụng để:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                <li>Xử lý đơn hàng và giao dịch</li>
+                <li>Cung cấp dịch vụ hỗ trợ khách hàng</li>
+                <li>Gửi thông báo về đơn hàng và khuyến mãi</li>
+                <li>Cải thiện chất lượng dịch vụ</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                4. Bảo mật thông tin
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn bằng các biện
+                pháp bảo mật hiện đại. Thông tin của bạn sẽ không được chia sẻ
+                với bên thứ ba mà không có sự đồng ý của bạn, trừ khi được yêu
+                cầu bởi pháp luật.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                5. Quyền và trách nhiệm
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-2">
+                Người dùng có quyền:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                <li>Truy cập và cập nhật thông tin cá nhân</li>
+                <li>Yêu cầu xóa tài khoản và dữ liệu</li>
+                <li>Từ chối nhận email marketing</li>
+              </ul>
+              <p className="text-gray-700 leading-relaxed mt-2">
+                Người dùng có trách nhiệm:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                <li>Cung cấp thông tin chính xác và đầy đủ</li>
+                <li>Bảo mật thông tin đăng nhập</li>
+                <li>Tuân thủ quy định và pháp luật hiện hành</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                6. Chính sách đặt hàng
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Đơn hàng sẽ được xử lý sau khi xác nhận thanh toán. Chúng tôi có
+                quyền từ chối hoặc hủy đơn hàng trong trường hợp phát hiện thông
+                tin sai lệch hoặc hành vi gian lận.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                7. Chính sách đổi trả
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Khách hàng có thể đổi trả sản phẩm trong vòng 7 ngày kể từ ngày
+                mua hàng, với điều kiện sản phẩm còn nguyên vẹn, chưa sử dụng và
+                có hóa đơn. Thuốc kê đơn không được phép đổi trả.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                8. Điều khoản thay đổi
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Chúng tôi có quyền cập nhật điều khoản này bất cứ lúc nào. Các
+                thay đổi sẽ được thông báo qua email hoặc trên trang web. Việc
+                tiếp tục sử dụng dịch vụ sau khi có thay đổi đồng nghĩa với việc
+                bạn chấp nhận các điều khoản mới.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">9. Liên hệ</h3>
+              <p className="text-gray-700 leading-relaxed">
+                Nếu có bất kỳ câu hỏi nào về chính sách này, vui lòng liên hệ
+                với chúng tôi:
+              </p>
+              <ul className="list-none space-y-1 text-gray-700 ml-4 mt-2">
+                <li>
+                  <strong>Email:</strong> support@pharmaflow.com
+                </li>
+                <li>
+                  <strong>Hotline:</strong> 1900 1234
+                </li>
+              </ul>
+            </section>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={() => setShowPolicyDialog(false)}
+            >
+              Đóng
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

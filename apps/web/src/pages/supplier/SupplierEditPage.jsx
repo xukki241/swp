@@ -1,5 +1,3 @@
-"use client";
-
 import { AppLayout } from "@/components/layouts/app-layout";
 import { MedicationRow } from "@/components/MedicationRow";
 import { Button } from "@/components/ui/button";

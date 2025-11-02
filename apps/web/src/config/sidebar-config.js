@@ -14,24 +14,21 @@ export const sidebarConfig = [
     title: "Tổng quan",
     icon: LayoutDashboard,
     path: "/dashboard",
-    roles: ["owner", "manager", "staff"],
+    roles: ["owner"],
   },
   {
-    title: "Nhà cung cấp",
-    icon: Truck,
-    path: "/suppliers",
-    roles: ["owner", "manager"],
-  },
-  {
-    title: "Thuốc",
-    icon: Pill,
-    path: "/medications",
-    roles: ["owner", "manager", "staff"],
+    title: "Bán hàng",
+    icon: ShoppingCart,
+    roles: ["owner", "staff"],
+    children: [
+      { label: "Bán hàng (POS)", path: "/sales" },
+      { label: "Đơn bán hàng", path: "/sales/orders" },
+    ],
   },
   {
     title: "Mua hàng",
     icon: ClipboardList,
-    roles: ["owner", "manager"],
+    roles: ["owner"],
     children: [
       { label: "Đơn đặt hàng", path: "/procurement/purchase-orders" },
       { label: "Phiếu nhập", path: "/procurement/receipts" },
@@ -40,7 +37,7 @@ export const sidebarConfig = [
   {
     title: "Kho hàng",
     icon: Package,
-    roles: ["owner", "manager", "staff"],
+    roles: ["owner", "staff"],
     children: [
       { label: "Tồn kho", path: "/inventory/stock" },
       { label: "Sơ đồ kho", path: "/inventory/warehouse" },
@@ -48,12 +45,37 @@ export const sidebarConfig = [
     ],
   },
   {
-    title: "Bán hàng",
-    icon: ShoppingCart,
-    roles: ["owner", "manager", "staff"],
+    title: "Nhà cung cấp",
+    icon: Truck,
+    path: "/suppliers",
+    roles: ["owner"],
+  },
+  {
+    title: "Thuốc",
+    icon: Pill,
+    path: "/medications",
+    roles: ["owner", "staff"],
+  },
+  {
+    title: "Ca làm việc",
+    icon: Calendar,
+    roles: ["owner", "staff"],
     children: [
-      { label: "Bán hàng (POS)", path: "/sales" },
-      { label: "Đơn bán hàng", path: "/sales/orders" },
+      {
+        label: "Quản lý ca",
+        path: "/shifts/management",
+        roles: ["owner"],
+      },
+      {
+        label: "Phân công ca",
+        path: "/shifts/assignments",
+        roles: ["owner"],
+      },
+      {
+        label: "Lịch của tôi",
+        path: "/shifts/my-schedule",
+        roles: ["owner", "staff"],
+      },
     ],
   },
   {
@@ -63,28 +85,6 @@ export const sidebarConfig = [
     children: [
       { label: "Danh sách", path: "/users/list" },
       { label: "Đăng ký chờ duyệt", path: "/users/registrations" },
-    ],
-  },
-  {
-    title: "Ca làm việc",
-    icon: Calendar,
-    roles: ["owner", "manager", "staff"],
-    children: [
-      {
-        label: "Quản lý ca",
-        path: "/shifts/management",
-        roles: ["owner", "manager"],
-      },
-      {
-        label: "Phân công ca",
-        path: "/shifts/assignments",
-        roles: ["owner", "manager"],
-      },
-      {
-        label: "Lịch của tôi",
-        path: "/shifts/my-schedule",
-        roles: ["owner", "manager", "staff"],
-      },
     ],
   },
 ];
