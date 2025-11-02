@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AlertTriangle } from "lucide-react";
+import MedicationPlaceholder from "../../../../assets/medicine-placeholder.jpg";
 
 const MedicineDialog = ({ medicine, open, onOpenChange, highlight }) => {
   if (!medicine) return null;
@@ -18,25 +19,27 @@ const MedicineDialog = ({ medicine, open, onOpenChange, highlight }) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{medicine.name}</DialogTitle>
-          <DialogDescription>{medicine.brand}</DialogDescription>
+          <DialogTitle>{medicine?.medicationVariant?.name}</DialogTitle>
+          <DialogDescription>
+            {medicine?.medicationVariant?.medication?.brand}
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="flex justify-center">
             <img
-              src={medicine.image_url}
-              alt={medicine.name}
+              src={medicine?.image_url || MedicationPlaceholder}
+              alt={medicine?.medicationVariant?.name}
               className="w-32 h-32 object-cover rounded-lg"
             />
           </div>
-          <p>{medicine.description}</p>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <span className="font-semibold">Batch Number:</span>{" "}
-              {medicine.batchNumber}
+              {medicine?.batchNumber}
             </div>
             <div>
-              <span className="font-semibold">Price:</span> ${medicine.price}
+              <span className="font-semibold">Price: </span>
+              {medicine?.medicationVariant?.sellPrice} VND
             </div>
             <div>
               <span className="font-semibold">Manufacture Date:</span>{" "}
@@ -53,12 +56,12 @@ const MedicineDialog = ({ medicine, open, onOpenChange, highlight }) => {
               className={`flex items-center ${isLowStock ? "text-red-500" : ""}`}
             >
               <span className="font-semibold">Stock:</span>&nbsp;
-              {medicine.stock}
+              {medicine?.quantity}
               {isLowStock && <AlertTriangle className="w-4 h-4 ml-2" />}
             </div>
             <div>
               <span className="font-semibold">Location:</span>{" "}
-              {`Zone ${medicine.zone}, Rack ${medicine.rack}, Level ${medicine.level}, Bin ${medicine.bin}`}
+              {`Zone: ${medicine?.bin?.rack?.zone?.name}, Rack: ${medicine?.bin?.rack.name}, Level: ${medicine?.bin?.level}, Bin ${medicine?.bin?.name}`}
             </div>
           </div>
           {medicine.isPrescription && <Badge>Prescription Required</Badge>}

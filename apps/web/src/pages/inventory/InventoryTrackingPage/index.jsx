@@ -9,7 +9,6 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useInventory } from "@/hooks/useInventory";
 import MedicineCard from "./components/MedicineCard";
-import { Button } from "@/components/ui/button";
 
 const InventoryTracking = () => {
   const {
@@ -20,7 +19,9 @@ const InventoryTracking = () => {
     refetchLowStock,
     refetchExpiring,
   } = useInventory();
+  console.log(lowStock);
 
+  // Render Low-stock
   function renderLowStock() {
     if (loading.lowStock) {
       return (
@@ -51,6 +52,7 @@ const InventoryTracking = () => {
     );
   }
 
+  // Render Expiry
   function renderExpiring() {
     if (loading.expiring) {
       return (
@@ -91,7 +93,7 @@ const InventoryTracking = () => {
               View low-stock and near expiry items
             </p>
           </div>
-          <Button className="w-50">Create Purchase Order</Button>
+          {/* <Button className="w-50">Create Purchase Order</Button> */}
         </div>
         <Card className="relative shadow-md rounded-xl border-0 p-6">
           <Accordion
@@ -100,11 +102,15 @@ const InventoryTracking = () => {
             className="w-full"
           >
             <AccordionItem value="low-stock">
-              <AccordionTrigger className="text-lg">Low Stock Tracking</AccordionTrigger>
+              <AccordionTrigger className="text-lg">
+                Low Stock Tracking
+              </AccordionTrigger>
               <AccordionContent>{renderLowStock()}</AccordionContent>
             </AccordionItem>
             <AccordionItem value="expiry-tracking">
-              <AccordionTrigger className="text-lg">Expiry Tracking</AccordionTrigger>
+              <AccordionTrigger className="text-lg">
+                Expiry Tracking
+              </AccordionTrigger>
               <AccordionContent>{renderExpiring()}</AccordionContent>
             </AccordionItem>
           </Accordion>
