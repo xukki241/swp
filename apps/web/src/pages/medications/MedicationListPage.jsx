@@ -9,6 +9,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -563,14 +564,14 @@ export default function MedicationListPage() {
 
         {/* Medication Form (popup) */}
         <Dialog open={medFormOpen} onOpenChange={setMedFormOpen}>
-          <DialogContent className="max-w-2xl" aria-describedby="med-form-desc">
-            <p id="med-form-desc" className="sr-only">
-              Medication form dialog
-            </p>
+          <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>
                 {editing ? "Chỉnh sửa Thuốc" : "Thêm Thuốc mới"}
               </DialogTitle>
+              <DialogDescription>
+                {editing ? "Cập nhật thông tin thuốc" : "Nhập thông tin thuốc mới"}
+              </DialogDescription>
             </DialogHeader>
 
             <form
@@ -730,10 +731,10 @@ export default function MedicationListPage() {
 
       {/* Lightbox – chỉ hiện ảnh */}
       <Dialog open={lightbox.open} onOpenChange={(o) => !o && closeLightbox()}>
-        <DialogContent className="max-w-3xl" aria-describedby="lightbox-desc">
-          <p id="lightbox-desc" className="sr-only">
+        <DialogContent className="max-w-3xl">
+          <DialogDescription className="sr-only">
             Medication image preview
-          </p>
+          </DialogDescription>
           <div className="flex items-center justify-center">
             <img
               src={lightbox.src}
