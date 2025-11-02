@@ -20,6 +20,7 @@ export const nodeConfig = defineConfig([
       "n/no-missing-import": "off",
       "n/no-unsupported-features/es-syntax": "off",
       "n/no-unpublished-import": "off",
+      "n/no-unsupported-features/node-builtins": "off",
     },
   },
 ]);
