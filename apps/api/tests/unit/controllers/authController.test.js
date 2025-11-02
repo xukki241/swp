@@ -223,9 +223,9 @@ describe("AuthController", () => {
   describe("logout", () => {
     it("should logout user successfully", async () => {
       req.body = { refreshToken: "some-refresh-token" };
-      authService.revokeRefreshToken = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      vi.spyOn(authService, "revokeRefreshToken").mockResolvedValue({
+        success: true,
+      });
 
       await authController.logout(req, res, next);
 
@@ -238,9 +238,9 @@ describe("AuthController", () => {
 
     it("should handle errors", async () => {
       req.body = { refreshToken: "some-refresh-token" };
-      authService.revokeRefreshToken = vi
-        .fn()
-        .mockRejectedValue(new Error("Revoke failed"));
+      vi.spyOn(authService, "revokeRefreshToken").mockRejectedValue(
+        new Error("Revoke failed")
+      );
 
       await authController.logout(req, res, next);
 

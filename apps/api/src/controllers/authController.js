@@ -104,7 +104,7 @@ export const login = async (req, res, _next) => {
  * Logout user (User Story 4)
  * @route POST /api/auth/logout
  */
-export const logout = async (req, res, next) => {
+export const logout = async (req, res, _next) => {
   try {
     const { refreshToken } = req.body;
 
