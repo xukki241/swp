@@ -4,10 +4,6 @@ export const purchaseOrderController = {
   // Create a new purchase order
   async create(req, res) {
     try {
-      console.log(
-        "📦 Received request body:",
-        JSON.stringify(req.body, null, 2)
-      );
       const po = await purchaseOrderService.create(req.body, req.user.id);
       res.status(201).json(po);
     } catch (error) {
