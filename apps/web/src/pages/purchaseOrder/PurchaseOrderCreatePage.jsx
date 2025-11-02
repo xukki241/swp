@@ -75,9 +75,7 @@ export default function PurchaseOrderCreatePage() {
 
   const handleAddItem = () => {
     if (!supplierId)
-      return toast.warning(
-        "Please select a supplier before adding medications!"
-      );
+      return toast.warning("Vui lòng chọn nhà cung cấp trước khi thêm thuốc!");
     setSelectedItems([
       ...selectedItems,
       { supplierMedicationVariantId: "", quantity: 1, unitPrice: 0 },
@@ -121,21 +119,21 @@ export default function PurchaseOrderCreatePage() {
 
     const errors = [];
 
-    if (!supplierId) errors.push("Supplier is required.");
+    if (!supplierId) errors.push("Nhà cung cấp là bắt buộc.");
     if (selectedItems.length === 0)
-      errors.push("At least one item must be added to the order.");
+      errors.push("Phải thêm ít nhất một mặt hàng vào đơn đặt hàng.");
 
     selectedItems.forEach((item, index) => {
       if (!item.supplierMedicationVariantId)
-        errors.push(`Line #${index + 1}: Medication not selected.`);
+        errors.push(`Dòng #${index + 1}: Chưa chọn thuốc.`);
       if (!item.quantity || item.quantity <= 0)
-        errors.push(`Line #${index + 1}: Quantity must be greater than 0.`);
+        errors.push(`Dòng #${index + 1}: Số lượng phải lớn hơn 0.`);
       if (!item.unitPrice || item.unitPrice <= 0)
-        errors.push(`Line #${index + 1}: Unit price must be greater than 0.`);
+        errors.push(`Dòng #${index + 1}: Đơn giá phải lớn hơn 0.`);
     });
 
     if (errors.length > 0) {
-      toast.error("Validation Failed", {
+      toast.error("Xác thực thất bại", {
         description: (
           <pre className="text-sm text-left whitespace-pre-wrap">
             {errors.join("\n")}
@@ -205,10 +203,12 @@ export default function PurchaseOrderCreatePage() {
       // Send email notification
       try {
         await instance.post("/send-purchase-order-email", emailData);
-        toast.success("✅ Purchase order created and email sent successfully!");
+        toast.success("✅ Đã tạo đơn đặt hàng và gửi email thành công!");
       } catch (emailError) {
         console.error("⚠️ Email sending failed:", emailError);
-        toast.warning("Purchase order created, but email notification failed.");
+        toast.warning(
+          "Đã tạo đơn đặt hàng, nhưng gửi email thông báo thất bại."
+        );
       }
 
       // Invalidate purchase orders query to refresh the list
@@ -218,8 +218,8 @@ export default function PurchaseOrderCreatePage() {
     } catch (error) {
       console.error("❌ Error creating PO:", error);
       const message =
-        error?.response?.data?.error || "Failed to create purchase order.";
-      toast.error("Error", { description: message });
+        error?.response?.data?.error || "Không thể tạo đơn đặt hàng.";
+      toast.error("Lỗi", { description: message });
     } finally {
       setIsSubmitting(false);
     }
