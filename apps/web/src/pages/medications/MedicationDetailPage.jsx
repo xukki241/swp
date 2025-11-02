@@ -315,25 +315,28 @@ export default function MedicationDetailsPage() {
                 {inventory
                   .filter(
                     (inv) =>
-                      !inv.medicationId ||
-                      String(inv.medicationId) === String(id)
+                      (!inv.medicationId ||
+                        String(inv.medicationId) === String(id)) &&
+                      variantNameById.has(String(inv.medicationVariantId))
                   )
                   .map((inv) => (
                     <TableRow
                       key={`${inv.medicationVariantId}-${inv.locationId || "all"}`}
                     >
                       <TableCell>
-                        {variantNameById.get(String(inv.medicationVariantId)) ||
-                          (inv.medicationVariantId
-                            ? String(inv.medicationVariantId).slice(0, 8)
-                            : "-")}
+                        {variantNameById.get(String(inv.medicationVariantId))}
                       </TableCell>
                       <TableCell>{inv.totalQuantity}</TableCell>
                       <TableCell>{inv.totalReserved}</TableCell>
                       <TableCell>{inv.availableQuantity}</TableCell>
                     </TableRow>
                   ))}
-                {inventory.length === 0 && (
+                {inventory.filter(
+                  (inv) =>
+                    (!inv.medicationId ||
+                      String(inv.medicationId) === String(id)) &&
+                    variantNameById.has(String(inv.medicationVariantId))
+                ).length === 0 && (
                   <TableRow>
                     <TableCell
                       colSpan={4}
