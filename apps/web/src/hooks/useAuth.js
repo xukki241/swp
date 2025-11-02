@@ -15,8 +15,6 @@ import {
  * Hook for user login
  */
 export const useLogin = () => {
-  const navigate = useNavigate();
-
   return useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
