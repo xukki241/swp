@@ -1,8 +1,11 @@
 // apps/web/src/lib/fileUrls.js
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 export function getMedicationImageUrl(id, imageId) {
-  return imageId ? `${API_BASE_URL}/files/${imageId}/view` : "/images/no-image.png";
+  return imageId
+    ? `${API_BASE_URL}/files/${imageId}/view`
+    : "/images/no-image.png";
 }
 
 export function getMedicationImageLocal(id) {

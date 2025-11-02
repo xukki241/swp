@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
-import { instance } from "@/lib/axios";
 import placeholderImg from "@/assets/medicine-placeholder.jpg";
+import { instance } from "@/lib/axios";
+import { useEffect, useState } from "react";
 
 export default function MedicationImage({ fileId, alt = "", size = 56 }) {
   const [src, setSrc] = useState(null);

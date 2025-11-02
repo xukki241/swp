@@ -280,7 +280,6 @@ function App() {
             </PublicRoute>
           }
         />
-
         {/* --- Medications routes --- */}
         <Route
           path="/medications"
@@ -323,7 +322,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         {/* 404 page - accessible to everyone */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

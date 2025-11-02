@@ -180,7 +180,7 @@ export async function findVariantsByBarcode(barcode) {
 export async function uploadMedicationImage(medicationId, file) {
   const form = new FormData();
   form.append("image", file);
-  const { data } = await api.post(
+  const { data } = await instance.post(
     `/api/medications/${medicationId}/upload-image`,
     form,
     { headers: { "Content-Type": "multipart/form-data" } }
@@ -190,6 +190,8 @@ export async function uploadMedicationImage(medicationId, file) {
 
 /** Delete medication image (set imageId = null) */
 export async function deleteMedicationImage(medicationId) {
-  const { data } = await api.delete(`/api/medications/${medicationId}/image`);
+  const { data } = await instance.delete(
+    `/api/medications/${medicationId}/image`
+  );
   return data?.data; // medication
 }

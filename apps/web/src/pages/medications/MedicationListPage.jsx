@@ -1,6 +1,4 @@
 "use client";
-import { useUploadFile } from "@/hooks/useFiles";
-import { instance } from "@/lib/axios";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import MedicationImage from "../../components/MedicationImage";
+import { useUploadFile } from "@/hooks/useFiles";
 import {
   useCreateMedication,
   useDeleteMedication,
@@ -23,6 +21,8 @@ import {
   useMedicationVariants,
   useUpdateMedication,
 } from "@/hooks/useMedications";
+import { instance } from "@/lib/axios";
+import MedicationImage from "../../components/MedicationImage";
 
 import {
   findVariantsByBarcode,
@@ -102,8 +102,7 @@ function MedImage({ medicationId, imageId, alt = "", version = 0, onClick }) {
   const [errored, setErrored] = useState(false);
 
   const src = useMemo(() => {
-    if (imageId)
-      return getMedicationImageUrl(medicationId, imageId);
+    if (imageId) return getMedicationImageUrl(medicationId, imageId);
     const local = getMedicationImageLocal(medicationId);
     return local || getMedicationImageUrl(medicationId);
   }, [medicationId, imageId, version]);
@@ -241,9 +240,13 @@ export default function MedicationListPage() {
         } else if (imageFile) {
           const formData = new FormData();
           formData.append("image", imageFile);
-          await instance.post(`/medications/${savedId}/upload-image`, formData, {
-            headers: { "Content-Type": "multipart/form-data" }
-          });
+          await instance.post(
+            `/medications/${savedId}/upload-image`,
+            formData,
+            {
+              headers: { "Content-Type": "multipart/form-data" },
+            }
+          );
         } else if (imagePreview) {
           setMedicationImage(savedId, imagePreview);
         }
@@ -254,7 +257,7 @@ export default function MedicationListPage() {
       setMedFormOpen(false);
 
       // Đợi một chút để backend xử lý xong
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       await refetch();
     } catch (e) {
       toast.error("Failed to save medication", {
@@ -262,7 +265,6 @@ export default function MedicationListPage() {
       });
     }
   };
-
 
   const handleDelete = async (id) => {
     if (confirm("Xóa thuốc này?")) {
@@ -557,7 +559,6 @@ export default function MedicationListPage() {
                   </div>
                 )}
               </div>
-
             )}
           </CardContent>
         </Card>
@@ -570,7 +571,9 @@ export default function MedicationListPage() {
                 {editing ? "Chỉnh sửa Thuốc" : "Thêm Thuốc mới"}
               </DialogTitle>
               <DialogDescription>
-                {editing ? "Cập nhật thông tin thuốc" : "Nhập thông tin thuốc mới"}
+                {editing
+                  ? "Cập nhật thông tin thuốc"
+                  : "Nhập thông tin thuốc mới"}
               </DialogDescription>
             </DialogHeader>
 
@@ -646,12 +649,16 @@ export default function MedicationListPage() {
                 name="name"
                 control={control}
                 rules={{ required: true }}
-                render={({ field }) => <Input {...field} placeholder="Tên thuốc" />}
+                render={({ field }) => (
+                  <Input {...field} placeholder="Tên thuốc" />
+                )}
               />
               <Controller
                 name="brand"
                 control={control}
-                render={({ field }) => <Input {...field} placeholder="Thương hiệu" />}
+                render={({ field }) => (
+                  <Input {...field} placeholder="Thương hiệu" />
+                )}
               />
               <Controller
                 name="description"
