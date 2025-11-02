@@ -106,15 +106,17 @@ export const useMedicationVariants = (medicationId) =>
     queryKey: ["medicationVariants", medicationId],
     queryFn: async () => {
       if (!medicationId) {
-        return [];
+        return { data: [] };
       }
+
       if (typeof api.getMedicationVariants === "function") {
         return api.getMedicationVariants(medicationId);
       }
       if (typeof api.getMedicationById === "function") {
         const med = await api.getMedicationById(medicationId);
-        return med?.variants ?? [];
+        return { data: med?.variants ?? [] };
       }
+
       const res = await instance.get(`/medications/${medicationId}/variants`);
       return res.data;
     },

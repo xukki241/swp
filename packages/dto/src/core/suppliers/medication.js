@@ -19,10 +19,10 @@ export const supplierMedicationVariantSchema = z.object({
 // POST /api/suppliers/:supplierId/medications (batch)
 export const createSupplierMedicationSchema = z.object({
   medication_variant_id: uuidSchema,
-  supplier_sku: z.string().max(50).optional(),
-  lead_time_days: nonNegativeIntSchema.optional(),
+  supplier_sku: z.string().max(50).nullable().optional(),
+  lead_time_days: nonNegativeIntSchema.nullable().optional(),
   purchase_price: positiveDecimalSchema,
-  contract_id: uuidSchema.optional(),
+  contract_id: uuidSchema.nullable().optional(),
 });
 
 export const createSupplierMedicationsRequestSchema = z.array(
