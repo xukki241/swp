@@ -180,7 +180,7 @@ export function RackItem({
                 onClick={() => setShowAddBinDialog(true)}
               >
                 <Plus className="h-4 w-4" />
-                Add Bin
+                Thêm ô
               </Button>
               <Button
                 size="sm"
@@ -188,7 +188,7 @@ export function RackItem({
                 onClick={() => setShowEditDialog(true)}
               >
                 <Edit2 className="h-4 w-4" />
-                Edit Rack
+                Sửa giá
               </Button>
               <Button
                 size="sm"
@@ -197,7 +197,7 @@ export function RackItem({
                 className="text-destructive hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4" />
-                Delete Rack
+                Xóa giá
               </Button>
             </div>
           </div>
@@ -210,7 +210,12 @@ export function RackItem({
 
         {isExpanded && (
           <CardContent>
-            <BinGrid rackId={rack.id} bins={rack.bins} refetch={refetch} />
+            <BinGrid
+              rackId={rack.id}
+              bins={rack.bins}
+              rack={rack}
+              refetch={refetch}
+            />
           </CardContent>
         )}
       </Card>
@@ -219,14 +224,14 @@ export function RackItem({
       <Dialog open={showAddBinDialog} onOpenChange={setShowAddBinDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Add New Bin</DialogTitle>
-            <DialogDescription>Create a new bin in this rack</DialogDescription>
+            <DialogTitle>Thêm ô mới</DialogTitle>
+            <DialogDescription>Tạo ô mới trong giá này</DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleAddBinSubmit} className="space-y-4">
             <div>
               <Label className="mb-2" htmlFor="binName">
-                Bin Name *
+                Tên ô *
               </Label>
               <Input
                 id="binName"
@@ -239,7 +244,7 @@ export function RackItem({
 
             <div>
               <Label className="mb-2" htmlFor="binCode">
-                Bin Code *
+                Mã ô *
               </Label>
               <Input
                 id="binCode"
@@ -253,7 +258,7 @@ export function RackItem({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="mb-2" htmlFor="level">
-                  Level *
+                  Tầng *
                 </Label>
                 <Input
                   id="level"
@@ -267,7 +272,7 @@ export function RackItem({
 
               <div>
                 <Label className="mb-2" htmlFor="number">
-                  Number *
+                  Cột *
                 </Label>
                 <Input
                   id="number"
@@ -282,7 +287,7 @@ export function RackItem({
 
             <div>
               <Label className="mb-2" htmlFor="binDescription">
-                Description
+                Mô tả
               </Label>
               <Textarea
                 id="binDescription"
@@ -300,10 +305,10 @@ export function RackItem({
                 onClick={() => setShowAddBinDialog(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                Hủy
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Creating..." : "Create Bin"}
+                {isSubmitting ? "Đang tạo..." : "Tạo ô"}
               </Button>
             </DialogFooter>
           </form>
@@ -314,15 +319,15 @@ export function RackItem({
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Rack</DialogTitle>
+            <DialogTitle>Sửa giá</DialogTitle>
             <DialogDescription>
-              Update the rack information below
+              Cập nhật thông tin giá bên dưới
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleEditRackSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="name">Rack Name</Label>
+              <Label htmlFor="name">Tên giá</Label>
               <Input
                 id="name"
                 name="name"
@@ -335,7 +340,7 @@ export function RackItem({
             </div>
 
             <div>
-              <Label htmlFor="code">Rack Code</Label>
+              <Label htmlFor="code">Mã giá</Label>
               <Input
                 id="code"
                 name="code"
@@ -348,7 +353,7 @@ export function RackItem({
             </div>
 
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Mô tả</Label>
               <Textarea
                 id="description"
                 name="description"
@@ -370,10 +375,10 @@ export function RackItem({
                 onClick={() => setShowEditDialog(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                Hủy
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Changes"}
+                {isSubmitting ? "Đang lưu..." : "Lưu thay đổi"}
               </Button>
             </DialogFooter>
           </form>
@@ -384,22 +389,19 @@ export function RackItem({
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Rack</AlertDialogTitle>
+            <AlertDialogTitle>Xóa giá</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this rack? This action cannot be
-              undone.
+              Bạn có chắc muốn xóa giá này? Hành động này không thể khôi phục.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel disabled={isSubmitting}>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteRack}
               disabled={isSubmitting}
               className="bg-destructive hover:bg-destructive/90"
             >
-              {isSubmitting ? "Deleting..." : "Delete"}
+              {isSubmitting ? "Đang xóa..." : "Xóa"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

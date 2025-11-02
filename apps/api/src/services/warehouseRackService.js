@@ -78,6 +78,13 @@ export const warehouseRackService = {
         bins: {
           with: {
             inventoryEntries: {
+              with: {
+                medicationVariant: {
+                  with: {
+                    medication: true,
+                  },
+                },
+              },
               where: ({ quantity, quantityReserved }) =>
                 gt(quantity, quantityReserved),
               orderBy: (entry, { asc }) => [asc(entry.expiryDate)],
@@ -101,6 +108,13 @@ export const warehouseRackService = {
         bins: {
           with: {
             inventoryEntries: {
+              with: {
+                medicationVariant: {
+                  with: {
+                    medication: true,
+                  },
+                },
+              },
               where: ({ quantity, quantityReserved }) =>
                 gt(quantity, quantityReserved),
               orderBy: (entry, { asc }) => [asc(entry.expiryDate)],
@@ -122,6 +136,13 @@ export const warehouseRackService = {
         bins: {
           with: {
             inventoryEntries: {
+              with: {
+                medicationVariant: {
+                  with: {
+                    medication: true,
+                  },
+                },
+              },
               where: ({ quantity, quantityReserved }) =>
                 gt(quantity, quantityReserved),
               orderBy: (entry, { asc }) => [asc(entry.expiryDate)],

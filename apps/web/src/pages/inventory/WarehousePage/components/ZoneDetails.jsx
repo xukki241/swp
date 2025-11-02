@@ -29,6 +29,7 @@ import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
 import { Textarea } from "../../../../components/ui/textarea";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
+import { zoneTypeLabel } from "../../../../utils/zoneTypeMap";
 
 export default function ZoneDetails({ zone, refetch }) {
   const { updateZoneData, deleteZoneData } = useWarehouse();
@@ -104,7 +105,9 @@ export default function ZoneDetails({ zone, refetch }) {
     <>
       <Card className="shadow-md rounded-xl border-0">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg font-semibold">Zone Details</CardTitle>
+          <CardTitle className="text-lg font-semibold">
+            Chi tiết khu vực
+          </CardTitle>
           <div className="flex gap-2">
             <Button
               size="sm"
@@ -112,7 +115,7 @@ export default function ZoneDetails({ zone, refetch }) {
               onClick={() => setShowEditDialog(true)}
             >
               <Edit2 className="h-4 w-4" />
-              Edit this Zone
+              Sửa khu vực
             </Button>
             <Button
               size="sm"
@@ -121,33 +124,39 @@ export default function ZoneDetails({ zone, refetch }) {
               className="text-destructive hover:text-destructive"
             >
               <Trash2 className="h-4 w-4" />
-              Delete this Zone
+              Xóa khu vực
             </Button>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label className="text-muted-foreground text-sm">Zone Name</Label>
+              <Label className="text-muted-foreground text-sm">
+                Tên khu vực
+              </Label>
               <p className="text-lg font-semibold mt-1">{zone.name}</p>
             </div>
             <div>
-              <Label className="text-muted-foreground text-sm">Zone Code</Label>
+              <Label className="text-muted-foreground text-sm">
+                Mã khu vực
+              </Label>
               <p className="text-lg font-semibold mt-1">{zone.code}</p>
             </div>
             <div>
-              <Label className="text-muted-foreground text-sm">Zone Type</Label>
-              <p className="text-lg font-semibold mt-1">{zone.type}</p>
+              <Label className="text-muted-foreground text-sm">
+                Loại khu vực
+              </Label>
+              <p className="text-lg font-semibold mt-1">
+                {zoneTypeLabel(zone.type)}
+              </p>
             </div>
             <div>
-              <Label className="text-muted-foreground text-sm">Location</Label>
+              <Label className="text-muted-foreground text-sm">Vị trí</Label>
               <p className="text-lg font-semibold mt-1">{zone.location}</p>
             </div>
             {zone.description && (
               <div className="md:col-span-2">
-                <Label className="text-muted-foreground text-sm">
-                  Description
-                </Label>
+                <Label className="text-muted-foreground text-sm">Mô tả</Label>
                 <p className="text-base mt-1">{zone.description}</p>
               </div>
             )}
@@ -159,16 +168,16 @@ export default function ZoneDetails({ zone, refetch }) {
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Zone</DialogTitle>
+            <DialogTitle>Sửa khu vực</DialogTitle>
             <DialogDescription>
-              Update the zone information below
+              Cập nhật thông tin khu vực bên dưới
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label className="mb-2" htmlFor="zoneName">
-                Zone Name
+                Tên khu vực
               </Label>
               <Input
                 id="zoneName"
@@ -181,7 +190,7 @@ export default function ZoneDetails({ zone, refetch }) {
 
             <div>
               <Label className="mb-2" htmlFor="zoneCode">
-                Zone Code
+                Mã khu vực
               </Label>
               <Input
                 id="zoneCode"
@@ -194,7 +203,7 @@ export default function ZoneDetails({ zone, refetch }) {
 
             <div>
               <Label className="mb-2" htmlFor="zoneType">
-                Zone Type
+                Loại khu vực
               </Label>
               <Input
                 id="zoneType"
@@ -207,7 +216,7 @@ export default function ZoneDetails({ zone, refetch }) {
 
             <div>
               <Label className="mb-2" htmlFor="location">
-                Location
+                Vị trí
               </Label>
               <Input
                 id="location"
@@ -220,7 +229,7 @@ export default function ZoneDetails({ zone, refetch }) {
 
             <div>
               <Label className="mb-2" htmlFor="description">
-                Description
+                Mô tả
               </Label>
               <Textarea
                 id="description"
@@ -238,10 +247,10 @@ export default function ZoneDetails({ zone, refetch }) {
                 onClick={() => setShowEditDialog(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                Hủy
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Changes"}
+                {isSubmitting ? "Đang lưu..." : "Lưu thay đổi"}
               </Button>
             </DialogFooter>
           </form>
@@ -251,26 +260,24 @@ export default function ZoneDetails({ zone, refetch }) {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Zone</AlertDialogTitle>
+            <AlertDialogTitle>Xóa khu vực</AlertDialogTitle>
             <AlertDialogDescription>
-              This action will permanently delete the zone {zone.name} and
-              cannot be undone.
+              Hành động này sẽ xóa vĩnh viễn khu vực {zone.name} và không thể
+              khôi phục.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel disabled={isSubmitting}>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteZone}
               disabled={isSubmitting || deleteCountdown > 0}
               className="bg-destructive hover:bg-destructive/90"
             >
               {isSubmitting
-                ? "Deleting..."
+                ? "Đang xóa..."
                 : deleteCountdown > 0
-                  ? `Delete (${deleteCountdown}s)`
-                  : "Delete"}
+                  ? `Xóa (${deleteCountdown}s)`
+                  : "Xóa"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

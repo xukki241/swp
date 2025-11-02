@@ -1,10 +1,10 @@
 import { BinCard } from "./BinCard";
 
-export function BinGrid({ rackId, bins, refetch }) {
+export function BinGrid({ rackId, bins, refetch, rack }) {
   if (!bins || bins.length === 0) {
     return (
       <div className="py-8 text-center">
-        <p className="text-muted-foreground">No bins in this rack</p>
+        <p className="text-muted-foreground">Không có ô trong giá này</p>
       </div>
     );
   }
@@ -28,7 +28,7 @@ export function BinGrid({ rackId, bins, refetch }) {
   return (
     <div className="space-y-2">
       <div className="text-sm text-muted-foreground mb-4">
-        Grid Layout: {maxLevel} Levels × {maxNumber} Columns
+        Bố cục lưới: {maxLevel} tầng × {maxNumber} cột
       </div>
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full">
@@ -56,6 +56,7 @@ export function BinGrid({ rackId, bins, refetch }) {
                   level={levelIndex + 1}
                   number={numberIndex + 1}
                   rackId={rackId}
+                  rack={rack}
                   refetch={refetch}
                 />
               ))}

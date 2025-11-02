@@ -2,7 +2,6 @@
 
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import MedicinePlaceholder from "../../../../assets/medicine-placeholder.jpg";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,7 +43,7 @@ function numberToColumn(num) {
   return result;
 }
 
-export function BinCard({ bin, level, number, rackId, refetch }) {
+export function BinCard({ bin, level, number, rackId, rack, refetch }) {
   const { updateBinData, deleteBinData } = useWarehouse();
   const [showBinDetails, setShowBinDetails] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -91,7 +90,7 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
     }
   };
 
-  const position = `${level}${numberToColumn(number)}`;
+  const position = `${bin?.level || level}${numberToColumn(bin?.number || number)}`;
   const isEmpty = !bin;
   const hasInventory = bin?.inventoryEntries && bin.inventoryEntries.length > 0;
   const inventoryItem = hasInventory ? bin.inventoryEntries[0] : null;
@@ -117,7 +116,7 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
         <Tooltip>
           <TooltipTrigger asChild>
             <button
-              onClick={() => setShowEditDialog(true)}
+              onClick={() => setShowBinDetails(true)}
               className={`w-16 h-16 flex flex-col items-center justify-center border-2 rounded transition-all hover:shadow-md hover:scale-105 ${
                 hasInventory
                   ? "bg-green-100 border-green-500 hover:bg-green-200"
@@ -134,9 +133,9 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
             <div className="space-y-2">
               <div>
                 <p className="font-semibold">{bin.name}</p>
-                <p className="text-xs">Code: {bin.code}</p>
+                <p className="text-xs">Mã: {bin.code}</p>
                 <p className="text-xs">
-                  Position: Level {bin.level}, {numberToColumn(bin.number)}
+                  Vị trí: Tầng {bin.level}, {numberToColumn(bin.number)}
                 </p>
                 {bin.description && (
                   <p className="text-xs text-gray-500">{bin.description}</p>
@@ -144,23 +143,27 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
               </div>
               {hasInventory && inventoryItem && (
                 <div className="pt-2 border-t">
-                  <p className="text-sm font-medium mb-1">Inventory Details</p>
+                  <p className="text-sm font-medium mb-1">Thông tin tồn kho</p>
                   <div className="text-xs space-y-0.5">
                     <p>
-                      <span className="font-medium">Batch:</span>{" "}
+                      <span className="font-medium">Thuốc:</span>{" "}
+                      {inventoryItem.medicationVariant?.name || "N/A"}
+                    </p>
+                    <p>
+                      <span className="font-medium">Lô:</span>{" "}
                       {inventoryItem.batchNumber}
                     </p>
                     <p>
-                      <span className="font-medium">Qty:</span>{" "}
+                      <span className="font-medium">Số lượng:</span>{" "}
                       {inventoryItem.quantity} (Reserved:{" "}
                       {inventoryItem.quantityReserved})
                     </p>
                     <p>
-                      <span className="font-medium">MFG Date:</span>{" "}
+                      <span className="font-medium">Ngày SX:</span>{" "}
                       {formatDate(inventoryItem.manufactureDate)}
                     </p>
                     <p>
-                      <span className="font-medium">EXP Date:</span>{" "}
+                      <span className="font-medium">Hạn dùng:</span>{" "}
                       {formatDate(inventoryItem.expiryDate)}
                     </p>
                   </div>
@@ -175,73 +178,165 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
       <Dialog open={showBinDetails} onOpenChange={setShowBinDetails}>
         <DialogContent className="max-w-2xl" aria-describedby={undefined}>
           <DialogHeader>
-            <DialogTitle>Bin Details</DialogTitle>
+            <DialogTitle>Chi tiết ô {position}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-6 py-4">
-            <div className="flex items-start gap-6">
-              <img
-                src={
-                  bin?.medication?.medicationVariant?.img_url ||
-                  MedicinePlaceholder ||
-                  "/placeholder.svg"
-                }
-                alt={bin?.name}
-                className="w-32 h-32 rounded-lg object-cover border"
-              />
-              <div className="flex-1">
-                <h3 className="text-2xl font-bold text-gray-900">
+          <div className="space-y-4 py-4">
+            {/* Important Information - Top Section */}
+            <div className="space-y-3">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-1">
                   {bin?.name || "N/A"}
                 </h3>
+                <p className="text-sm text-muted-foreground">
+                  Mã:{" "}
+                  <span className="font-medium text-gray-700">
+                    {bin?.code || "N/A"}
+                  </span>
+                </p>
+              </div>
+
+              {hasInventory && inventoryItem ? (
+                <>
+                  {/* Medication Info - Most Important */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
+                    <div>
+                      <Label className="text-xs text-green-700 uppercase font-semibold">
+                        Thuốc
+                      </Label>
+                      <p className="text-xl font-bold text-green-900 capitalize">
+                        {inventoryItem.medicationVariant?.name || "N/A"}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-xs text-green-700">Số lô</Label>
+                        <p className="text-lg font-semibold text-green-900">
+                          {inventoryItem.batchNumber || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-green-700">
+                          Số lượng
+                        </Label>
+                        <p className="text-lg font-semibold text-green-900">
+                          {inventoryItem.quantity || 0}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-xs text-green-700">
+                          Hạn dùng
+                        </Label>
+                        <p className="text-base font-semibold text-green-900">
+                          {formatDate(inventoryItem.expiryDate)}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-green-700">
+                          Đã sử dụng
+                        </Label>
+                        <p className="text-base font-semibold text-green-900">
+                          {inventoryItem.quantityReserved || 0}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <p className="text-lg font-semibold text-gray-500 text-center">
+                    Ô trống - Chưa có thuốc
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Secondary Information - Bottom Section with smaller text */}
+            <div className="border-t pt-4">
+              <Label className="text-xs text-muted-foreground uppercase font-semibold mb-3 block">
+                Thông tin vị trí
+              </Label>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-0.5">
+                  <Label className="text-xs text-muted-foreground">
+                    Khu vực
+                  </Label>
+                  <p className="text-sm font-medium">
+                    {rack?.zone?.name || "N/A"}
+                  </p>
+                </div>
+                <div className="space-y-0.5">
+                  <Label className="text-xs text-muted-foreground">Giá</Label>
+                  <p className="text-sm font-medium">{rack?.name || "N/A"}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <Label className="text-xs text-muted-foreground">
+                    Vị trí
+                  </Label>
+                  <p className="text-sm font-medium">{position}</p>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label className="text-muted-foreground">Code</Label>
-                <p className="text-lg font-semibold capitalize">
-                  {bin?.code || "N/A"}
-                </p>
+            {/* Additional Details - Smallest text */}
+            {hasInventory && inventoryItem && (
+              <div className="border-t pt-4">
+                <Label className="text-xs text-muted-foreground uppercase font-semibold mb-3 block">
+                  Thông tin bổ sung
+                </Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-0.5">
+                    <Label className="text-xs text-muted-foreground">
+                      Ngày sản xuất
+                    </Label>
+                    <p className="text-sm">
+                      {formatDate(inventoryItem.manufactureDate)}
+                    </p>
+                  </div>
+                  {bin?.description && (
+                    <div className="space-y-0.5 col-span-2">
+                      <Label className="text-xs text-muted-foreground">
+                        Mô tả
+                      </Label>
+                      <p className="text-sm text-gray-600">{bin.description}</p>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground">Storage Area</Label>
-                <p className="text-lg font-semibold">
-                  {bin?.rack?.zone?.name || "N/A"}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground">Rack</Label>
-                <p className="text-lg font-semibold">
-                  {bin?.rack?.name || "N/A"}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground">Level</Label>
-                <p className="text-lg font-semibold">{bin?.level || "N/A"}</p>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground">Number</Label>
-                <p className="text-lg font-semibold">{bin?.number || "N/A"}</p>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground">Medication</Label>
-                <p className="text-lg font-semibold capitalize">
-                  {bin?.medicationVariant?.name || "N/A"}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground">Stock</Label>
-                <p className="text-lg font-semibold capitalize">
-                  {bin?.medicationVariant?.quantity
-                    ? `${bin?.medicationVariant?.quantity} ${bin?.medicationVariant?.unit}`
-                    : "N/A"}
-                </p>
-              </div>
-            </div>
+            )}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowBinDetails(false)}>
-              Close
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                setShowBinDetails(false);
+                setShowDeleteDialog(true);
+              }}
+              disabled={isSubmitting}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Xóa ô
             </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowBinDetails(false)}
+              >
+                Đóng
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowBinDetails(false);
+                  setShowEditDialog(true);
+                }}
+              >
+                Chỉnh sửa
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -250,15 +345,13 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Bin - {position}</DialogTitle>
-            <DialogDescription>
-              Update the bin information below
-            </DialogDescription>
+            <DialogTitle>Sửa ô - {position}</DialogTitle>
+            <DialogDescription>Cập nhật thông tin ô bên dưới</DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleEditSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="name">Bin Name</Label>
+              <Label htmlFor="name">Tên ô</Label>
               <Input
                 id="name"
                 name="name"
@@ -269,7 +362,7 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
             </div>
 
             <div>
-              <Label htmlFor="code">Bin Code</Label>
+              <Label htmlFor="code">Mã ô</Label>
               <Input
                 id="code"
                 name="code"
@@ -281,7 +374,7 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="level">Level (Row)</Label>
+                <Label htmlFor="level">Tầng (Hàng)</Label>
                 <Input
                   id="level"
                   name="level"
@@ -293,7 +386,7 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
                 />
               </div>
               <div>
-                <Label htmlFor="number">Number (Column)</Label>
+                <Label htmlFor="number">Cột (Số)</Label>
                 <Input
                   id="number"
                   name="number"
@@ -308,7 +401,7 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
 
             <div>
               <Label className="mb-2" htmlFor="description">
-                Description
+                Mô tả
               </Label>
               <Textarea
                 id="description"
@@ -322,12 +415,12 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
             {hasInventory && inventoryItem && (
               <div className="border-t pt-4 space-y-3">
                 <Label className="text-sm font-semibold">
-                  Inventory Information
+                  Thông tin tồn kho
                 </Label>
 
                 <div>
                   <Label htmlFor="batchNumber" className="text-xs">
-                    Batch Number
+                    Số lô
                   </Label>
                   <Input
                     id="batchNumber"
@@ -340,7 +433,7 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label htmlFor="quantity" className="text-xs">
-                      Quantity
+                      Số lượng
                     </Label>
                     <Input
                       id="quantity"
@@ -351,7 +444,7 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
                   </div>
                   <div>
                     <Label htmlFor="quantityReserved" className="text-xs">
-                      Reserved
+                      Đã đặt trước
                     </Label>
                     <Input
                       id="quantityReserved"
@@ -365,7 +458,7 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label htmlFor="manufactureDate" className="text-xs">
-                      Manufacture Date
+                      Ngày sản xuất
                     </Label>
                     <Input
                       id="manufactureDate"
@@ -376,7 +469,7 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
                   </div>
                   <div>
                     <Label htmlFor="expiryDate" className="text-xs">
-                      Expiry Date
+                      Ngày hết hạn
                     </Label>
                     <Input
                       id="expiryDate"
@@ -389,30 +482,18 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
               </div>
             )}
 
-            <DialogFooter className="gap-2 sm:gap-0">
+            <DialogFooter className="gap-2">
               <Button
                 type="button"
-                variant="destructive"
-                onClick={() => setShowDeleteDialog(true)}
+                variant="outline"
+                onClick={() => setShowEditDialog(false)}
                 disabled={isSubmitting}
-                className="sm:mr-auto"
               >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Bin
+                Hủy
               </Button>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowEditDialog(false)}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Saving..." : "Save Changes"}
-                </Button>
-              </div>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Saving..." : "Save Changes"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -422,22 +503,20 @@ export function BinCard({ bin, level, number, rackId, refetch }) {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Bin {bin.name}</AlertDialogTitle>
+            <AlertDialogTitle>Xóa ô {bin.name}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {bin.name} at position {position}?
-              This action cannot be undone.
+              Bạn có chắc chắn muốn xóa {bin.name} tại vị trí {position}? Hành
+              động này không thể hoàn tác.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel disabled={isSubmitting}>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isSubmitting}
               className="bg-destructive hover:bg-destructive/90"
             >
-              {isSubmitting ? "Deleting..." : "Delete"}
+              {isSubmitting ? "Đang xóa..." : "Xóa"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
