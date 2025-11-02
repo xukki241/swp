@@ -75,10 +75,10 @@ export default function PurchaseOrderReceiptListPage() {
   const confirmDelete = () => {
     deleteReceipt(selectedId, {
       onSuccess: () => {
-        toast.success("Receipt deleted successfully!");
+        toast.success("Đã xóa phiếu nhập thành công!");
       },
       onError: (error) => {
-        toast.error("Failed to delete receipt!", {
+        toast.error("Không thể xóa phiếu nhập!", {
           description: error?.response?.data?.error || error.message,
         });
       },
@@ -120,10 +120,10 @@ export default function PurchaseOrderReceiptListPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Purchase Order Receipts
+              Phiếu nhập hàng
             </h1>
             <p className="text-muted-foreground">
-              View all received purchase orders
+              Xem tất cả phiếu nhập hàng đã nhận
             </p>
           </div>
           <Button
@@ -131,15 +131,15 @@ export default function PurchaseOrderReceiptListPage() {
             variant="outline"
             className="flex items-center gap-2"
           >
-            <Package className="w-4 h-4" /> View Orders
+            <Package className="w-4 h-4" /> Xem đơn đặt hàng
           </Button>
         </div>
 
         <Card className="shadow-md border-0">
           <CardHeader>
-            <CardTitle>Receipt List</CardTitle>
+            <CardTitle>Danh sách phiếu nhập</CardTitle>
             <CardDescription>
-              Search and manage all purchase order receipts
+              Tìm kiếm và quản lý tất cả phiếu nhập hàng
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -154,14 +154,14 @@ export default function PurchaseOrderReceiptListPage() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <Input
-                    placeholder="Search by supplier, received by, or status..."
+                    placeholder="Tìm kiếm theo nhà cung cấp, người nhận hoặc trạng thái..."
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     className="pl-10 h-11"
                   />
                 </div>
                 <Button type="submit" className="h-11">
-                  <Search className="h-4 w-4 mr-2" /> Search
+                  <Search className="h-4 w-4 mr-2" /> Tìm kiếm
                 </Button>
                 {searchQuery && (
                   <Button
@@ -173,7 +173,7 @@ export default function PurchaseOrderReceiptListPage() {
                       setSearchQuery("");
                     }}
                   >
-                    Clear
+                    Xóa
                   </Button>
                 )}
               </div>
@@ -181,16 +181,16 @@ export default function PurchaseOrderReceiptListPage() {
               {/* Sort by Date */}
               <div className="flex items-center gap-2">
                 <Label htmlFor="sortOrder" className="text-sm font-medium">
-                  Sort by Received Date:
+                  Sắp xếp theo ngày nhập:
                 </Label>
                 <Select value={sortOrder} onValueChange={setSortOrder}>
                   <SelectTrigger id="sortOrder" className="w-[200px] h-10">
                     <ArrowUpDown className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Sort order" />
+                    <SelectValue placeholder="Thứ tự sắp xếp" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="desc">Newest First</SelectItem>
-                    <SelectItem value="asc">Oldest First</SelectItem>
+                    <SelectItem value="desc">Mới nhất trước</SelectItem>
+                    <SelectItem value="asc">Cũ nhất trước</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -200,12 +200,12 @@ export default function PurchaseOrderReceiptListPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Supplier</TableHead>
-                    <TableHead>Received Date</TableHead>
-                    <TableHead>Received By</TableHead>
-                    <TableHead>Order Status</TableHead>
-                    <TableHead className="text-right">Total Amount</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>Nhà cung cấp</TableHead>
+                    <TableHead>Ngày nhập</TableHead>
+                    <TableHead>Người nhập</TableHead>
+                    <TableHead>Trạng thái đơn</TableHead>
+                    <TableHead className="text-right">Tổng tiền</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -217,11 +217,13 @@ export default function PurchaseOrderReceiptListPage() {
                       >
                         <div className="flex flex-col items-center gap-2">
                           <Search className="h-10 w-10 text-muted-foreground/50" />
-                          <p className="font-medium">No receipts found</p>
+                          <p className="font-medium">
+                            Không tìm thấy phiếu nhập
+                          </p>
                           <p className="text-sm">
                             {searchQuery
-                              ? "Try adjusting your search"
-                              : "No receipts have been recorded yet"}
+                              ? "Thử điều chỉnh tìm kiếm của bạn"
+                              : "Chưa có phiếu nhập nào được ghi nhận"}
                           </p>
                         </div>
                       </TableCell>
@@ -258,7 +260,7 @@ export default function PurchaseOrderReceiptListPage() {
                               onClick={() =>
                                 navigate(`/procurement/receipts/${r.id}`)
                               }
-                              title="View Details"
+                              title="Xem chi tiết"
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
@@ -266,7 +268,7 @@ export default function PurchaseOrderReceiptListPage() {
                               size="sm"
                               variant="destructive"
                               onClick={() => handleDelete(r.id)}
-                              title="Delete"
+                              title="Xóa"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
@@ -285,18 +287,18 @@ export default function PurchaseOrderReceiptListPage() {
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogTitle>Xác nhận xóa</DialogTitle>
           </DialogHeader>
           <p className="text-muted-foreground">
-            Are you sure you want to delete this receipt? This action cannot be
-            undone.
+            Bạn có chắc chắn muốn xóa phiếu nhập này không? Hành động này không
+            thể hoàn tác.
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>
-              Cancel
+              Hủy
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
-              Delete
+              Xóa
             </Button>
           </DialogFooter>
         </DialogContent>

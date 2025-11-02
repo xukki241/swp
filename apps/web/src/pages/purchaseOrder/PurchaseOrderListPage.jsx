@@ -89,10 +89,10 @@ export default function PurchaseOrderListPage() {
   const confirmDelete = () => {
     deletePurchaseOrder(selectedId, {
       onSuccess: () => {
-        toast.success("Purchase order deleted successfully!");
+        toast.success("Đã xóa đơn đặt hàng thành công!");
       },
       onError: (error) => {
-        toast.error("Failed to delete order!", {
+        toast.error("Không thể xóa đơn hàng!", {
           description: error?.response?.data?.error || error.message,
         });
       },
@@ -105,11 +105,11 @@ export default function PurchaseOrderListPage() {
       { id: selectedId, status: selectedStatus },
       {
         onSuccess: () => {
-          toast.success("Status updated successfully!");
+          toast.success("Đã cập nhật trạng thái thành công!");
           setEditStatusOpen(false);
         },
         onError: (error) => {
-          toast.error("Failed to update status!", {
+          toast.error("Không thể cập nhật trạng thái!", {
             description: error?.response?.data?.error || error.message,
           });
         },
@@ -150,26 +150,24 @@ export default function PurchaseOrderListPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Purchase Orders
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900">Đơn đặt hàng</h1>
             <p className="text-muted-foreground">
-              Manage all supplier purchase orders
+              Quản lý tất cả đơn đặt hàng từ nhà cung cấp
             </p>
           </div>
           <Button
             onClick={() => navigate("/purchase-orders/create")}
             className="flex items-center gap-2"
           >
-            <PlusCircle className="w-4 h-4" /> New Order
+            <PlusCircle className="w-4 h-4" /> Tạo đơn mới
           </Button>
         </div>
 
         <Card className="shadow-md border-0">
           <CardHeader>
-            <CardTitle>Purchase Orders List</CardTitle>
+            <CardTitle>Danh sách đơn đặt hàng</CardTitle>
             <CardDescription>
-              Search, view, or manage all purchase orders
+              Tìm kiếm, xem hoặc quản lý tất cả đơn đặt hàng
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -184,14 +182,14 @@ export default function PurchaseOrderListPage() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <Input
-                    placeholder="Search by supplier or status..."
+                    placeholder="Tìm kiếm theo nhà cung cấp hoặc trạng thái..."
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     className="pl-10 h-11"
                   />
                 </div>
                 <Button type="submit" className="h-11">
-                  <Search className="h-4 w-4 mr-2" /> Search
+                  <Search className="h-4 w-4 mr-2" /> Tìm kiếm
                 </Button>
                 {searchQuery && (
                   <Button
@@ -203,19 +201,19 @@ export default function PurchaseOrderListPage() {
                       setSearchQuery("");
                     }}
                   >
-                    Clear
+                    Xóa
                   </Button>
                 )}
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="w-full md:w-[180px] h-11">
-                    <SelectValue placeholder="Filter by status" />
+                    <SelectValue placeholder="Lọc theo trạng thái" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="ordered">Ordered</SelectItem>
-                    <SelectItem value="received">Received</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                    <SelectItem value="pending">Chờ xử lý</SelectItem>
+                    <SelectItem value="ordered">Đã đặt hàng</SelectItem>
+                    <SelectItem value="received">Đã nhận</SelectItem>
+                    <SelectItem value="cancelled">Đã hủy</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -223,16 +221,16 @@ export default function PurchaseOrderListPage() {
               {/* Sort by Date */}
               <div className="flex items-center gap-2">
                 <Label htmlFor="sortOrder" className="text-sm font-medium">
-                  Sort by Order Date:
+                  Sắp xếp theo ngày đặt:
                 </Label>
                 <Select value={sortOrder} onValueChange={setSortOrder}>
                   <SelectTrigger id="sortOrder" className="w-[200px] h-10">
                     <ArrowUpDown className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Sort order" />
+                    <SelectValue placeholder="Thứ tự sắp xếp" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="desc">Newest First</SelectItem>
-                    <SelectItem value="asc">Oldest First</SelectItem>
+                    <SelectItem value="desc">Mới nhất trước</SelectItem>
+                    <SelectItem value="asc">Cũ nhất trước</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -242,12 +240,12 @@ export default function PurchaseOrderListPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Supplier</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Order Date</TableHead>
-                    <TableHead>Expected Delivery</TableHead>
-                    <TableHead>Total Amount</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>Nhà cung cấp</TableHead>
+                    <TableHead>Trạng thái</TableHead>
+                    <TableHead>Ngày đặt</TableHead>
+                    <TableHead>Ngày dự kiến</TableHead>
+                    <TableHead>Tổng tiền</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -260,12 +258,12 @@ export default function PurchaseOrderListPage() {
                         <div className="flex flex-col items-center gap-2">
                           <Search className="h-10 w-10 text-muted-foreground/50" />
                           <p className="font-medium">
-                            No purchase orders found
+                            Không tìm thấy đơn đặt hàng
                           </p>
                           <p className="text-sm">
                             {searchQuery || statusFilter !== "all"
-                              ? "Try adjusting your filters"
-                              : "Get started by creating your first order"}
+                              ? "Thử điều chỉnh bộ lọc của bạn"
+                              : "Bắt đầu bằng cách tạo đơn đầu tiên"}
                           </p>
                         </div>
                       </TableCell>
@@ -291,7 +289,7 @@ export default function PurchaseOrderListPage() {
                             </div>
                           ) : (
                             <span className="text-sm text-muted-foreground">
-                              Not set
+                              Chưa đặt
                             </span>
                           )}
                         </TableCell>
@@ -306,7 +304,7 @@ export default function PurchaseOrderListPage() {
                               onClick={() =>
                                 navigate(`/purchase-orders/${o.id}`)
                               }
-                              title="View Details"
+                              title="Xem chi tiết"
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
@@ -314,7 +312,7 @@ export default function PurchaseOrderListPage() {
                               size="sm"
                               variant="secondary"
                               onClick={() => handleEditStatus(o)}
-                              title="Edit Status"
+                              title="Sửa trạng thái"
                             >
                               <Edit className="w-4 h-4" />
                             </Button>
@@ -322,7 +320,7 @@ export default function PurchaseOrderListPage() {
                               size="sm"
                               variant="destructive"
                               onClick={() => handleDelete(o.id)}
-                              title="Delete"
+                              title="Xóa"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
@@ -341,18 +339,18 @@ export default function PurchaseOrderListPage() {
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogTitle>Xác nhận xóa</DialogTitle>
           </DialogHeader>
           <p className="text-muted-foreground">
-            Are you sure you want to delete this purchase order? This action
-            cannot be undone.
+            Bạn có chắc chắn muốn xóa đơn đặt hàng này không? Hành động này
+            không thể hoàn tác.
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>
-              Cancel
+              Hủy
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
-              Delete
+              Xóa
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -361,21 +359,21 @@ export default function PurchaseOrderListPage() {
       <Dialog open={editStatusOpen} onOpenChange={setEditStatusOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Update Order Status</DialogTitle>
+            <DialogTitle>Cập nhật trạng thái đơn hàng</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <p className="text-sm text-muted-foreground">
-              Select a new status for this purchase order:
+              Chọn trạng thái mới cho đơn đặt hàng này:
             </p>
             <Select value={selectedStatus} onValueChange={setSelectedStatus}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select status" />
+                <SelectValue placeholder="Chọn trạng thái" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="ordered">Ordered</SelectItem>
-                <SelectItem value="received">Received</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="pending">Chờ xử lý</SelectItem>
+                <SelectItem value="ordered">Đã đặt hàng</SelectItem>
+                <SelectItem value="received">Đã nhận</SelectItem>
+                <SelectItem value="cancelled">Đã hủy</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -385,7 +383,7 @@ export default function PurchaseOrderListPage() {
               onClick={() => setEditStatusOpen(false)}
               disabled={isUpdatingStatus}
             >
-              Cancel
+              Hủy
             </Button>
             <Button
               onClick={confirmUpdateStatus}
@@ -395,10 +393,10 @@ export default function PurchaseOrderListPage() {
               {isUpdatingStatus ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Updating...
+                  Đang cập nhật...
                 </>
               ) : (
-                "Update"
+                "Cập nhật"
               )}
             </Button>
           </DialogFooter>

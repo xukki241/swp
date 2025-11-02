@@ -1,9 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingDown, TrendingUp } from "lucide-react";
 
 export function StatCard({ stat }) {
   const Icon = stat.icon;
-  const TrendIcon = stat.trendUp ? TrendingUp : TrendingDown;
 
   return (
     <Card className="group relative overflow-hidden rounded-2xl border-0 shadow-lg transition-all hover:shadow-xl hover:scale-[1.02] cursor-pointer">
@@ -29,26 +27,9 @@ export function StatCard({ stat }) {
             <div className="h-4 w-24 animate-pulse rounded bg-gray-200" />
           </div>
         ) : (
-          <>
-            <div className="text-3xl font-bold text-foreground transition-colors group-hover:text-primary">
-              {stat.value}
-            </div>
-            <div className="mt-2 flex items-center gap-1 text-sm">
-              <TrendIcon
-                className={`h-4 w-4 ${
-                  stat.trendUp ? "text-green-600" : "text-red-600"
-                }`}
-              />
-              <span
-                className={`font-medium ${
-                  stat.trendUp ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {stat.trend}
-              </span>
-              <span className="text-muted-foreground">so với tháng trước</span>
-            </div>
-          </>
+          <div className="text-3xl font-bold text-foreground transition-colors group-hover:text-primary">
+            {stat.value}
+          </div>
         )}
       </CardContent>
     </Card>

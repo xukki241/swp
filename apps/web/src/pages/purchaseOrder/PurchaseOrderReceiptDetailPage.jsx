@@ -96,9 +96,11 @@ export default function PurchaseOrderReceiptDetailPage() {
       <AppLayout>
         <Card className="shadow-md border-0">
           <CardContent className="flex flex-col justify-center items-center py-12">
-            <p className="text-red-500 mb-4">Failed to load receipt details</p>
+            <p className="text-red-500 mb-4">
+              Không thể tải chi tiết phiếu nhập
+            </p>
             <Button onClick={() => navigate("/procurement/receipts")}>
-              <ArrowLeft className="w-4 h-4 mr-2" /> Back to List
+              <ArrowLeft className="w-4 h-4 mr-2" /> Quay lại danh sách
             </Button>
           </CardContent>
         </Card>
@@ -121,11 +123,9 @@ export default function PurchaseOrderReceiptDetailPage() {
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Receipt Details
+                Chi tiết phiếu nhập
               </h1>
-              <p className="text-muted-foreground">
-                Purchase order receipt information
-              </p>
+              <p className="text-muted-foreground">Thông tin phiếu nhập hàng</p>
             </div>
           </div>
           {getStatusBadge(receipt.poStatus)}
@@ -134,8 +134,8 @@ export default function PurchaseOrderReceiptDetailPage() {
         {/* Receipt Information */}
         <Card className="shadow-md border-0">
           <CardHeader>
-            <CardTitle>Receipt Information</CardTitle>
-            <CardDescription>Basic details of the receipt</CardDescription>
+            <CardTitle>Thông tin phiếu nhập</CardTitle>
+            <CardDescription>Chi tiết cơ bản của phiếu nhập</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -144,7 +144,7 @@ export default function PurchaseOrderReceiptDetailPage() {
                   <FileText className="w-5 h-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">
-                      Receipt ID
+                      Mã phiếu nhập
                     </p>
                     <p className="text-base font-mono font-semibold">
                       #{receipt.id}
@@ -156,7 +156,7 @@ export default function PurchaseOrderReceiptDetailPage() {
                   <Building2 className="w-5 h-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">
-                      Supplier
+                      Nhà cung cấp
                     </p>
                     <p className="text-base font-semibold">
                       {receipt.supplierName || "N/A"}
@@ -168,7 +168,7 @@ export default function PurchaseOrderReceiptDetailPage() {
                   <User className="w-5 h-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">
-                      Received By
+                      Người nhập
                     </p>
                     <p className="text-base font-semibold">
                       {receipt.receivedByName || "N/A"}
@@ -182,7 +182,7 @@ export default function PurchaseOrderReceiptDetailPage() {
                   <Calendar className="w-5 h-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">
-                      Received Date
+                      Ngày nhập
                     </p>
                     <p className="text-base font-semibold">
                       {formatDate(receipt.receivedDate)}
@@ -194,7 +194,7 @@ export default function PurchaseOrderReceiptDetailPage() {
                   <Calendar className="w-5 h-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">
-                      Order Date
+                      Ngày đặt hàng
                     </p>
                     <p className="text-base font-semibold">
                       {receipt.poOrderDate
@@ -208,7 +208,7 @@ export default function PurchaseOrderReceiptDetailPage() {
                   <Package className="w-5 h-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">
-                      Order Status
+                      Trạng thái đơn
                     </p>
                     <div className="mt-1">
                       {getStatusBadge(receipt.poStatus)}
@@ -223,7 +223,7 @@ export default function PurchaseOrderReceiptDetailPage() {
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Package className="w-4 h-4" />
               <span>
-                Purchase Order ID:{" "}
+                Mã đơn đặt hàng:{" "}
                 <span className="font-mono font-medium">
                   {receipt.purchaseOrderId}
                 </span>
@@ -236,7 +236,7 @@ export default function PurchaseOrderReceiptDetailPage() {
                   navigate(`/purchase-orders/${receipt.purchaseOrderId}`)
                 }
               >
-                View Order
+                Xem đơn hàng
               </Button>
             </div>
           </CardContent>
@@ -245,9 +245,9 @@ export default function PurchaseOrderReceiptDetailPage() {
         {/* Receipt Items */}
         <Card className="shadow-md border-0">
           <CardHeader>
-            <CardTitle>Received Items</CardTitle>
+            <CardTitle>Hàng hóa đã nhập</CardTitle>
             <CardDescription>
-              List of items received in this receipt
+              Danh sách hàng hóa được nhập trong phiếu này
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -256,12 +256,12 @@ export default function PurchaseOrderReceiptDetailPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[50px]">#</TableHead>
-                    <TableHead>Medication</TableHead>
-                    <TableHead>Variant</TableHead>
-                    <TableHead className="text-right">Ordered Qty</TableHead>
-                    <TableHead className="text-right">Received Qty</TableHead>
-                    <TableHead className="text-right">Unit Price</TableHead>
-                    <TableHead className="text-right">Total</TableHead>
+                    <TableHead>Thuốc</TableHead>
+                    <TableHead>Biến thể</TableHead>
+                    <TableHead className="text-right">SL đặt</TableHead>
+                    <TableHead className="text-right">SL nhận</TableHead>
+                    <TableHead className="text-right">Đơn giá</TableHead>
+                    <TableHead className="text-right">Tổng</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -301,14 +301,14 @@ export default function PurchaseOrderReceiptDetailPage() {
                         colSpan={7}
                         className="text-center py-8 text-muted-foreground"
                       >
-                        No items found in this receipt
+                        Không tìm thấy hàng hóa trong phiếu nhập này
                       </TableCell>
                     </TableRow>
                   )}
                   {receipt.items && receipt.items.length > 0 && (
                     <TableRow className="bg-muted/50">
                       <TableCell colSpan={6} className="text-right font-bold">
-                        Total Received Value:
+                        Tổng giá trị nhập:
                       </TableCell>
                       <TableCell className="text-right font-bold text-primary text-lg">
                         {formatCurrency(
@@ -334,10 +334,9 @@ export default function PurchaseOrderReceiptDetailPage() {
             <div className="flex items-center gap-3">
               <Warehouse className="w-6 h-6 text-primary" />
               <div>
-                <CardTitle>Warehouse Allocation</CardTitle>
+                <CardTitle>Phân bổ kho</CardTitle>
                 <CardDescription>
-                  Automatic allocation to warehouse locations using FIFO
-                  strategy
+                  Phân bổ tự động đến vị trí kho theo chiến lược FIFO
                 </CardDescription>
               </div>
             </div>
@@ -351,7 +350,7 @@ export default function PurchaseOrderReceiptDetailPage() {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  No inventory allocations found for this receipt.
+                  Không tìm thấy phân bổ tồn kho cho phiếu nhập này.
                 </AlertDescription>
               </Alert>
             ) : (
@@ -359,8 +358,8 @@ export default function PurchaseOrderReceiptDetailPage() {
                 <Alert className="bg-green-50 border-green-200">
                   <CheckCircle className="h-4 w-4 text-green-600" />
                   <AlertDescription className="text-green-800">
-                    Successfully allocated {allocations.length} item(s) to
-                    warehouse locations
+                    Đã phân bổ thành công {allocations.length} hàng hóa đến vị
+                    trí kho
                   </AlertDescription>
                 </Alert>
 
@@ -369,20 +368,20 @@ export default function PurchaseOrderReceiptDetailPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-[50px]">#</TableHead>
-                        <TableHead>Batch Number</TableHead>
-                        <TableHead>Mfg. Date</TableHead>
-                        <TableHead>Expiry Date</TableHead>
-                        <TableHead className="text-right">Quantity</TableHead>
+                        <TableHead>Số lô</TableHead>
+                        <TableHead>Ngày SX</TableHead>
+                        <TableHead>Ngày hết hạn</TableHead>
+                        <TableHead className="text-right">Số lượng</TableHead>
                         <TableHead>
                           <div className="flex items-center gap-2">
                             <MapPin className="w-4 h-4" />
-                            Zone
+                            Khu vực
                           </div>
                         </TableHead>
-                        <TableHead>Rack</TableHead>
-                        <TableHead>Bin</TableHead>
-                        <TableHead className="text-center">Level</TableHead>
-                        <TableHead className="text-center">Position</TableHead>
+                        <TableHead>Giá đỡ</TableHead>
+                        <TableHead>Ngăn</TableHead>
+                        <TableHead className="text-center">Tầng</TableHead>
+                        <TableHead className="text-center">Vị trí</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -464,21 +463,21 @@ export default function PurchaseOrderReceiptDetailPage() {
           <CardContent className="py-6">
             <div className="flex justify-between items-center">
               <div className="text-sm text-muted-foreground">
-                Receipt ID: <span className="font-mono">#{receipt.id}</span>
+                Mã phiếu nhập: <span className="font-mono">#{receipt.id}</span>
               </div>
               <div className="flex gap-3">
                 <Button
                   variant="outline"
                   onClick={() => navigate("/procurement/receipts")}
                 >
-                  <ArrowLeft className="w-4 h-4 mr-2" /> Back to List
+                  <ArrowLeft className="w-4 h-4 mr-2" /> Quay lại danh sách
                 </Button>
                 <Button
                   onClick={() =>
                     navigate(`/purchase-orders/${receipt.purchaseOrderId}`)
                   }
                 >
-                  <Package className="w-4 h-4 mr-2" /> View Purchase Order
+                  <Package className="w-4 h-4 mr-2" /> Xem đơn đặt hàng
                 </Button>
               </div>
             </div>

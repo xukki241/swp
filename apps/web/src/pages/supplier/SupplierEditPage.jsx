@@ -294,7 +294,10 @@ export default function SupplierEditPage() {
               `Thuốc #${index + 1}: Mã SKU nhà cung cấp là bắt buộc.`
             );
           }
-          if (!med.purchasePrice || Number(med.purchasePrice) <= 0) {
+          // Giá mua là bắt buộc
+          if (!med.purchasePrice || med.purchasePrice.trim() === "") {
+            validationErrors.push(`Thuốc #${index + 1}: Giá mua là bắt buộc.`);
+          } else if (Number(med.purchasePrice) <= 0) {
             validationErrors.push(
               `Thuốc #${index + 1}: Giá mua phải lớn hơn 0.`
             );
