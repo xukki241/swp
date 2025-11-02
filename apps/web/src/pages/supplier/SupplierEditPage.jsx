@@ -1,7 +1,13 @@
 import { AppLayout } from "@/components/layouts/app-layout";
 import { MedicationRow } from "@/components/MedicationRow";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -98,9 +104,20 @@ export default function SupplierEditPage() {
 
         setMeds(mappedMeds);
         setMedsLoaded(true);
+
+        // Set contract file nếu có medication nào có contract
+        const firstWithContract = supplier.medicationVariants.find(
+          (v) => v.contractId && v.contractFilename
+        );
+        if (firstWithContract && !contractFile.id) {
+          setContractFile({
+            id: firstWithContract.contractId,
+            filename: firstWithContract.contractFilename,
+          });
+        }
       }
     }
-  }, [supplier, medsLoaded]);
+  }, [supplier, medsLoaded, contractFile.id]);
 
   const handleAddMed = () =>
     setMeds([
@@ -138,15 +155,15 @@ export default function SupplierEditPage() {
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      toast.error("Invalid file type", {
-        description: "Please upload PDF, DOC, or DOCX files only.",
+      toast.error("Định dạng file không hợp lệ", {
+        description: "Vui lòng chỉ upload file PDF, DOC, hoặc DOCX.",
       });
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      toast.error("File too large", {
-        description: "Maximum file size is 10MB.",
+      toast.error("File quá lớn", {
+        description: "Kích thước file tối đa là 10MB.",
       });
       return;
     }
@@ -158,13 +175,20 @@ export default function SupplierEditPage() {
 
       setContractFile({ id: fileId, filename });
 
-      toast.success("Contract uploaded!", {
-        description: "Parsing contract...",
+      // Update all existing medications to use new contract
+      setMeds((prevMeds) =>
+        prevMeds.map((med) => ({
+          ...med,
+          contractId: fileId,
+          contractFilename: filename,
+        }))
+      );
+
+      toast.success("Đã tải hợp đồng lên!", {
+        description: "Đang phân tích hợp đồng...",
       });
 
       const parseResult = await parseContract.mutateAsync(fileId);
-
-      console.log("📦 Parse result from backend:", parseResult);
 
       if (parseResult.success && parseResult.data.medications.length > 0) {
         const newMeds = parseResult.data.medications.map((med) => {
@@ -174,17 +198,10 @@ export default function SupplierEditPage() {
               med.medicationName.toLowerCase().trim()
           );
 
-          console.log("🔍 Matching medication:", {
-            parsedName: med.medicationName,
-            matchedMed: matchedMed,
-            matchedId: matchedMed?.id,
-            variantIdFromBackend: med.medicationVariantId, // ✅ Log variant ID from backend
-          });
-
           return {
             medicationId: matchedMed?.id || "",
             medicationName: med.medicationName,
-            medicationVariantId: med.medicationVariantId || "", // ✅ Use matched variant from backend
+            medicationVariantId: med.medicationVariantId || "",
             variantName: med.variantName,
             supplierSku: med.supplierSku,
             leadTimeDays: med.leadTimeDays?.toString() || "",
@@ -194,7 +211,6 @@ export default function SupplierEditPage() {
           };
         });
 
-        console.log("📋 New meds array:", newMeds);
         setMeds(newMeds);
 
         // Check if any medication was not found
@@ -202,25 +218,25 @@ export default function SupplierEditPage() {
         const medsMatched = newMeds.length - medsWithoutId.length;
 
         if (medsWithoutId.length > 0) {
-          toast.warning("Contract parsed with warnings", {
-            description: `Found ${newMeds.length} medication(s). ${medsWithoutId.length} medication(s) not found in database - please create them first.`,
+          toast.warning("Phân tích hợp đồng với cảnh báo", {
+            description: `Tìm thấy ${newMeds.length} thuốc. ${medsWithoutId.length} thuốc chưa có trong database - vui lòng tạo trước.`,
             duration: 7000,
           });
         } else {
-          toast.success("Contract parsed successfully!", {
-            description: `✅ ${medsMatched} medication(s) matched! Please select variants for each medication or create new variants if needed.`,
+          toast.success("Phân tích hợp đồng thành công!", {
+            description: `✅ Đã khớp ${medsMatched} thuốc! Vui lòng chọn variant cho từng thuốc hoặc tạo variant mới nếu cần.`,
             duration: 6000,
           });
         }
       } else {
-        toast.warning("No medications found", {
-          description: "Please add medications manually.",
+        toast.warning("Không tìm thấy thuốc nào", {
+          description: "Vui lòng thêm thuốc thủ công.",
         });
       }
     } catch (error) {
       console.error("Contract upload/parse error:", error);
-      toast.error("Failed to process contract", {
-        description: error.message || "Please try again.",
+      toast.error("Không thể xử lý hợp đồng", {
+        description: error.message || "Vui lòng thử lại.",
       });
 
       if (fileInputRef.current) {
@@ -243,7 +259,7 @@ export default function SupplierEditPage() {
       fileInputRef.current.value = "";
     }
 
-    toast.info("Contract removed");
+    toast.info("Đã xóa hợp đồng");
   };
 
   const handleSubmit = async (e) => {
@@ -287,6 +303,13 @@ export default function SupplierEditPage() {
       });
     }
 
+    // Check if contract exists but no medications
+    if (contractFile.id && meds.length === 0) {
+      validationErrors.push(
+        "Bạn đã upload hợp đồng nhưng chưa có thuốc nào. Vui lòng thêm ít nhất 1 thuốc để lưu hợp đồng."
+      );
+    }
+
     if (validationErrors.length > 0) {
       toast.error("Xác thực thất bại", {
         description: (
@@ -318,15 +341,25 @@ export default function SupplierEditPage() {
               m.purchasePrice &&
               Number(m.purchasePrice) > 0
           )
-          .map((m) => ({
-            medication_variant_id: m.medicationVariantId,
-            supplier_sku: m.supplierSku.trim(),
-            lead_time_days: m.leadTimeDays
-              ? Number.parseInt(m.leadTimeDays, 10)
-              : null,
-            purchase_price: Number(m.purchasePrice),
-            contract_id: m.contractId || null,
-          }));
+          .map((m) => {
+            const variant = {
+              medication_variant_id: m.medicationVariantId,
+              purchase_price: Number(m.purchasePrice),
+            };
+
+            // Only include optional fields if they have values
+            if (m.supplierSku?.trim()) {
+              variant.supplier_sku = m.supplierSku.trim();
+            }
+            if (m.leadTimeDays) {
+              variant.lead_time_days = Number.parseInt(m.leadTimeDays, 10);
+            }
+            if (m.contractId) {
+              variant.contract_id = m.contractId;
+            }
+
+            return variant;
+          });
 
         payload.medicationVariants = variants;
       }
@@ -367,6 +400,9 @@ export default function SupplierEditPage() {
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle>Sửa nhà cung cấp</CardTitle>
+          <CardDescription>
+            Cập nhật thông tin nhà cung cấp và danh sách thuốc
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -461,17 +497,17 @@ export default function SupplierEditPage() {
                   {uploadFile.isPending ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />
-                      Uploading...
+                      Đang tải lên...
                     </>
                   ) : parseContract.isPending ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />
-                      Parsing...
+                      Đang phân tích...
                     </>
                   ) : (
                     <>
                       <Upload className="w-4 h-4 mr-2" />
-                      Upload Contract & Auto-fill
+                      Tải hợp đồng & Tự động điền
                       <Sparkles className="w-3 h-3 ml-1 text-yellow-500" />
                     </>
                   )}
