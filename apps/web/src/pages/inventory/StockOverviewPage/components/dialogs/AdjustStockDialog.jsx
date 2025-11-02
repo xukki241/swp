@@ -55,11 +55,11 @@ export default function AddjustStockDialog({
   // Handle submit new quantity
   async function handleSubmitAdjustment() {
     if (adjustQuantity === 0) {
-      toast.success("Inventory quantity remains the same");
+      toast.success("Số lượng trong kho không thay đổi");
       onOpenChange(false);
       return;
     } else if (reason.length === 0) {
-      toast.warning("Reason cannot be empty.");
+      toast.warning("Lý do không được để trống.");
       return;
     }
 
@@ -69,11 +69,11 @@ export default function AddjustStockDialog({
         medication.quantity + adjustQuantity,
         reason
       );
-      toast.success("Stock adjusted successfully");
+      toast.success("Điều chỉnh tồn kho thành công");
       onOpenChange(false);
       refetchInventory();
     } catch {
-      toast.error(error.adjustStock || "Failed to adjust stock");
+      toast.error(error.adjustStock || "Không thể điều chỉnh tồn kho");
     } finally {
       handleClose();
     }
@@ -102,29 +102,29 @@ export default function AddjustStockDialog({
         {loading.adjustQuantity && (
           <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-10">
             <span className="text-primary font-semibold animate-pulse">
-              Submitting...
+              Đang gửi...
             </span>
           </div>
         )}
         <DialogHeader>
-          <DialogTitle>Adjust Stock Quantity</DialogTitle>
+          <DialogTitle>Điều chỉnh số lượng tồn kho</DialogTitle>
         </DialogHeader>
         {medication && (
           <div className="space-y-5 py-4">
             <div className="space-y-2">
-              <Label>Medicine Name</Label>
+              <Label>Tên thuốc</Label>
               <p className="text-lg">{medication?.medicationVariant?.name}</p>
             </div>
 
             <div className="space-y-2">
-              <Label>Current Stock</Label>
+              <Label>Tồn kho hiện tại</Label>
               <p className="text-lg">
                 {medication.quantity} {medication.unit}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="newQuantity">Adjust Quantity</Label>
+              <Label htmlFor="newQuantity">Điều chỉnh số lượng</Label>
               <div className="flex items-center gap-2 mt-4">
                 <Button
                   type="button"
@@ -164,17 +164,17 @@ export default function AddjustStockDialog({
             </div>
 
             <div className="space-y-2">
-              <Label>Quantity After Change</Label>
+              <Label>Số lượng sau khi thay đổi</Label>
               <p className="text-lg">
                 {medication.quantity + Number(adjustQuantity)}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="reason">Reason</Label>
+              <Label htmlFor="reason">Lý do</Label>
               <Textarea
                 id="reason"
-                placeholder="Enter reason to change..."
+                placeholder="Nhập lý do thay đổi..."
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
               />
@@ -187,14 +187,14 @@ export default function AddjustStockDialog({
             onClick={() => handleClose()}
             disabled={loading.adjustStock}
           >
-            Cancel
+            Hủy
           </Button>
           <Button
             onClick={handleSubmitAdjustment}
             className="bg-primary hover:bg-primary/90"
             disabled={loading.adjustQuantity}
           >
-            Submit
+            Gửi
           </Button>
         </DialogFooter>
       </DialogContent>

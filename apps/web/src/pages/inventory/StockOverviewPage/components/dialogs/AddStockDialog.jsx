@@ -46,13 +46,13 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
 
     for (const field of requiredFields) {
       if (!stockFormData[field]) {
-        toast.error(`Please fill in ${field}`);
+        toast.error(`Vui lòng nhập ${field}`);
         return false;
       }
     }
 
     if (Number(stockFormData.quantity) <= 0) {
-      toast.error("Quantity must be greater than 0");
+      toast.error("Số lượng phải lớn hơn 0");
       return false;
     }
 
@@ -60,7 +60,7 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
       new Date(stockFormData.expiryDate) <=
       new Date(stockFormData.manufactureDate)
     ) {
-      toast.error("Expiry date must be after manufacture date");
+      toast.error("Ngày hết hạn phải sau ngày sản xuất");
       return false;
     }
 
@@ -76,8 +76,8 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      console.log("Stock added:", stockFormData);
-      toast.success("Stock added successfully!");
+  console.log("Stock added:", stockFormData);
+  toast.success("Thêm tồn kho thành công!");
       onOpenChange(false);
       setStockFormData({
         medication: "",
@@ -92,7 +92,7 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
         rowNumber: "",
       });
     } catch {
-      toast.error("Failed to add stock. Please try again.");
+      toast.error("Thêm tồn kho thất bại. Vui lòng thử lại.");
     } finally {
       setIsSubmitting(false);
     }
@@ -102,9 +102,9 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Add Stock</DialogTitle>
+          <DialogTitle>Thêm tồn kho</DialogTitle>
           <DialogDescription>
-            Fill out the information below to add stock
+            Điền thông tin bên dưới để thêm tồn kho
           </DialogDescription>
         </DialogHeader>
 
@@ -120,14 +120,14 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
             <div>
               <Label className="mb-2" htmlFor="medication">
-                Medication
+                Thuốc
               </Label>
 
               <Input
                 required
                 id="medication"
                 name="medication"
-                placeholder="Enter medication name"
+                placeholder="Nhập tên thuốc"
                 value={stockFormData.medication}
                 onChange={handleFormChange}
               />
@@ -135,7 +135,7 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
 
             <div>
               <Label className="mb-2" htmlFor="batchNumber">
-                Batch Number
+                Số lô
               </Label>
               <Input
                 required
@@ -148,7 +148,7 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
 
             <div>
               <Label className="mb-2" htmlFor="manufactureDate">
-                Manufacture Date
+                Ngày sản xuất
               </Label>
               <Input
                 required
@@ -162,7 +162,7 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
 
             <div>
               <Label className="mb-2" htmlFor="expiryDate">
-                Expiry Date
+                Ngày hết hạn
               </Label>
               <Input
                 required
@@ -176,7 +176,7 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
 
             <div>
               <Label className="mb-2" htmlFor="quantity">
-                Quantity
+                Số lượng
               </Label>
               <Input
                 required
@@ -191,7 +191,7 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
 
             <div>
               <Label className="mb-2" htmlFor="price">
-                Price
+                Giá
               </Label>
               <Input
                 required
@@ -207,7 +207,7 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
 
             <div>
               <Label className="mb-2" htmlFor="zone">
-                Zone
+                Khu vực
               </Label>
               <Input
                 required
@@ -226,14 +226,14 @@ export default function AddStockDialog({ medication, open, onOpenChange }) {
               disabled={isSubmitting}
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              Hủy
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
               className="bg-primary hover:bg-primary/90"
             >
-              {isSubmitting ? "Saving..." : "Submit"}
+              {isSubmitting ? "Đang lưu..." : "Gửi"}
             </Button>
           </DialogFooter>
         </form>

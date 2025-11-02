@@ -13,10 +13,10 @@ export default function SearchBar({ searchValue, onSearchChange, onSearch }) {
     <div className="flex gap-2 items-end">
       <div className="flex-1">
         <label className="text-sm font-medium text-foreground mb-2 block">
-          Search
+          Tìm kiếm
         </label>
         <Input
-          placeholder="Search medicines by name..."
+          placeholder="Tìm thuốc theo tên..."
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
           onKeyPress={handleKeyPress}
@@ -25,7 +25,7 @@ export default function SearchBar({ searchValue, onSearchChange, onSearch }) {
       </div>
       <Button onClick={onSearch} className="gap-2">
         <Search className="h-4 w-4" />
-        Search
+        Tìm
       </Button>
     </div>
   );

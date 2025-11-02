@@ -27,21 +27,21 @@ export default function StockDetailsDialog({
 }) {
   function getExpiryBadge(daysRemaining) {
     if (daysRemaining < 30) {
-      return (
-        <Badge className="bg-red-100 text-red-700 hover:bg-red-100">
-          Expires Soon
-        </Badge>
-      );
+        return (
+          <Badge className="bg-red-100 text-red-700 hover:bg-red-100">
+            Sắp hết hạn
+          </Badge>
+        );
     } else if (daysRemaining < 90) {
-      return (
-        <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100">
-          Expiring
-        </Badge>
-      );
+        return (
+          <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100">
+            Gần hết hạn
+          </Badge>
+        );
     }
     return (
       <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-        Good
+        Tốt
       </Badge>
     );
   }
@@ -50,7 +50,7 @@ export default function StockDetailsDialog({
     if (medicationItem.quantity < 10) {
       return (
         <Badge className="bg-red-100 text-red-700 hover:bg-red-100">
-          Low-stock
+          Hết hàng sắp xảy ra
         </Badge>
       );
     }
@@ -60,10 +60,10 @@ export default function StockDetailsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Medicine Details</DialogTitle>
-          <DialogDescription>
-            Complete information about {medicationItem?.medicationVariant?.name}
-          </DialogDescription>
+            <DialogTitle>Chi tiết thuốc</DialogTitle>
+            <DialogDescription>
+              Thông tin đầy đủ về {medicationItem?.medicationVariant?.name}
+            </DialogDescription>
         </DialogHeader>
         {medicationItem && (
           <div className="space-y-6 py-4">
@@ -92,9 +92,7 @@ export default function StockDetailsDialog({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <Label className="text-muted-foreground">Quantity</Label>
-                <p className="text-lg font-semibold">
-                  {medicationItem.quantity}
-                </p>
+                  <p className="text-lg font-semibold">{medicationItem.quantity}</p>
               </div>
               <div className="space-y-1">
                 <Label className="text-muted-foreground">Unit</Label>
@@ -116,8 +114,8 @@ export default function StockDetailsDialog({
                 <p className="text-lg font-semibold capitalize">
                   {medicationItem?.medicationVariant?.medication
                     ?.isPrescriptionRequired
-                    ? "true"
-                    : "false"}
+                      ? "Có"
+                      : "Không"}
                 </p>
               </div>
               <div className="space-y-1">
@@ -148,21 +146,17 @@ export default function StockDetailsDialog({
                 <Label className="text-muted-foreground">
                   Manifacture Date
                 </Label>
-                <p className="text-lg font-semibold">
-                  {medicationItem?.manufactureDate}
-                </p>
+                  <p className="text-lg font-semibold">{medicationItem?.manufactureDate}</p>
               </div>
               <div className="space-y-1">
                 <Label className="text-muted-foreground">Expiration Date</Label>
-                <p className="text-lg font-semibold">
-                  {medicationItem?.expiryDate}
-                </p>
+                  <p className="text-lg font-semibold">{medicationItem?.expiryDate}</p>
               </div>
               <div className="space-y-1">
                 <Label className="text-muted-foreground">Days Remaining</Label>
-                <p className="text-lg font-semibold">
-                  {calculateRemainingDays(medicationItem?.expiryDate)} days
-                </p>
+                  <p className="text-lg font-semibold">
+                    {calculateRemainingDays(medicationItem?.expiryDate)} ngày
+                  </p>
               </div>
               <div className="space-y-1">
                 <Label className="text-muted-foreground">Batch Number</Label>
@@ -186,9 +180,9 @@ export default function StockDetailsDialog({
           </div>
         )}
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
-          </Button>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Đóng
+            </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

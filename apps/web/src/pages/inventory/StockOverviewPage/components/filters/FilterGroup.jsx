@@ -40,7 +40,7 @@ export default function FilterGroup({ filters, onFilterChange, suppliers }) {
       <div className="flex flex-wrap gap-2">
         {/* Stock Filter */}
         <FilterDropdown
-          label="Stock"
+          label="Tồn kho"
           filterType="range"
           value={filters.stock}
           onSave={(value) => handleRangeFilter("stock", value)}
@@ -50,7 +50,7 @@ export default function FilterGroup({ filters, onFilterChange, suppliers }) {
 
         {/* Price Filter */}
         <FilterDropdown
-          label="Price"
+          label="Giá"
           filterType="range"
           value={filters.price}
           onSave={(value) => handleRangeFilter("price", value)}
@@ -60,7 +60,7 @@ export default function FilterGroup({ filters, onFilterChange, suppliers }) {
 
         {/* Manufacture Date Filter */}
         <FilterDropdown
-          label="Manufacture Date"
+          label="Ngày sản xuất"
           filterType="dateRange"
           value={filters.manufactureDate}
           onSave={(value) => handleRangeFilter("manufactureDate", value)}
@@ -70,7 +70,7 @@ export default function FilterGroup({ filters, onFilterChange, suppliers }) {
 
         {/* Expiry Date Filter */}
         <FilterDropdown
-          label="Expiry Date"
+          label="Ngày hết hạn"
           filterType="dateRange"
           value={filters.expiryDate}
           onSave={(value) => handleRangeFilter("expiryDate", value)}
@@ -80,7 +80,7 @@ export default function FilterGroup({ filters, onFilterChange, suppliers }) {
 
         {/* Supplier Filter */}
         <FilterDropdown
-          label="Supplier"
+          label="Nhà cung cấp"
           filterType="multiSelect"
           value={filters.supplier}
           options={suppliers}
@@ -99,7 +99,7 @@ export default function FilterGroup({ filters, onFilterChange, suppliers }) {
             }
           />
           <Label htmlFor="prescription" className="cursor-pointer text-sm">
-            Prescription Only
+            Thuốc cần kê đơn
           </Label>
         </div>
       </div>

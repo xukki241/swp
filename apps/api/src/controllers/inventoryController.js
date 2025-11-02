@@ -123,6 +123,7 @@ export const inventoryController = {
 
   /**
    * GET /api/inventory/low-stock - Get low stock items
+   * Default threshold: 250 units
    */
   getLowStock: asyncHandler(async (req, res) => {
     const page = req.query.page ? Number.parseInt(req.query.page) : 1;
@@ -132,7 +133,7 @@ export const inventoryController = {
       : (page - 1) * limit;
     const threshold = req.query.threshold
       ? Number.parseFloat(req.query.threshold)
-      : 10;
+      : 250;
 
     const filters = {
       threshold,
