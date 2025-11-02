@@ -268,4 +268,95 @@ export const purchaseOrderService = {
       .returning();
     return po;
   },
+
+  // Confirm purchase order (supplier confirmation)
+  async confirmOrder(purchaseOrderId, token) {
+    const { verifyConfirmationToken, sendConfirmationNotificationEmail } =
+      await import("../utils/purchaseOrderEmail.js");
+
+    // Verify token
+    if (!verifyConfirmationToken(token, purchaseOrderId)) {
+      throw new Error(
+        "Invalid or expired confirmation token. Please contact the buyer for a new link."
+      );
+    }
+
+    return await db.transaction(async (tx) => {
+      // Get purchase order with all related data
+      const [po] = await tx
+        .select({
+          id: purchaseOrders.id,
+          orderDate: purchaseOrders.orderDate,
+          expectedDate: purchaseOrders.expectedDate,
+          status: purchaseOrders.status,
+          totalAmount: purchaseOrders.totalAmount,
+          supplierName: suppliers.name,
+          supplierEmail: suppliers.email,
+          supplierContact: suppliers.contactPerson,
+          buyerEmail: users.email,
+          buyerName: users.fullName,
+        })
+        .from(purchaseOrders)
+        .leftJoin(suppliers, eq(purchaseOrders.supplierId, suppliers.id))
+        .leftJoin(users, eq(purchaseOrders.createdBy, users.id))
+        .where(eq(purchaseOrders.id, purchaseOrderId));
+
+      if (!po) {
+        throw new Error("Purchase order not found");
+      }
+
+      // Check if already confirmed/ordered
+      if (po.status === "ordered") {
+        throw new Error("This purchase order has already been confirmed");
+      }
+
+      // Check if cancelled
+      if (po.status === "cancelled") {
+        throw new Error("This purchase order has been cancelled");
+      }
+
+      // Update status to "ordered"
+      const [updatedPo] = await tx
+        .update(purchaseOrders)
+        .set({
+          status: "ordered",
+          updatedAt: new Date(),
+        })
+        .where(eq(purchaseOrders.id, purchaseOrderId))
+        .returning();
+
+      // Generate order number from ID (first 8 chars)
+      const orderNumber = purchaseOrderId.substring(0, 8).toUpperCase();
+
+      // Send notification email to owner/buyer
+      if (po.buyerEmail) {
+        try {
+          await sendConfirmationNotificationEmail({
+            ownerEmail: po.buyerEmail,
+            ownerName: po.buyerName || "Owner",
+            supplierName: po.supplierName,
+            supplierEmail: po.supplierEmail,
+            orderNumber,
+            orderDate: po.orderDate
+              ? new Date(po.orderDate).toLocaleDateString("vi-VN")
+              : "N/A",
+            expectedDeliveryDate: po.expectedDate
+              ? new Date(po.expectedDate).toLocaleDateString("vi-VN")
+              : "N/A",
+            totalAmount: po.totalAmount,
+            confirmedAt: new Date().toLocaleString("vi-VN"),
+          });
+        } catch (emailError) {
+          // Log error but don't fail the confirmation
+          console.error("Failed to send confirmation email:", emailError);
+        }
+      }
+
+      return {
+        success: true,
+        orderNumber,
+        purchaseOrder: updatedPo,
+      };
+    });
+  },
 };
