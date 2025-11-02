@@ -15,14 +15,15 @@ import {
  * Hook for user login
  */
 export const useLogin = () => {
-  const navigate = useNavigate();
-
   return useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-      // Store token and user info
-      if (data.token) {
-        localStorage.setItem("token", data.token);
+      // Store tokens and user info
+      if (data.accessToken || data.token) {
+        localStorage.setItem("token", data.accessToken || data.token);
+      }
+      if (data.refreshToken) {
+        localStorage.setItem("refreshToken", data.refreshToken);
       }
       if (data.user) {
         localStorage.setItem("user", JSON.stringify(data.user));
@@ -75,6 +76,7 @@ export const useLogout = () => {
     onSuccess: () => {
       // Clear storage
       localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
 
       // Redirect to login
@@ -83,6 +85,7 @@ export const useLogout = () => {
     onError: () => {
       // Clear storage even on error
       localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
       navigate("/login");
     },
