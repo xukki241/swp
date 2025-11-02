@@ -104,9 +104,11 @@ export default function StockOverviewPage() {
       {/* Main Layout of Page */}
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Stock Overview</h2>
+          <h2 className="text-3xl font-bold text-gray-900">
+            Tổng quan tồn kho
+          </h2>
           <p className="text-muted-foreground mt-1">
-            Browse and manage all medicines in stock
+            Duyệt và quản lý tất cả thuốc trong kho
           </p>
         </div>
         <Card className="shadow-md rounded-xl border-0">
@@ -119,7 +121,7 @@ export default function StockOverviewPage() {
               {isSearching && (
                 <div className="text-center py-8">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  <p className="text-muted-foreground mt-2">Searching...</p>
+                  <p className="text-muted-foreground mt-2">Đang tìm...</p>
                 </div>
               )}
 
@@ -142,10 +144,10 @@ export default function StockOverviewPage() {
                               {medication.medicationVariant.name}
                             </h3>
                             <p className="text-sm text-muted-foreground mt-1">
-                              Stock: {medication.quantity}
+                              Tồn kho: {medication.quantity}
                             </p>
                             <p className="text-sm text-muted-foreground mt-1">
-                              Price:{" "}
+                              Giá:{" "}
                               {Number(
                                 medication.medicationVariant.sellPrice
                               ).toLocaleString("vi-VN")}{" "}
@@ -161,7 +163,7 @@ export default function StockOverviewPage() {
                             onClick={() => handleShowDialog("view", medication)}
                           >
                             <Eye className="h-4 w-4 mr-1" />
-                            View
+                            Xem
                           </Button>
                           <Button
                             size="sm"
@@ -172,7 +174,7 @@ export default function StockOverviewPage() {
                             }
                           >
                             <Settings2 className="h-4 w-4 mr-1" />
-                            Adjust
+                            Điều chỉnh
                           </Button>
                         </div>
                       </CardContent>
@@ -185,10 +187,10 @@ export default function StockOverviewPage() {
                 <div className="text-center py-12">
                   <Search className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    No medications found
+                    Không tìm thấy thuốc
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    Try adjusting your search query or filters
+                    Thử điều chỉnh truy vấn tìm kiếm hoặc bộ lọc
                   </p>
                 </div>
               )}

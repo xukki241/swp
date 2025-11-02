@@ -444,7 +444,7 @@ export function BinCard({ bin, level, number, rackId, rack, refetch }) {
                   </div>
                   <div>
                     <Label htmlFor="quantityReserved" className="text-xs">
-                      Đã đặt trước
+                      Đã Sử Dụng
                     </Label>
                     <Input
                       id="quantityReserved"

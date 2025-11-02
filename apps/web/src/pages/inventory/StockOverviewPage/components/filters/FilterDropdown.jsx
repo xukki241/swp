@@ -40,10 +40,10 @@ export default function FilterDropdown({
         return (
           <div className="space-y-3">
             <div>
-              <Label className="text-xs mb-1">Min</Label>
+              <Label className="text-xs mb-1">Tối thiểu</Label>
               <Input
                 type="number"
-                placeholder="Min"
+                placeholder="Tối thiểu"
                 value={tempValue.min || ""}
                 onChange={(e) =>
                   setTempValue({ ...tempValue, min: e.target.value })
@@ -52,10 +52,10 @@ export default function FilterDropdown({
               />
             </div>
             <div>
-              <Label className="text-xs mb-1">Max</Label>
+              <Label className="text-xs mb-1">Tối đa</Label>
               <Input
                 type="number"
-                placeholder="Max"
+                placeholder="Tối đa"
                 value={tempValue.max || ""}
                 onChange={(e) =>
                   setTempValue({ ...tempValue, max: e.target.value })
@@ -70,7 +70,7 @@ export default function FilterDropdown({
         return (
           <div className="space-y-3">
             <div>
-              <Label className="text-xs mb-1">From</Label>
+              <Label className="text-xs mb-1">Từ</Label>
               <Input
                 type="date"
                 value={tempValue.from || ""}
@@ -81,7 +81,7 @@ export default function FilterDropdown({
               />
             </div>
             <div>
-              <Label className="text-xs mb-1">To</Label>
+              <Label className="text-xs mb-1">Đến</Label>
               <Input
                 type="date"
                 value={tempValue.to || ""}
@@ -150,10 +150,10 @@ export default function FilterDropdown({
               onClick={handleCancel}
               className="flex-1 bg-transparent"
             >
-              Cancel
+              Hủy
             </Button>
             <Button size="sm" onClick={handleSave} className="flex-1">
-              Save
+              Lưu
             </Button>
           </div>
         </div>

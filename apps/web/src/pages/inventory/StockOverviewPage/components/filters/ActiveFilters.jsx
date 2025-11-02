@@ -5,7 +5,7 @@ export default function ActiveFilters({ filters, onRemoveFilter }) {
   function renderSupplierNames(suppliers) {
     return (
       <div>
-        Supplier:
+        Nhà cung cấp:
         {suppliers.map((supplier, index) => (
           <div key={supplier.id}>
             {supplier.name}
@@ -22,26 +22,26 @@ export default function ActiveFilters({ filters, onRemoveFilter }) {
     switch (key) {
       case "stock":
         return value.min || value.max
-          ? `Stock: ${value.min || "0"} - ${value.max || "∞"} `
+          ? `Tồn kho: ${value.min || "0"} - ${value.max || "\u221e"} `
           : null;
       case "price":
         return value.min || value.max
-          ? `Price: ${value.min || "0"} - ${value.max || "∞"} `
+          ? `Giá: ${value.min || "0"} - ${value.max || "\u221e"} `
           : null;
       case "manufactureDate":
         return value.from || value.to
-          ? `Manufacture: ${value.from || "any"} - ${value.to || "any"} `
+          ? `Ngày sản xuất: ${value.from || "bất kỳ"} - ${value.to || "bất kỳ"} `
           : null;
       case "expiryDate":
         return value.from || value.to
-          ? `Expiry: ${value.from || "any"} - ${value.to || "any"} `
+          ? `Ngày hết hạn: ${value.from || "bất kỳ"} - ${value.to || "bất kỳ"} `
           : null;
       case "supplier":
         return Array.isArray(value) && value.length > 0
           ? renderSupplierNames(value)
           : null;
       case "prescription":
-        return value ? "Prescription: required" : null;
+        return value ? "Thuốc cần kê đơn" : null;
       default:
         return null;
     }
@@ -61,7 +61,7 @@ export default function ActiveFilters({ filters, onRemoveFilter }) {
   return (
     <div className="flex flex-wrap gap-2 items-center">
       <span className="text-sm text-muted-foreground">
-        Search with filters:
+        Tìm kiếm với bộ lọc:
       </span>
       {activeFilterEntries.map(([key, value]) => {
         const display = formatFilterDisplay(key, value);

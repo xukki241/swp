@@ -27,7 +27,7 @@ export default function InventorySearching({ onSearch, suppliers }) {
       filters.stock.max &&
       Number(filters.stock.min) > Number(filters.stock.max)
     ) {
-      toast.error("Stock Min cannot be greater than Stock Max.");
+      toast.error("Giá trị Tồn kho tối thiểu không được lớn hơn Tối đa.");
       return;
     }
     if (
@@ -35,7 +35,7 @@ export default function InventorySearching({ onSearch, suppliers }) {
       filters.price.max &&
       Number(filters.price.min) > Number(filters.price.max)
     ) {
-      toast.error("Price Min cannot be greater than Price Max.");
+      toast.error("Giá tối thiểu không được lớn hơn Giá tối đa.");
       return;
     }
     if (
@@ -44,9 +44,7 @@ export default function InventorySearching({ onSearch, suppliers }) {
       new Date(filters.manufactureDateMin) >
         new Date(filters.manufactureDateMax)
     ) {
-      toast.error(
-        "Manufacture Date Min cannot be later than Manufacture Date Max."
-      );
+      toast.error("Ngày sản xuất bắt đầu không được sau ngày kết thúc.");
       return;
     }
     if (
@@ -54,7 +52,7 @@ export default function InventorySearching({ onSearch, suppliers }) {
       filters.expiryDate.to &&
       new Date(filters.expiryDate.from) > new Date(filters.expiryDate.to)
     ) {
-      toast.error("Expiry Date Min cannot be later than Expiry Date Max.");
+      toast.error("Ngày hết hạn bắt đầu không được sau ngày kết thúc.");
       return;
     }
 
