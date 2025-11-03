@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCurrentUser } from "@/hooks/useAuth";
 import { useInventory } from "@/hooks/useInventory";
-import { useSuppliers } from "@/hooks/useSuppliers";
 import { Eye, Search, Settings2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -21,7 +20,6 @@ import {
 export default function StockOverviewPage() {
   const { inventory, refetchInventory, fetchMedicationImage, imageCache } =
     useInventory();
-  const { data: suppliers = [] } = useSuppliers();
   const [medications, setMedications] = useState([]);
   const [currentMedication, setCurrentMedication] = useState({});
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
@@ -98,10 +96,6 @@ export default function StockOverviewPage() {
           (!searchPayload.expiryDateMax ||
             new Date(item.expiryDate) <= new Date(searchPayload.expiryDateMax));
 
-        const matchesSupplier =
-          searchPayload.supplier.length === 0 ||
-          searchPayload.supplier.includes(item.supplier);
-
         const matchesPrescription =
           !searchPayload.prescription ||
           item.medicationVariant.isPrescriptionRequired;
@@ -112,7 +106,6 @@ export default function StockOverviewPage() {
           matchesPrice &&
           matchesManufactureDate &&
           matchesExpiryDate &&
-          matchesSupplier &&
           matchesPrescription
         );
       });
@@ -141,7 +134,6 @@ export default function StockOverviewPage() {
             <InventorySearching
               earching
               onSearch={handleSearch}
-              suppliers={suppliers}
             />
 
             {/* Medication List */}
