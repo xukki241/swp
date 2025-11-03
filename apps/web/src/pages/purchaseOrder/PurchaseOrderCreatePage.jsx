@@ -46,9 +46,17 @@ export default function PurchaseOrderCreatePage() {
     const itemsWithLeadTime = selectedItems
       .map((item) => {
         const med = meds.find((m) => m.id === item.supplierMedicationVariantId);
-        return med?.leadTimeDays || 0;
+        console.log("🔍 Checking item:", {
+          itemId: item.supplierMedicationVariantId,
+          med: med,
+          leadTimeDays: med?.leadTimeDays,
+        });
+        const leadDays = Number(med?.leadTimeDays);
+        return !isNaN(leadDays) && leadDays > 0 ? leadDays : 0;
       })
       .filter((days) => days > 0);
+
+    console.log("📅 Items with lead time:", itemsWithLeadTime);
 
     if (itemsWithLeadTime.length === 0) return null;
 
@@ -59,7 +67,10 @@ export default function PurchaseOrderCreatePage() {
       today.getTime() + maxLeadTime * 24 * 60 * 60 * 1000
     );
 
-    return deliveryDate.toISOString().split("T")[0];
+    const calculatedDate = deliveryDate.toISOString().split("T")[0];
+    console.log("✅ Calculated expected delivery date:", calculatedDate);
+
+    return calculatedDate;
   }, [selectedItems, meds]);
 
   const totalAmount = useMemo(
@@ -144,6 +155,10 @@ export default function PurchaseOrderCreatePage() {
     setIsSubmitting(true);
 
     try {
+      console.log(
+        "📅 Expected delivery date before sending:",
+        expectedDeliveryDate
+      );
       const payload = [
         {
           supplier_id: supplierId,
@@ -156,15 +171,20 @@ export default function PurchaseOrderCreatePage() {
         },
       ];
 
+      console.log("📦 Payload to send:", payload);
       const response = await instance.post("/purchases", payload);
-      const createdOrder = response.data?.data?.[0] || response.data;
+      console.log("📦 Response from API:", response.data);
+      const createdOrder =
+        response.data?.data?.[0] || response.data?.[0] || response.data;
+      console.log("📦 Created order:", createdOrder);
 
       // Prepare email data
       const emailData = {
         purchaseOrderId: createdOrder?.id,
         supplierEmail: supplierDetail.email,
         supplierName: supplierDetail.name,
-        supplierContact: supplierDetail.contactName,
+        supplierContact:
+          supplierDetail.contactName || supplierDetail.name || "Supplier",
         buyerInfo: {
           contact: buyerInfo.contact,
           email: buyerInfo.email,
@@ -200,12 +220,21 @@ export default function PurchaseOrderCreatePage() {
 
       // Send email notification
       try {
+        console.log("📧 Sending email with data:", emailData);
         await instance.post("/send-purchase-order-email", emailData);
         toast.success("✅ Đã tạo đơn đặt hàng và gửi email thành công!");
       } catch (emailError) {
         console.error("⚠️ Email sending failed:", emailError);
+        console.error("⚠️ Email error response:", emailError?.response?.data);
+        const emailErrorMsg =
+          emailError?.response?.data?.message ||
+          emailError?.response?.data?.error ||
+          emailError.message;
         toast.warning(
-          "Đã tạo đơn đặt hàng, nhưng gửi email thông báo thất bại."
+          "Đã tạo đơn đặt hàng, nhưng gửi email thông báo thất bại.",
+          {
+            description: `${emailErrorMsg}\n\nĐơn hàng đã được tạo thành công. Bạn có thể gửi email thủ công sau.`,
+          }
         );
       }
 
