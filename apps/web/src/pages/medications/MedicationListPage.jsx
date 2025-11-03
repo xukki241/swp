@@ -28,7 +28,7 @@ import {
   useMedicationVariants,
   useUpdateMedication,
 } from "@/hooks/useMedications";
-import { instance } from "@/lib/axios";
+import instance from "@/lib/axios";
 import MedicationImage from "../../components/MedicationImage";
 
 import {
@@ -275,11 +275,27 @@ export default function MedicationListPage() {
 
   const handleDelete = async (id) => {
     if (confirm("Xóa thuốc này?")) {
-      await deleteMed.mutateAsync(id);
-      clearMedicationImage(id);
-      bumpImageVersion(id);
-      toast.success("Đã xóa");
-      await refetch();
+      try {
+        await deleteMed.mutateAsync(id);
+        clearMedicationImage(id);
+        bumpImageVersion(id);
+        toast.success("Đã xóa thuốc thành công");
+        await refetch();
+      } catch (e) {
+        console.log("Delete error:", e?.response?.data);
+        const rawMsg =
+          e?.response?.data?.error ||
+          e?.response?.data?.message ||
+          e.message ||
+          "";
+        const errorMsg =
+          typeof rawMsg === "string" ? rawMsg : JSON.stringify(rawMsg);
+        toast.error("Không thể xóa thuốc", {
+          description: errorMsg.toLowerCase().includes("inventory")
+            ? "Thuốc đang có sản phẩm trong kho. Bạn chỉ có thể chỉnh sửa thông tin."
+            : errorMsg || "Thuốc đang được sử dụng trong hệ thống",
+        });
+      }
     }
   };
 
@@ -711,19 +727,22 @@ export default function MedicationListPage() {
                 />
               </div>
 
-              <div>
+              <div className="md:col-span-2">
                 <Controller
                   name="status"
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    <select
-                      value={value}
-                      onChange={(e) => onChange(e.target.value)}
-                      className="h-9 w-40 rounded-md border border-input bg-background px-3 text-sm"
-                    >
-                      <option value="active">Đang hoạt động</option>
-                      <option value="inactive">Ngừng hoạt động</option>
-                    </select>
+                    <Select value={value} onValueChange={onChange}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Trạng thái" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Đang hoạt động</SelectItem>
+                        <SelectItem value="inactive">
+                          Ngừng hoạt động
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   )}
                 />
               </div>
