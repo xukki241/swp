@@ -14,10 +14,10 @@
 
 **Dữ liệu October 2025:**
 
-- 8 đơn PAID (đã thanh toán)
-- 1 đơn CANCELLED (đã hủy)
-- 1 đơn PENDING (chờ thanh toán)
-- Tổng revenue: 7,580,000 VND
+- 8 đơn PAID (đã thanh toán) - có items
+- 1 đơn CANCELLED (đã hủy) - KHÔNG có items (hủy trước khi xử lý)
+- 1 đơn PENDING (chờ thanh toán) - có items
+- Tổng revenue: 4,890,000 VND (chỉ từ 8 đơn PAID)
 
 ### 2. **Dashboard - Bỏ "Sales by Status"**
 
@@ -138,9 +138,11 @@
 - Inventory Entries: 9 (from all receipts)
 - Sales Orders: 15 (5 from June 2024 + 10 from October 2025)
   * Status: pending, paid, cancelled only
-  * October 2025: 10 orders - 8 paid, 1 cancelled, 1 pending
-  * Total October Revenue: 7,580,000 VND
-- Sales Order Items: 6 (old June 2024 data only)
+  * October 2025: 10 orders - 8 paid, 1 cancelled (no items), 1 pending
+  * Total October Revenue: 4,890,000 VND (from 8 paid orders only)
+- Sales Order Items: 36 (5 from June 2024 + 31 from October 2025)
+  * October items only for paid + pending orders
+  * Cancelled orders have NO items (cancelled before processing)
 - Files: 3 + 6 medication images
 - Notifications: 5
 - Audit Logs: 5
