@@ -1,8 +1,5 @@
 import bcrypt from "bcryptjs";
-<<<<<<< HEAD
-=======
 import crypto from "crypto";
->>>>>>> 1b8b504c05915521560aa146b7c9e766a5659436
 import { and, count, eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 
