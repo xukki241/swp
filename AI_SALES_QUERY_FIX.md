@@ -9,12 +9,14 @@ User phát hiện AI analytics đang query sai so với dữ liệu thực tế 
 ### Trước khi fix:
 
 **Seed Data có vấn đề:**
+
 - Sale 14 (Oct 25, 2025) - Status: **CANCELLED**
   - Nhưng vẫn có 2 items: Amoxicillin (340,000 VND) + Paracetamol (10,000 VND)
   - Tổng: 350,000 VND
 - Đơn đã hủy KHÔNG NÊN có items vì đã hủy trước khi xử lý
 
 **Document SALES_STATUS_AND_POR_UPDATE.md tuyên bố sai:**
+
 - Nói October 2025 có tổng revenue: 7,580,000 VND
 - Thực tế chỉ nên là: 4,890,000 VND (từ 8 đơn paid)
 
@@ -31,6 +33,7 @@ User phát hiện AI analytics đang query sai so với dữ liệu thực tế 
 ```
 
 **Lý do AI chỉ query 'paid' orders:**
+
 - ✅ **Pending orders**: Chưa thanh toán, chưa chắc chắn có doanh thu (customer có thể hủy)
 - ✅ **Cancelled orders**: Đơn đã hủy, KHÔNG có doanh thu thực tế
 - ✅ **Paid orders**: Doanh thu đã xác nhận, nên dùng để phân tích và dự báo
@@ -90,14 +93,18 @@ Xóa items của đơn cancelled (Sale 14):
 
 ```markdown
 # ❌ TRƯỚC:
+
 **Dữ liệu October 2025:**
+
 - 8 đơn PAID (đã thanh toán)
 - 1 đơn CANCELLED (đã hủy)
 - 1 đơn PENDING (chờ thanh toán)
 - Tổng revenue: 7,580,000 VND
 
 # ✅ SAU:
+
 **Dữ liệu October 2025:**
+
 - 8 đơn PAID (đã thanh toán) - có items
 - 1 đơn CANCELLED (đã hủy) - KHÔNG có items (hủy trước khi xử lý)
 - 1 đơn PENDING (chờ thanh toán) - có items
@@ -130,20 +137,21 @@ const salesData = await db
 
 ### October 2025 Data (Đã Fix):
 
-| Order | Date       | Status    | Items | Amount      |
-|-------|------------|-----------|-------|-------------|
-| Sale 6 | Oct 2     | PAID      | 2     | 450,000     |
-| Sale 7 | Oct 5     | PAID      | 1     | 680,000     |
-| Sale 8 | Oct 8     | PAID      | 1     | 340,000     |
-| Sale 9 | Oct 12    | PAID      | 4     | 520,000     |
-| Sale 10| Oct 15    | PAID      | 3     | 780,000     |
-| Sale 11| Oct 18    | PAID      | 2     | 920,000     |
-| Sale 12| Oct 20    | PAID      | 2     | 560,000     |
-| Sale 13| Oct 22    | PAID      | 3     | 430,000     |
-| Sale 14| Oct 25    | CANCELLED | **0** | ~~350,000~~ |
-| Sale 15| Oct 28    | PENDING   | 2     | ~~920,000~~ |
+| Order   | Date   | Status    | Items | Amount      |
+| ------- | ------ | --------- | ----- | ----------- |
+| Sale 6  | Oct 2  | PAID      | 2     | 450,000     |
+| Sale 7  | Oct 5  | PAID      | 1     | 680,000     |
+| Sale 8  | Oct 8  | PAID      | 1     | 340,000     |
+| Sale 9  | Oct 12 | PAID      | 4     | 520,000     |
+| Sale 10 | Oct 15 | PAID      | 3     | 780,000     |
+| Sale 11 | Oct 18 | PAID      | 2     | 920,000     |
+| Sale 12 | Oct 20 | PAID      | 2     | 560,000     |
+| Sale 13 | Oct 22 | PAID      | 3     | 430,000     |
+| Sale 14 | Oct 25 | CANCELLED | **0** | ~~350,000~~ |
+| Sale 15 | Oct 28 | PENDING   | 2     | ~~920,000~~ |
 
 **Tổng hợp:**
+
 - ✅ **8 đơn PAID** với **31 items** = **4,890,000 VND** (AI sẽ phân tích)
 - ⏳ **1 đơn PENDING** với **2 items** = 920,000 VND (không tính vào AI)
 - ❌ **1 đơn CANCELLED** với **0 items** = 0 VND (không tính vào AI)
@@ -173,16 +181,19 @@ Khi gọi `getSalesAndInventoryData(90)`:
 ### Tại sao không tính pending/cancelled vào AI analysis?
 
 **1. Business Logic:**
+
 - **Paid orders** = Doanh thu thực tế, đã xác nhận
 - **Pending orders** = Chưa chắc chắn (customer có thể hủy hoặc đổi ý)
 - **Cancelled orders** = Không có doanh thu
 
 **2. AI Forecasting:**
+
 - AI cần dữ liệu **ổn định và xác thực** để dự báo
 - Nếu tính pending → AI sẽ dự báo sai vì pending có thể thành cancelled
 - Nếu tính cancelled → AI sẽ nghĩ có nhu cầu trong khi thực tế không có
 
 **3. Inventory Management:**
+
 - Paid orders → Hàng đã xuất → Cần dự trù nhập
 - Pending orders → Hàng chưa xuất → Chưa ảnh hưởng tồn kho thực tế
 - Cancelled orders → Hàng không xuất → Không ảnh hưởng
@@ -197,6 +208,7 @@ pnpm run db:seed
 ```
 
 **Expected output:**
+
 ```
 - Sales Order Items: 36 (5 from June 2024 + 31 from October 2025)
 - October items only for paid + pending orders
@@ -211,6 +223,7 @@ curl http://localhost:5000/api/ai-analysis/recommendations \
 ```
 
 **Expected:**
+
 - Total revenue: 4,890,000 VND (chỉ 8 đơn paid)
 - Total orders: 8 (không tính cancelled và pending)
 - Top selling items: dựa trên 31 items từ paid orders
@@ -219,7 +232,7 @@ curl http://localhost:5000/api/ai-analysis/recommendations \
 
 ```sql
 -- Check October 2025 orders
-SELECT 
+SELECT
   status,
   COUNT(*) as order_count,
   COUNT(soi.id) as item_count,
@@ -232,6 +245,7 @@ GROUP BY status;
 ```
 
 **Expected result:**
+
 ```
 status    | order_count | item_count | total_amount
 ----------|-------------|------------|-------------
@@ -245,7 +259,6 @@ cancelled | 1           | 0          | 350,000
 1. ✅ `apps/api/src/db/seed.js`
    - Removed Sale 14 items (cancelled order)
    - Updated summary comments
-   
 2. ✅ `SALES_STATUS_AND_POR_UPDATE.md`
    - Corrected October 2025 revenue
    - Clarified cancelled orders have no items

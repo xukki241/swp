@@ -1,7 +1,8 @@
-import { and, eq, ilike, or } from "drizzle-orm";
+import { and, eq, ilike, or, sum } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import {
+  inventory,
   medications,
   medicationVariants,
   purchaseOrderItems,
@@ -232,6 +233,34 @@ export const updateMedication = async (id, medicationData) => {
  */
 export const deleteMedication = async (id) => {
   try {
+    // Check if medication has any variants with inventory
+    const variants = await db
+      .select({ id: medicationVariants.id })
+      .from(medicationVariants)
+      .where(eq(medicationVariants.medicationId, id));
+
+    if (variants.length > 0) {
+      const variantIds = variants.map((v) => v.id);
+
+      // Check if any variant has inventory
+      const inventoryCheck = await db
+        .select({
+          totalQty: sum(inventory.quantity),
+        })
+        .from(inventory)
+        .where(
+          or(...variantIds.map((vid) => eq(inventory.medicationVariantId, vid)))
+        );
+
+      const totalQuantity = Number(inventoryCheck[0]?.totalQty || 0);
+
+      if (totalQuantity > 0) {
+        throw new Error(
+          "Cannot delete medication that still has products in inventory. You can only edit the information."
+        );
+      }
+    }
+
     const result = await db
       .delete(medications)
       .where(eq(medications.id, id))
