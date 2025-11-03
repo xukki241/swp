@@ -13,6 +13,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useUploadFile } from "@/hooks/useFiles";
 import {
   useCreateMedication,
@@ -424,16 +431,16 @@ export default function MedicationListPage() {
                 className="flex flex-col sm:flex-row gap-2 sm:items-center"
               >
                 <div className="flex items-center gap-2">
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-                    title="Filter by status"
-                  >
-                    <option value="all">Tất cả trạng thái</option>
-                    <option value="active">Đang hoạt động</option>
-                    <option value="inactive">Ngừng hoạt động</option>
-                  </select>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-[180px] h-9">
+                      <SelectValue placeholder="Trạng thái" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                      <SelectItem value="active">Đang hoạt động</SelectItem>
+                      <SelectItem value="inactive">Ngừng hoạt động</SelectItem>
+                    </SelectContent>
+                  </Select>
 
                   <Input
                     className="w-64"
