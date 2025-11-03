@@ -30,6 +30,10 @@ export const aiAnalysisService = {
     console.log("AI Analysis - Days Back:", daysBack);
 
     // Get sales data with medication details
+    // NOTE: Only include 'paid' orders for AI analysis because:
+    // - 'pending': Not yet confirmed revenue (customer might cancel)
+    // - 'cancelled': No actual sales occurred
+    // AI recommendations should be based on actual confirmed sales only
     const salesData = await db
       .select({
         medicationId: medications.id,
@@ -60,7 +64,7 @@ export const aiAnalysisService = {
       .where(
         and(
           gte(salesOrders.orderDate, startDate),
-          eq(salesOrders.status, "paid")
+          eq(salesOrders.status, "paid") // Only confirmed sales
         )
       )
       .groupBy(
@@ -358,6 +362,7 @@ Chỉ trả về JSON, không có text ngoài lề.
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - daysBack);
 
+    // Count only paid orders for accurate statistics
     const [orderStats] = await db
       .select({
         totalOrders: sql`COUNT(DISTINCT ${salesOrders.id})`.as("total_orders"),
@@ -366,7 +371,7 @@ Chỉ trả về JSON, không có text ngoài lề.
       .where(
         and(
           gte(salesOrders.orderDate, startDate),
-          eq(salesOrders.status, "paid")
+          eq(salesOrders.status, "paid") // Only confirmed orders
         )
       );
 
