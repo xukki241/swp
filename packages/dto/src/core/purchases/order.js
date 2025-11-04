@@ -38,6 +38,7 @@ export const createPurchaseOrderItemSchema = z.object({
 
 export const createPurchaseOrderSchema = z.object({
   supplier_id: uuidSchema,
+  expected_date: z.string().nullable().optional(),
   items: z.array(createPurchaseOrderItemSchema).min(1),
 });
 

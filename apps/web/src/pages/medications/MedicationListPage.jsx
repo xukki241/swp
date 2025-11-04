@@ -1,3 +1,4 @@
+"use client";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,20 +7,20 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useUploadFile } from "@/hooks/useFiles";
 import {
   useCreateMedication,
   useDeleteMedication,
@@ -27,6 +28,8 @@ import {
   useMedicationVariants,
   useUpdateMedication,
 } from "@/hooks/useMedications";
+import instance from "@/lib/axios";
+import MedicationImage from "../../components/MedicationImage";
 
 import {
   findVariantsByBarcode,
@@ -47,16 +50,17 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import MedicationViewModal from "./MedicationViewModal";
 
+// 🔄 CHỈ ĐỔI DÒNG IMPORT NÀY: dùng từ fileUrls thay vì mockImages
 import {
   clearMedicationImage,
   fileToDataURL,
   getMedicationImageLocal,
   getMedicationImageUrl,
   setMedicationImage,
-} from "@/lib/mockImages";
+} from "@/lib/fileUrls";
 
 /* helpers */
 function useDebounced(value, delay = 350) {
@@ -101,50 +105,45 @@ function StatusBadge({ status }) {
 }
 
 /** Inline MedImage (không tạo file mới) */
-function MedImage({
-  medicationId,
-  alt = "",
-  version = 0,
-  className = "h-14 w-14 rounded-xl object-cover border",
-  placeholderClass = "h-14 w-14",
-  onClick, // ⬅️ thêm click-to-zoom
-}) {
+function MedImage({ medicationId, imageId, alt = "", version = 0, onClick }) {
   const [errored, setErrored] = useState(false);
 
   const src = useMemo(() => {
-    if (!medicationId) return null;
+    if (imageId) return getMedicationImageUrl(medicationId, imageId);
     const local = getMedicationImageLocal(medicationId);
-    if (local) return local;
-    return `/images/medications/${medicationId}.jpg?v=${version}`;
-  }, [medicationId, version]);
+    return local || getMedicationImageUrl(medicationId);
+  }, [medicationId, imageId, version]);
 
   useEffect(() => setErrored(false), [src]);
 
-  if (!src || errored) {
-    return <PillPlaceholder className={placeholderClass} />;
-  }
+  if (!src || errored) return <PillPlaceholder />;
   return (
     <img
       src={src}
       alt={alt}
-      className={`${className} ${onClick ? "cursor-zoom-in" : ""}`}
+      className="h-20 w-20 rounded-xl object-cover border cursor-zoom-in"
       onError={() => setErrored(true)}
-      onClick={onClick}
+      onClick={() => onClick?.(src, alt)}
     />
   );
 }
 
 export default function MedicationListPage() {
-  /* filters */
-  const [search, setSearch] = useState("");
-  const debounced = useDebounced(search);
-  const [statusFilter] = useState("all");
+  const navigate = useNavigate();
+  const uploadFile = useUploadFile();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const isOwner = user.role?.toUpperCase() === "OWNER";
+  /* filters — giống UserListPage: searchInput / appliedSearch + statusFilter */
+  const [searchInput, setSearchInput] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const debounced = useDebounced(appliedSearch);
 
   /* modals */
   const [medFormOpen, setMedFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [manageMed, setManageMed] = useState(null);
-  const [viewMed, setViewMed] = useState(null);
   const medId = manageMed?.id;
 
   /* data */
@@ -184,7 +183,7 @@ export default function MedicationListPage() {
   const [imagePreview, setImagePreview] = useState(null);
   const [removeImage, setRemoveImage] = useState(false);
 
-  // ⬇️ Lightbox state
+  // Lightbox state
   const [lightbox, setLightbox] = useState({ open: false, src: "", alt: "" });
   const openLightbox = (src, alt) => setLightbox({ open: true, src, alt });
   const closeLightbox = () => setLightbox({ open: false, src: "", alt: "" });
@@ -244,22 +243,31 @@ export default function MedicationListPage() {
       if (savedId) {
         if (removeImage) {
           clearMedicationImage(savedId);
-          bumpImageVersion(savedId);
+          await instance.delete(`/medications/${savedId}/image`);
+        } else if (imageFile) {
+          const formData = new FormData();
+          formData.append("image", imageFile);
+          await instance.post(
+            `/medications/${savedId}/upload-image`,
+            formData,
+            {
+              headers: { "Content-Type": "multipart/form-data" },
+            }
+          );
         } else if (imagePreview) {
           setMedicationImage(savedId, imagePreview);
-          bumpImageVersion(savedId);
         }
+        bumpImageVersion(savedId);
       }
 
-      toast.success(editing ? "Đã cập nhật thuốc" : "Đã tạo thuốc mới");
+      toast.success(editing ? "Medication updated" : "Medication created");
       setMedFormOpen(false);
-      setEditing(null);
-      setImageFile(null);
-      setImagePreview(null);
-      setRemoveImage(false);
+
+      // Đợi một chút để backend xử lý xong
+      await new Promise((resolve) => setTimeout(resolve, 500));
       await refetch();
     } catch (e) {
-      toast.error("Không thể lưu thuốc", {
+      toast.error("Failed to save medication", {
         description: e?.response?.data?.message || e.message,
       });
     }
@@ -267,15 +275,31 @@ export default function MedicationListPage() {
 
   const handleDelete = async (id) => {
     if (confirm("Xóa thuốc này?")) {
-      await deleteMed.mutateAsync(id);
-      clearMedicationImage(id);
-      bumpImageVersion(id);
-      toast.success("Đã xóa");
-      await refetch();
+      try {
+        await deleteMed.mutateAsync(id);
+        clearMedicationImage(id);
+        bumpImageVersion(id);
+        toast.success("Đã xóa thuốc thành công");
+        await refetch();
+      } catch (e) {
+        console.log("Delete error:", e?.response?.data);
+        const rawMsg =
+          e?.response?.data?.error ||
+          e?.response?.data?.message ||
+          e.message ||
+          "";
+        const errorMsg =
+          typeof rawMsg === "string" ? rawMsg : JSON.stringify(rawMsg);
+        toast.error("Không thể xóa thuốc", {
+          description: errorMsg.toLowerCase().includes("inventory")
+            ? "Thuốc đang có sản phẩm trong kho. Bạn chỉ có thể chỉnh sửa thông tin."
+            : errorMsg || "Thuốc đang được sử dụng trong hệ thống",
+        });
+      }
     }
   };
 
-  /* VARIANTS */
+  /* VARIANTS (giữ nguyên) */
   const { data: variants = [], refetch: refetchVariants } =
     useMedicationVariants(medId);
   const {
@@ -393,42 +417,84 @@ export default function MedicationListPage() {
     }
   };
 
-  const resetSearch = () => setSearch("");
+  // Handlers filter inline (giống UserListPage)
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setAppliedSearch(searchInput.trim());
+  };
+  const handleClearFilters = () => {
+    setSearchInput("");
+    setAppliedSearch("");
+    setStatusFilter("all");
+  };
 
   return (
     <AppLayout>
       <div className="space-y-6">
-        <Card>
-          <CardHeader className="flex items-center justify-between">
-            <CardTitle>Thuốc</CardTitle>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Tìm theo tên hoặc thương hiệu..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-64"
-              />
-              {search && (
-                <Button variant="outline" onClick={resetSearch}>
-                  <X className="w-4 h-4 mr-1" /> Xóa
-                </Button>
-              )}
-              <Button onClick={() => refetch()}>
-                <Search className="w-4 h-4 mr-1" /> Tìm kiếm
-              </Button>
-              <Button onClick={openAdd}>
-                <PlusCircle className="mr-2 h-4 w-4" /> Thêm
-              </Button>
-            </div>
-          </CardHeader>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Quản lý Thuốc</h1>
+        </div>
 
-          <CardContent>
+        <Card>
+          <CardHeader>
+            <CardTitle>Danh mục Thuốc</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* FILTER BAR */}
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <form
+                onSubmit={handleSearchSubmit}
+                className="flex flex-col sm:flex-row gap-2 sm:items-center"
+              >
+                <div className="flex items-center gap-2">
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-[180px] h-9">
+                      <SelectValue placeholder="Trạng thái" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                      <SelectItem value="active">Đang hoạt động</SelectItem>
+                      <SelectItem value="inactive">Ngừng hoạt động</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Input
+                    className="w-64"
+                    placeholder="Tìm theo tên hoặc thương hiệu…"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <Button type="submit">
+                    <Search className="w-4 h-4 mr-1" />
+                    Tìm kiếm
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleClearFilters}
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Xóa bộ lọc
+                  </Button>
+                </div>
+              </form>
+
+              <div className="flex gap-2">
+                <Button onClick={openAdd}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Thêm mới
+                </Button>
+              </div>
+            </div>
+
             {isLoading ? (
               <p>Đang tải...</p>
             ) : (
               <div className="space-y-3">
                 {medications.map((m) => {
-                  // Tạo src hiện tại để lightbox mở đúng ảnh đang hiển thị
                   const local = getMedicationImageLocal(m.id);
                   const src =
                     local ||
@@ -439,11 +505,10 @@ export default function MedicationListPage() {
                       className="flex items-center justify-between rounded-xl border bg-card p-4 shadow-sm"
                     >
                       <div className="flex items-center gap-4">
-                        <MedImage
-                          medicationId={m.id}
+                        <MedicationImage
+                          fileId={m.imageId}
                           alt={m.name}
-                          version={imageVersion[m.id] || 0}
-                          onClick={() => openLightbox(src, m.name)}
+                          size={56}
                         />
                         <div>
                           <div className="flex items-center gap-2">
@@ -460,39 +525,52 @@ export default function MedicationListPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => setViewMed(m)}
-                          title="Xem"
+                          onClick={() =>
+                            navigate(`/medications/${m.id}`, {
+                              state: { medication: m },
+                            })
+                          }
+                          title="View"
                         >
                           <Eye className="w-4 h-4 mr-1" />
                           Xem
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(m)}
-                          title="Sửa"
-                        >
-                          <Edit className="w-4 h-4 mr-1" />
-                          Sửa
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setManageMed(m)}
-                          title="Quản lý phiên bản"
-                        >
-                          <Package className="w-4 h-4 mr-1" />
-                          Phiên bản
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDelete(m.id)}
-                          title="Xóa"
-                        >
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Xóa
-                        </Button>
+
+                        {isOwner && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(m)}
+                              title="Chỉnh sửa"
+                            >
+                              <Edit className="w-4 h-4 mr-1" />
+                              Sửa
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                navigate(`/medications/${m.id}/variants`, {
+                                  state: { medication: m },
+                                })
+                              }
+                              title="Quản lý biến thể"
+                            >
+                              <Package className="w-4 h-4 mr-1" />
+                              Biến thể
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDelete(m.id)}
+                              title="Xóa"
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Xóa
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                   );
@@ -500,7 +578,7 @@ export default function MedicationListPage() {
 
                 {medications.length === 0 && (
                   <div className="rounded-xl border p-10 text-center text-sm text-muted-foreground">
-                    No medications found
+                    Không tìm thấy thuốc nào
                   </div>
                 )}
               </div>
@@ -508,25 +586,18 @@ export default function MedicationListPage() {
           </CardContent>
         </Card>
 
-        {/* View modal (truyền imageVersion để cache-bust) */}
-        <MedicationViewModal
-          open={!!viewMed}
-          onClose={() => setViewMed(null)}
-          medication={viewMed}
-          withVariants
-          imageVersion={viewMed?.id ? imageVersion[viewMed.id] || 0 : 0}
-        />
-
-        {/* Medication Form */}
+        {/* Medication Form (popup) */}
         <Dialog open={medFormOpen} onOpenChange={setMedFormOpen}>
-          <DialogContent className="max-w-2xl" aria-describedby="med-form-desc">
-            <p id="med-form-desc" className="sr-only">
-              Medication form dialog
-            </p>
+          <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>
-                {editing ? "Edit Medication" : "Add Medication"}
+                {editing ? "Chỉnh sửa Thuốc" : "Thêm Thuốc mới"}
               </DialogTitle>
+              <DialogDescription>
+                {editing
+                  ? "Cập nhật thông tin thuốc"
+                  : "Nhập thông tin thuốc mới"}
+              </DialogDescription>
             </DialogHeader>
 
             <form
@@ -582,7 +653,7 @@ export default function MedicationListPage() {
                     />
                     <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm">
                       <ImageIcon className="w-4 h-4" />
-                      Choose image…
+                      Chọn ảnh…
                     </span>
                   </label>
 
@@ -591,7 +662,7 @@ export default function MedicationListPage() {
                       checked={removeImage}
                       onCheckedChange={(c) => setRemoveImage(!!c)}
                     />
-                    <span>Remove image</span>
+                    <span>Xóa ảnh</span>
                   </label>
                 </div>
               </div>
@@ -601,12 +672,16 @@ export default function MedicationListPage() {
                 name="name"
                 control={control}
                 rules={{ required: true }}
-                render={({ field }) => <Input {...field} placeholder="Name" />}
+                render={({ field }) => (
+                  <Input {...field} placeholder="Tên thuốc" />
+                )}
               />
               <Controller
                 name="brand"
                 control={control}
-                render={({ field }) => <Input {...field} placeholder="Brand" />}
+                render={({ field }) => (
+                  <Input {...field} placeholder="Thương hiệu" />
+                )}
               />
               <Controller
                 name="description"
@@ -615,7 +690,7 @@ export default function MedicationListPage() {
                   <Input
                     {...field}
                     className="md:col-span-2"
-                    placeholder="Description"
+                    placeholder="Mô tả"
                   />
                 )}
               />
@@ -630,7 +705,7 @@ export default function MedicationListPage() {
                         checked={!!value}
                         onCheckedChange={(c) => onChange(!!c)}
                       />
-                      <span>Prescription required</span>
+                      <span>Cần đơn thuốc</span>
                     </>
                   )}
                 />
@@ -646,25 +721,28 @@ export default function MedicationListPage() {
                         checked={!!value}
                         onCheckedChange={(c) => onChange(!!c)}
                       />
-                      <span>Controlled substance</span>
+                      <span>Chất kiểm soát</span>
                     </>
                   )}
                 />
               </div>
 
-              <div>
+              <div className="md:col-span-2">
                 <Controller
                   name="status"
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    <select
-                      value={value}
-                      onChange={(e) => onChange(e.target.value)}
-                      className="h-9 w-40 rounded-md border border-input bg-background px-3 text-sm"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
+                    <Select value={value} onValueChange={onChange}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Trạng thái" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Đang hoạt động</SelectItem>
+                        <SelectItem value="inactive">
+                          Ngừng hoạt động
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   )}
                 />
               </div>
@@ -672,231 +750,25 @@ export default function MedicationListPage() {
               <DialogFooter className="md:col-span-2 flex gap-2 justify-end">
                 <DialogClose asChild>
                   <Button type="button" variant="outline">
-                    Cancel
+                    Hủy
                   </Button>
                 </DialogClose>
                 <Button type="submit">
-                  {editing ? "Save Changes" : "Add Medication"}
+                  {editing ? "Lưu thay đổi" : "Thêm thuốc"}
                 </Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
-
-        {/* Manage Variants */}
-        <Dialog
-          open={!!manageMed}
-          onOpenChange={(open) => !open && setManageMed(null)}
-        >
-          <DialogContent className="max-w-5xl" aria-describedby="variants-desc">
-            <p id="variants-desc" className="sr-only">
-              Medication variants dialog
-            </p>
-            <DialogHeader>
-              <DialogTitle>Manage Variants • {manageMed?.name}</DialogTitle>
-            </DialogHeader>
-
-            {manageMed && (
-              <div className="mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Brand:</span>{" "}
-                  {manageMed.brand || "-"}
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Status:</span>{" "}
-                  <span className="capitalize">
-                    {manageMed.status || "active"}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">
-                    Prescription required:
-                  </span>{" "}
-                  {manageMed.isPrescriptionRequired ? "Yes" : "No"}
-                </div>
-                <div>
-                  <span className="text-muted-foreground">
-                    Controlled substance:
-                  </span>{" "}
-                  {manageMed.isControlledSubstance ? "Yes" : "No"}
-                </div>
-                <div className="md:col-span-2 lg:col-span-4">
-                  <span className="text-muted-foreground">Description:</span>{" "}
-                  {manageMed.description || "-"}
-                </div>
-              </div>
-            )}
-
-            <div className="overflow-auto rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>SKU</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Unit</TableHead>
-                    <TableHead>Factor</TableHead>
-                    <TableHead>Barcode</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Active</TableHead>
-                    <TableHead>For Sale</TableHead>
-                    <TableHead className="text-right" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {variants.map((v) => (
-                    <TableRow key={v.id}>
-                      <TableCell>{v.sku}</TableCell>
-                      <TableCell>{v.name}</TableCell>
-                      <TableCell>{v.unit}</TableCell>
-                      <TableCell>{v.unitFactor}</TableCell>
-                      <TableCell>{v.barcode}</TableCell>
-                      <TableCell>{v.sellPrice}</TableCell>
-                      <TableCell>
-                        {v.isActive ? "Active" : "Inactive"}
-                      </TableCell>
-                      <TableCell>{v.isForSale ? "Yes" : "No"}</TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button size="sm" onClick={() => onEditVariant(v)}>
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDeleteVariant(v.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {variants.length === 0 && (
-                    <TableRow>
-                      <TableCell
-                        colSpan={9}
-                        className="text-center text-sm text-muted-foreground"
-                      >
-                        No variants
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-
-            <div className="border-t pt-4 mt-4">
-              <form
-                onSubmit={handleVarSubmit(saveVariant)}
-                className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3"
-              >
-                <Controller
-                  name="sku"
-                  control={controlVar}
-                  render={({ field }) => <Input {...field} placeholder="SKU" />}
-                />
-                <Controller
-                  name="name"
-                  control={controlVar}
-                  render={({ field }) => (
-                    <Input {...field} placeholder="Name" />
-                  )}
-                />
-                <Controller
-                  name="unit"
-                  control={controlVar}
-                  render={({ field }) => (
-                    <Input {...field} placeholder="Unit" />
-                  )}
-                />
-                <Controller
-                  name="unitFactor"
-                  control={controlVar}
-                  render={({ field }) => (
-                    <Input {...field} placeholder="Factor" />
-                  )}
-                />
-                <Controller
-                  name="barcode"
-                  control={controlVar}
-                  render={({ field }) => (
-                    <Input {...field} placeholder="Barcode" />
-                  )}
-                />
-                <Controller
-                  name="sellPrice"
-                  control={controlVar}
-                  render={({ field }) => (
-                    <Input {...field} placeholder="Sell Price" type="number" />
-                  )}
-                />
-
-                <div className="flex items-center gap-2">
-                  <Controller
-                    name="isActive"
-                    control={controlVar}
-                    render={({ field: { value, onChange } }) => (
-                      <>
-                        <Checkbox
-                          checked={!!value}
-                          onCheckedChange={(c) => onChange(!!c)}
-                        />
-                        <span>Active</span>
-                      </>
-                    )}
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Controller
-                    name="isForSale"
-                    control={controlVar}
-                    render={({ field: { value, onChange } }) => (
-                      <>
-                        <Checkbox
-                          checked={!!value}
-                          onCheckedChange={(c) => onChange(!!c)}
-                        />
-                        <span>For Sale</span>
-                      </>
-                    )}
-                  />
-                </div>
-
-                <div className="md:col-span-3 lg:col-span-4 flex justify-end gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() =>
-                      resetVar({
-                        sku: "",
-                        name: "",
-                        unit: "",
-                        unitFactor: "1.00",
-                        barcode: "",
-                        sellPrice: "",
-                        isActive: true,
-                        isForSale: true,
-                      })
-                    }
-                  >
-                    Reset
-                  </Button>
-                  <Button type="submit">
-                    {editingVar ? "Save Variant" : "Add Variant"}
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
 
-      {/* 🔎 Lightbox – chỉ hiện ảnh */}
+      {/* Lightbox – chỉ hiện ảnh */}
       <Dialog open={lightbox.open} onOpenChange={(o) => !o && closeLightbox()}>
-        <DialogContent className="max-w-3xl" aria-describedby="lightbox-desc">
-          <p id="lightbox-desc" className="sr-only">
+        <DialogContent className="max-w-3xl">
+          <DialogDescription className="sr-only">
             Medication image preview
-          </p>
+          </DialogDescription>
           <div className="flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={lightbox.src}
               alt={lightbox.alt || "Medication image"}
@@ -905,7 +777,7 @@ export default function MedicationListPage() {
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Close</Button>
+              <Button variant="outline">Đóng</Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>

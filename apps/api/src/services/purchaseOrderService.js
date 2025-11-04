@@ -40,25 +40,40 @@ export const purchaseOrderService = {
 
         // ✅ Parse expected_date an toàn
         const parseExpectedDate = (val) => {
+          console.log("🔍 Parsing expected_date:", val, "Type:", typeof val);
           if (val === undefined || val === null) {
+            console.log("❌ Expected date is null/undefined");
             return null;
           }
           if (typeof val === "string") {
             const s = val.trim();
             if (s === "") {
+              console.log("❌ Expected date is empty string");
               return null;
             }
             const d = new Date(s);
-            return isNaN(d.getTime()) ? null : d;
+            if (isNaN(d.getTime())) {
+              console.log("❌ Expected date is invalid:", s);
+              return null;
+            }
+            console.log("✅ Parsed expected date:", d);
+            return d;
           }
           if (val instanceof Date) {
-            return isNaN(val.getTime()) ? null : val;
+            if (isNaN(val.getTime())) {
+              console.log("❌ Expected date (Date object) is invalid");
+              return null;
+            }
+            console.log("✅ Expected date (Date object):", val);
+            return val;
           }
           // other types - ignore
+          console.log("❌ Expected date has unsupported type");
           return null;
         };
 
         const parsedExpectedDate = parseExpectedDate(expected_date);
+        console.log("📅 Final parsed expected date:", parsedExpectedDate);
 
         // ✅ Tạo purchase order
         const [po] = await tx
@@ -72,6 +87,8 @@ export const purchaseOrderService = {
             createdBy: userId,
           })
           .returning();
+
+        console.log("📦 Created PO with expectedDate:", po.expectedDate);
 
         // ✅ Tạo items
         const createdItems = await tx
@@ -292,9 +309,9 @@ export const purchaseOrderService = {
           totalAmount: purchaseOrders.totalAmount,
           supplierName: suppliers.name,
           supplierEmail: suppliers.email,
-          supplierContact: suppliers.contactPerson,
+          supplierContact: suppliers.contactName,
           buyerEmail: users.email,
-          buyerName: users.fullName,
+          buyerName: users.name,
         })
         .from(purchaseOrders)
         .leftJoin(suppliers, eq(purchaseOrders.supplierId, suppliers.id))

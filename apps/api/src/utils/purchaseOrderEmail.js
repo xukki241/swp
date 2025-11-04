@@ -1,3 +1,5 @@
+import crypto from "node:crypto";
+
 import nodemailer from "nodemailer";
 
 import config from "../config/environment.js";
@@ -48,7 +50,6 @@ const createTransporter = () => {
  * @returns {string} Confirmation token
  */
 export const generateConfirmationToken = (purchaseOrderId) => {
-  const crypto = require("node:crypto");
   const secret = config.jwtSecret || "default-secret-key";
   const timestamp = Date.now();
   const data = `${purchaseOrderId}:${timestamp}`;
@@ -64,7 +65,6 @@ export const generateConfirmationToken = (purchaseOrderId) => {
  */
 export const verifyConfirmationToken = (token, purchaseOrderId) => {
   try {
-    const crypto = require("node:crypto");
     const [receivedToken, timestamp] = token.split(".");
 
     // Check if token expired (valid for 7 days)
@@ -106,6 +106,17 @@ export const sendPurchaseOrderEmail = async (purchaseOrderData) => {
       orderNumber,
       orderDate,
     } = purchaseOrderData;
+
+    // Validate required fields
+    if (!supplierEmail) {
+      throw new Error("Supplier email is required");
+    }
+    if (!supplierName) {
+      throw new Error("Supplier name is required");
+    }
+    if (!items || items.length === 0) {
+      throw new Error("Order items are required");
+    }
 
     // Generate confirmation token and link
     const confirmationToken = generateConfirmationToken(purchaseOrderId);
