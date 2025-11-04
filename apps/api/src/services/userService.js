@@ -54,10 +54,6 @@ export const getAllUsers = async ({ search, role, status } = {}) => {
  * @returns {Promise<Object|null>} User object or null
  */
 export const getUserById = async (id) => {
-  if (!id || typeof id !== "string") {
-    throw new Error("Invalid user ID");
-  }
-
   try {
     const result = await db
       .select()
@@ -83,18 +79,6 @@ export const getUserById = async (id) => {
  * @returns {Promise<Object>} Created user
  */
 export const createUser = async (userData) => {
-  if (!userData || typeof userData !== "object") {
-    throw new Error("Invalid user data");
-  }
-
-  if (!userData.name || typeof userData.name !== "string") {
-    throw new Error("Invalid user name");
-  }
-
-  if (!userData.email || typeof userData.email !== "string") {
-    throw new Error("Invalid user email");
-  }
-
   try {
     const result = await db.insert(users).values(userData).returning();
     return result[0];
@@ -114,18 +98,6 @@ export const createUser = async (userData) => {
  * @returns {Promise<Object|null>} Updated user or null
  */
 export const updateUser = async (id, userData) => {
-  if (!id || typeof id !== "string") {
-    throw new Error("Invalid user ID");
-  }
-
-  if (
-    !userData ||
-    typeof userData !== "object" ||
-    Object.keys(userData).length === 0
-  ) {
-    throw new Error("Invalid user data");
-  }
-
   try {
     const result = await db
       .update(users)
@@ -149,10 +121,6 @@ export const updateUser = async (id, userData) => {
  * @returns {Promise<Object|null>} Deleted user or null
  */
 export const deleteUser = async (id) => {
-  if (!id || typeof id !== "string") {
-    throw new Error("Invalid user ID");
-  }
-
   try {
     const result = await db.delete(users).where(eq(users.id, id)).returning();
 
@@ -168,10 +136,6 @@ export const deleteUser = async (id) => {
  * @returns {Promise<Object|null>} User object or null
  */
 export const getUserByEmail = async (email) => {
-  if (!email || typeof email !== "string") {
-    throw new Error("Invalid email");
-  }
-
   try {
     const result = await db
       .select()
@@ -191,10 +155,6 @@ export const getUserByEmail = async (email) => {
  * @returns {Promise<Object|null>} User object or null
  */
 export const getUserByPhone = async (phone) => {
-  if (!phone || typeof phone !== "string") {
-    throw new Error("Invalid phone number");
-  }
-
   try {
     const result = await db
       .select()
@@ -259,10 +219,6 @@ export const getAllStaff = async ({ search, role, status } = {}) => {
  * @returns {Promise<Object|null>} Updated user or null
  */
 export const activateUser = async (id) => {
-  if (!id || typeof id !== "string") {
-    throw new Error("Invalid user ID");
-  }
-
   try {
     const result = await db
       .update(users)
@@ -282,10 +238,6 @@ export const activateUser = async (id) => {
  * @returns {Promise<Object|null>} Updated user or null
  */
 export const deactivateUser = async (id) => {
-  if (!id || typeof id !== "string") {
-    throw new Error("Invalid user ID");
-  }
-
   try {
     const result = await db
       .update(users)
@@ -305,10 +257,6 @@ export const deactivateUser = async (id) => {
  * @returns {Promise<Object|null>} Updated user or null
  */
 export const suspendUser = async (id) => {
-  if (!id || typeof id !== "string") {
-    throw new Error("Invalid user ID");
-  }
-
   try {
     const result = await db
       .update(users)

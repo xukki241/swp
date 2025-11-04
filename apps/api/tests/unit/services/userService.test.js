@@ -223,30 +223,6 @@ describe("UserService", () => {
         "Failed to fetch user"
       );
     });
-
-    it("should throw error for null id", async () => {
-      await expect(userService.getUserById(null)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for undefined id", async () => {
-      await expect(userService.getUserById(undefined)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for number id", async () => {
-      await expect(userService.getUserById(123)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for empty string id", async () => {
-      await expect(userService.getUserById("")).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
   });
 
   describe("createUser", () => {
@@ -311,70 +287,6 @@ describe("UserService", () => {
 
       await expect(userService.createUser(userData)).rejects.toThrow(
         "Failed to create user"
-      );
-    });
-
-    it("should throw error for null userData", async () => {
-      await expect(userService.createUser(null)).rejects.toThrow(
-        "Invalid user data"
-      );
-    });
-
-    it("should throw error for undefined userData", async () => {
-      await expect(userService.createUser(undefined)).rejects.toThrow(
-        "Invalid user data"
-      );
-    });
-
-    it("should throw error for non-object userData", async () => {
-      await expect(userService.createUser("not an object")).rejects.toThrow(
-        "Invalid user data"
-      );
-    });
-
-    it("should throw error for missing name", async () => {
-      const userData = {
-        email: "john@example.com",
-        phone: "1234567890",
-      };
-
-      await expect(userService.createUser(userData)).rejects.toThrow(
-        "Invalid user name"
-      );
-    });
-
-    it("should throw error for non-string name", async () => {
-      const userData = {
-        name: 123,
-        email: "john@example.com",
-        phone: "1234567890",
-      };
-
-      await expect(userService.createUser(userData)).rejects.toThrow(
-        "Invalid user name"
-      );
-    });
-
-    it("should throw error for missing email", async () => {
-      const userData = {
-        name: "John Doe",
-        phone: "1234567890",
-      };
-
-      await expect(userService.createUser(userData)).rejects.toThrow(
-        "Invalid user email"
-      );
-    });
-
-    it("should throw error for non-string email", async () => {
-      const userData = {
-        name: "John Doe",
-        email: 123,
-        phone: "1234567890",
-      };
-
-      await expect(userService.createUser(userData)).rejects.toThrow(
-        "Invalid user email"
       );
     });
   });
@@ -444,54 +356,6 @@ describe("UserService", () => {
         "Failed to update user"
       );
     });
-
-    it("should throw error for null id", async () => {
-      await expect(
-        userService.updateUser(null, { name: "Test" })
-      ).rejects.toThrow("Invalid user ID");
-    });
-
-    it("should throw error for undefined id", async () => {
-      await expect(
-        userService.updateUser(undefined, { name: "Test" })
-      ).rejects.toThrow("Invalid user ID");
-    });
-
-    it("should throw error for number id", async () => {
-      await expect(
-        userService.updateUser(123, { name: "Test" })
-      ).rejects.toThrow("Invalid user ID");
-    });
-
-    it("should throw error for empty string id", async () => {
-      await expect(
-        userService.updateUser("", { name: "Test" })
-      ).rejects.toThrow("Invalid user ID");
-    });
-
-    it("should throw error for null userData", async () => {
-      await expect(userService.updateUser("valid-id", null)).rejects.toThrow(
-        "Invalid user data"
-      );
-    });
-
-    it("should throw error for undefined userData", async () => {
-      await expect(
-        userService.updateUser("valid-id", undefined)
-      ).rejects.toThrow("Invalid user data");
-    });
-
-    it("should throw error for non-object userData", async () => {
-      await expect(
-        userService.updateUser("valid-id", "not an object")
-      ).rejects.toThrow("Invalid user data");
-    });
-
-    it("should throw error for empty object userData", async () => {
-      await expect(userService.updateUser("valid-id", {})).rejects.toThrow(
-        "Invalid user data"
-      );
-    });
   });
 
   describe("deleteUser", () => {
@@ -530,30 +394,6 @@ describe("UserService", () => {
 
       await expect(userService.deleteUser("uuid-1")).rejects.toThrow(
         "Failed to delete user"
-      );
-    });
-
-    it("should throw error for null id", async () => {
-      await expect(userService.deleteUser(null)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for undefined id", async () => {
-      await expect(userService.deleteUser(undefined)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for number id", async () => {
-      await expect(userService.deleteUser(123)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for empty string id", async () => {
-      await expect(userService.deleteUser("")).rejects.toThrow(
-        "Invalid user ID"
       );
     });
   });
@@ -599,30 +439,6 @@ describe("UserService", () => {
         userService.getUserByEmail("john@example.com")
       ).rejects.toThrow("Failed to fetch user by email");
     });
-
-    it("should throw error for null email", async () => {
-      await expect(userService.getUserByEmail(null)).rejects.toThrow(
-        "Invalid email"
-      );
-    });
-
-    it("should throw error for undefined email", async () => {
-      await expect(userService.getUserByEmail(undefined)).rejects.toThrow(
-        "Invalid email"
-      );
-    });
-
-    it("should throw error for number email", async () => {
-      await expect(userService.getUserByEmail(123)).rejects.toThrow(
-        "Invalid email"
-      );
-    });
-
-    it("should throw error for empty string email", async () => {
-      await expect(userService.getUserByEmail("")).rejects.toThrow(
-        "Invalid email"
-      );
-    });
   });
 
   describe("getUserByPhone", () => {
@@ -664,30 +480,6 @@ describe("UserService", () => {
 
       await expect(userService.getUserByPhone("1234567890")).rejects.toThrow(
         "Failed to fetch user by phone"
-      );
-    });
-
-    it("should throw error for null phone", async () => {
-      await expect(userService.getUserByPhone(null)).rejects.toThrow(
-        "Invalid phone number"
-      );
-    });
-
-    it("should throw error for undefined phone", async () => {
-      await expect(userService.getUserByPhone(undefined)).rejects.toThrow(
-        "Invalid phone number"
-      );
-    });
-
-    it("should throw error for number phone", async () => {
-      await expect(userService.getUserByPhone(123)).rejects.toThrow(
-        "Invalid phone number"
-      );
-    });
-
-    it("should throw error for empty string phone", async () => {
-      await expect(userService.getUserByPhone("")).rejects.toThrow(
-        "Invalid phone number"
       );
     });
   });
@@ -737,30 +529,6 @@ describe("UserService", () => {
         "Failed to activate user"
       );
     });
-
-    it("should throw error for null id", async () => {
-      await expect(userService.activateUser(null)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for undefined id", async () => {
-      await expect(userService.activateUser(undefined)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for number id", async () => {
-      await expect(userService.activateUser(123)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for empty string id", async () => {
-      await expect(userService.activateUser("")).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
   });
 
   describe("deactivateUser", () => {
@@ -808,30 +576,6 @@ describe("UserService", () => {
         "Failed to deactivate user"
       );
     });
-
-    it("should throw error for null id", async () => {
-      await expect(userService.deactivateUser(null)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for undefined id", async () => {
-      await expect(userService.deactivateUser(undefined)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for number id", async () => {
-      await expect(userService.deactivateUser(123)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for empty string id", async () => {
-      await expect(userService.deactivateUser("")).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
   });
 
   describe("suspendUser", () => {
@@ -877,30 +621,6 @@ describe("UserService", () => {
 
       await expect(userService.suspendUser("uuid-1")).rejects.toThrow(
         "Failed to suspend user"
-      );
-    });
-
-    it("should throw error for null id", async () => {
-      await expect(userService.suspendUser(null)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for undefined id", async () => {
-      await expect(userService.suspendUser(undefined)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for number id", async () => {
-      await expect(userService.suspendUser(123)).rejects.toThrow(
-        "Invalid user ID"
-      );
-    });
-
-    it("should throw error for empty string id", async () => {
-      await expect(userService.suspendUser("")).rejects.toThrow(
-        "Invalid user ID"
       );
     });
   });
