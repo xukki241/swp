@@ -156,6 +156,16 @@ export default function MedicationListPage() {
   );
   const { data: meds, isLoading, refetch } = useMedications(filters);
   const medications = Array.isArray(meds) ? meds : meds?.data || [];
+  
+  // Debug: Check for duplicate IDs
+  useEffect(() => {
+    const ids = medications.map(m => m.id);
+    const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
+    if (duplicates.length > 0) {
+      console.warn('⚠️ Duplicate medication IDs found:', duplicates);
+      console.log('All medications:', medications.map(m => ({ id: m.id, name: m.name })));
+    }
+  }, [medications]);
 
   const createMed = useCreateMedication();
   const updateMed = useUpdateMedication();
@@ -230,6 +240,7 @@ export default function MedicationListPage() {
   }
 
   const onSubmitMed = async (data) => {
+    console.log(`💾 Starting ${editing ? 'update' : 'create'} medication:`, { editing: !!editing, removeImage, data });
     try {
       let savedId = editing?.id;
 
@@ -242,8 +253,10 @@ export default function MedicationListPage() {
 
       if (savedId) {
         if (removeImage) {
+          console.log(`🗑️ Removing image for medication: ${savedId}`);
           clearMedicationImage(savedId);
-          await instance.delete(`/medications/${savedId}/image`);
+          const deleteResponse = await instance.delete(`/medications/${savedId}/image`);
+          console.log(`✅ Image deleted successfully:`, deleteResponse.data);
         } else if (imageFile) {
           const formData = new FormData();
           formData.append("image", imageFile);
@@ -265,7 +278,9 @@ export default function MedicationListPage() {
 
       // Đợi một chút để backend xử lý xong
       await new Promise((resolve) => setTimeout(resolve, 500));
-      await refetch();
+      console.log(`🔄 Refetching medications after ${editing ? 'update' : 'create'}...`);
+      const refetchResult = await refetch();
+      console.log(`✅ Refetch completed:`, refetchResult?.data?.length || 0, 'medications found');
     } catch (e) {
       toast.error("Failed to save medication", {
         description: e?.response?.data?.message || e.message,
@@ -509,6 +524,7 @@ export default function MedicationListPage() {
                           fileId={m.imageId}
                           alt={m.name}
                           size={56}
+                          onClick={openLightbox}
                         />
                         <div>
                           <div className="flex items-center gap-2">
@@ -657,13 +673,21 @@ export default function MedicationListPage() {
                     </span>
                   </label>
 
-                  <label className="inline-flex items-center gap-2 text-sm">
-                    <Checkbox
-                      checked={removeImage}
-                      onCheckedChange={(c) => setRemoveImage(!!c)}
-                    />
-                    <span>Xóa ảnh</span>
-                  </label>
+                  {(editing?.imageId || imagePreview) && (
+                    <label className="inline-flex items-center gap-2 text-sm">
+                      <Checkbox
+                        checked={removeImage}
+                        onCheckedChange={(c) => {
+                          setRemoveImage(!!c);
+                          if (c) {
+                            setImageFile(null);
+                            setImagePreview(null);
+                          }
+                        }}
+                      />
+                      <span>Xóa ảnh</span>
+                    </label>
+                  )}
                 </div>
               </div>
 
@@ -762,26 +786,34 @@ export default function MedicationListPage() {
         </Dialog>
       </div>
 
-      {/* Lightbox – chỉ hiện ảnh */}
-      <Dialog open={lightbox.open} onOpenChange={(o) => !o && closeLightbox()}>
-        <DialogContent className="max-w-3xl">
-          <DialogDescription className="sr-only">
-            Medication image preview
-          </DialogDescription>
-          <div className="flex items-center justify-center">
+      {/* Image Lightbox Popup */}
+      {lightbox.open && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+          onClick={closeLightbox}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] p-4">
+            {/* Close button at top right */}
+            <button
+              onClick={closeLightbox}
+              className="absolute -top-2 -right-2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 z-10"
+              aria-label="Close image"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            {/* Image */}
             <img
               src={lightbox.src}
               alt={lightbox.alt || "Medication image"}
-              className="max-h-[80vh] w-auto rounded-md object-contain"
+              className="max-h-[85vh] w-auto rounded-lg object-contain shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
             />
           </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Đóng</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
     </AppLayout>
   );
 }
