@@ -216,17 +216,17 @@ describe("AuthController", () => {
     });
 
     it("should handle errors gracefully", async () => {
-      // Mock res.status to throw error
-      const mockStatus = vi.fn().mockImplementation(() => {
+      // Mock res.json to throw error instead of res.status
+      const mockJson = vi.fn().mockImplementation(() => {
         throw new Error("Something went wrong");
       });
-      res.status = mockStatus;
+      res.json = mockJson;
 
       await authController.logout(req, res, next);
 
-      // Should attempt to call status
-      expect(mockStatus).toHaveBeenCalledWith(200);
+      // Should log error and still try to return success
       expect(logger.error).toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(200);
     });
   });
 
