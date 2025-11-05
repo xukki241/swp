@@ -57,13 +57,6 @@
       "when": 1761927925132,
       "tag": "0007_petite_romulus",
       "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1762011617232,
-      "tag": "0008_strange_warhawk",
-      "breakpoints": true
     }
   ]
 }

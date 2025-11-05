@@ -153,12 +153,6 @@ describe("AuthController", () => {
         email: "test@example.com",
         password: "password123",
       };
-      req.headers = {
-        "user-agent": "Mozilla/5.0",
-      };
-      req.connection = {
-        remoteAddress: "127.0.0.1",
-      };
 
       const mockResult = {
         success: true,
@@ -172,11 +166,7 @@ describe("AuthController", () => {
 
       expect(authService.login).toHaveBeenCalledWith(
         "test@example.com",
-        "password123",
-        {
-          deviceInfo: "Mozilla/5.0",
-          ipAddress: "127.0.0.1",
-        }
+        "password123"
       );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(mockResult);
@@ -199,12 +189,6 @@ describe("AuthController", () => {
         email: "test@example.com",
         password: "wrongpassword",
       };
-      req.headers = {
-        "user-agent": "Mozilla/5.0",
-      };
-      req.connection = {
-        remoteAddress: "127.0.0.1",
-      };
 
       const error = new Error("Invalid credentials");
       authService.login.mockRejectedValue(error);
@@ -222,34 +206,23 @@ describe("AuthController", () => {
 
   describe("logout", () => {
     it("should logout user successfully", async () => {
-      req.body = { refreshToken: "some-refresh-token" };
-      vi.spyOn(authService, "revokeRefreshToken").mockResolvedValue({
-        success: true,
-      });
-
       await authController.logout(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
-        message: "Logout successful. Please remove tokens from client.",
+        message: "Logout successful. Please remove token from client.",
       });
     });
 
     it("should handle errors", async () => {
-      req.body = { refreshToken: "some-refresh-token" };
-      vi.spyOn(authService, "revokeRefreshToken").mockRejectedValue(
-        new Error("Revoke failed")
-      );
+      res.status.mockImplementation(() => {
+        throw new Error("Something went wrong");
+      });
 
       await authController.logout(req, res, next);
 
       expect(logger.error).toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
-        success: true,
-        message: "Logout successful. Please remove tokens from client.",
-      });
     });
   });
 

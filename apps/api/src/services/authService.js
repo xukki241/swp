@@ -1,6 +1,4 @@
 import bcrypt from "bcryptjs";
-
-import crypto from "crypto";
 import { and, count, eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 
@@ -8,7 +6,6 @@ import config from "../config/environment.js";
 import { db } from "../db/index.js";
 import {
   passwordResetTokens,
-  refreshTokens,
   userCredentials,
   userRegistrations,
   users,
@@ -168,10 +165,9 @@ export const register = async ({ name, email, phone, address, password }) => {
  * Login user (User Story 3)
  * @param {string} email - User email
  * @param {string} password - User password
- * @param {Object} options - Additional options (deviceInfo, ipAddress)
  * @returns {Promise<Object>} Login result with token
  */
-export const login = async (email, password, options = {}) => {
+export const login = async (email, password) => {
   try {
     // Find user by email
     const [user] = await db
@@ -209,61 +205,21 @@ export const login = async (email, password, options = {}) => {
       throw new Error("Invalid email or password");
     }
 
-    // Generate JWT tokens
-    // Access token: short-lived (15 minutes)
-    const accessToken = jwt.sign(
+    // Generate JWT token with 1 day expiry
+    const token = jwt.sign(
       {
         userId: user.id.toString(),
         email: user.email,
         role: user.role,
-        type: "access",
       },
       config.jwtSecret || "your-secret-key",
-      { expiresIn: "15m" }
+      { expiresIn: "1d" }
     );
-
-    // Refresh token: long-lived (7 days)
-    // Generate a random token string
-    const refreshTokenString = crypto.randomBytes(40).toString("hex");
-
-    // Create JWT with the random token
-    const refreshToken = jwt.sign(
-      {
-        userId: user.id.toString(),
-        email: user.email,
-        token: refreshTokenString,
-        type: "refresh",
-      },
-      config.jwtSecret || "your-secret-key",
-      { expiresIn: "7d" }
-    );
-
-    // Hash the refresh token before storing in DB
-    const tokenHash = crypto
-      .createHash("sha256")
-      .update(refreshTokenString)
-      .digest("hex");
-
-    // Calculate expiration date (7 days from now)
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
-
-    // Save refresh token to database
-    await db.insert(refreshTokens).values({
-      userId: user.id,
-      tokenHash,
-      expiresAt,
-      deviceInfo: options.deviceInfo || null,
-      ipAddress: options.ipAddress || null,
-      isRevoked: false,
-    });
 
     return {
       success: true,
       message: "Login successful",
-      token: accessToken, // Keep as 'token' for backward compatibility
-      accessToken,
-      refreshToken,
+      token,
       user: {
         id: user.id.toString(),
         name: user.name,
@@ -385,177 +341,6 @@ export const verifyToken = async (token) => {
     return decoded;
   } catch {
     throw new Error("Invalid or expired token");
-  }
-};
-
-/**
- * Refresh access token using refresh token
- * @param {string} refreshToken - Refresh token (JWT)
- * @returns {Promise<Object>} New access token
- */
-export const refreshAccessToken = async (refreshToken) => {
-  try {
-    // Verify refresh token JWT
-    const decoded = jwt.verify(
-      refreshToken,
-      config.jwtSecret || "your-secret-key"
-    );
-
-    // Check if token type is refresh
-    if (decoded.type !== "refresh") {
-      throw new Error("Invalid token type");
-    }
-
-    // Hash the token string to compare with DB
-    const tokenHash = crypto
-      .createHash("sha256")
-      .update(decoded.token)
-      .digest("hex");
-
-    // Check if refresh token exists in database and is valid
-    const [storedToken] = await db
-      .select()
-      .from(refreshTokens)
-      .where(
-        and(
-          eq(refreshTokens.userId, parseInt(decoded.userId)),
-          eq(refreshTokens.tokenHash, tokenHash)
-        )
-      )
-      .limit(1);
-
-    if (!storedToken) {
-      throw new Error("Invalid refresh token");
-    }
-
-    // Check if token is revoked
-    if (storedToken.isRevoked) {
-      throw new Error("Refresh token has been revoked");
-    }
-
-    // Check if token is expired
-    if (new Date() > new Date(storedToken.expiresAt)) {
-      throw new Error("Refresh token has expired");
-    }
-
-    // Get user to verify they still exist and are active
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, parseInt(decoded.userId)))
-      .limit(1);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    if (user.status !== "active") {
-      throw new Error("Account is not active");
-    }
-
-    // Update lastUsedAt timestamp
-    await db
-      .update(refreshTokens)
-      .set({ lastUsedAt: new Date() })
-      .where(eq(refreshTokens.id, storedToken.id));
-
-    // Generate new access token
-    const accessToken = jwt.sign(
-      {
-        userId: user.id.toString(),
-        email: user.email,
-        role: user.role,
-        type: "access",
-      },
-      config.jwtSecret || "your-secret-key",
-      { expiresIn: "15m" }
-    );
-
-    return {
-      success: true,
-      message: "Token refreshed successfully",
-      token: accessToken,
-      accessToken,
-      user: {
-        id: user.id.toString(),
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        status: user.status,
-      },
-    };
-  } catch (error) {
-    throw new Error(`Token refresh failed: ${error.message}`);
-  }
-};
-
-/**
- * Revoke refresh token (logout)
- * @param {string} refreshToken - Refresh token to revoke
- * @returns {Promise<Object>} Revoke result
- */
-export const revokeRefreshToken = async (refreshToken) => {
-  try {
-    // Verify and decode the refresh token
-    const decoded = jwt.verify(
-      refreshToken,
-      config.jwtSecret || "your-secret-key"
-    );
-
-    if (decoded.type !== "refresh") {
-      throw new Error("Invalid token type");
-    }
-
-    // Hash the token to find it in DB
-    const tokenHash = crypto
-      .createHash("sha256")
-      .update(decoded.token)
-      .digest("hex");
-
-    // Mark token as revoked
-    await db
-      .update(refreshTokens)
-      .set({ isRevoked: true })
-      .where(
-        and(
-          eq(refreshTokens.userId, parseInt(decoded.userId)),
-          eq(refreshTokens.tokenHash, tokenHash)
-        )
-      );
-
-    return {
-      success: true,
-      message: "Refresh token revoked successfully",
-    };
-  } catch (error) {
-    // Even if revoke fails, we can still proceed with logout on client side
-    console.error("Error revoking refresh token:", error);
-    return {
-      success: true,
-      message: "Logout successful",
-    };
-  }
-};
-
-/**
- * Revoke all refresh tokens for a user (logout from all devices)
- * @param {number} userId - User ID
- * @returns {Promise<Object>} Revoke result
- */
-export const revokeAllRefreshTokens = async (userId) => {
-  try {
-    await db
-      .update(refreshTokens)
-      .set({ isRevoked: true })
-      .where(eq(refreshTokens.userId, userId));
-
-    return {
-      success: true,
-      message: "All refresh tokens revoked successfully",
-    };
-  } catch (error) {
-    throw new Error(`Failed to revoke all tokens: ${error.message}`);
   }
 };
 
