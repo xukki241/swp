@@ -6,7 +6,8 @@ import logger from "../utils/logger.js";
 
 export const fileController = {
   /**
-   * Upload a file
+   /**
+oad a file
    * POST /api/files
    */
   upload: asyncHandler(async (req, res) => {

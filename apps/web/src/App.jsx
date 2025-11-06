@@ -27,6 +27,7 @@ import StockOverviewPage from "@/pages/inventory/StockOverviewPage";
 import WarehousePage from "@/pages/inventory/WarehousePage";
 import MedicationDetailPage from "@/pages/medications/MedicationDetailPage";
 import MedicationFormPage from "@/pages/medications/MedicationFormPage";
+import MedicationVariantsPage from "@/pages/medications/MedicationVariantsPage";
 import MedicationListPage from "./pages/medications/MedicationListPage";
 import SalesOrderDetailPage from "./pages/sales/SalesOrderDetailPage";
 import SalesOrderListPage from "./pages/sales/SalesOrderListPage";
@@ -309,6 +310,15 @@ function App() {
           element={
             <ProtectedRoute>
               <MedicationDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        {/* Bổ Sung Trang variants*/}
+        <Route
+          path="/medications/:id/variants"
+          element={
+            <ProtectedRoute>
+              <MedicationVariantsPage />
             </ProtectedRoute>
           }
         />
