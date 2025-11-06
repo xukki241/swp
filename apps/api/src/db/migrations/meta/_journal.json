@@ -64,6 +64,13 @@
       "when": 1762011617232,
       "tag": "0008_strange_warhawk",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1762400170710,
+      "tag": "0009_graceful_carlie_cooper",
+      "breakpoints": true
     }
   ]
 }

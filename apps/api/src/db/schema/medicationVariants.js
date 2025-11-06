@@ -14,7 +14,10 @@ export const medicationVariants = pgTable(
   "medication_variants",
   {
     id: identityPrimaryKey(),
-    medicationId: foreignKey("medication_id", medications.id).notNull(),
+    medicationId: foreignKey("medication_id", medications.id, {
+      onDelete: "restrict",
+      onUpdate: "cascade",
+    }).notNull(),
     sku: varchar("sku", { length: 50 }).notNull(),
     name: name(),
     unit: varchar("unit", { length: 50 }).notNull(),
