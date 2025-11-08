@@ -10,11 +10,19 @@ export const purchaseOrderReceiptItems = pgTable(
     id: identityPrimaryKey(),
     purchaseOrderReceiptId: foreignKey(
       "purchase_order_receipt_id",
-      purchaseOrderReceipts.id
+      purchaseOrderReceipts.id,
+      {
+        onDelete: "restrict",
+        onUpdate: "cascade",
+      }
     ).notNull(),
     purchaseOrderItemId: foreignKey(
       "purchase_order_item_id",
-      purchaseOrderItems.id
+      purchaseOrderItems.id,
+      {
+        onDelete: "restrict",
+        onUpdate: "cascade",
+      }
     ).notNull(),
     quantity: int("quantity").notNull(),
   }

@@ -127,7 +127,7 @@ export default function PurchaseOrderReceiptListPage() {
             </p>
           </div>
           <Button
-            onClick={() => navigate("/purchase-orders")}
+            onClick={() => navigate("/procurement/purchase-orders")}
             variant="outline"
             className="flex items-center gap-2"
           >

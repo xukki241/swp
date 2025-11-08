@@ -48,7 +48,6 @@ export default function SalesOrderListPage() {
     setUpdatingOrderId(orderId);
     try {
       await salesService.updateSalesOrder(orderId, { status: "paid" });
-      toast.success("Đã đánh dấu đơn hàng là ĐÃ THANH TOÁN");
       fetchOrders();
     } catch (error) {
       console.error("Error updating order:", error);
@@ -68,7 +67,6 @@ export default function SalesOrderListPage() {
     setUpdatingOrderId(orderId);
     try {
       await salesService.updateSalesOrder(orderId, { status: "cancelled" });
-      toast.success("Đơn hàng đã được hủy");
       fetchOrders();
     } catch (error) {
       console.error("Error cancelling order:", error);

@@ -47,7 +47,7 @@ export const foreignKey = (columnName, references, actions) =>
   uuid(columnName).references(
     () => references,
     actions ?? {
-      onDelete: "cascade",
+      onDelete: "restrict",
       onUpdate: "cascade",
     }
   );

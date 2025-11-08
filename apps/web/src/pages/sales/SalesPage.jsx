@@ -165,7 +165,6 @@ export default function SalesPageV3() {
         );
       }
       setDeleteConfirmId(null);
-      toast.success("Đã xóa đơn hàng");
     },
     [orders, activeOrderId]
   );
@@ -181,7 +180,6 @@ export default function SalesPageV3() {
       };
       setOrders((prev) => [...prev, newOrder]);
       setActiveOrderId(newOrder.id);
-      toast.success("Đã nhân bản đơn hàng");
     },
     [orders]
   );
@@ -208,14 +206,31 @@ export default function SalesPageV3() {
   // Add to cart
   const handleAddToCart = useCallback(
     (medication) => {
-      if (!medication.id || !medication.sellPrice) {
-        toast.error("Thông tin sản phẩm không hợp lệ");
+      console.info("handleAddToCart called with:", medication);
+      console.info(
+        "Validation check - id:",
+        medication.id,
+        "sellPrice:",
+        medication.sellPrice
+      );
+      console.info("Available quantity:", medication.availableQuantity);
+
+      if (!medication.id) {
+        console.error("Missing medication.id");
+        return;
+      }
+
+      if (!medication.sellPrice) {
+        console.error("Missing medication.sellPrice");
         return;
       }
 
       const availableQty = Number(medication.availableQuantity) || 0;
+      console.info("Parsed available quantity:", availableQty);
+
       if (availableQty <= 0) {
         toast.error("Sản phẩm hết hàng");
+        console.error("Out of stock, availableQty:", availableQty);
         return;
       }
 
@@ -224,45 +239,62 @@ export default function SalesPageV3() {
         medication.is_prescription_required ||
         false;
 
-      const existingItem = activeOrder.cart.find(
-        (item) => item.medication_variant_id === medication.id
-      );
+      console.info("Proceeding to update cart...");
 
-      if (existingItem) {
-        const newQuantity = existingItem.quantity + 1;
-        if (newQuantity > availableQty) {
-          toast.error(`Không thể vượt quá số lượng tồn kho (${availableQty})`);
-          return;
+      setOrders((prevOrders) => {
+        const currentOrder = prevOrders.find((o) => o.id === activeOrderId);
+        if (!currentOrder) {
+          console.error("Current order not found!");
+          return prevOrders;
         }
-        const updatedCart = activeOrder.cart.map((item) =>
-          item.medication_variant_id === medication.id
-            ? { ...item, quantity: newQuantity }
-            : item
+
+        console.info("Current cart:", currentOrder.cart);
+
+        const existingItem = currentOrder.cart.find(
+          (item) => item.medication_variant_id === medication.id
         );
-        setCart(updatedCart);
-        toast.success(`Đã tăng số lượng lên ${newQuantity}`);
-      } else {
-        const newItem = {
-          medication_variant_id: medication.id,
-          medicationName: medication.medicationName || medication.name,
-          variantName: medication.variantName || "",
-          sellPrice: Number(medication.sellPrice),
-          unit: medication.unit || "đơn vị",
-          availableQuantity: availableQty,
-          quantity: 1,
-          isPrescriptionRequired: isPrescriptionRequired,
-        };
-        setCart([...activeOrder.cart, newItem]);
-        toast.success(
-          `Đã thêm ${medication.medicationName || medication.name}`
+
+        let updatedCart;
+
+        if (existingItem) {
+          const newQuantity = existingItem.quantity + 1;
+          if (newQuantity > availableQty) {
+            toast.error(
+              `Không thể vượt quá số lượng tồn kho (${availableQty})`
+            );
+            return prevOrders;
+          }
+          updatedCart = currentOrder.cart.map((item) =>
+            item.medication_variant_id === medication.id
+              ? { ...item, quantity: newQuantity }
+              : item
+          );
+        } else {
+          const newItem = {
+            medication_variant_id: medication.id,
+            medicationName: medication.medicationName || medication.name,
+            variantName: medication.variantName || "",
+            sellPrice: Number(medication.sellPrice),
+            unit: medication.unit || "đơn vị",
+            availableQuantity: availableQty,
+            quantity: 1,
+            isPrescriptionRequired: isPrescriptionRequired,
+          };
+          console.info("Creating new cart item:", newItem);
+          updatedCart = [...currentOrder.cart, newItem];
+        }
+
+        console.info("Updated cart:", updatedCart);
+
+        return prevOrders.map((order) =>
+          order.id === activeOrderId ? { ...order, cart: updatedCart } : order
         );
-      }
+      });
+
       setSearchResults([]);
     },
-    [activeOrder.cart, setCart]
-  );
-
-  // Update cart item
+    [activeOrderId]
+  ); // Update cart item
   const updateCartItem = useCallback(
     (index, quantity) => {
       const item = activeOrder.cart[index];
@@ -287,10 +319,8 @@ export default function SalesPageV3() {
   // Remove cart item
   const removeCartItem = useCallback(
     (index) => {
-      const item = activeOrder.cart[index];
       const newCart = activeOrder.cart.filter((_, i) => i !== index);
       setCart(newCart);
-      toast.success(`Đã xóa ${item.medicationName}`);
     },
     [activeOrder.cart, setCart]
   );
@@ -308,7 +338,6 @@ export default function SalesPageV3() {
       setCustomer(customer);
       setShowNewCustomerForm(false);
       setNewCustomerData({ name: "", email: "", phone: "" });
-      toast.success("Đã tạo khách hàng mới");
     } catch (error) {
       toast.error("Lỗi tạo khách hàng: " + error.message);
     } finally {
