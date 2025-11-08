@@ -1,11 +1,5 @@
+import loginBg from "@/assets/login.jpg";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,26 +54,33 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
-      <Card className="w-full max-w-md shadow-lg rounded-2xl border-0">
-        <CardHeader className="space-y-4 text-center pb-4">
-          <div className="flex justify-center">
-            <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Pill className="h-8 w-8 text-primary" />
+    <div className="flex min-h-screen overflow-hidden">
+      {/* Left Side - Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white animate-in fade-in slide-in-from-left-10 duration-700">
+        <div className="w-full max-w-md">
+          {/* Logo and Title */}
+          <div className="mb-8 animate-in fade-in slide-in-from-left-5 duration-700 delay-100">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center transform transition-transform hover:scale-110 duration-300">
+                <Pill className="h-6 w-6 text-primary" />
+              </div>
+              <span className="text-2xl font-bold text-primary">
+                PharmaFlow
+              </span>
             </div>
-          </div>
-          <div>
-            <CardTitle className="text-3xl font-bold text-gray-800">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Chào mừng trở lại 👋
-            </CardTitle>
-            <CardDescription className="text-base mt-2">
+            </h1>
+            <p className="text-gray-600">
               Đăng nhập để tiếp tục sử dụng PharmaFlow
-            </CardDescription>
+            </p>
           </div>
-        </CardHeader>
 
-        <CardContent className="p-8 pt-4">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          {/* Form */}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-5 animate-in fade-in slide-in-from-left-5 duration-700 delay-200"
+          >
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">
                 Email
@@ -128,24 +129,32 @@ export default function LoginPage() {
               )}
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="remember"
-                checked={rememberValue}
-                onCheckedChange={(checked) => setValue("remember", checked)}
-              />
-              <Label
-                htmlFor="remember"
-                className="text-sm font-medium leading-none cursor-pointer"
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="remember"
+                  checked={rememberValue}
+                  onCheckedChange={(checked) => setValue("remember", checked)}
+                />
+                <Label
+                  htmlFor="remember"
+                  className="text-sm font-medium leading-none cursor-pointer"
+                >
+                  Ghi nhớ đăng nhập
+                </Label>
+              </div>
+              <Link
+                to="/forgot-password"
+                className="text-sm text-primary font-medium hover:underline"
               >
-                Ghi nhớ đăng nhập
-              </Label>
+                Quên mật khẩu?
+              </Link>
             </div>
 
             <Button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full h-11 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium"
+              className="w-full h-11 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
             >
               {loginMutation.isPending ? (
                 <span className="flex items-center gap-2">
@@ -157,27 +166,39 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-          <div className="mt-4 text-center">
-            <Link
-              to="/forgot-password"
-              className="text-sm text-primary font-medium hover:underline"
-            >
-              Quên mật khẩu?
-            </Link>
-          </div>
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
+
+          <div className="mt-6 text-center animate-in fade-in duration-700 delay-300">
+            <p className="text-sm text-gray-600">
               Chưa có tài khoản?{" "}
               <Link
                 to="/register"
-                className="text-primary font-medium hover:underline"
+                className="text-primary font-medium hover:underline transition-all"
               >
-                Đăng ký
+                Đăng ký ngay
               </Link>
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      {/* Right Side - Image */}
+      <div
+        className="hidden lg:flex flex-1 bg-cover bg-center bg-no-repeat relative animate-in fade-in slide-in-from-right-10 duration-700"
+        style={{
+          backgroundImage: `url(${loginBg})`,
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-primary/70 animate-in fade-in duration-1000" />
+        <div className="relative z-10 flex flex-col items-center justify-center text-white p-12 text-center animate-in fade-in slide-in-from-bottom-5 duration-700 delay-300">
+          <h2 className="text-4xl font-bold mb-4 animate-in fade-in slide-in-from-bottom-3 duration-700 delay-500">
+            Quản lý nhà thuốc hiện đại
+          </h2>
+          <p className="text-xl text-white/90 max-w-md animate-in fade-in slide-in-from-bottom-3 duration-700 delay-700">
+            Giải pháp toàn diện cho việc quản lý kho, bán hàng và theo dõi tồn
+            kho thuốc
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
