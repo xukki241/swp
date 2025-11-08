@@ -156,14 +156,17 @@ export default function MedicationListPage() {
   );
   const { data: meds, isLoading, refetch } = useMedications(filters);
   const medications = Array.isArray(meds) ? meds : meds?.data || [];
-  
+
   // Debug: Check for duplicate IDs
   useEffect(() => {
-    const ids = medications.map(m => m.id);
+    const ids = medications.map((m) => m.id);
     const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
     if (duplicates.length > 0) {
-      console.warn('⚠️ Duplicate medication IDs found:', duplicates);
-      console.log('All medications:', medications.map(m => ({ id: m.id, name: m.name })));
+      console.warn("⚠️ Duplicate medication IDs found:", duplicates);
+      console.log(
+        "All medications:",
+        medications.map((m) => ({ id: m.id, name: m.name }))
+      );
     }
   }, [medications]);
 
@@ -240,7 +243,11 @@ export default function MedicationListPage() {
   }
 
   const onSubmitMed = async (data) => {
-    console.log(`💾 Starting ${editing ? 'update' : 'create'} medication:`, { editing: !!editing, removeImage, data });
+    console.log(`💾 Starting ${editing ? "update" : "create"} medication:`, {
+      editing: !!editing,
+      removeImage,
+      data,
+    });
     try {
       let savedId = editing?.id;
 
@@ -255,7 +262,9 @@ export default function MedicationListPage() {
         if (removeImage) {
           console.log(`🗑️ Removing image for medication: ${savedId}`);
           clearMedicationImage(savedId);
-          const deleteResponse = await instance.delete(`/medications/${savedId}/image`);
+          const deleteResponse = await instance.delete(
+            `/medications/${savedId}/image`
+          );
           console.log(`✅ Image deleted successfully:`, deleteResponse.data);
         } else if (imageFile) {
           const formData = new FormData();
@@ -278,9 +287,15 @@ export default function MedicationListPage() {
 
       // Đợi một chút để backend xử lý xong
       await new Promise((resolve) => setTimeout(resolve, 500));
-      console.log(`🔄 Refetching medications after ${editing ? 'update' : 'create'}...`);
+      console.log(
+        `🔄 Refetching medications after ${editing ? "update" : "create"}...`
+      );
       const refetchResult = await refetch();
-      console.log(`✅ Refetch completed:`, refetchResult?.data?.length || 0, 'medications found');
+      console.log(
+        `✅ Refetch completed:`,
+        refetchResult?.data?.length || 0,
+        "medications found"
+      );
     } catch (e) {
       toast.error("Failed to save medication", {
         description: e?.response?.data?.message || e.message,
@@ -788,7 +803,7 @@ export default function MedicationListPage() {
 
       {/* Image Lightbox Popup */}
       {lightbox.open && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
           onClick={closeLightbox}
         >
@@ -799,11 +814,21 @@ export default function MedicationListPage() {
               className="absolute -top-2 -right-2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 z-10"
               aria-label="Close image"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
-            
+
             {/* Image */}
             <img
               src={lightbox.src}

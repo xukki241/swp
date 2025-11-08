@@ -1,3 +1,4 @@
+import MedicationImage from "@/components/MedicationImage";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -10,7 +11,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import MedicationImage from "@/components/MedicationImage";
 import { Image as ImageIcon } from "lucide-react";
 import { Controller } from "react-hook-form";
 
