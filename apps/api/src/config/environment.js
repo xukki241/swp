@@ -31,6 +31,8 @@ const config = {
     "DATABASE_URL",
     "postgresql://postgres:postgres@localhost:5432/pharmaflow"
   ),
+  allowAutoMigration:
+    getEnv("DATABASE_ALLOW_AUTO_MIGRATION", "false") === "true",
 
   // JWT
   jwtSecret: getEnv("JWT_SECRET", "your-secret-key-change-in-production"),

@@ -10,6 +10,11 @@ import logger from "../utils/logger.js";
  * This function applies all pending migrations to the database
  */
 export async function runMigrations() {
+  if (!config.allowAutoMigration) {
+    logger.info("Database auto-migration is disabled. Skipping migrations.");
+    return;
+  }
+
   const pool = new Pool({
     connectionString: config.databaseUrl,
   });
