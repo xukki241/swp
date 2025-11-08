@@ -22,9 +22,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
 import { toast } from "sonner";
+import PharmacyPolicyDialog from "./components/PharmacyPolicyDialog";
 
 export default function RegisterPage() {
   const [showPolicyDialog, setShowPolicyDialog] = useState(false);
+  const [showPharmacyPolicyDialog, setShowPharmacyPolicyDialog] =
+    useState(false);
 
   const {
     register,
@@ -39,7 +42,8 @@ export default function RegisterPage() {
       address: "",
       password: "",
       confirmPassword: "",
-      agreePolicy: false, // Added agreePolicy field
+      agreePolicy: false,
+      agreePharmacyPolicy: false,
     },
   });
 
@@ -224,7 +228,7 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label className="flex items-start space-x-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -249,6 +253,33 @@ export default function RegisterPage() {
               {errors.agreePolicy && (
                 <p className="text-sm text-destructive mt-1">
                   {errors.agreePolicy.message}
+                </p>
+              )}
+
+              <Label className="flex items-start space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="agreePharmacyPolicy"
+                  {...register("agreePharmacyPolicy", {
+                    required:
+                      "Bạn phải đồng ý tuân thủ quy định về kinh doanh thuốc.",
+                  })}
+                  className="accent-primary h-4 w-4 mt-0.5 cursor-pointer"
+                />
+                <span className="text-sm text-gray-700">
+                  Tôi cam kết tuân thủ{" "}
+                  <button
+                    type="button"
+                    onClick={() => setShowPharmacyPolicyDialog(true)}
+                    className="text-primary underline hover:text-primary/80 font-medium"
+                  >
+                    Nghị định 102/2016/NĐ-CP về điều kiện kinh doanh thuốc
+                  </button>
+                </span>
+              </Label>
+              {errors.agreePharmacyPolicy && (
+                <p className="text-sm text-destructive mt-1">
+                  {errors.agreePharmacyPolicy.message}
                 </p>
               )}
             </div>
@@ -431,6 +462,12 @@ export default function RegisterPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Pharmacy Policy Dialog */}
+      <PharmacyPolicyDialog
+        open={showPharmacyPolicyDialog}
+        onOpenChange={setShowPharmacyPolicyDialog}
+      />
     </div>
   );
 }
