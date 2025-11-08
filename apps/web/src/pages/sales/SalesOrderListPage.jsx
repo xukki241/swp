@@ -4,14 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { salesService } from "@/services/salesService";
-import {
-  CheckCircle,
-  Eye,
-  Loader2,
-  Search,
-  ShoppingCart,
-  XCircle,
-} from "lucide-react";
+import { Eye, Loader2, Search, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -222,34 +215,6 @@ export default function SalesOrderListPage() {
                         </div>
                       </div>
                       <div className="flex gap-2 ml-4">
-                        {order.status === "pending" && (
-                          <>
-                            <Button
-                              onClick={() => handleMarkAsCompleted(order.id)}
-                              disabled={updatingOrderId === order.id}
-                              size="sm"
-                              className="bg-green-600 hover:bg-green-700"
-                            >
-                              {updatingOrderId === order.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <>
-                                  <CheckCircle className="w-4 h-4 mr-2" />
-                                  Đánh dấu đã thanh toán
-                                </>
-                              )}
-                            </Button>
-                            <Button
-                              onClick={() => handleCancelOrder(order.id)}
-                              disabled={updatingOrderId === order.id}
-                              size="sm"
-                              variant="destructive"
-                            >
-                              <XCircle className="w-4 h-4 mr-2" />
-                              Hủy
-                            </Button>
-                          </>
-                        )}
                         <Button
                           variant="outline"
                           size="sm"

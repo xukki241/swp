@@ -365,9 +365,13 @@ export default function SalesPageV3() {
         // Extract data from response
         const orderResult = response?.data || response;
 
+        // Update order status to "paid" immediately since payment is already confirmed
+        await salesService.updateSalesOrder(orderResult.id, { status: "paid" });
+
         // Set success order with proper format
         setSuccessOrder({
           ...orderResult,
+          status: "paid", // Set status to paid for display
           paymentMethod: orderData.payment_method,
           totalAmount: activeOrder.cart.reduce(
             (sum, item) => sum + item.sellPrice * item.quantity,
