@@ -30,9 +30,6 @@ export default function MedicationSearch({
           } else if (barcodeResults.length === 1) {
             // Single result - auto add to cart
             onSelectMedication(barcodeResults[0]);
-            toast.success(
-              `Đã thêm: ${barcodeResults[0].medicationName || barcodeResults[0].name}`
-            );
             // Clear search term after auto-adding
             setSearchTerm("");
           } else {

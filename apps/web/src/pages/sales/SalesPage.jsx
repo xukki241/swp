@@ -165,7 +165,6 @@ export default function SalesPageV3() {
         );
       }
       setDeleteConfirmId(null);
-      toast.success("Đã xóa đơn hàng");
     },
     [orders, activeOrderId]
   );
@@ -181,7 +180,6 @@ export default function SalesPageV3() {
       };
       setOrders((prev) => [...prev, newOrder]);
       setActiveOrderId(newOrder.id);
-      toast.success("Đã nhân bản đơn hàng");
     },
     [orders]
   );
@@ -218,13 +216,11 @@ export default function SalesPageV3() {
       console.info("Available quantity:", medication.availableQuantity);
 
       if (!medication.id) {
-        toast.error("Thiếu ID sản phẩm");
         console.error("Missing medication.id");
         return;
       }
 
       if (!medication.sellPrice) {
-        toast.error("Thiếu giá bán sản phẩm");
         console.error("Missing medication.sellPrice");
         return;
       }
@@ -273,7 +269,6 @@ export default function SalesPageV3() {
               ? { ...item, quantity: newQuantity }
               : item
           );
-          toast.success(`Đã tăng số lượng lên ${newQuantity}`);
         } else {
           const newItem = {
             medication_variant_id: medication.id,
@@ -287,9 +282,6 @@ export default function SalesPageV3() {
           };
           console.info("Creating new cart item:", newItem);
           updatedCart = [...currentOrder.cart, newItem];
-          toast.success(
-            `Đã thêm ${medication.medicationName || medication.name}`
-          );
         }
 
         console.info("Updated cart:", updatedCart);
@@ -327,10 +319,8 @@ export default function SalesPageV3() {
   // Remove cart item
   const removeCartItem = useCallback(
     (index) => {
-      const item = activeOrder.cart[index];
       const newCart = activeOrder.cart.filter((_, i) => i !== index);
       setCart(newCart);
-      toast.success(`Đã xóa ${item.medicationName}`);
     },
     [activeOrder.cart, setCart]
   );
@@ -348,7 +338,6 @@ export default function SalesPageV3() {
       setCustomer(customer);
       setShowNewCustomerForm(false);
       setNewCustomerData({ name: "", email: "", phone: "" });
-      toast.success("Đã tạo khách hàng mới");
     } catch (error) {
       toast.error("Lỗi tạo khách hàng: " + error.message);
     } finally {

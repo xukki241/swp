@@ -73,7 +73,6 @@ export default function SalesOrderDetailPage() {
     setIsUpdating(true);
     try {
       await salesService.updateSalesOrder(id, { status: "paid" });
-      toast.success("Đã đánh dấu đơn hàng là ĐÃ THANH TOÁN");
       fetchOrderDetail();
     } catch (error) {
       toast.error(
@@ -92,7 +91,6 @@ export default function SalesOrderDetailPage() {
     setIsUpdating(true);
     try {
       await salesService.updateSalesOrder(id, { status: "cancelled" });
-      toast.success("Đơn hàng đã được hủy");
       fetchOrderDetail();
     } catch (error) {
       toast.error(error.response?.data?.message || "Không thể hủy đơn hàng");
