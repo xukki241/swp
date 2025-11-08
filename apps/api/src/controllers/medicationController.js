@@ -351,7 +351,6 @@ export const deleteMedicationImage = async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    // Check if medication exists
     const medication = await medicationService.getMedicationById(id);
     if (!medication) {
       return res.status(404).json({
@@ -367,18 +366,20 @@ export const deleteMedicationImage = async (req, res, next) => {
       });
     }
 
-    // Delete file
-    await fileService.delete(medication.imageId);
+    const imageIdToDelete = medication.imageId;
 
-    // Update medication to remove image reference
-    const updatedMedication = await medicationService.updateMedication(id, {
+    // ✅ Set imageId = null TRƯỚC
+    await medicationService.updateMedication(id, {
       imageId: null,
     });
+
+    // ✅ Xóa file SAU
+    await fileService.delete(imageIdToDelete);
 
     res.status(200).json({
       success: true,
       message: "Medication image deleted successfully",
-      data: updatedMedication,
+      data: null,
     });
   } catch (error) {
     logger.error("Error in deleteMedicationImage controller:", error);

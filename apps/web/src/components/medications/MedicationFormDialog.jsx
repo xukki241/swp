@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import MedicationImage from "@/components/MedicationImage";
 import { Image as ImageIcon } from "lucide-react";
 import { Controller } from "react-hook-form";
 
@@ -40,8 +41,6 @@ export function MedicationFormDialog({
   handleSubmit,
   onSubmit,
   imagePreview,
-  imageVersion,
-  getMedicationImageUrl,
   onChangeImage,
   removeImage,
   setRemoveImage,
@@ -73,29 +72,13 @@ export function MedicationFormDialog({
                   className="h-16 w-16 rounded-lg object-cover border cursor-zoom-in"
                   onClick={() => openLightbox(imagePreview, "Preview")}
                 />
-              ) : editing ? (
-                (() => {
-                  const url = getMedicationImageUrl(editing.id);
-                  const src = url.includes("?v=")
-                    ? url
-                    : `${url}?v=${imageVersion[editing.id] || 0}`;
-                  return (
-                    <img
-                      key={
-                        (editing && editing.id) +
-                        ":v" +
-                        (imageVersion[editing.id] || 0)
-                      }
-                      src={src}
-                      alt="Current"
-                      className="h-16 w-16 rounded-lg object-cover border cursor-zoom-in"
-                      onError={(e) =>
-                        (e.currentTarget.style.visibility = "hidden")
-                      }
-                      onClick={() => openLightbox(src, "Current")}
-                    />
-                  );
-                })()
+              ) : editing?.imageId ? (
+                <MedicationImage
+                  fileId={editing.imageId}
+                  alt={editing.name}
+                  size={64}
+                  onClick={openLightbox}
+                />
               ) : (
                 <PillPlaceholder className="h-16 w-16" />
               )}
