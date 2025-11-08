@@ -397,47 +397,6 @@ export default function SalesOrderDetailPage() {
                   In hóa đơn
                 </Button>
 
-                {order.status === "pending" && (
-                  <>
-                    <Button
-                      onClick={handleMarkAsPaid}
-                      disabled={isUpdating}
-                      className="w-full bg-green-600 hover:bg-green-700"
-                    >
-                      {isUpdating ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Đang cập nhật...
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Đánh dấu đã thanh toán
-                        </>
-                      )}
-                    </Button>
-
-                    <Button
-                      onClick={handleCancelOrder}
-                      disabled={isUpdating}
-                      variant="destructive"
-                      className="w-full"
-                    >
-                      {isUpdating ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Đang hủy...
-                        </>
-                      ) : (
-                        <>
-                          <XCircle className="w-4 h-4 mr-2" />
-                          Hủy đơn hàng
-                        </>
-                      )}
-                    </Button>
-                  </>
-                )}
-
                 {order.status === "paid" && (
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
                     <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
