@@ -1,13 +1,14 @@
 # Screen Flow Report - PharmaFlow
 
 > Báo cáo chi tiết về các màn hình chức năng và luồng điều hướng trong hệ thống PharmaFlow
-> 
+>
 > **Ngày tạo**: November 5, 2025
 > **Phiên bản**: 1.0
 
 ---
 
 ## 📋 Mục lục
+
 1. [Tổng quan hệ thống](#tổng-quan-hệ-thống)
 2. [Danh sách Screens](#danh-sách-screens)
 3. [Danh sách Actions](#danh-sách-actions)
@@ -18,11 +19,13 @@
 ## Tổng quan hệ thống
 
 ### Roles trong hệ thống
+
 - **Owner**: Chủ cửa hàng - Quyền quản trị toàn bộ hệ thống
 - **Staff**: Nhân viên - Quyền hạn chế, chủ yếu bán hàng và xem kho
 - **Public**: Người dùng chưa đăng nhập
 
 ### Tổng số screens
+
 - **Protected Screens**: 32 màn hình (yêu cầu đăng nhập)
 - **Public Screens**: 5 màn hình (không yêu cầu đăng nhập)
 - **Dialog Screens**: 10 dialog phức tạp (được xem như màn hình con)
@@ -35,11 +38,12 @@
 ### PUBLIC SCREENS (5 screens)
 
 #### S01. Login Page
+
 - **Name**: Login Page
 - **Path**: `/login`
 - **Description**: Màn hình đăng nhập vào hệ thống
 - **Required Roles**: None (Public)
-- **Connected Screens**: 
+- **Connected Screens**:
   - S03 (Forgot Password Page) - Link "Quên mật khẩu"
   - S02 (Register Page) - Link "Đăng ký tài khoản"
   - S06 (Dashboard) - Sau khi đăng nhập thành công (Owner)
@@ -47,41 +51,45 @@
 - **Note**: PublicRoute - Redirect về dashboard nếu đã đăng nhập
 
 #### S02. Register Page
+
 - **Name**: Register Page
 - **Path**: `/register`
 - **Description**: Màn hình đăng ký tài khoản mới
 - **Required Roles**: None (Public)
-- **Connected Screens**: 
+- **Connected Screens**:
   - S01 (Login Page) - Link "Đã có tài khoản"
   - S05 (Policy Page) - Link xem chính sách
 - **Note**: Đăng ký Owner tự động approve, Staff cần chờ duyệt
 
 #### S03. Forgot Password Page
+
 - **Name**: Forgot Password Page
 - **Path**: `/forgot-password`
 - **Description**: Màn hình yêu cầu reset mật khẩu qua email
 - **Required Roles**: None (Public)
-- **Connected Screens**: 
+- **Connected Screens**:
   - S04 (Reset Password Page) - Link "Đã có OTP"
   - S01 (Login Page) - Link "Quay lại đăng nhập"
 - **Note**: Gửi OTP qua email
 
 #### S04. Reset Password Page
+
 - **Name**: Reset Password Page
 - **Path**: `/reset-password`
 - **Description**: Màn hình reset mật khẩu với OTP
 - **Required Roles**: None (Public)
-- **Connected Screens**: 
+- **Connected Screens**:
   - S01 (Login Page) - Sau khi reset thành công
   - S03 (Forgot Password Page) - Link "Gửi lại OTP"
 - **Note**: Yêu cầu OTP từ email
 
 #### S05. Policy Page
+
 - **Name**: Policy Page
 - **Path**: `/policy`
 - **Description**: Màn hình hiển thị chính sách và điều khoản
 - **Required Roles**: None (Public)
-- **Connected Screens**: 
+- **Connected Screens**:
   - S02 (Register Page) - Link quay lại đăng ký
 - **Note**: Hiển thị điều khoản sử dụng
 
@@ -90,11 +98,12 @@
 ### PROTECTED SCREENS (32 screens)
 
 #### S06. Dashboard Page
+
 - **Name**: Dashboard Page
 - **Path**: `/dashboard`
 - **Description**: Trang tổng quan với thống kê doanh thu, đơn hàng và báo cáo tháng
 - **Required Roles**: Owner
-- **Connected Screens**: 
+- **Connected Screens**:
   - S10 (Sales POS Page) - Quick action "Bán hàng"
   - S11 (Sales Order List Page) - Quick action "Đơn bán hàng"
   - S24 (Medication List Page) - Quick action "Quản lý thuốc"
@@ -104,6 +113,7 @@
 - **Note**: Staff được tự động redirect đến /sales khi login. Có AI Analytics Dialog để phân tích dữ liệu
 
 #### S07. User Profile Page
+
 - **Name**: User Profile Page
 - **Path**: `/user-profile`
 - **Description**: Trang thông tin cá nhân và đổi mật khẩu
@@ -116,6 +126,7 @@
 ### USER MANAGEMENT MODULE (2 screens)
 
 #### S08. User List Page
+
 - **Name**: User List Page
 - **Path**: `/users/list`
 - **Description**: Danh sách người dùng với filter theo role, status và tìm kiếm
@@ -124,6 +135,7 @@
 - **Note**: Chức năng: Create, Update, Delete, Activate, Deactivate, Suspend users
 
 #### S09. Registration Requests Page
+
 - **Name**: Registration Requests Page
 - **Path**: `/users/registrations`
 - **Description**: Danh sách yêu cầu đăng ký tài khoản Staff chờ duyệt
@@ -136,31 +148,34 @@
 ### SALES MODULE (3 screens)
 
 #### S10. Sales POS Page
+
 - **Name**: Sales POS Page
 - **Path**: `/sales`
 - **Description**: Màn hình bán hàng (Point of Sale) với giỏ hàng và thanh toán
 - **Required Roles**: Owner, Staff
-- **Connected Screens**: 
+- **Connected Screens**:
   - S11 (Sales Order List Page) - Button "Xem đơn hàng"
   - S12 (Sales Order Detail Page) - Sau khi tạo đơn thành công
 - **Note**: Chọn thuốc, thêm vào giỏ, chọn khách hàng, thanh toán
 
 #### S11. Sales Order List Page
+
 - **Name**: Sales Order List Page
 - **Path**: `/sales/orders`
 - **Description**: Danh sách đơn bán hàng với filter theo trạng thái và ngày
 - **Required Roles**: Owner, Staff
-- **Connected Screens**: 
+- **Connected Screens**:
   - S10 (Sales POS Page) - Button "Tạo đơn hàng mới"
   - S12 (Sales Order Detail Page) - Click vào đơn hàng
 - **Note**: Hiển thị tất cả đơn bán hàng đã tạo
 
 #### S12. Sales Order Detail Page
+
 - **Name**: Sales Order Detail Page
 - **Path**: `/sales/orders/:id`
 - **Description**: Chi tiết đơn bán hàng với thông tin khách hàng và items
 - **Required Roles**: Owner, Staff
-- **Connected Screens**: 
+- **Connected Screens**:
   - S11 (Sales Order List Page) - Button "Quay lại danh sách"
 - **Note**: Hiển thị thông tin đầy đủ về đơn hàng
 
@@ -169,98 +184,108 @@
 ### PROCUREMENT MODULE (6 screens)
 
 #### S13. Supplier List Page
+
 - **Name**: Supplier List Page
 - **Path**: `/suppliers`
 - **Description**: Danh sách nhà cung cấp với tìm kiếm và phân trang
 - **Required Roles**: Owner
-- **Connected Screens**: 
+- **Connected Screens**:
   - S16 (Supplier Create Page) - Button "Thêm nhà cung cấp"
   - S14 (Supplier Detail Page) - Click vào nhà cung cấp
 - **Note**: Hiển thị thông tin contact, email, phone
 
 #### S14. Supplier Detail Page
+
 - **Name**: Supplier Detail Page
 - **Path**: `/suppliers/:id`
 - **Description**: Chi tiết nhà cung cấp và danh sách thuốc cung cấp
 - **Required Roles**: Owner
-- **Connected Screens**: 
+- **Connected Screens**:
   - S13 (Supplier List Page) - Button "Quay lại"
   - S15 (Supplier Edit Page) - Button "Chỉnh sửa"
 - **Note**: Hiển thị medications từ nhà cung cấp
 
 #### S15. Supplier Edit Page
+
 - **Name**: Supplier Edit Page
 - **Path**: `/suppliers/:id/edit`
 - **Description**: Form chỉnh sửa thông tin nhà cung cấp
 - **Required Roles**: Owner
-- **Connected Screens**: 
+- **Connected Screens**:
   - S13 (Supplier List Page) - Sau khi save thành công
 - **Note**: Update name, contact, email, phone, address
 
 #### S16. Supplier Create Page
+
 - **Name**: Supplier Create Page
 - **Path**: `/suppliers/create`
 - **Description**: Form tạo nhà cung cấp mới
 - **Required Roles**: Owner
-- **Connected Screens**: 
+- **Connected Screens**:
   - S13 (Supplier List Page) - Sau khi tạo thành công
 - **Note**: Validate form trước khi submit
 
 #### S17. Purchase Order List Page
+
 - **Name**: Purchase Order List Page
 - **Path**: `/procurement/purchase-orders`
 - **Description**: Danh sách đơn đặt hàng với filter theo status và supplier
 - **Required Roles**: Owner
-- **Connected Screens**: 
+- **Connected Screens**:
   - S20 (Purchase Order Create Page) - Button "Tạo đơn đặt hàng"
   - S18 (Purchase Order Detail Page) - Click vào đơn đặt hàng
 - **Note**: Status: pending, confirmed, received, cancelled
 
 #### S18. Purchase Order Detail Page
+
 - **Name**: Purchase Order Detail Page
 - **Path**: `/purchase-orders/:id`
 - **Description**: Chi tiết đơn đặt hàng với items và supplier
 - **Required Roles**: Owner
-- **Connected Screens**: 
+- **Connected Screens**:
   - S17 (Purchase Order List Page) - Button "Quay lại danh sách"
   - S23 (Purchase Order Receipt Create Page) - Button "Tạo phiếu nhập"
 - **Note**: Xem items, notes, tracking info. Tạo receipt nếu status confirmed
 
 #### S19. Purchase Order Receipt List Page
+
 - **Name**: Purchase Order Receipt List Page
 - **Path**: `/procurement/receipts`
 - **Description**: Danh sách phiếu nhập hàng (receipts)
 - **Required Roles**: Owner
-- **Connected Screens**: 
+- **Connected Screens**:
   - S17 (Purchase Order List Page) - Button "Đơn đặt hàng"
   - S21 (Purchase Order Receipt Detail Page) - Click vào phiếu nhập
 - **Note**: Hiển thị receivedDate, warehouse, notes
 
 #### S20. Purchase Order Create Page
+
 - **Name**: Purchase Order Create Page
 - **Path**: `/purchase-orders/create`
 - **Description**: Form tạo đơn đặt hàng mới
 - **Required Roles**: Owner
-- **Connected Screens**: 
+- **Connected Screens**:
   - S17 (Purchase Order List Page) - Sau khi tạo thành công
 - **Note**: Chọn supplier, thêm medications, nhập notes
 
 #### S21. Purchase Order Receipt Detail Page
+
 - **Name**: Purchase Order Receipt Detail Page
 - **Path**: `/procurement/receipts/:id`
 - **Description**: Chi tiết phiếu nhập hàng với items đã nhận
 - **Required Roles**: Owner
-- **Connected Screens**: 
+- **Connected Screens**:
   - S19 (Purchase Order Receipt List Page) - Button "Quay lại danh sách"
   - S18 (Purchase Order Detail Page) - Link "Xem đơn đặt hàng"
 - **Note**: Hiển thị warehouse location, received items với batch numbers
 
 #### S22. Purchase Order Receipt Create Page
+
 - **Name**: Purchase Order Receipt Create Page
 - **Path**: `/purchase-orders/:purchaseOrderId/receipts/create`
 - **Description**: Form tạo phiếu nhập hàng cho đơn đặt hàng
 - **Required Roles**: Owner
-- **Connected Screens**: 
+- **Connected Screens**:
   - S21 (Purchase Order Receipt Detail Page) - Sau khi tạo thành công
   - S19 (Purchase Order Receipt List Page) - Sau khi tạo thành công
   - S18 (Purchase Order Detail Page) - Button "Quay lại đơn đặt hàng"
@@ -271,15 +296,17 @@
 ### INVENTORY MODULE (3 screens)
 
 #### S23. Stock Overview Page
+
 - **Name**: Stock Overview Page
 - **Path**: `/inventory/stock`
 - **Description**: Tổng quan tồn kho với filter và cảnh báo hết hàng
 - **Required Roles**: Owner, Staff
-- **Connected Screens**: 
+- **Connected Screens**:
   - S24 (Medication Detail Page) - Click vào thuốc
 - **Note**: Hiển thị quantity, min stock level, stock alerts
 
 #### S24. Warehouse Page
+
 - **Name**: Warehouse Page (Sơ đồ kho)
 - **Path**: `/inventory/warehouse`
 - **Description**: Sơ đồ kho hàng trực quan theo vị trí
@@ -288,6 +315,7 @@
 - **Note**: Visual layout của warehouse với sections và shelves
 
 #### S25. Inventory Tracking Page
+
 - **Name**: Inventory Tracking Page
 - **Path**: `/inventory/tracking`
 - **Description**: Lịch sử nhập/xuất kho với filter
@@ -300,41 +328,45 @@
 ### MEDICATION MODULE (5 screens)
 
 #### S26. Medication List Page
+
 - **Name**: Medication List Page
 - **Path**: `/medications`
 - **Description**: Danh sách thuốc với tìm kiếm full-text và filter
 - **Required Roles**: Owner, Staff
-- **Connected Screens**: 
+- **Connected Screens**:
   - S27 (Medication Form Page - Create) - Button "Thêm thuốc" (Owner only)
   - S28 (Medication Detail Page) - Click vào thuốc
   - S30 (Medication Variants Page) - Button "Xem variants"
 - **Note**: Tìm kiếm theo name, genericName, category, usage
 
 #### S27. Medication Form Page (Create/Edit)
+
 - **Name**: Medication Form Page
 - **Path**: `/medications/new` hoặc `/medications/edit/:id`
 - **Description**: Form tạo mới hoặc chỉnh sửa thuốc
 - **Required Roles**: Owner
-- **Connected Screens**: 
+- **Connected Screens**:
   - S26 (Medication List Page) - Sau khi save thành công
 - **Note**: Upload ảnh, nhập thông tin đầy đủ về thuốc
 
 #### S28. Medication Detail Page
+
 - **Name**: Medication Detail Page
 - **Path**: `/medications/:id`
 - **Description**: Chi tiết thuốc với thông tin đầy đủ và variants
 - **Required Roles**: Owner, Staff
-- **Connected Screens**: 
+- **Connected Screens**:
   - S26 (Medication List Page) - Button "Quay lại"
   - S30 (Medication Variants Page) - Button "Xem tất cả variants"
 - **Note**: Hiển thị image, usage, contraindications, interactions
 
 #### S29. Medication Variants Page
+
 - **Name**: Medication Variants Page
 - **Path**: `/medications/:id/variants`
 - **Description**: Danh sách variants (dosage forms) của một thuốc
 - **Required Roles**: Owner, Staff
-- **Connected Screens**: 
+- **Connected Screens**:
   - S28 (Medication Detail Page) - Button "Quay lại thuốc"
   - S26 (Medication List Page) - Button "Danh sách thuốc"
 - **Note**: Hiển thị các dạng bào chế: viên nén, viên nang, xi-rô, etc.
@@ -344,6 +376,7 @@
 ### SHIFT MANAGEMENT MODULE (3 screens)
 
 #### S30. Shift Management Page
+
 - **Name**: Shift Management Page
 - **Path**: `/shifts/management`
 - **Description**: Quản lý ca làm việc (tạo, sửa, xóa shifts)
@@ -352,6 +385,7 @@
 - **Note**: Định nghĩa shifts: Morning, Afternoon, Evening với time ranges
 
 #### S31. Shift Assignment Page
+
 - **Name**: Shift Assignment Page
 - **Path**: `/shifts/assignments`
 - **Description**: Phân công ca làm việc cho nhân viên
@@ -360,6 +394,7 @@
 - **Note**: Assign staff to shifts on specific dates
 
 #### S32. My Schedule Page
+
 - **Name**: My Schedule Page
 - **Path**: `/shifts/my-schedule`
 - **Description**: Lịch làm việc cá nhân của user
@@ -374,6 +409,7 @@
 > **Note**: Các dialog sau được xem như màn hình con (sub-screens) vì chúng có nghiệp vụ phức tạp, form riêng biệt và logic xử lý độc lập.
 
 #### D01. AI Analytics Dialog
+
 - **Name**: AI Analytics Dialog
 - **Parent Screen**: S06 (Dashboard Page)
 - **Description**: Dialog phân tích AI với khuyến nghị mua hàng, insights và warnings
@@ -382,6 +418,7 @@
 - **Note**: Có tabs: Recommendations, Quick Insights, Warnings. Fetch data từ AI Analysis API với filter theo thời gian (30/60/90/180 days)
 
 #### D02. Create User Dialog
+
 - **Name**: Create User Dialog
 - **Parent Screen**: S08 (User List Page)
 - **Description**: Dialog tạo user mới với form validation
@@ -390,6 +427,7 @@
 - **Note**: Form fields: name, email, phone, address, role. Validation với React Hook Form
 
 #### D03. Edit User Dialog
+
 - **Name**: Edit User Dialog
 - **Parent Screen**: S08 (User List Page)
 - **Description**: Dialog chỉnh sửa thông tin user
@@ -398,6 +436,7 @@
 - **Note**: Pre-populated form với thông tin user hiện tại. Có thể update role
 
 #### D04. Approve Registration Dialog
+
 - **Name**: Approve Registration Dialog
 - **Parent Screen**: S09 (Registration Requests Page)
 - **Description**: Dialog xác nhận phê duyệt đăng ký với form nhập password và role
@@ -406,6 +445,7 @@
 - **Note**: AlertDialog với form input password cho user mới. Default role là Staff
 
 #### D05. Reject Registration Dialog
+
 - **Name**: Reject Registration Dialog
 - **Parent Screen**: S09 (Registration Requests Page)
 - **Description**: Dialog xác nhận từ chối yêu cầu đăng ký
@@ -414,6 +454,7 @@
 - **Note**: AlertDialog confirmation. Hành động không thể hoàn tác
 
 #### D06. Create Medication Dialog
+
 - **Name**: Create Medication Dialog
 - **Parent Screen**: S26 (Medication List Page)
 - **Description**: Dialog tạo thuốc mới với form đầy đủ và upload ảnh
@@ -422,6 +463,7 @@
 - **Note**: Form phức tạp với image upload (Azure Blob), validation, generic name, usage instructions
 
 #### D07. Edit Medication Dialog
+
 - **Name**: Edit Medication Dialog
 - **Parent Screen**: S26 (Medication List Page) hoặc S28 (Medication Detail Page)
 - **Description**: Dialog chỉnh sửa thuốc với preview ảnh hiện tại
@@ -430,6 +472,7 @@
 - **Note**: Pre-filled form, có thể thay đổi ảnh, xóa ảnh cũ
 
 #### D08. Customer Selector Dialog
+
 - **Name**: Customer Selector Dialog
 - **Parent Screen**: S10 (Sales POS Page)
 - **Description**: Dialog chọn khách hàng hoặc tạo khách hàng mới nhanh
@@ -438,6 +481,7 @@
 - **Note**: Search customer, create new customer inline với quick form (name, email, phone)
 
 #### D09. VietQR Payment Dialog
+
 - **Name**: VietQR Payment Dialog
 - **Parent Screen**: S10 (Sales POS Page)
 - **Description**: Dialog hiển thị QR code thanh toán VietQR
@@ -446,6 +490,7 @@
 - **Note**: Generate QR code với số tiền, thông tin đơn hàng. Có countdown timer
 
 #### D10. Receipt Creation Confirmation Dialog
+
 - **Name**: Receipt Creation Confirmation Dialog
 - **Parent Screen**: S22 (Receipt Create Page)
 - **Description**: Dialog xác nhận tạo phiếu nhập với summary items
@@ -458,11 +503,12 @@
 ### SYSTEM SCREENS (1 screen)
 
 #### S33. Not Found Page (404)
+
 - **Name**: Not Found Page
 - **Path**: `*` (catch-all route)
 - **Description**: Trang hiển thị khi route không tồn tại
 - **Required Roles**: None (Public)
-- **Connected Screens**: 
+- **Connected Screens**:
   - S06 (Dashboard) - Link "Về Dashboard"
   - S01 (Login Page) - Link "Về Trang chủ"
 - **Note**: Accessible to everyone
@@ -691,6 +737,7 @@
 ### Screens theo Role
 
 #### Owner (Full Access) - 42 screens (32 pages + 10 dialogs)
+
 ```
 ✅ Dashboard (S06)
   ↳ D01 (AI Analytics Dialog)
@@ -713,6 +760,7 @@
 ```
 
 #### Staff (Limited Access) - 11 screens (9 pages + 2 dialogs)
+
 ```
 ✅ Profile (S07)
 ✅ Sales (S10, S11, S12)
@@ -724,6 +772,7 @@
 ```
 
 #### Public (No Authentication) - 5 screens
+
 ```
 ✅ Login (S01)
 ✅ Register (S02)
@@ -736,37 +785,39 @@
 
 ### Feature Access Matrix
 
-| Feature Module        | Owner  | Staff  | Public |
-| --------------------- | ------ | ------ | ------ |
-| Dashboard & Analytics | ✅ Full | ❌      | ❌      |
-| User Management       | ✅ Full | ❌      | ❌      |
-| Registration Approval | ✅ Full | ❌      | ❌      |
-| Sales (POS)           | ✅ Full | ✅ Full | ❌      |
-| Sales Orders View     | ✅ Full | ✅ View | ❌      |
-| Suppliers             | ✅ Full | ❌      | ❌      |
-| Purchase Orders       | ✅ Full | ❌      | ❌      |
-| Receipts              | ✅ Full | ❌      | ❌      |
-| Stock Overview        | ✅ Full | ✅ View | ❌      |
-| Warehouse Map         | ✅ Full | ✅ View | ❌      |
-| Inventory Tracking    | ✅ Full | ✅ View | ❌      |
-| Medications View      | ✅ Full | ✅ View | ❌      |
-| Medications CRUD      | ✅ Full | ❌      | ❌      |
-| Shift Management      | ✅ Full | ❌      | ❌      |
-| Shift Assignment      | ✅ Full | ❌      | ❌      |
-| My Schedule           | ✅ View | ✅ View | ❌      |
-| Profile Management    | ✅ Full | ✅ Full | ❌      |
+| Feature Module        | Owner   | Staff   | Public |
+| --------------------- | ------- | ------- | ------ |
+| Dashboard & Analytics | ✅ Full | ❌      | ❌     |
+| User Management       | ✅ Full | ❌      | ❌     |
+| Registration Approval | ✅ Full | ❌      | ❌     |
+| Sales (POS)           | ✅ Full | ✅ Full | ❌     |
+| Sales Orders View     | ✅ Full | ✅ View | ❌     |
+| Suppliers             | ✅ Full | ❌      | ❌     |
+| Purchase Orders       | ✅ Full | ❌      | ❌     |
+| Receipts              | ✅ Full | ❌      | ❌     |
+| Stock Overview        | ✅ Full | ✅ View | ❌     |
+| Warehouse Map         | ✅ Full | ✅ View | ❌     |
+| Inventory Tracking    | ✅ Full | ✅ View | ❌     |
+| Medications View      | ✅ Full | ✅ View | ❌     |
+| Medications CRUD      | ✅ Full | ❌      | ❌     |
+| Shift Management      | ✅ Full | ❌      | ❌     |
+| Shift Assignment      | ✅ Full | ❌      | ❌     |
+| My Schedule           | ✅ View | ✅ View | ❌     |
+| Profile Management    | ✅ Full | ✅ Full | ❌     |
 
 ---
 
 ## Ghi chú kỹ thuật
 
 ### Authentication Flow
+
 1. **Login** → Store token & user in localStorage
 2. **ProtectedRoute** → Check token, redirect to login if missing
 3. **PublicRoute** → Check token, redirect to dashboard if present
 4. **Role-based redirect**: Owner → dashboard, Staff → sales
 
 ### Navigation Pattern
+
 - **Primary Navigation**: Sidebar menu (role-based visibility)
 - **Secondary Navigation**: Breadcrumbs, back buttons
 - **Quick Actions**: Dashboard cards (owner only)
@@ -774,37 +825,44 @@
 - **Dialog Navigation**: Modal overlays cho CRUD operations và confirmations
 
 ### Dialog Architecture
+
 **Criteria for Dialog as Screen:**
+
 1. **Complex Business Logic**: Form validation, API calls, state management
 2. **Independent Workflow**: Có thể hoàn thành task độc lập
 3. **Significant User Interaction**: Multi-step forms, search, selection
 4. **Data Transformation**: Create/Edit/Delete operations với data processing
 
 **Dialog Categories:**
+
 - **Form Dialogs (5)**: D02, D03, D06, D07, D08 - CRUD operations
 - **Confirmation Dialogs (3)**: D04, D05, D10 - Action confirmations với validation
 - **Analytics Dialogs (1)**: D01 - AI-powered data visualization với tabs
 - **Payment Dialogs (1)**: D09 - QR code generation và payment flow
 
 **Benefits:**
+
 - ✅ Faster UX - No full page reload
 - ✅ Context Preservation - Stay on current page
 - ✅ Multi-tasking - Can switch between orders (POS)
 - ✅ Reduced Navigation - Less clicks to complete tasks
 
 ### State Management
+
 - **Authentication**: localStorage (token, user)
 - **API State**: TanStack Query (caching, refetching)
 - **Local State**: React useState for forms and UI
 - **No Redux**: Simple state management approach
 
 ### API Integration
+
 - **Axios Instance**: With interceptors for auth
 - **Auto Refresh**: Token refresh on 401
 - **Error Handling**: Centralized in axios interceptors
 - **Loading States**: Per-query via TanStack Query
 
 ### Key Features
+
 - **Full-text Search**: Medications (name, genericName, usage)
 - **File Upload**: Medication images (Azure Blob Storage)
 - **Audit Logging**: All CRUD operations tracked
@@ -821,6 +879,7 @@
 ## Tổng kết
 
 ### Statistics
+
 - **Total Screens**: 47 (32 protected pages + 5 public pages + 10 dialog screens)
 - **Total Actions**: 108 actions (86 page actions + 22 dialog actions)
 - **Modules**: 9 modules (Auth, Dashboard, Sales, Procurement, Inventory, Medications, Users, Shifts, System)
@@ -828,6 +887,7 @@
 - **Complex Dialogs**: 10 dialog screens với business logic độc lập
 
 ### Coverage
+
 - ✅ **Authentication & Authorization**: Complete
 - ✅ **Sales Management**: Complete
 - ✅ **Procurement**: Complete (PO + Receipts)
@@ -837,6 +897,7 @@
 - ✅ **Shift Management**: Complete
 
 ### Development Status
+
 - **Implementation**: Production-ready
 - **Testing**: Unit tests with Vitest
 - **Documentation**: Comprehensive guides available
@@ -866,30 +927,30 @@ Hệ thống PharmaFlow có **8 luồng làm việc chính**:
 ```mermaid
 flowchart TD
     Start([Người dùng truy cập]) --> S01[S01: Login Page]
-    
+
     S01 -->|Login thành công<br/>Owner| S06[S06: Dashboard]
     S01 -->|Login thành công<br/>Staff| S10[S10: Sales POS]
     S01 -->|Quên mật khẩu| S03[S03: Forgot Password]
     S01 -->|Đăng ký mới| S02[S02: Register Page]
-    
+
     S02 -->|Owner đăng ký| S06
     S02 -->|Staff đăng ký| Pending[Chờ Owner duyệt]
     S02 -->|Xem chính sách| S05[S05: Policy Page]
     S05 --> S02
-    
+
     S03 -->|Gửi OTP| S04[S04: Reset Password]
     S04 -->|Reset thành công| S01
-    
+
     Pending --> S09[S09: Registration Requests]
     S09 -->|Owner approve| D04{D04: Approve Dialog}
     S09 -->|Owner reject| D05{D05: Reject Dialog}
     D04 -->|Nhập password| Approved[Tạo tài khoản thành công]
     D05 --> Rejected[Từ chối đăng ký]
-    
+
     S06 --> Logout[Đăng xuất]
     S10 --> Logout
     Logout --> S01
-    
+
     style S01 fill:#e1f5ff
     style S06 fill:#fff9e1
     style S10 fill:#e8f5e9
@@ -904,40 +965,40 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start([Owner/Staff]) --> S10[S10: Sales POS Page]
-    
+
     S10 -->|Chọn khách hàng| D08{D08: Customer Selector}
     D08 -->|Tìm khách hàng| D08
     D08 -->|Tạo KH mới nhanh| CreateCust[Tạo customer inline]
     CreateCust --> S10
     D08 -->|Chọn| S10
-    
+
     S10 -->|Tìm thuốc| Search[Tìm kiếm medications]
     Search -->|Thêm vào giỏ| Cart[Giỏ hàng]
     Cart -->|Điều chỉnh số lượng| Cart
     Cart -->|Xóa item| Cart
-    
+
     Cart -->|Chọn thanh toán| Payment{Phương thức?}
     Payment -->|Tiền mặt| CalcChange[Tính tiền thừa]
     Payment -->|VietQR| D09{D09: VietQR Dialog}
-    
+
     CalcChange -->|Hoàn tất| CreateOrder[Tạo đơn hàng]
     D09 -->|QR code| Scan[Quét mã thanh toán]
     Scan -->|Xác nhận thanh toán| CreateOrder
-    
+
     CreateOrder --> S12[S12: Sales Order Detail]
     S12 -->|In hóa đơn| Print[In receipt]
     S12 -->|Quay lại| S11[S11: Sales Order List]
-    
+
     S10 -->|Xem đơn hàng| S11
     S11 -->|Tạo đơn mới| S10
     S11 -->|Xem chi tiết| S12
     S12 -->|Quay lại DS| S11
-    
+
     S10 -->|Multiple tabs| MultiOrder[Quản lý nhiều đơn đồng thời]
     MultiOrder -->|Chuyển đổi| S10
     MultiOrder -->|Nhân bản đơn| Duplicate[Tạo đơn từ template]
     Duplicate --> S10
-    
+
     style S10 fill:#e8f5e9
     style D08 fill:#fff9e1
     style D09 fill:#ffe1e1
@@ -951,10 +1012,10 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start([Owner Only]) --> Menu{Mua hàng}
-    
+
     Menu -->|Quản lý NCC| S13[S13: Supplier List]
     Menu -->|Đơn đặt hàng| S17[S17: Purchase Order List]
-    
+
     S13 -->|Tạo NCC mới| S16[S16: Supplier Create]
     S13 -->|Xem chi tiết| S14[S14: Supplier Detail]
     S14 -->|Chỉnh sửa| S15[S15: Supplier Edit]
@@ -962,24 +1023,24 @@ flowchart TD
     S15 -->|Lưu| S13
     S16 -->|Lưu| S13
     S14 -->|Quay lại| S13
-    
+
     S17 -->|Tạo đơn mới| S20[S20: PO Create]
     S17 -->|Xem chi tiết| S18[S18: PO Detail]
     S17 -->|Filter| FilterPO[Lọc theo status/supplier]
     FilterPO --> S17
-    
+
     S20 -->|Chọn supplier| SelectSup[Chọn nhà cung cấp]
     SelectSup -->|Thêm medications| AddItems[Thêm items]
     AddItems -->|Nhập notes| S20
     S20 -->|Lưu| S17
-    
+
     S18 -->|Status: pending| WaitConfirm[Chờ xác nhận]
     WaitConfirm -->|Supplier xác nhận| Confirmed[Status: confirmed]
     Confirmed -->|Tạo phiếu nhập| S22[S22: Receipt Create]
-    
+
     S18 -->|Quay lại DS| S17
     S18 -->|Xem receipts| S19[S19: Receipt List]
-    
+
     style S13 fill:#fff9e1
     style S17 fill:#e1f5ff
     style S18 fill:#e8f5e9
@@ -993,35 +1054,35 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start([Owner Only]) --> Entry{Entry Point}
-    
+
     Entry -->|Từ PO Detail| S18[S18: PO Detail]
     Entry -->|Trực tiếp| S19[S19: Receipt List]
-    
+
     S18 -->|Tạo phiếu nhập| Check{Kiểm tra status}
     Check -->|Status ≠ confirmed| Error[Không thể tạo receipt]
     Check -->|Status = confirmed| S22[S22: Receipt Create]
-    
+
     S22 -->|Load PO items| ItemList[Danh sách items từ PO]
     ItemList -->|Nhập số lượng thực nhận| ActualQty[Actual quantity]
     ActualQty -->|Nhập batch number| BatchNo[Batch number]
     BatchNo -->|Nhập expiry date| ExpiryDate[Expiry date]
     ExpiryDate -->|Chọn warehouse location| Location[Vị trí kho]
-    
+
     Location -->|Review| D10{D10: Confirm Dialog}
     D10 -->|Kiểm tra items| Review[Review summary]
     Review -->|Xác nhận| CreateReceipt[Tạo receipt]
     D10 -->|Cancel| S22
-    
+
     CreateReceipt -->|Thành công| S21[S21: Receipt Detail]
     CreateReceipt -->|Update inventory| UpdateStock[Cập nhật tồn kho]
     UpdateStock -->|Create transactions| InvLog[Inventory tracking log]
-    
+
     S21 -->|Xem PO gốc| S18
     S21 -->|Quay lại DS| S19
-    
+
     S19 -->|Xem chi tiết| S21
     S19 -->|Về PO List| S17[S17: PO List]
-    
+
     style S22 fill:#ffe1e1
     style D10 fill:#fff9e1
     style S21 fill:#e8f5e9
@@ -1035,40 +1096,40 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start([Owner/Staff]) --> S26[S26: Medication List]
-    
+
     S26 -->|Tìm kiếm full-text| Search[Search by name/generic/usage]
     Search --> S26
     S26 -->|Filter| Filter[Filter by category/stock]
     Filter --> S26
-    
+
     S26 -->|Owner: Thêm thuốc| D06{D06: Create Dialog}
     S26 -->|Xem chi tiết| S28[S28: Medication Detail]
     S26 -->|Xem variants| S29[S29: Variants Page]
-    
+
     D06 -->|Upload ảnh| UploadImg[Upload to Azure Blob]
     UploadImg -->|Nhập thông tin| FormData[Form: name, generic, usage, etc.]
     FormData -->|Validate| ValidateForm{Validation}
     ValidateForm -->|Lỗi| D06
     ValidateForm -->|OK| CreateMed[Tạo medication]
     CreateMed --> S26
-    
+
     S28 -->|Owner: Chỉnh sửa| D07{D07: Edit Dialog}
     S28 -->|Xem variants| S29
     S28 -->|Quay lại DS| S26
-    
+
     D07 -->|Pre-filled form| EditForm[Form với dữ liệu hiện tại]
     EditForm -->|Thay đổi ảnh| ReplaceImg[Upload ảnh mới]
     ReplaceImg -->|Xóa ảnh cũ| DeleteOld[Delete from Azure]
     EditForm -->|Update| UpdateMed[Cập nhật medication]
     UpdateMed --> S26
-    
+
     S29 -->|Xem variants| VariantList[Danh sách dạng bào chế]
     VariantList -->|Quay lại thuốc| S28
     S29 -->|Quay lại DS| S26
-    
+
     S26 -->|Từ Stock Overview| S23[S23: Stock Overview]
     S23 -->|Click medication| S28
-    
+
     style S26 fill:#e8f5e9
     style D06 fill:#ffe1e1
     style D07 fill:#fff9e1
@@ -1082,52 +1143,52 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start([Owner Only]) --> Menu{User Management}
-    
+
     Menu -->|Quản lý users| S08[S08: User List]
     Menu -->|Duyệt đăng ký| S09[S09: Registration Requests]
-    
+
     S08 -->|Filter| FilterUser[Filter by role/status]
     FilterUser --> S08
     S08 -->|Search| SearchUser[Tìm theo name/email]
     SearchUser --> S08
-    
+
     S08 -->|Tạo user mới| D02{D02: Create User Dialog}
     D02 -->|Nhập thông tin| FormCreate[Form: name, email, phone, role]
     FormCreate -->|Validate| ValCreate{Valid?}
     ValCreate -->|Lỗi| D02
     ValCreate -->|OK| CreateUser[Tạo user]
     CreateUser --> S08
-    
+
     S08 -->|Chỉnh sửa user| D03{D03: Edit User Dialog}
     D03 -->|Pre-filled form| FormEdit[Form với dữ liệu hiện tại]
     FormEdit -->|Update role| ChangeRole[Thay đổi role]
     FormEdit -->|Update info| UpdateUser[Cập nhật user]
     UpdateUser --> S08
-    
+
     S08 -->|Actions| Actions{User Actions}
     Actions -->|Activate| ActivateUser[Kích hoạt]
     Actions -->|Deactivate| DeactivateUser[Vô hiệu hóa]
     Actions -->|Suspend| SuspendUser[Tạm ngưng]
     Actions -->|Delete| DeleteUser[Xóa soft delete]
-    
+
     ActivateUser --> S08
     DeactivateUser --> S08
     SuspendUser --> S08
     DeleteUser --> S08
-    
+
     S09 -->|Approve| D04{D04: Approve Dialog}
     S09 -->|Reject| D05{D05: Reject Dialog}
-    
+
     D04 -->|Nhập password| SetPass[Set password cho user mới]
     SetPass -->|Chọn role| SetRole[Assign role: staff/owner]
     SetRole -->|Confirm| ApproveReg[Approve registration]
     ApproveReg -->|Tạo user| CreateAccount[Tạo tài khoản]
     CreateAccount --> S09
-    
+
     D05 -->|Confirm| RejectReg[Reject registration]
     RejectReg -->|Delete request| RemoveReq[Xóa khỏi danh sách]
     RemoveReq --> S09
-    
+
     style S08 fill:#e8f5e9
     style D02 fill:#ffe1e1
     style D03 fill:#fff9e1
@@ -1142,48 +1203,48 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start([Owner/Staff]) --> Menu{Inventory}
-    
+
     Menu -->|Tồn kho| S23[S23: Stock Overview]
     Menu -->|Sơ đồ kho| S24[S24: Warehouse Page]
     Menu -->|Theo dõi xuất nhập| S25[S25: Inventory Tracking]
-    
+
     S23 -->|Filter| FilterStock{Filter Options}
     FilterStock -->|Low stock| LowStock[Thuốc sắp hết]
     FilterStock -->|By category| Category[Theo danh mục]
     FilterStock -->|Stock alerts| Alerts[Cảnh báo tồn kho]
-    
+
     LowStock --> S23
     Category --> S23
     Alerts --> S23
-    
+
     S23 -->|Search| SearchStock[Tìm theo tên thuốc]
     SearchStock --> S23
-    
+
     S23 -->|Click medication| S28[S28: Medication Detail]
     S28 -->|Xem thông tin| MedInfo[Chi tiết thuốc]
     MedInfo -->|Quay lại| S23
-    
+
     S24 -->|Xem sơ đồ| WarehouseMap[Visual warehouse layout]
     WarehouseMap -->|Sections| Sections[Khu vực kho]
     Sections -->|Shelves| Shelves[Kệ hàng]
     Shelves -->|Locations| Locations[Vị trí cụ thể]
-    
+
     S25 -->|View transactions| TransLog[Transaction history]
     TransLog -->|Filter by type| FilterTrans{Transaction Type}
     FilterTrans -->|IN| InTrans[Nhập kho từ receipts]
     FilterTrans -->|OUT| OutTrans[Xuất kho từ sales]
     FilterTrans -->|ADJUST| AdjustTrans[Điều chỉnh tồn kho]
-    
+
     InTrans --> S25
     OutTrans --> S25
     AdjustTrans --> S25
-    
+
     S25 -->|Filter by date| DateRange[Chọn khoảng thời gian]
     DateRange --> S25
-    
+
     S25 -->|Filter by medication| MedFilter[Lọc theo thuốc]
     MedFilter --> S25
-    
+
     style S23 fill:#e8f5e9
     style S24 fill:#e1f5ff
     style S25 fill:#fff9e1
@@ -1196,49 +1257,49 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start([Owner/Staff]) --> Entry{Entry Point}
-    
+
     Entry -->|Owner| OwnerMenu{Shift Management}
     Entry -->|Staff| S32[S32: My Schedule]
-    
+
     OwnerMenu -->|Quản lý ca| S30[S30: Shift Management]
     OwnerMenu -->|Phân công| S31[S31: Shift Assignment]
     OwnerMenu -->|Xem lịch| S32
-    
+
     S30 -->|Create shift| CreateShift{Modal: Create}
     CreateShift -->|Nhập thông tin| ShiftInfo[Name, time range, description]
     ShiftInfo -->|Save| AddShift[Tạo shift definition]
     AddShift --> S30
-    
+
     S30 -->|Edit shift| EditShift{Modal: Edit}
     EditShift -->|Update info| UpdateShift[Cập nhật shift]
     UpdateShift --> S30
-    
+
     S30 -->|Delete shift| DeleteShift{Modal: Confirm}
     DeleteShift -->|Confirm| RemoveShift[Xóa shift]
     RemoveShift --> S30
-    
+
     S31 -->|View calendar| Calendar[Calendar interface]
     Calendar -->|Select date| DateSelect[Chọn ngày]
     DateSelect -->|Select shift| ShiftSelect[Chọn ca]
     ShiftSelect -->|Assign staff| StaffSelect[Chọn nhân viên]
-    
+
     StaffSelect -->|Add assignment| CreateAssign[Tạo assignment]
     CreateAssign --> S31
-    
+
     Calendar -->|Remove assignment| RemoveAssign[Xóa phân công]
     RemoveAssign --> S31
-    
+
     S31 -->|Filter by date| DateFilter[Lọc theo ngày/tuần/tháng]
     DateFilter --> S31
-    
+
     S32 -->|View only| MyCalendar[Lịch cá nhân]
     MyCalendar -->|Filter date| MyDateFilter[Chọn thời gian]
     MyDateFilter --> S32
-    
+
     MyCalendar -->|View details| ShiftDetail[Chi tiết ca làm]
     ShiftDetail -->|Time| TimeInfo[Giờ làm việc]
     ShiftDetail -->|Colleagues| Teammates[Đồng nghiệp cùng ca]
-    
+
     style S30 fill:#ffe1e1
     style S31 fill:#fff9e1
     style S32 fill:#e8f5e9
@@ -1251,56 +1312,56 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start([Owner]) --> S06[S06: Dashboard]
-    
+
     S06 -->|View stats| Stats[Thống kê tổng quan]
     Stats -->|Total orders| Orders[Tổng đơn hàng]
     Stats -->|Revenue| Revenue[Doanh thu]
     Stats -->|Avg order| AvgOrder[Đơn hàng trung bình]
     Stats -->|Top products| TopProd[Sản phẩm bán chạy]
-    
+
     S06 -->|Month selector| MonthSelect[Chọn tháng/năm]
     MonthSelect -->|Previous| PrevMonth[Tháng trước]
     MonthSelect -->|Next| NextMonth[Tháng sau]
     MonthSelect -->|Current| CurrentMonth[Tháng hiện tại]
-    
+
     PrevMonth --> S06
     NextMonth --> S06
     CurrentMonth --> S06
-    
+
     S06 -->|AI Analytics| D01{D01: AI Analytics Dialog}
     D01 -->|Tab: Recommendations| TabRec[Purchase Recommendations]
     D01 -->|Tab: Quick Insights| TabIns[Quick Insights]
     D01 -->|Tab: Warnings| TabWarn[Warnings & Alerts]
-    
+
     TabRec -->|View by priority| PrioFilter{Priority}
     PrioFilter -->|HIGH| HighPrio[Ưu tiên cao]
     PrioFilter -->|MEDIUM| MedPrio[Ưu tiên trung bình]
     PrioFilter -->|LOW| LowPrio[Ưu tiên thấp]
-    
+
     HighPrio --> TabRec
     MedPrio --> TabRec
     LowPrio --> TabRec
-    
+
     TabRec -->|Medication info| MedDetail[Chi tiết thuốc]
     MedDetail -->|Stock info| StockInfo[Tồn kho hiện tại]
     MedDetail -->|Sales trend| Trend[Xu hướng bán]
     MedDetail -->|Recommended qty| RecommendQty[Số lượng đề xuất]
-    
+
     TabIns -->|Summary| Summary[Tổng quan insights]
     Summary -->|Revenue analysis| RevenueAnal[Phân tích doanh thu]
     Summary -->|Sales patterns| SalesPattern[Mẫu bán hàng]
     Summary -->|Customer behavior| CustBehavior[Hành vi khách hàng]
-    
+
     TabWarn -->|Expiring soon| Expiring[Sắp hết hạn]
     TabWarn -->|Low stock| LowStockWarn[Tồn kho thấp]
     TabWarn -->|Slow moving| SlowMoving[Hàng ế]
-    
+
     D01 -->|Refresh data| RefreshAI[Refresh AI analysis]
     RefreshAI --> D01
-    
+
     D01 -->|Change time range| TimeRange[30/60/90/180 days]
     TimeRange --> D01
-    
+
     S06 -->|Quick actions| QuickActions{Quick Actions}
     QuickActions -->|Bán hàng| S10[S10: Sales POS]
     QuickActions -->|Đơn bán hàng| S11[S11: Sales Orders]
@@ -1308,11 +1369,11 @@ flowchart TD
     QuickActions -->|Đơn đặt hàng| S17[S17: Purchase Orders]
     QuickActions -->|Tồn kho| S23[S23: Stock Overview]
     QuickActions -->|Người dùng| S08[S08: User List]
-    
+
     S06 -->|Recent activities| Activities[Hoạt động gần đây]
     Activities -->|Purchase receipts| Receipts[Phiếu nhập mới]
     Activities -->|Sales orders| SalesOrders[Đơn bán hàng mới]
-    
+
     style S06 fill:#fff9e1
     style D01 fill:#e1f5ff
     style TabRec fill:#c8e6c9
@@ -1326,18 +1387,18 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start([Truy cập hệ thống]) --> CheckAuth{Đã đăng nhập?}
-    
+
     CheckAuth -->|Chưa| S01[S01: Login]
     CheckAuth -->|Rồi| CheckRole{Role?}
-    
+
     CheckRole -->|Owner| S06[S06: Dashboard]
     CheckRole -->|Staff| S10[S10: Sales POS]
-    
+
     S01 -->|Login Owner| S06
     S01 -->|Login Staff| S10
     S01 -->|Register| S02[S02: Register]
     S01 -->|Forgot Password| S03[S03: Forgot Password]
-    
+
     S06 --> OwnerFeatures{Owner Features}
     OwnerFeatures -->|Analytics| D01[D01: AI Analytics]
     OwnerFeatures -->|Sales| SalesModule[Sales Module]
@@ -1346,40 +1407,40 @@ flowchart TD
     OwnerFeatures -->|Inventory| InvModule[Inventory Module]
     OwnerFeatures -->|Medications| MedModule[Medication Module]
     OwnerFeatures -->|Shifts| ShiftModule[Shift Management]
-    
+
     S10 --> StaffFeatures{Staff Features}
     StaffFeatures -->|Sales| SalesModule
     StaffFeatures -->|View Inventory| InvModule
     StaffFeatures -->|View Medications| MedModule
     StaffFeatures -->|My Schedule| S32[S32: My Schedule]
-    
+
     SalesModule --> S10
     SalesModule --> S11[S11: Sales Orders]
     SalesModule --> S12[S12: Order Detail]
-    
+
     ProcModule --> S13[S13: Suppliers]
     ProcModule --> S17[S17: Purchase Orders]
     ProcModule --> S19[S19: Receipts]
-    
+
     UserModule --> S08[S08: User List]
     UserModule --> S09[S09: Registrations]
-    
+
     InvModule --> S23[S23: Stock Overview]
     InvModule --> S24[S24: Warehouse]
     InvModule --> S25[S25: Tracking]
-    
+
     MedModule --> S26[S26: Medication List]
     MedModule --> S28[S28: Medication Detail]
-    
+
     ShiftModule --> S30[S30: Shift Management]
     ShiftModule --> S31[S31: Assignments]
     ShiftModule --> S32
-    
+
     S06 -->|Profile| S07[S07: User Profile]
     S10 -->|Profile| S07
-    
+
     S07 -->|Logout| S01
-    
+
     style CheckAuth fill:#e1f5ff
     style CheckRole fill:#fff9e1
     style OwnerFeatures fill:#c8e6c9

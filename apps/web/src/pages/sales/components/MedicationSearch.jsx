@@ -1,8 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, MapPin, Plus, Search } from "lucide-react";
+import { useBarcodeScanner } from "@/hooks/useBarcodeScanner";
+import { searchByBarcode } from "@/services/barcodeService";
+import { Loader2, MapPin, Plus, Scan, Search } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function MedicationSearch({
   onSearch,
@@ -12,6 +15,45 @@ export default function MedicationSearch({
 }) {
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Add barcode scanner hook with global mode
+  const { inputRef, isScanning, scannedValue, scanHistory } = useBarcodeScanner(
+    {
+      onScan: async (barcode) => {
+        console.info("Barcode scanned:", barcode);
+
+        try {
+          // Search by barcode
+          const barcodeResults = await searchByBarcode(barcode);
+
+          if (barcodeResults.length === 0) {
+            toast.error(`Không tìm thấy sản phẩm với mã: ${barcode}`);
+          } else if (barcodeResults.length === 1) {
+            // Single result - auto add to cart
+            onSelectMedication(barcodeResults[0]);
+            toast.success(
+              `Đã thêm: ${barcodeResults[0].medicationName || barcodeResults[0].name}`
+            );
+            // Clear search term after auto-adding
+            setSearchTerm("");
+          } else {
+            // Multiple results - show in search
+            setSearchTerm(barcode);
+            onSearch(barcode);
+            toast.info(`Tìm thấy ${barcodeResults.length} sản phẩm`);
+          }
+        } catch (error) {
+          toast.error("Lỗi khi quét mã: " + error.message);
+        }
+      },
+      onError: (error) => {
+        toast.error(error);
+      },
+      minLength: 4,
+      maxLength: 20,
+      global: true, // Enable global scanning - no focus required!
+    }
+  );
+
   const handleSearch = (term) => {
     setSearchTerm(term);
     onSearch(term);
@@ -19,15 +61,53 @@ export default function MedicationSearch({
 
   return (
     <div className="space-y-4">
+      {/* Global scanning indicator - always visible at top */}
+      {isScanning && (
+        <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2">
+          <Badge className="bg-blue-600 text-white shadow-lg px-4 py-2 text-sm font-semibold animate-pulse">
+            <Scan className="w-4 h-4 mr-2 animate-spin" />
+            Đang quét mã vạch...
+          </Badge>
+        </div>
+      )}
+
       <div className="relative">
         <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+        {/* Attach barcode scanner ref */}
         <Input
-          placeholder="Tìm thuốc theo tên..."
+          ref={inputRef}
+          placeholder="Quét mã bất kỳ lúc nào hoặc nhập tên thuốc..."
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
           className="pl-10"
         />
+
+        {/* Last scanned value indicator */}
+        {scannedValue && !isScanning && (
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-green-600 font-medium flex items-center gap-1">
+            <Scan className="w-3 h-3" />✓ Đã quét
+          </div>
+        )}
       </div>
+
+      {/* Optional: Scan history dropdown */}
+      {scanHistory.length > 0 && (
+        <details className="text-xs text-gray-500">
+          <summary className="cursor-pointer hover:text-gray-700">
+            Lịch sử quét ({scanHistory.length})
+          </summary>
+          <ul className="mt-2 space-y-1 pl-4">
+            {scanHistory.slice(0, 5).map((scan) => (
+              <li key={scan.id} className="flex justify-between">
+                <span className="font-mono">{scan.barcode}</span>
+                <span className="text-gray-400">
+                  {new Date(scan.timestamp).toLocaleTimeString()}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
 
       {isSearching && (
         <div className="flex items-center justify-center py-8">

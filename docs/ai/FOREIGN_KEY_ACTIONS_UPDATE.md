@@ -7,6 +7,7 @@ Migration `0001_fix_foreign_key_actions.sql` đã được tạo để cập nh�
 ## Nguyên Tắc Áp Dụng
 
 ### 1. **CASCADE** - Xóa theo (Cascade Delete)
+
 - **Khi nào sử dụng**: Dữ liệu phụ thuộc hoàn toàn vào parent và không có giá trị độc lập
 - **Ví dụ trong hệ thống**:
   - `user_credentials` → `users`: Xóa user thì xóa credentials
@@ -15,6 +16,7 @@ Migration `0001_fix_foreign_key_actions.sql` đã được tạo để cập nh�
   - `file_attachments` → `files`: Xóa file thì xóa attachments
 
 ### 2. **RESTRICT** - Ngăn chặn xóa
+
 - **Khi nào sử dụng**: Dữ liệu có giá trị business quan trọng, không cho phép xóa nếu còn tham chiếu
 - **Ví dụ trong hệ thống**:
   - **Transactional Data**: Không cho xóa orders, receipts nếu còn items
@@ -23,6 +25,7 @@ Migration `0001_fix_foreign_key_actions.sql` đã được tạo để cập nh�
   - **Warehouse Structure**: Không cho xóa zones nếu còn racks, racks nếu còn bins
 
 ### 3. **SET NULL** - Giữ lại dữ liệu, null reference
+
 - **Khi nào sử dụng**: Cần giữ lại dữ liệu lịch sử nhưng có thể mất thông tin reference
 - **Ví dụ trong hệ thống**:
   - `audit_logs.user_id`: Giữ audit trail ngay cả khi user bị xóa
@@ -32,6 +35,7 @@ Migration `0001_fix_foreign_key_actions.sql` đã được tạo để cập nh�
   - `sales_orders.salesperson_id`: Giữ order ngay cả khi salesperson bị xóa
 
 ### 4. **UPDATE CASCADE** - Luôn áp dụng
+
 - Tất cả foreign keys đều sử dụng `ON UPDATE CASCADE` để đảm bảo data consistency khi ID thay đổi
 
 ## Chi Tiết Thay Đổi
@@ -187,11 +191,13 @@ warehouse_racks.zone_id → warehouse_zones.id
 ## Cách Áp Dụng Migration
 
 ### Bước 1: Review Migration File
+
 ```bash
 cat apps/api/src/db/migrations/0001_fix_foreign_key_actions.sql
 ```
 
 ### Bước 2: Backup Database (QUAN TRỌNG!)
+
 ```bash
 # Azure SQL
 az sql db export \
@@ -205,12 +211,14 @@ az sql db export \
 ```
 
 ### Bước 3: Apply Migration
+
 ```bash
 cd apps/api
 node run-migration.js
 ```
 
 ### Bước 4: Verify Changes
+
 ```sql
 -- Check foreign key constraints
 SELECT
@@ -234,6 +242,7 @@ ORDER BY tc.table_name, kcu.column_name;
 ## Testing Scenarios
 
 ### Test 1: RESTRICT - Prevent deletion of referenced data
+
 ```javascript
 // Should FAIL: Cannot delete medication if variants exist
 await db.delete(medications).where(eq(medications.id, medicationId));
@@ -245,6 +254,7 @@ await db.delete(customers).where(eq(customers.id, customerId));
 ```
 
 ### Test 2: CASCADE - Delete dependent data
+
 ```javascript
 // Should SUCCESS: Delete user and all credentials
 await db.delete(users).where(eq(users.id, userId));
@@ -252,6 +262,7 @@ await db.delete(users).where(eq(users.id, userId));
 ```
 
 ### Test 3: SET NULL - Preserve data with null reference
+
 ```javascript
 // Should SUCCESS: Delete user but keep audit logs
 await db.delete(users).where(eq(users.id, userId));
@@ -265,21 +276,25 @@ await db.delete(users).where(eq(users.id, userId));
 ## Business Logic Rationale
 
 ### Why RESTRICT for Transactions?
+
 - **Data Integrity**: Không bao giờ mất dữ liệu giao dịch lịch sử
 - **Audit Trail**: Giữ đầy đủ thông tin cho báo cáo, kiểm toán
 - **Business Rules**: Phải xóa chi tiết trước khi xóa master
 
 ### Why SET NULL for User References?
+
 - **Preserve History**: Giữ lại orders, receipts ngay cả khi nhân viên nghỉ việc
 - **Audit Compliance**: Không mất audit logs khi xóa user
 - **Data Archival**: Files uploaded vẫn có giá trị dù uploader không còn
 
 ### Why CASCADE for User Data?
+
 - **Privacy**: Xóa hết credentials, tokens khi user bị xóa
 - **Clean Up**: Notifications không còn giá trị khi user không tồn tại
 - **Security**: Password reset tokens phải bị xóa cùng user
 
 ### Why RESTRICT for Warehouse Structure?
+
 - **Operational Safety**: Không thể xóa zone/rack/bin nếu đang có hàng
 - **Inventory Accuracy**: Đảm bảo không mất thông tin vị trí hàng hóa
 - **Hierarchical Integrity**: Phải xóa từ dưới lên (bin → rack → zone)
@@ -287,15 +302,18 @@ await db.delete(users).where(eq(users.id, userId));
 ## Impact Assessment
 
 ### Performance Impact
+
 - **Minimal**: Foreign key constraint checking is database-optimized
 - **Improved**: RESTRICT prevents accidental cascading deletes
 
 ### Application Impact
+
 - **Breaking Changes**: Một số delete operations sẽ fail nếu có references
 - **Required Updates**: Application code cần handle RESTRICT errors properly
 - **User Experience**: Clear error messages khi không thể delete
 
 ### Data Safety
+
 - **Greatly Improved**: Không thể accidentally delete critical data
 - **Audit Compliance**: Full audit trail preserved
 - **Business Continuity**: Historical data always available
