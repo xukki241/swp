@@ -6,7 +6,6 @@ import { Link, useLocation } from "react-router";
 export function SidebarItem({ item, collapsed }) {
   const location = useLocation();
   const pathname = location.pathname;
-  const [isOpen, setIsOpen] = useState(false);
   const Icon = item.icon;
 
   // Get user role from localStorage
@@ -51,9 +50,13 @@ export function SidebarItem({ item, collapsed }) {
     accessibleChildren.length > 0 &&
     accessibleChildren.some((child) => pathname === child.path);
 
+  // Auto-open if has active child, otherwise use local state
+  const [manuallyToggled, setManuallyToggled] = useState(false);
+  const isOpen = hasActiveChild || manuallyToggled;
+
   const handleClick = () => {
     if (accessibleChildren.length > 0 && !collapsed) {
-      setIsOpen(!isOpen);
+      setManuallyToggled(!manuallyToggled);
     }
   };
 

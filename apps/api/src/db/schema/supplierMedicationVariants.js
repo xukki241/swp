@@ -15,10 +15,17 @@ export const supplierMedicationVariants = pgTable(
   "supplier_medication_variants",
   {
     id: identityPrimaryKey(),
-    supplierId: foreignKey("supplier_id", suppliers.id).notNull(),
+    supplierId: foreignKey("supplier_id", suppliers.id, {
+      onDelete: "restrict",
+      onUpdate: "cascade",
+    }).notNull(),
     medicationVariantId: foreignKey(
       "medication_variant_id",
-      medicationVariants.id
+      medicationVariants.id,
+      {
+        onDelete: "restrict",
+        onUpdate: "cascade",
+      }
     ).notNull(),
 
     supplierSku: varchar("supplier_sku", { length: 50 }),

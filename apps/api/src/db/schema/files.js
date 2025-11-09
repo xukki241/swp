@@ -16,6 +16,9 @@ export const files = pgTable("files", {
   mimeType: varchar("mime_type", { length: 100 }).notNull(),
   fileSize: int("file_size").notNull(),
   blob: blobColumn("blob").notNull(),
-  uploadedBy: foreignKey("uploaded_by", users.id),
+  uploadedBy: foreignKey("uploaded_by", users.id, {
+    onDelete: "set null",
+    onUpdate: "cascade",
+  }),
   uploadedAt: createdAt("uploaded_at"),
 });

@@ -15,12 +15,18 @@ export const purchaseOrders = pgTable(
   "purchase_orders",
   {
     id: identityPrimaryKey(),
-    supplierId: foreignKey("supplier_id", suppliers.id).notNull(),
+    supplierId: foreignKey("supplier_id", suppliers.id, {
+      onDelete: "restrict",
+      onUpdate: "cascade",
+    }).notNull(),
     orderDate: createdAt("order_date"),
     expectedDate: timestamp("expected_date"),
     status: purchaseOrderStatus("status").notNull().default("pending"),
     totalAmount: decimalColumn("total_amount").notNull().default(0),
-    createdBy: foreignKey("created_by", users.id),
+    createdBy: foreignKey("created_by", users.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
     searchVector: searchVector(),
   },
   (table) => [

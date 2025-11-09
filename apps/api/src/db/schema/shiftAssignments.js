@@ -18,14 +18,23 @@ export const shiftAssignments = pgTable(
   "shift_assignments",
   {
     id: identityPrimaryKey(),
-    userId: foreignKey("user_id", users.id).notNull(), // Nhân viên được phân ca
-    shiftId: foreignKey("shift_id", shifts.id).notNull(), // Ca làm việc
+    userId: foreignKey("user_id", users.id, {
+      onDelete: "restrict",
+      onUpdate: "cascade",
+    }).notNull(), // Nhân viên được phân ca
+    shiftId: foreignKey("shift_id", shifts.id, {
+      onDelete: "restrict",
+      onUpdate: "cascade",
+    }).notNull(), // Ca làm việc
     assignedDate: timestamp("assigned_date").notNull(), // Ngày làm việc
     status: shiftAssignmentStatus("status").notNull().default("scheduled"),
     checkInTime: timestamp("check_in_time"), // Giờ check-in thực tế
     checkOutTime: timestamp("check_out_time"), // Giờ check-out thực tế
     notes: text("notes"), // Ghi chú (lý do vắng mặt, thay ca, v.v.)
-    createdBy: foreignKey("created_by", users.id), // Người tạo lịch (owner)
+    createdBy: foreignKey("created_by", users.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }), // Người tạo lịch (owner)
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },

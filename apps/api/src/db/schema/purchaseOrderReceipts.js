@@ -6,7 +6,13 @@ import { users } from "./users.js";
 
 export const purchaseOrderReceipts = pgTable("purchase_order_receipts", {
   id: identityPrimaryKey(),
-  purchaseOrderId: foreignKey("purchase_order_id", purchaseOrders.id).notNull(),
+  purchaseOrderId: foreignKey("purchase_order_id", purchaseOrders.id, {
+    onDelete: "restrict",
+    onUpdate: "cascade",
+  }).notNull(),
   receivedDate: timestamp("received_date").notNull(),
-  receivedBy: foreignKey("received_by", users.id),
+  receivedBy: foreignKey("received_by", users.id, {
+    onDelete: "set null",
+    onUpdate: "cascade",
+  }),
 });

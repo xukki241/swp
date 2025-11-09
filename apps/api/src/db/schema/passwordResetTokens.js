@@ -13,7 +13,10 @@ export const resetMethod = pgEnum("reset_method", ["email", "sms"]);
 
 export const passwordResetTokens = pgTable("password_reset_tokens", {
   id: identityPrimaryKey(),
-  userId: foreignKey("user_id", users.id).notNull(),
+  userId: foreignKey("user_id", users.id, {
+    onDelete: "cascade",
+    onUpdate: "cascade",
+  }).notNull(),
   token: varchar("token", { length: 6 }).notNull(),
   method: resetMethod("method").notNull().default("email"),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),

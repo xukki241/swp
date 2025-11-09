@@ -16,14 +16,20 @@ export const salesOrders = pgTable(
   "sales_orders",
   {
     id: identityPrimaryKey(),
-    customerId: foreignKey("customer_id", customers.id).notNull(),
+    customerId: foreignKey("customer_id", customers.id, {
+      onDelete: "restrict",
+      onUpdate: "cascade",
+    }).notNull(),
     orderDate: createdAt("order_date"),
     totalAmount: decimalColumn("total_amount").notNull().default(0),
     status: salesOrderStatus("status").notNull().default("pending"),
     paymentMethod: salesOrderPaymentMethod("payment_method")
       .notNull()
       .default("cash"),
-    salespersonId: foreignKey("salesperson_id", users.id),
+    salespersonId: foreignKey("salesperson_id", users.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
     prescriptionId: foreignKey("prescription_id", files.id),
     prescriptionNote: text("prescription_note"),
     notes: text("notes"),

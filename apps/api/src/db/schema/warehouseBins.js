@@ -15,7 +15,10 @@ export const warehouseBins = pgTable(
   "warehouse_bins",
   {
     id: identityPrimaryKey(),
-    rackId: foreignKey("rack_id", warehouseRacks.id).notNull(),
+    rackId: foreignKey("rack_id", warehouseRacks.id, {
+      onDelete: "restrict",
+      onUpdate: "cascade",
+    }).notNull(),
     code: code(),
     name: name(),
     level: int("level").notNull(),

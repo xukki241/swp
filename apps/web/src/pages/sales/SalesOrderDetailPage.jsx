@@ -73,7 +73,6 @@ export default function SalesOrderDetailPage() {
     setIsUpdating(true);
     try {
       await salesService.updateSalesOrder(id, { status: "paid" });
-      toast.success("Đã đánh dấu đơn hàng là ĐÃ THANH TOÁN");
       fetchOrderDetail();
     } catch (error) {
       toast.error(
@@ -92,7 +91,6 @@ export default function SalesOrderDetailPage() {
     setIsUpdating(true);
     try {
       await salesService.updateSalesOrder(id, { status: "cancelled" });
-      toast.success("Đơn hàng đã được hủy");
       fetchOrderDetail();
     } catch (error) {
       toast.error(error.response?.data?.message || "Không thể hủy đơn hàng");
@@ -396,47 +394,6 @@ export default function SalesOrderDetailPage() {
                   <Printer className="w-4 h-4 mr-2" />
                   In hóa đơn
                 </Button>
-
-                {order.status === "pending" && (
-                  <>
-                    <Button
-                      onClick={handleMarkAsPaid}
-                      disabled={isUpdating}
-                      className="w-full bg-green-600 hover:bg-green-700"
-                    >
-                      {isUpdating ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Đang cập nhật...
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Đánh dấu đã thanh toán
-                        </>
-                      )}
-                    </Button>
-
-                    <Button
-                      onClick={handleCancelOrder}
-                      disabled={isUpdating}
-                      variant="destructive"
-                      className="w-full"
-                    >
-                      {isUpdating ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Đang hủy...
-                        </>
-                      ) : (
-                        <>
-                          <XCircle className="w-4 h-4 mr-2" />
-                          Hủy đơn hàng
-                        </>
-                      )}
-                    </Button>
-                  </>
-                )}
 
                 {order.status === "paid" && (
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">

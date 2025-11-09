@@ -14,7 +14,10 @@ export const warehouseRacks = pgTable(
   "warehouse_racks",
   {
     id: identityPrimaryKey(),
-    zoneId: foreignKey("zone_id", warehouseZones.id).notNull(),
+    zoneId: foreignKey("zone_id", warehouseZones.id, {
+      onDelete: "restrict",
+      onUpdate: "cascade",
+    }).notNull(),
     code: code(),
     name: name(),
     description: description(),
