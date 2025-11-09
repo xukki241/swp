@@ -17,24 +17,46 @@ export const customerController = {
       });
     }
 
+    // Validation: name is required
+    if (!payload.name || !payload.name.trim()) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          message: "Tên khách hàng là bắt buộc",
+        },
+      });
+    }
+
     // Single create - check for duplicates
+    // Email is optional but must be unique if provided
     if (payload.email) {
-      const existingCustomer = await customerService.getByEmail(payload.email);
-      if (existingCustomer) {
-        return res.status(400).json({
-          success: false,
-          message: `Customer with email '${payload.email}' already exists`,
-        });
+      const trimmedEmail = payload.email.trim();
+      if (trimmedEmail) {
+        const existingCustomer = await customerService.getByEmail(trimmedEmail);
+        if (existingCustomer) {
+          return res.status(409).json({
+            success: false,
+            error: {
+              message: `Khách hàng với email '${trimmedEmail}' đã tồn tại`,
+            },
+          });
+        }
       }
     }
 
+    // Phone is optional but must be unique if provided
     if (payload.phone) {
-      const existingCustomer = await customerService.getByPhone(payload.phone);
-      if (existingCustomer) {
-        return res.status(400).json({
-          success: false,
-          message: `Customer with phone '${payload.phone}' already exists`,
-        });
+      const trimmedPhone = payload.phone.trim();
+      if (trimmedPhone) {
+        const existingCustomer = await customerService.getByPhone(trimmedPhone);
+        if (existingCustomer) {
+          return res.status(409).json({
+            success: false,
+            error: {
+              message: `Khách hàng với số điện thoại '${trimmedPhone}' đã tồn tại`,
+            },
+          });
+        }
       }
     }
 
@@ -89,9 +111,11 @@ export const customerController = {
         const existingCustomer = await customerService.getByEmail(trimmedEmail);
         // Compare IDs directly (both are UUIDs as strings)
         if (existingCustomer && existingCustomer.id !== id) {
-          return res.status(400).json({
+          return res.status(409).json({
             success: false,
-            message: `Customer with email '${trimmedEmail}' already exists`,
+            error: {
+              message: `Khách hàng với email '${trimmedEmail}' đã tồn tại`,
+            },
           });
         }
       }
@@ -104,9 +128,11 @@ export const customerController = {
         const existingCustomer = await customerService.getByPhone(trimmedPhone);
         // Compare IDs directly (both are UUIDs as strings)
         if (existingCustomer && existingCustomer.id !== id) {
-          return res.status(400).json({
+          return res.status(409).json({
             success: false,
-            message: `Customer with phone '${trimmedPhone}' already exists`,
+            error: {
+              message: `Khách hàng với số điện thoại '${trimmedPhone}' đã tồn tại`,
+            },
           });
         }
       }
@@ -117,7 +143,9 @@ export const customerController = {
     if (!customer) {
       return res.status(404).json({
         success: false,
-        message: "Customer not found",
+        error: {
+          message: "Khách hàng không tồn tại",
+        },
       });
     }
 

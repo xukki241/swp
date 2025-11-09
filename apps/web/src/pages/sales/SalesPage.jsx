@@ -86,10 +86,11 @@ export default function SalesPageV3() {
 
   // Calculate total
   const totalAmount = useMemo(() => {
-    return activeOrder.cart.reduce(
-      (sum, item) => sum + item.sellPrice * item.quantity,
-      0
-    );
+    return activeOrder.cart.reduce((sum, item) => {
+      const price = Number(item.sellPrice) || 0;
+      const qty = Number(item.quantity) || 0;
+      return sum + (isNaN(price) ? 0 : price * qty);
+    }, 0);
   }, [activeOrder.cart]);
 
   // Calculate change
@@ -270,11 +271,12 @@ export default function SalesPageV3() {
               : item
           );
         } else {
+          const parsedPrice = Number(medication.sellPrice) || 0;
           const newItem = {
             medication_variant_id: medication.id,
             medicationName: medication.medicationName || medication.name,
             variantName: medication.variantName || "",
-            sellPrice: Number(medication.sellPrice),
+            sellPrice: isNaN(parsedPrice) ? 0 : parsedPrice,
             unit: medication.unit || "đơn vị",
             availableQuantity: availableQty,
             quantity: 1,
@@ -334,12 +336,39 @@ export default function SalesPageV3() {
 
     setIsCreatingCustomer(true);
     try {
-      const customer = await customerService.createCustomer(newCustomerData);
-      setCustomer(customer);
+      const response = await customerService.createCustomer(newCustomerData);
+      const customerData = response?.data || response;
+      setCustomer(customerData);
       setShowNewCustomerForm(false);
       setNewCustomerData({ name: "", email: "", phone: "" });
+      toast.success("Tạo khách hàng thành công!");
     } catch (error) {
-      toast.error("Lỗi tạo khách hàng: " + error.message);
+      console.error("Create customer error:", error);
+
+      // Extract detailed error message
+      let message = "Không thể tạo khách hàng";
+      if (error?.response?.data?.error) {
+        const errorData = error.response.data.error;
+        if (typeof errorData === "object" && errorData.message) {
+          message = errorData.message;
+        } else if (typeof errorData === "string") {
+          message = errorData;
+        }
+      } else if (error?.response?.data?.message) {
+        message = error.response.data.message;
+      } else if (error?.response?.status) {
+        if (error.response.status === 400) {
+          message = error.response.data?.error?.message || "Dữ liệu không hợp lệ";
+        } else if (error.response.status === 409) {
+          message = "Khách hàng đã tồn tại";
+        } else if (error.response.status === 500) {
+          message = "Lỗi máy chủ. Vui lòng thử lại sau";
+        }
+      } else if (error?.message) {
+        message = error.message;
+      }
+
+      toast.error(message);
     } finally {
       setIsCreatingCustomer(false);
     }
@@ -373,6 +402,7 @@ export default function SalesPageV3() {
         quantity: item.quantity,
         unit_price: item.sellPrice,
       })),
+      total: totalAmount,
     };
 
     if (activeOrder.paymentMethod === "mobile_payment") {
@@ -401,12 +431,15 @@ export default function SalesPageV3() {
         setSuccessOrder({
           ...orderResult,
           status: "paid", // Set status to paid for display
-          paymentMethod: orderData.payment_method,
+          paymentMethod: orderData.payment_method || "cash",
           totalAmount: activeOrder.cart.reduce(
             (sum, item) => sum + item.sellPrice * item.quantity,
             0
           ),
-          items: activeOrder.cart,
+          items: activeOrder.cart.map((item) => ({
+            ...item,
+            name: item.medicationName,
+          })),
         });
 
         // Reset order
@@ -419,7 +452,38 @@ export default function SalesPageV3() {
 
         toast.success("Đơn hàng đã hoàn tất!");
       } catch (error) {
-        toast.error("Lỗi tạo đơn hàng: " + error.message);
+        console.error("Submit order error:", error);
+
+        // Extract detailed error message
+        let message = "Không thể tạo đơn hàng";
+        if (error?.response?.data?.error) {
+          const errorData = error.response.data.error;
+          if (typeof errorData === "object" && errorData.message) {
+            message = errorData.message;
+          } else if (typeof errorData === "string") {
+            message = errorData;
+          }
+        } else if (error?.response?.data?.message) {
+          message = error.response.data.message;
+        } else if (error?.response?.status) {
+          if (error.response.status === 400) {
+            message = error.response.data?.error?.message || "Dữ liệu không hợp lệ";
+          } else if (error.response.status === 401) {
+            message = "Chưa xác thực. Vui lòng đăng nhập lại";
+          } else if (error.response.status === 403) {
+            message = "Bạn không có quyền tạo đơn hàng";
+          } else if (error.response.status === 404) {
+            message = "Khách hàng hoặc sản phẩm không tồn tại";
+          } else if (error.response.status === 409) {
+            message = error.response.data?.error?.message || "Dữ liệu bị xung đột";
+          } else if (error.response.status >= 500) {
+            message = "Lỗi máy chủ. Vui lòng thử lại sau";
+          }
+        } else if (error?.message) {
+          message = error.message;
+        }
+
+        toast.error(message);
       } finally {
         setIsSubmitting(false);
         setShowVietQRDialog(false);
@@ -476,11 +540,10 @@ export default function SalesPageV3() {
               return (
                 <div
                   key={order.id}
-                  className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all ${
-                    isActive
-                      ? "border-primary bg-primary/10 text-foreground shadow-sm"
-                      : "border-border bg-card hover:border-primary/50 text-muted-foreground"
-                  }`}
+                  className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all ${isActive
+                    ? "border-primary bg-primary/10 text-foreground shadow-sm"
+                    : "border-border bg-card hover:border-primary/50 text-muted-foreground"
+                    }`}
                   onClick={() => setActiveOrderId(order.id)}
                 >
                   <FileText className="h-4 w-4" />
@@ -606,7 +669,7 @@ export default function SalesPageV3() {
                           </td>
                           <td className="p-3 text-right">
                             <div className="font-semibold text-primary">
-                              {item.sellPrice.toLocaleString("vi-VN")}₫
+                              {(Number(item.sellPrice) || 0).toLocaleString("vi-VN")}₫
                             </div>
                             <div className="text-xs text-muted-foreground">
                               / {item.unit}
@@ -655,7 +718,7 @@ export default function SalesPageV3() {
                             </div>
                           </td>
                           <td className="p-3 text-right font-bold text-primary">
-                            {(item.sellPrice * item.quantity).toLocaleString(
+                            {((Number(item.sellPrice) || 0) * item.quantity).toLocaleString(
                               "vi-VN"
                             )}
                             ₫
@@ -700,11 +763,10 @@ export default function SalesPageV3() {
                       <button
                         key={value}
                         onClick={() => setPaymentMethod(value)}
-                        className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${
-                          activeOrder.paymentMethod === value
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border hover:border-primary/50"
-                        }`}
+                        className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${activeOrder.paymentMethod === value
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border hover:border-primary/50"
+                          }`}
                       >
                         <Icon className="h-4 w-4" />
                         <span className="text-sm font-medium">{label}</span>
