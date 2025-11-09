@@ -101,10 +101,15 @@ export const logout = async (_req, res, _next) => {
     });
   } catch (error) {
     logger.error("Error in logout controller:", error);
-    res.status(200).json({
-      success: true,
-      message: "Logout successful. Please remove token from client.",
-    });
+    // Try to send response, but handle if it fails
+    try {
+      res.status(200).json({
+        success: true,
+        message: "Logout successful. Please remove token from client.",
+      });
+    } catch (innerError) {
+      logger.error("Error sending response in logout controller:", innerError);
+    }
   }
 };
 
