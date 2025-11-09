@@ -18,12 +18,9 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-      // Store tokens and user info
-      if (data.accessToken || data.token) {
-        localStorage.setItem("token", data.accessToken || data.token);
-      }
-      if (data.refreshToken) {
-        localStorage.setItem("refreshToken", data.refreshToken);
+      // Store token and user info
+      if (data.token) {
+        localStorage.setItem("token", data.token);
       }
       if (data.user) {
         localStorage.setItem("user", JSON.stringify(data.user));
@@ -76,7 +73,6 @@ export const useLogout = () => {
     onSuccess: () => {
       // Clear storage
       localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
 
       // Redirect to login
@@ -85,7 +81,6 @@ export const useLogout = () => {
     onError: () => {
       // Clear storage even on error
       localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
       navigate("/login");
     },

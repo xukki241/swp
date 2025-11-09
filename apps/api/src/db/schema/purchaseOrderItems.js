@@ -11,10 +11,17 @@ import { supplierMedicationVariants } from "./supplierMedicationVariants.js";
 
 export const purchaseOrderItems = pgTable("purchase_order_items", {
   id: identityPrimaryKey(),
-  purchaseOrderId: foreignKey("purchase_order_id", purchaseOrders.id).notNull(),
+  purchaseOrderId: foreignKey("purchase_order_id", purchaseOrders.id, {
+    onDelete: "restrict",
+    onUpdate: "cascade",
+  }).notNull(),
   supplierMedicationVariantId: foreignKey(
     "supplier_medication_variant_id",
-    supplierMedicationVariants.id
+    supplierMedicationVariants.id,
+    {
+      onDelete: "restrict",
+      onUpdate: "cascade",
+    }
   ).notNull(),
   quantity: int("quantity").notNull(),
   unitPrice: decimalColumn("unit_price").notNull(),

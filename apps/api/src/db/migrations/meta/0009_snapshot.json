@@ -1,6 +1,6 @@
 {
-  "id": "b0d6d250-017e-4ce3-b3da-3507f2201b56",
-  "prevId": "ca97c50c-e3e5-4723-bea0-e24c24c13613",
+  "id": "741cf9f2-0e5f-487f-98d8-86f4ce397c10",
+  "prevId": "b0d6d250-017e-4ce3-b3da-3507f2201b56",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -61,7 +61,7 @@
           "tableTo": "users",
           "columnsFrom": ["user_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "cascade"
         }
       },
@@ -230,7 +230,7 @@
           "tableTo": "users",
           "columnsFrom": ["uploaded_by"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "cascade"
         }
       },
@@ -358,7 +358,7 @@
           "tableTo": "medication_variants",
           "columnsFrom": ["medication_variant_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "inventory_purchase_order_receipt_items_id_purchase_order_receipt_items_id_fk": {
@@ -367,7 +367,7 @@
           "tableTo": "purchase_order_receipt_items",
           "columnsFrom": ["purchase_order_receipt_items_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "inventory_bin_id_warehouse_bins_id_fk": {
@@ -376,7 +376,7 @@
           "tableTo": "warehouse_bins",
           "columnsFrom": ["bin_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },
@@ -474,7 +474,7 @@
           "tableTo": "files",
           "columnsFrom": ["image_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },
@@ -613,7 +613,7 @@
           "tableTo": "medications",
           "columnsFrom": ["medication_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },
@@ -742,86 +742,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.refresh_tokens": {
-      "name": "refresh_tokens",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "token_hash": {
-          "name": "token_hash",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "last_used_at": {
-          "name": "last_used_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "device_info": {
-          "name": "device_info",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "ip_address": {
-          "name": "ip_address",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "is_revoked": {
-          "name": "is_revoked",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "refresh_tokens_user_id_users_id_fk": {
-          "name": "refresh_tokens_user_id_users_id_fk",
-          "tableFrom": "refresh_tokens",
-          "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.purchase_order_items": {
       "name": "purchase_order_items",
       "schema": "",
@@ -872,7 +792,7 @@
           "tableTo": "purchase_orders",
           "columnsFrom": ["purchase_order_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "purchase_order_items_supplier_medication_variant_id_supplier_medication_variants_id_fk": {
@@ -881,7 +801,7 @@
           "tableTo": "supplier_medication_variants",
           "columnsFrom": ["supplier_medication_variant_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },
@@ -929,7 +849,7 @@
           "tableTo": "purchase_order_receipts",
           "columnsFrom": ["purchase_order_receipt_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "purchase_order_receipt_items_purchase_order_item_id_purchase_order_items_id_fk": {
@@ -938,7 +858,7 @@
           "tableTo": "purchase_order_items",
           "columnsFrom": ["purchase_order_item_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },
@@ -986,7 +906,7 @@
           "tableTo": "purchase_orders",
           "columnsFrom": ["purchase_order_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "purchase_order_receipts_received_by_users_id_fk": {
@@ -995,7 +915,7 @@
           "tableTo": "users",
           "columnsFrom": ["received_by"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "cascade"
         }
       },
@@ -1087,7 +1007,7 @@
           "tableTo": "suppliers",
           "columnsFrom": ["supplier_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "purchase_orders_created_by_users_id_fk": {
@@ -1095,6 +1015,86 @@
           "tableFrom": "purchase_orders",
           "tableTo": "users",
           "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.refresh_tokens": {
+      "name": "refresh_tokens",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_used_at": {
+          "name": "last_used_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "device_info": {
+          "name": "device_info",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_revoked": {
+          "name": "is_revoked",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "refresh_tokens_user_id_users_id_fk": {
+          "name": "refresh_tokens_user_id_users_id_fk",
+          "tableFrom": "refresh_tokens",
+          "tableTo": "users",
+          "columnsFrom": ["user_id"],
           "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
@@ -1202,7 +1202,7 @@
           "tableTo": "sales_orders",
           "columnsFrom": ["sales_order_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "sales_order_items_medication_variant_id_medication_variants_id_fk": {
@@ -1211,7 +1211,7 @@
           "tableTo": "medication_variants",
           "columnsFrom": ["medication_variant_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },
@@ -1323,7 +1323,7 @@
           "tableTo": "customers",
           "columnsFrom": ["customer_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "sales_orders_salesperson_id_users_id_fk": {
@@ -1332,7 +1332,7 @@
           "tableTo": "users",
           "columnsFrom": ["salesperson_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "cascade"
         },
         "sales_orders_prescription_id_files_id_fk": {
@@ -1341,7 +1341,7 @@
           "tableTo": "files",
           "columnsFrom": ["prescription_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },
@@ -1524,7 +1524,7 @@
           "tableTo": "users",
           "columnsFrom": ["user_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "shift_assignments_shift_id_shifts_id_fk": {
@@ -1533,7 +1533,7 @@
           "tableTo": "shifts",
           "columnsFrom": ["shift_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "shift_assignments_created_by_users_id_fk": {
@@ -1542,7 +1542,7 @@
           "tableTo": "users",
           "columnsFrom": ["created_by"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "cascade"
         }
       },
@@ -1695,7 +1695,7 @@
           "tableTo": "suppliers",
           "columnsFrom": ["supplier_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "supplier_medication_variants_medication_variant_id_medication_variants_id_fk": {
@@ -1704,7 +1704,7 @@
           "tableTo": "medication_variants",
           "columnsFrom": ["medication_variant_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "supplier_medication_variants_contract_id_files_id_fk": {
@@ -1713,7 +1713,7 @@
           "tableTo": "files",
           "columnsFrom": ["contract_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },
@@ -2236,7 +2236,7 @@
           "tableTo": "warehouse_racks",
           "columnsFrom": ["rack_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },
@@ -2333,7 +2333,7 @@
           "tableTo": "warehouse_zones",
           "columnsFrom": ["zone_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },

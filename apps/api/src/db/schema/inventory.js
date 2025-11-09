@@ -22,13 +22,24 @@ export const inventory = pgTable(
     id: identityPrimaryKey(),
     medicationVariantId: foreignKey(
       "medication_variant_id",
-      medicationVariants.id
+      medicationVariants.id,
+      {
+        onDelete: "restrict",
+        onUpdate: "cascade",
+      }
     ).notNull(),
     purchaseOrderReceiptItemsId: foreignKey(
       "purchase_order_receipt_items_id",
-      purchaseOrderReceiptItems.id
+      purchaseOrderReceiptItems.id,
+      {
+        onDelete: "restrict",
+        onUpdate: "cascade",
+      }
     ).notNull(),
-    binId: foreignKey("bin_id", warehouseBins.id).notNull(),
+    binId: foreignKey("bin_id", warehouseBins.id, {
+      onDelete: "restrict",
+      onUpdate: "cascade",
+    }).notNull(),
     batchNumber: varchar("batch_number", { length: 100 }).notNull(),
     manufactureDate: date("manufacture_date"),
     expiryDate: date("expiry_date"),

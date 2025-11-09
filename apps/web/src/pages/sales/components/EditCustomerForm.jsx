@@ -57,13 +57,14 @@ export default function EditCustomerForm({ customer, onClose, onSuccess }) {
         updateData
       );
 
-      const updatedCustomer = response.data || response;
+      const updatedCustomer = response?.data || response;
       toast.success("Cập nhật thông tin khách hàng thành công!");
       onSuccess(updatedCustomer);
       onClose();
     } catch (error) {
       console.error("Lỗi cập nhật khách hàng:", error);
 
+      // Extract detailed error message
       let message = "Không thể cập nhật thông tin khách hàng";
       if (error?.response?.data?.error) {
         const errorData = error.response.data.error;
@@ -74,6 +75,18 @@ export default function EditCustomerForm({ customer, onClose, onSuccess }) {
         }
       } else if (error?.response?.data?.message) {
         message = error.response.data.message;
+      } else if (error?.response?.status) {
+        if (error.response.status === 400) {
+          message =
+            error.response.data?.error?.message || "Dữ liệu không hợp lệ";
+        } else if (error.response.status === 404) {
+          message = "Khách hàng không tồn tại";
+        } else if (error.response.status === 409) {
+          message =
+            error.response.data?.error?.message || "Dữ liệu bị xung đột";
+        } else if (error.response.status >= 500) {
+          message = "Lỗi máy chủ. Vui lòng thử lại sau";
+        }
       } else if (error?.message) {
         message = error.message;
       }

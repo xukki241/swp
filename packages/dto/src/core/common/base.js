@@ -7,13 +7,23 @@ export const uuidSchema = z.uuid();
 export const nameSchema = z.string().min(1).max(100);
 export const codeSchema = z.string().min(1).max(50);
 export const descriptionSchema = z.string().nullable().optional();
-export const emailSchema = z.email().max(255).nullable().optional();
-export const phoneSchema = z
-  .string()
-  .regex(/^\d{10}$/, "Phone must be exactly 10 digits")
-  .nullable()
-  .optional();
-export const addressSchema = z.string().nullable().optional();
+// Email and phone schemas: preprocess empty strings to null before validation
+export const emailSchema = z.preprocess(
+  (val) => (val === "" ? null : val),
+  z.email().max(255).nullable().optional()
+);
+export const phoneSchema = z.preprocess(
+  (val) => (val === "" ? null : val),
+  z
+    .string()
+    .regex(/^\d{10}$/, "Phone must be exactly 10 digits")
+    .nullable()
+    .optional()
+);
+export const addressSchema = z.preprocess(
+  (val) => (val === "" ? null : val),
+  z.string().nullable().optional()
+);
 
 // Numeric fields
 export const intSchema = z.number().int();

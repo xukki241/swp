@@ -1,11 +1,5 @@
+import backgroundImg from "@/assets/background.jpg";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -22,9 +16,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
 import { toast } from "sonner";
+import PharmacyPolicyDialog from "./components/PharmacyPolicyDialog";
 
 export default function RegisterPage() {
   const [showPolicyDialog, setShowPolicyDialog] = useState(false);
+  const [showPharmacyPolicyDialog, setShowPharmacyPolicyDialog] =
+    useState(false);
 
   const {
     register,
@@ -39,7 +36,8 @@ export default function RegisterPage() {
       address: "",
       password: "",
       confirmPassword: "",
-      agreePolicy: false, // Added agreePolicy field
+      agreePolicy: false,
+      agreePharmacyPolicy: false,
     },
   });
 
@@ -62,26 +60,33 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
-      <Card className="w-full max-w-md shadow-lg rounded-2xl border-0">
-        <CardHeader className="space-y-4 text-center pb-4">
-          <div className="flex justify-center">
-            <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Pill className="h-8 w-8 text-primary" />
+    <div className="flex min-h-screen overflow-hidden">
+      {/* Left Side - Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white overflow-y-auto animate-in fade-in slide-in-from-left-10 duration-700">
+        <div className="w-full max-w-md py-8">
+          {/* Logo and Title */}
+          <div className="mb-6 animate-in fade-in slide-in-from-left-5 duration-700 delay-100">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center transform transition-transform hover:scale-110 duration-300">
+                <Pill className="h-6 w-6 text-primary" />
+              </div>
+              <span className="text-2xl font-bold text-primary">
+                PharmaFlow
+              </span>
             </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Tạo tài khoản mới
+            </h1>
+            <p className="text-gray-600">
+              Tham gia PharmaFlow để quản lý nhà thuốc hiệu quả
+            </p>
           </div>
-          <div>
-            <CardTitle className="text-3xl font-bold text-gray-800">
-              Tạo tài khoản
-            </CardTitle>
-            <CardDescription className="text-base mt-2">
-              Tham gia PharmaFlow để bắt đầu
-            </CardDescription>
-          </div>
-        </CardHeader>
 
-        <CardContent className="p-8 pt-4">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Form */}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-4 animate-in fade-in slide-in-from-left-5 duration-700 delay-200"
+          >
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">
                 Họ và tên
@@ -224,7 +229,7 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label className="flex items-start space-x-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -251,12 +256,39 @@ export default function RegisterPage() {
                   {errors.agreePolicy.message}
                 </p>
               )}
+
+              <Label className="flex items-start space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="agreePharmacyPolicy"
+                  {...register("agreePharmacyPolicy", {
+                    required:
+                      "Bạn phải đồng ý tuân thủ quy định về kinh doanh thuốc.",
+                  })}
+                  className="accent-primary h-4 w-4 mt-0.5 cursor-pointer"
+                />
+                <span className="text-sm text-gray-700">
+                  Tôi cam kết tuân thủ{" "}
+                  <button
+                    type="button"
+                    onClick={() => setShowPharmacyPolicyDialog(true)}
+                    className="text-primary underline hover:text-primary/80 font-medium"
+                  >
+                    Nghị định 102/2016/NĐ-CP về điều kiện kinh doanh thuốc
+                  </button>
+                </span>
+              </Label>
+              {errors.agreePharmacyPolicy && (
+                <p className="text-sm text-destructive mt-1">
+                  {errors.agreePharmacyPolicy.message}
+                </p>
+              )}
             </div>
 
             <Button
               type="submit"
               disabled={registerMutation.isPending}
-              className="w-full h-11 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium mt-6"
+              className="w-full h-11 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium mt-6 transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
             >
               {registerMutation.isPending ? (
                 <span className="flex items-center gap-2">
@@ -269,19 +301,47 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
+          <div className="mt-6 text-center animate-in fade-in duration-700 delay-300">
+            <p className="text-sm text-gray-600">
               Đã có tài khoản?{" "}
               <Link
                 to="/login"
-                className="text-primary font-medium hover:underline"
+                className="text-primary font-medium hover:underline transition-all"
               >
-                Đăng nhập
+                Đăng nhập ngay
               </Link>
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      {/* Right Side - Image */}
+      <div
+        className="hidden lg:flex flex-1 bg-cover bg-center bg-no-repeat relative animate-in fade-in slide-in-from-right-10 duration-700"
+        style={{
+          backgroundImage: `url(${backgroundImg})`,
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-primary/70 animate-in fade-in duration-1000" />
+        <div className="relative z-10 flex flex-col items-center justify-center text-white p-12 text-center">
+          <h2 className="text-4xl font-bold mb-4 animate-in fade-in slide-in-from-bottom-3 duration-700 delay-500">
+            Bắt đầu hành trình số hóa
+          </h2>
+          <p className="text-xl text-white/90 max-w-md mb-8 animate-in fade-in slide-in-from-bottom-3 duration-700 delay-700">
+            Quản lý nhà thuốc chuyên nghiệp với hệ thống tự động hóa toàn diện
+          </p>
+          <div className="grid grid-cols-2 gap-4 max-w-md w-full animate-in fade-in zoom-in-95 duration-700 delay-1000">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 transform transition-all hover:scale-105 hover:bg-white/20 duration-300">
+              <div className="text-3xl font-bold">1000+</div>
+              <div className="text-sm text-white/90">Sản phẩm</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 transform transition-all hover:scale-105 hover:bg-white/20 duration-300">
+              <div className="text-3xl font-bold">24/7</div>
+              <div className="text-sm text-white/90">Hỗ trợ</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Policy Dialog */}
       <Dialog open={showPolicyDialog} onOpenChange={setShowPolicyDialog}>
@@ -431,6 +491,12 @@ export default function RegisterPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Pharmacy Policy Dialog */}
+      <PharmacyPolicyDialog
+        open={showPharmacyPolicyDialog}
+        onOpenChange={setShowPharmacyPolicyDialog}
+      />
     </div>
   );
 }

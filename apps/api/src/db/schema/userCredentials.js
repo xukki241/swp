@@ -7,7 +7,10 @@ export const userCredentials = pgTable(
   "user_credentials",
   {
     id: identityPrimaryKey(),
-    userId: foreignKey("user_id", users.id).notNull(),
+    userId: foreignKey("user_id", users.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }).notNull(),
     provider: varchar("provider", { length: 50 }).notNull(),
     identifier: varchar("identifier", { length: 255 }).notNull(),
     secret: varchar("secret", { length: 255 }).notNull(),
