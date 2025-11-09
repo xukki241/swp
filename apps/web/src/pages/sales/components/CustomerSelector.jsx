@@ -35,7 +35,31 @@ export default function CustomerSelector({ onSelectCustomer }) {
       setCustomers(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("[v0] Customer search error:", error);
-      toast.error("Không thể tìm kiếm khách hàng");
+
+      // Extract detailed error message
+      let message = "Không thể tìm kiếm khách hàng";
+      if (error?.response?.data?.error) {
+        const errorData = error.response.data.error;
+        if (typeof errorData === "object" && errorData.message) {
+          message = errorData.message;
+        } else if (typeof errorData === "string") {
+          message = errorData;
+        }
+      } else if (error?.response?.data?.message) {
+        message = error.response.data.message;
+      } else if (error?.response?.status) {
+        if (error.response.status === 400) {
+          message = error.response.data?.error?.message || "Tham số tìm kiếm không hợp lệ";
+        } else if (error.response.status === 401) {
+          message = "Chưa xác thực. Vui lòng đăng nhập lại";
+        } else if (error.response.status >= 500) {
+          message = "Lỗi máy chủ. Vui lòng thử lại sau";
+        }
+      } else if (error?.message) {
+        message = error.message;
+      }
+
+      toast.error(message);
       setCustomers([]);
     } finally {
       setIsLoading(false);
