@@ -86,10 +86,11 @@ export default function SalesPageV3() {
 
   // Calculate total
   const totalAmount = useMemo(() => {
-    return activeOrder.cart.reduce(
-      (sum, item) => sum + item.sellPrice * item.quantity,
-      0
-    );
+    return activeOrder.cart.reduce((sum, item) => {
+      const price = Number(item.sellPrice) || 0;
+      const qty = Number(item.quantity) || 0;
+      return sum + (isNaN(price) ? 0 : price * qty);
+    }, 0);
   }, [activeOrder.cart]);
 
   // Calculate change
@@ -270,11 +271,12 @@ export default function SalesPageV3() {
               : item
           );
         } else {
+          const parsedPrice = Number(medication.sellPrice) || 0;
           const newItem = {
             medication_variant_id: medication.id,
             medicationName: medication.medicationName || medication.name,
             variantName: medication.variantName || "",
-            sellPrice: Number(medication.sellPrice),
+            sellPrice: isNaN(parsedPrice) ? 0 : parsedPrice,
             unit: medication.unit || "đơn vị",
             availableQuantity: availableQty,
             quantity: 1,
@@ -400,6 +402,7 @@ export default function SalesPageV3() {
         quantity: item.quantity,
         unit_price: item.sellPrice,
       })),
+      total: totalAmount,
     };
 
     if (activeOrder.paymentMethod === "mobile_payment") {
@@ -538,8 +541,8 @@ export default function SalesPageV3() {
                 <div
                   key={order.id}
                   className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all ${isActive
-                      ? "border-primary bg-primary/10 text-foreground shadow-sm"
-                      : "border-border bg-card hover:border-primary/50 text-muted-foreground"
+                    ? "border-primary bg-primary/10 text-foreground shadow-sm"
+                    : "border-border bg-card hover:border-primary/50 text-muted-foreground"
                     }`}
                   onClick={() => setActiveOrderId(order.id)}
                 >
@@ -666,7 +669,7 @@ export default function SalesPageV3() {
                           </td>
                           <td className="p-3 text-right">
                             <div className="font-semibold text-primary">
-                              {item.sellPrice.toLocaleString("vi-VN")}₫
+                              {(Number(item.sellPrice) || 0).toLocaleString("vi-VN")}₫
                             </div>
                             <div className="text-xs text-muted-foreground">
                               / {item.unit}
@@ -715,7 +718,7 @@ export default function SalesPageV3() {
                             </div>
                           </td>
                           <td className="p-3 text-right font-bold text-primary">
-                            {(item.sellPrice * item.quantity).toLocaleString(
+                            {((Number(item.sellPrice) || 0) * item.quantity).toLocaleString(
                               "vi-VN"
                             )}
                             ₫
@@ -761,8 +764,8 @@ export default function SalesPageV3() {
                         key={value}
                         onClick={() => setPaymentMethod(value)}
                         className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${activeOrder.paymentMethod === value
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border hover:border-primary/50"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border hover:border-primary/50"
                           }`}
                       >
                         <Icon className="h-4 w-4" />
