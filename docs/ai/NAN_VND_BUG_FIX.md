@@ -29,6 +29,7 @@
 ### Fix 1: Total Amount Calculation (Line 88-95)
 
 **Before:**
+
 ```javascript
 const totalAmount = useMemo(() => {
   return activeOrder.cart.reduce(
@@ -39,6 +40,7 @@ const totalAmount = useMemo(() => {
 ```
 
 **After:**
+
 ```javascript
 const totalAmount = useMemo(() => {
   return activeOrder.cart.reduce((sum, item) => {
@@ -50,6 +52,7 @@ const totalAmount = useMemo(() => {
 ```
 
 **What changed:**
+
 - Convert price to number with fallback to 0
 - Convert quantity to number with fallback to 0
 - Check if price is NaN and use 0 instead
@@ -58,6 +61,7 @@ const totalAmount = useMemo(() => {
 ### Fix 2: Adding Item to Cart (Line 277-288)
 
 **Before:**
+
 ```javascript
 const newItem = {
   medication_variant_id: medication.id,
@@ -72,6 +76,7 @@ const newItem = {
 ```
 
 **After:**
+
 ```javascript
 const parsedPrice = Number(medication.sellPrice) || 0;
 const newItem = {
@@ -87,38 +92,45 @@ const newItem = {
 ```
 
 **What changed:**
+
 - Check if parsed price is NaN and replace with 0
 - Ensures every cart item has a valid numeric price
 
 ### Fix 3: Display Single Item Price (Line 671)
 
 **Before:**
+
 ```javascript
 {item.sellPrice.toLocaleString("vi-VN")}₫
 ```
 
 **After:**
+
 ```javascript
 {(Number(item.sellPrice) || 0).toLocaleString("vi-VN")}₫
 ```
 
 **What changed:**
+
 - Convert price to number with fallback to 0
 - Prevents NaN from being formatted and displayed
 
 ### Fix 4: Display Item Total Price (Line 720)
 
 **Before:**
+
 ```javascript
 {(item.sellPrice * item.quantity).toLocaleString("vi-VN")}₫
 ```
 
 **After:**
+
 ```javascript
 {((Number(item.sellPrice) || 0) * item.quantity).toLocaleString("vi-VN")}₫
 ```
 
 **What changed:**
+
 - Convert price to number with fallback to 0
 - Calculate correct total before formatting
 
@@ -142,42 +154,47 @@ const newItem = {
 
 ## 📋 Changes Summary
 
-| Location | Line | Change | Impact |
-|----------|------|--------|--------|
-| SalesPage.jsx | 88-95 | Add NaN check to totalAmount calculation | Fixes total amount NaN |
-| SalesPage.jsx | 277-288 | Add NaN check when adding to cart | Ensures valid prices stored |
-| SalesPage.jsx | 671 | Add fallback 0 to sellPrice | Fixes price display NaN |
-| SalesPage.jsx | 720 | Add fallback 0 to item calculation | Fixes item total NaN |
+| Location      | Line    | Change                                   | Impact                      |
+| ------------- | ------- | ---------------------------------------- | --------------------------- |
+| SalesPage.jsx | 88-95   | Add NaN check to totalAmount calculation | Fixes total amount NaN      |
+| SalesPage.jsx | 277-288 | Add NaN check when adding to cart        | Ensures valid prices stored |
+| SalesPage.jsx | 671     | Add fallback 0 to sellPrice              | Fixes price display NaN     |
+| SalesPage.jsx | 720     | Add fallback 0 to item calculation       | Fixes item total NaN        |
 
 ---
 
 ## 🧪 Test Cases
 
 ### Test 1: Valid Price
+
 ```
 Medication: { sellPrice: 75000 }
 Result: "75,000 VNĐ" ✅
 ```
 
 ### Test 2: Undefined Price
+
 ```
 Medication: { sellPrice: undefined }
 Result: "0 VNĐ" ✅ (instead of "NaN VNĐ")
 ```
 
 ### Test 3: Null Price
+
 ```
 Medication: { sellPrice: null }
 Result: "0 VNĐ" ✅ (instead of "NaN VNĐ")
 ```
 
 ### Test 4: Non-numeric String Price
+
 ```
 Medication: { sellPrice: "invalid" }
 Result: "0 VNĐ" ✅ (instead of "NaN VNĐ")
 ```
 
 ### Test 5: Multiple Items in Cart
+
 ```
 Item 1: 75,000 VNĐ × 2 = 150,000 VNĐ
 Item 2: undefined → 0 VNĐ × 1 = 0 VNĐ
@@ -191,17 +208,20 @@ Total: 150,000 VNĐ ✅ (not "NaN VNĐ")
 To avoid similar NaN issues in the future:
 
 1. **Always validate numeric fields:**
+
    ```javascript
    const price = Number(value) || 0;
    if (isNaN(price)) return 0;
    ```
 
 2. **Use fallbacks for calculations:**
+
    ```javascript
    const total = (Number(price) || 0) * (Number(qty) || 0);
    ```
 
 3. **Check before formatting:**
+
    ```javascript
    const formatted = (Number(value) || 0).toLocaleString("vi-VN");
    ```
@@ -221,6 +241,7 @@ To avoid similar NaN issues in the future:
 ## 🚀 Testing
 
 After deploying this fix, test:
+
 1. Add medications with valid prices → Should show correct prices ✅
 2. (If possible) Test with invalid price data → Should show 0 VNĐ ✅
 3. Calculate multiple items → Total should be correct ✅
@@ -231,11 +252,13 @@ After deploying this fix, test:
 ## 📌 Related Issues
 
 This fix addresses:
+
 - NaN displaying in price fields
 - Invalid total calculations
 - Broken arithmetic with invalid numbers
 
 Similar patterns may exist in other components that calculate prices or totals. Consider auditing:
+
 - `OrderSuccessModal.jsx` - displays final order total
 - `CartSummary.jsx` - if it exists
 - Any component that performs price calculations

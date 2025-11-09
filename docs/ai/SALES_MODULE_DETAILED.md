@@ -35,7 +35,9 @@ The Sales Module handles the complete sales workflow in the pharmacy system, inc
 ```
 
 #### API: Search Customer
+
 **Endpoint:** `GET /api/customers?search={term}`
+
 ```json
 Request:
 {
@@ -65,7 +67,9 @@ Response (200 OK):
 ```
 
 #### API: Create New Customer
+
 **Endpoint:** `POST /api/customers`
+
 ```json
 Request:
 {
@@ -133,7 +137,9 @@ Error Cases:
 ```
 
 #### API: Search Medications
+
 **Endpoint:** `GET /api/medications?search={term}&limit=20`
+
 ```json
 Request:
 {
@@ -179,6 +185,7 @@ Response (200 OK):
 ```
 
 #### Cart Item Structure (Frontend State)
+
 ```javascript
 {
   medication_variant_id: "uuid-var-1",    // Required for API
@@ -230,7 +237,9 @@ Response (200 OK):
 ```
 
 #### API: Create Sales Order
+
 **Endpoint:** `POST /api/sales`
+
 ```json
 Request:
 {
@@ -313,7 +322,9 @@ Error Cases:
 ```
 
 #### API: Update Order Status (Mark as Paid)
+
 **Endpoint:** `PATCH /api/sales/{orderId}`
+
 ```json
 Request:
 {
@@ -402,6 +413,7 @@ Response (200 OK):
 ## 📱 API Reference - Sales Module
 
 ### 1. Create Sales Order
+
 ```
 POST /api/sales
 Authorization: Bearer {token}
@@ -428,6 +440,7 @@ Response: 201 Created
 ```
 
 ### 2. Get All Sales Orders (with filtering)
+
 ```
 GET /api/sales?page=1&limit=50&status=pending&sortBy=orderDate&sortOrder=desc
 Authorization: Bearer {token}
@@ -459,6 +472,7 @@ Response: 200 OK
 ```
 
 ### 3. Get Sales Order by ID
+
 ```
 GET /api/sales/{id}
 Authorization: Bearer {token}
@@ -490,6 +504,7 @@ Response: 200 OK
 ```
 
 ### 4. Update Order Status
+
 ```
 PATCH /api/sales/{id}
 Authorization: Bearer {token}
@@ -509,6 +524,7 @@ Response: 200 OK
 ```
 
 ### 5. Cancel Sales Order (Owner only)
+
 ```
 DELETE /api/sales/{id}
 Authorization: Bearer {token}
@@ -527,6 +543,7 @@ Error: 403 Forbidden (if not owner)
 ## 🛒 Frontend State Management
 
 ### Active Order Structure
+
 ```javascript
 {
   id: "temp-order-id",              // Temporary ID until created
@@ -557,28 +574,30 @@ Error: 403 Forbidden (if not owner)
 
 ## 🔐 Error Handling & HTTP Status Codes
 
-| Status | Meaning | Example |
-|--------|---------|---------|
-| 201 | Order created successfully | New order in system |
-| 200 | Request successful | Order updated, retrieved |
-| 400 | Bad request (validation error) | Missing required fields, invalid data |
-| 401 | Unauthorized | Missing/invalid authentication token |
-| 403 | Forbidden | Not owner (can't delete order), permission denied |
-| 404 | Not found | Order ID doesn't exist, customer not found |
-| 409 | Conflict | Insufficient stock, duplicate entry |
-| 500 | Server error | Database error, unexpected error |
+| Status | Meaning                        | Example                                           |
+| ------ | ------------------------------ | ------------------------------------------------- |
+| 201    | Order created successfully     | New order in system                               |
+| 200    | Request successful             | Order updated, retrieved                          |
+| 400    | Bad request (validation error) | Missing required fields, invalid data             |
+| 401    | Unauthorized                   | Missing/invalid authentication token              |
+| 403    | Forbidden                      | Not owner (can't delete order), permission denied |
+| 404    | Not found                      | Order ID doesn't exist, customer not found        |
+| 409    | Conflict                       | Insufficient stock, duplicate entry               |
+| 500    | Server error                   | Database error, unexpected error                  |
 
 ---
 
 ## 💳 Payment Methods Details
 
 ### 1. Cash (Tiền mặt)
+
 - Customer pays directly
 - Staff enters amount received
 - System calculates change
 - Order marked as "paid"
 
 ### 2. VietQR (Mobile Payment)
+
 - QR code displayed to customer
 - Customer scans with banking app
 - Payment confirmed by customer
@@ -635,6 +654,7 @@ Thank you for your purchase!
 ## 🎯 Common Workflows
 
 ### Workflow 1: Complete Sale - Cash Payment
+
 1. Customer searches for existing customer
 2. If not found, creates new customer
 3. Searches and adds medications to cart
@@ -646,6 +666,7 @@ Thank you for your purchase!
 9. Shows success modal with order details
 
 ### Workflow 2: Complete Sale - VietQR Payment
+
 1. Customer searches for existing customer
 2. If not found, creates new customer
 3. Searches and adds medications to cart
@@ -658,6 +679,7 @@ Thank you for your purchase!
 10. Shows success modal with order details
 
 ### Workflow 3: View Order History
+
 1. Navigate to Sales Dashboard
 2. Filter by status, date range, customer
 3. Sort by date, amount, etc.
@@ -674,4 +696,3 @@ Thank you for your purchase!
 4. **Cash Payment Insufficient**: Change amount must be ≥ 0
 5. **Duplicate Email/Phone**: When creating customer
 6. **Missing Customer Data**: Email/Phone can be empty (optional)
-

@@ -358,7 +358,8 @@ export default function SalesPageV3() {
         message = error.response.data.message;
       } else if (error?.response?.status) {
         if (error.response.status === 400) {
-          message = error.response.data?.error?.message || "Dữ liệu không hợp lệ";
+          message =
+            error.response.data?.error?.message || "Dữ liệu không hợp lệ";
         } else if (error.response.status === 409) {
           message = "Khách hàng đã tồn tại";
         } else if (error.response.status === 500) {
@@ -467,7 +468,8 @@ export default function SalesPageV3() {
           message = error.response.data.message;
         } else if (error?.response?.status) {
           if (error.response.status === 400) {
-            message = error.response.data?.error?.message || "Dữ liệu không hợp lệ";
+            message =
+              error.response.data?.error?.message || "Dữ liệu không hợp lệ";
           } else if (error.response.status === 401) {
             message = "Chưa xác thực. Vui lòng đăng nhập lại";
           } else if (error.response.status === 403) {
@@ -475,7 +477,8 @@ export default function SalesPageV3() {
           } else if (error.response.status === 404) {
             message = "Khách hàng hoặc sản phẩm không tồn tại";
           } else if (error.response.status === 409) {
-            message = error.response.data?.error?.message || "Dữ liệu bị xung đột";
+            message =
+              error.response.data?.error?.message || "Dữ liệu bị xung đột";
           } else if (error.response.status >= 500) {
             message = "Lỗi máy chủ. Vui lòng thử lại sau";
           }
@@ -540,10 +543,11 @@ export default function SalesPageV3() {
               return (
                 <div
                   key={order.id}
-                  className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all ${isActive
-                    ? "border-primary bg-primary/10 text-foreground shadow-sm"
-                    : "border-border bg-card hover:border-primary/50 text-muted-foreground"
-                    }`}
+                  className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all ${
+                    isActive
+                      ? "border-primary bg-primary/10 text-foreground shadow-sm"
+                      : "border-border bg-card hover:border-primary/50 text-muted-foreground"
+                  }`}
                   onClick={() => setActiveOrderId(order.id)}
                 >
                   <FileText className="h-4 w-4" />
@@ -669,7 +673,10 @@ export default function SalesPageV3() {
                           </td>
                           <td className="p-3 text-right">
                             <div className="font-semibold text-primary">
-                              {(Number(item.sellPrice) || 0).toLocaleString("vi-VN")}₫
+                              {(Number(item.sellPrice) || 0).toLocaleString(
+                                "vi-VN"
+                              )}
+                              ₫
                             </div>
                             <div className="text-xs text-muted-foreground">
                               / {item.unit}
@@ -718,9 +725,9 @@ export default function SalesPageV3() {
                             </div>
                           </td>
                           <td className="p-3 text-right font-bold text-primary">
-                            {((Number(item.sellPrice) || 0) * item.quantity).toLocaleString(
-                              "vi-VN"
-                            )}
+                            {(
+                              (Number(item.sellPrice) || 0) * item.quantity
+                            ).toLocaleString("vi-VN")}
                             ₫
                           </td>
                           <td className="p-3">
@@ -763,10 +770,11 @@ export default function SalesPageV3() {
                       <button
                         key={value}
                         onClick={() => setPaymentMethod(value)}
-                        className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${activeOrder.paymentMethod === value
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border hover:border-primary/50"
-                          }`}
+                        className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all ${
+                          activeOrder.paymentMethod === value
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border hover:border-primary/50"
+                        }`}
                       >
                         <Icon className="h-4 w-4" />
                         <span className="text-sm font-medium">{label}</span>

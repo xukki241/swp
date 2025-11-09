@@ -5,11 +5,14 @@
 ### 1. **Hiển thị lỗi không cụ thể khi tạo khách hàng thất bại**
 
 #### Vấn đề:
+
 - Khi tạo khách hàng thất bại, hiệu thị `error.message` chỉ hiển thị status code thay vì lỗi chi tiết
 - Ví dụ: "404 Not Found" thay vì "Khách hàng đã tồn tại"
 
 #### Giải pháp:
+
 Cập nhật `handleCreateCustomer` trong `SalesPage.jsx` để:
+
 - Extract lỗi chi tiết từ response object
 - Kiểm tra các trường: `error.response.data.error.message`, `error.response.data.message`
 - Kiểm tra status code và hiển thị lỗi phù hợp cho mỗi trường hợp:
@@ -45,10 +48,12 @@ catch (error) {
 ### 2. **Hiển thị bị lỗi sau khi tạo khách hàng thành công**
 
 #### Vấn đề:
+
 - Không xử lý đúng response từ API khi tạo khách hàng
 - Response có thể có structure `{ data: customerObject }` hoặc `customerObject` trực tiếp
 
 #### Giải pháp:
+
 ```javascript
 // Trước
 const customer = await customerService.createCustomer(newCustomerData);
@@ -63,11 +68,14 @@ setCustomer(customerData);
 ### 3. **Hiển thị lỗi không cụ thể khi tạo đơn hàng thất bại**
 
 #### Vấn đề:
-- `submitOrder` function cũng chỉ hiển thị `error.message` 
+
+- `submitOrder` function cũng chỉ hiển thị `error.message`
 - Không extract lỗi chi tiết từ response
 
 #### Giải pháp:
+
 Áp dụng cách xử lý lỗi chi tiết giống như `handleCreateCustomer`:
+
 - Kiểm tra `error.response.data.error` hoặc `error.response.data.message`
 - Kiểm tra status code (400, 401, 403, 404, 409, 500+)
 - Cập nhật `OrderSuccessModal` data:
@@ -77,18 +85,22 @@ setCustomer(customerData);
 ### 4. **Cập nhật lỗi trong tìm kiếm khách hàng**
 
 #### Vấn đề:
+
 - `CustomerSelector` hiển thị generic error message
 
 #### Giải pháp:
+
 - Extract lỗi chi tiết từ API response
 - Hiển thị lỗi cụ thể cho mỗi status code
 
 ### 5. **Cập nhật lỗi trong chỉnh sửa thông tin khách hàng**
 
 #### Vấn đề:
+
 - `EditCustomerForm` không xử lý đầy đủ các loại lỗi
 
 #### Giải pháp:
+
 - Thêm kiểm tra status code cho các lỗi phổ biến
 - Extract lỗi từ response chi tiết
 
@@ -107,6 +119,7 @@ setCustomer(customerData);
 ## Kiểm tra và test
 
 ### Test cases:
+
 1. ✅ Tạo khách hàng thành công
    - Kiểm tra: Customer được hiển thị đúng trong list
    - Kiểm tra: Form được reset

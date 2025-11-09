@@ -49,7 +49,9 @@ export default function CustomerSelector({ onSelectCustomer }) {
         message = error.response.data.message;
       } else if (error?.response?.status) {
         if (error.response.status === 400) {
-          message = error.response.data?.error?.message || "Tham số tìm kiếm không hợp lệ";
+          message =
+            error.response.data?.error?.message ||
+            "Tham số tìm kiếm không hợp lệ";
         } else if (error.response.status === 401) {
           message = "Chưa xác thực. Vui lòng đăng nhập lại";
         } else if (error.response.status >= 500) {

@@ -2,25 +2,27 @@
 
 ## ⚡ Quick Summary
 
-| Aspect | Status |
-|--------|--------|
-| **Email bắt buộc?** | ❌ NO - Email is optional |
-| **SĐT bắt buộc?** | ❌ NO - Phone is optional |
-| **Tên bắt buộc?** | ✅ YES - Name is required |
-| **Error messages** | ✅ Chi tiết bằng tiếng Việt |
-| **Email invoice** | ✅ Chỉ gửi nếu customer có email |
+| Aspect              | Status                           |
+| ------------------- | -------------------------------- |
+| **Email bắt buộc?** | ❌ NO - Email is optional        |
+| **SĐT bắt buộc?**   | ❌ NO - Phone is optional        |
+| **Tên bắt buộc?**   | ✅ YES - Name is required        |
+| **Error messages**  | ✅ Chi tiết bằng tiếng Việt      |
+| **Email invoice**   | ✅ Chỉ gửi nếu customer có email |
 
 ---
 
 ## 🔧 Changes Made
 
 ### Backend Files:
+
 - ✅ `apps/api/src/db/schema/common.js` - Phone length 10→20
 - ✅ `apps/api/src/controllers/customerController.js` - Validation + error structure
 
 ### Frontend Files:
+
 - ✅ `apps/web/src/pages/sales/SalesPage.jsx` - Error extraction
-- ✅ `apps/web/src/pages/sales/components/CustomerSelector.jsx` - Error extraction  
+- ✅ `apps/web/src/pages/sales/components/CustomerSelector.jsx` - Error extraction
 - ✅ `apps/web/src/pages/sales/components/EditCustomerForm.jsx` - Error extraction
 
 ---
@@ -46,6 +48,7 @@ Edit Customer:
 ## ✅ API Response Format - CREATE /api/customers
 
 ### Success (201):
+
 ```json
 {
   "success": true,
@@ -61,6 +64,7 @@ Edit Customer:
 ```
 
 ### Error - Name Missing (400):
+
 ```json
 {
   "success": false,
@@ -71,6 +75,7 @@ Edit Customer:
 ```
 
 ### Error - Email Duplicate (409):
+
 ```json
 {
   "success": false,
@@ -81,6 +86,7 @@ Edit Customer:
 ```
 
 ### Error - Phone Duplicate (409):
+
 ```json
 {
   "success": false,
@@ -100,7 +106,7 @@ try {
   setCustomer(response?.data || response);
 } catch (error) {
   let message = "Không thể tạo khách hàng";
-  
+
   // Extract from error.response.data.error.message
   if (error?.response?.data?.error?.message) {
     message = error.response.data.error.message;
@@ -109,7 +115,7 @@ try {
   else if (error?.response?.data?.message) {
     message = error.response.data.message;
   }
-  
+
   toast.error(message);
 }
 ```
@@ -137,6 +143,7 @@ try {
 ## 🧪 Test Cases
 
 ### ✅ Create Customer - Success Cases:
+
 ```
 1. Name only → ✅ Created
 2. Name + Phone → ✅ Created
@@ -146,6 +153,7 @@ try {
 ```
 
 ### ❌ Create Customer - Error Cases:
+
 ```
 1. No name → ❌ "Tên khách hàng là bắt buộc"
 2. Empty name → ❌ "Tên khách hàng là bắt buộc"
@@ -154,6 +162,7 @@ try {
 ```
 
 ### ✅ Sales Order - Success Cases:
+
 ```
 1. Customer without email → ✅ Order created, no email sent
 2. Customer with email → ✅ Order created, email sent when paid
@@ -163,13 +172,13 @@ try {
 
 ## 📝 HTTP Status Codes
 
-| Code | Meaning | Example |
-|------|---------|---------|
-| **201** | Created | Customer successfully created |
-| **400** | Bad Request | Missing name, invalid format |
-| **404** | Not Found | Customer doesn't exist |
-| **409** | Conflict | Duplicate email or phone |
-| **500** | Server Error | Internal server error |
+| Code    | Meaning      | Example                       |
+| ------- | ------------ | ----------------------------- |
+| **201** | Created      | Customer successfully created |
+| **400** | Bad Request  | Missing name, invalid format  |
+| **404** | Not Found    | Customer doesn't exist        |
+| **409** | Conflict     | Duplicate email or phone      |
+| **500** | Server Error | Internal server error         |
 
 ---
 
@@ -217,6 +226,7 @@ A: Không có email nào được gửi. System không báo lỗi, chỉ skip em
 
 **Q: Lỗi ghi gì?**
 A: Lỗi ghi cụ thể bằng tiếng Việt, ví dụ:
+
 - "Khách hàng với email 'abc@gmail.com' đã tồn tại"
 - "Tên khách hàng là bắt buộc"
 

@@ -39,7 +39,9 @@ The User Management Module handles all staff account management, authentication,
 ```
 
 #### API: Get All Staff Accounts
+
 **Endpoint:** `GET /api/users/staff?search={term}&role={role}&status={status}`
+
 ```json
 Request:
 {
@@ -80,7 +82,9 @@ Response (200 OK):
 ```
 
 #### API: Get All Users (Both Staff and Admin)
+
 **Endpoint:** `GET /api/users?search={term}`
+
 ```json
 Request:
 {
@@ -172,7 +176,9 @@ Response (200 OK):
 ```
 
 #### API: Create New User
+
 **Endpoint:** `POST /api/users`
+
 ```json
 Request:
 {
@@ -256,7 +262,9 @@ Error Cases (409 Conflict):
 ```
 
 #### API: Update User
+
 **Endpoint:** `PUT /api/users/{userId}`
+
 ```json
 Request:
 {
@@ -326,7 +334,9 @@ Error Cases (409 Conflict):
 ```
 
 #### API: Activate User
+
 **Endpoint:** `PATCH /api/users/{userId}/activate`
+
 ```json
 Request: (No body required)
 
@@ -346,7 +356,9 @@ Response (200 OK):
 ```
 
 #### API: Deactivate User
+
 **Endpoint:** `PATCH /api/users/{userId}/deactivate`
+
 ```json
 Request: (No body required)
 
@@ -368,7 +380,9 @@ Note: Deactivated users cannot log in to the system
 ```
 
 #### API: Suspend User
+
 **Endpoint:** `PATCH /api/users/{userId}/suspend`
+
 ```json
 Request: (No body required)
 
@@ -390,7 +404,9 @@ Note: Suspended users cannot log in; accounts can be reactivated
 ```
 
 #### API: Delete User (Permanent)
+
 **Endpoint:** `DELETE /api/users/{userId}`
+
 ```json
 Request: (No body required)
 
@@ -430,7 +446,9 @@ Response (200 OK):
 ```
 
 #### API: Get User by ID
+
 **Endpoint:** `GET /api/users/{userId}`
+
 ```json
 Response (200 OK):
 {
@@ -456,7 +474,9 @@ Error Cases (404 Not Found):
 ```
 
 #### API: Get User Schedule
+
 **Endpoint:** `GET /api/users/{userId}/schedule?startDate={date}&endDate={date}`
+
 ```json
 Request:
 {
@@ -535,19 +555,19 @@ Response (200 OK):
 
 ### Permission Matrix
 
-| Action | Owner | Admin | Pharmacist | Staff |
-|--------|-------|-------|------------|-------|
-| Create user | ✅ | ✅ | ❌ | ❌ |
-| Edit user | ✅ | ✅* | ❌ | ❌ |
-| Delete user | ✅ | ✅* | ❌ | ❌ |
-| Activate/Suspend | ✅ | ✅* | ❌ | ❌ |
-| View all users | ✅ | ✅ | ❌ | ❌ |
-| View own profile | ✅ | ✅ | ✅ | ✅ |
-| Create sales order | ✅ | ✅ | ✅ | ✅ |
-| View reports | ✅ | ✅ | ⚠️ | ❌ |
-| Manage inventory | ✅ | ✅ | ⚠️ | ❌ |
+| Action             | Owner | Admin | Pharmacist | Staff |
+| ------------------ | ----- | ----- | ---------- | ----- |
+| Create user        | ✅    | ✅    | ❌         | ❌    |
+| Edit user          | ✅    | ✅\*  | ❌         | ❌    |
+| Delete user        | ✅    | ✅\*  | ❌         | ❌    |
+| Activate/Suspend   | ✅    | ✅\*  | ❌         | ❌    |
+| View all users     | ✅    | ✅    | ❌         | ❌    |
+| View own profile   | ✅    | ✅    | ✅         | ✅    |
+| Create sales order | ✅    | ✅    | ✅         | ✅    |
+| View reports       | ✅    | ✅    | ⚠️         | ❌    |
+| Manage inventory   | ✅    | ✅    | ⚠️         | ❌    |
 
-*Admin cannot manage other Admins or Owners
+\*Admin cannot manage other Admins or Owners
 
 ---
 
@@ -596,35 +616,35 @@ Response (200 OK):
 
 ### Request/Response Summary
 
-| Method | Endpoint | Purpose | Auth Required | Owner Only |
-|--------|----------|---------|---------------|-----------|
-| GET | /api/users | Get all users | ✅ | ✅ |
-| GET | /api/users/staff | Get all staff | ✅ | ✅ |
-| GET | /api/users/{id} | Get user details | ✅ | ⚠️* |
-| GET | /api/users/{id}/schedule | Get schedule | ✅ | ⚠️* |
-| POST | /api/users | Create user | ✅ | ✅ |
-| PUT | /api/users/{id} | Update user | ✅ | ✅ |
-| DELETE | /api/users/{id} | Delete user | ✅ | ✅ |
-| PATCH | /api/users/{id}/activate | Activate | ✅ | ✅ |
-| PATCH | /api/users/{id}/deactivate | Deactivate | ✅ | ✅ |
-| PATCH | /api/users/{id}/suspend | Suspend | ✅ | ✅ |
+| Method | Endpoint                   | Purpose          | Auth Required | Owner Only |
+| ------ | -------------------------- | ---------------- | ------------- | ---------- |
+| GET    | /api/users                 | Get all users    | ✅            | ✅         |
+| GET    | /api/users/staff           | Get all staff    | ✅            | ✅         |
+| GET    | /api/users/{id}            | Get user details | ✅            | ⚠️\*       |
+| GET    | /api/users/{id}/schedule   | Get schedule     | ✅            | ⚠️\*       |
+| POST   | /api/users                 | Create user      | ✅            | ✅         |
+| PUT    | /api/users/{id}            | Update user      | ✅            | ✅         |
+| DELETE | /api/users/{id}            | Delete user      | ✅            | ✅         |
+| PATCH  | /api/users/{id}/activate   | Activate         | ✅            | ✅         |
+| PATCH  | /api/users/{id}/deactivate | Deactivate       | ✅            | ✅         |
+| PATCH  | /api/users/{id}/suspend    | Suspend          | ✅            | ✅         |
 
-*Can view own profile/schedule
+\*Can view own profile/schedule
 
 ---
 
 ## 🔐 Error Handling & HTTP Status Codes
 
-| Status | Meaning | Example Scenario |
-|--------|---------|------------------|
-| 200 | OK | User updated, retrieved |
-| 201 | Created | New user created |
-| 400 | Bad Request | Missing required fields |
-| 401 | Unauthorized | No auth token provided |
-| 403 | Forbidden | Not owner, can't change own role |
-| 404 | Not Found | User ID doesn't exist |
-| 409 | Conflict | Email/phone already used |
-| 500 | Server Error | Database error |
+| Status | Meaning      | Example Scenario                 |
+| ------ | ------------ | -------------------------------- |
+| 200    | OK           | User updated, retrieved          |
+| 201    | Created      | New user created                 |
+| 400    | Bad Request  | Missing required fields          |
+| 401    | Unauthorized | No auth token provided           |
+| 403    | Forbidden    | Not owner, can't change own role |
+| 404    | Not Found    | User ID doesn't exist            |
+| 409    | Conflict     | Email/phone already used         |
+| 500    | Server Error | Database error                   |
 
 ---
 
@@ -663,6 +683,7 @@ Response (200 OK):
 ## 🎯 Common Workflows
 
 ### Workflow 1: Add New Pharmacy Staff
+
 1. Owner logs in
 2. Navigate to User Management
 3. Click "Add New User"
@@ -672,6 +693,7 @@ Response (200 OK):
 7. New staff can log in with provided email/password
 
 ### Workflow 2: Deactivate Employee (Temporary)
+
 1. Owner views all staff
 2. Find employee to deactivate
 3. Click "Deactivate" action
@@ -680,6 +702,7 @@ Response (200 OK):
 6. Can reactivate later
 
 ### Workflow 3: Manage User Information
+
 1. Owner searches for specific user
 2. Click user to view details
 3. Click "Edit" to modify
@@ -688,6 +711,7 @@ Response (200 OK):
 6. Changes applied immediately
 
 ### Workflow 4: View Employee Schedule
+
 1. Owner/Pharmacist views user details
 2. Click "View Schedule"
 3. System shows shifts for date range
@@ -698,14 +722,15 @@ Response (200 OK):
 ## 📧 Audit Logging
 
 All user management actions are logged:
+
 - User created: Record timestamp, creator, new user details
 - User updated: Record timestamp, modifier, changed fields
 - User activated/deactivated/suspended: Record action, reason
 - User deleted: Record timestamp, deleter, user details
 
 Audit logs help track:
+
 - Who made changes
 - When changes were made
 - What was changed
 - Compliance requirements
-

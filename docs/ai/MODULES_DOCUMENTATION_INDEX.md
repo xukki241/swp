@@ -7,9 +7,11 @@ This folder contains comprehensive documentation for the main pharmacy system mo
 ---
 
 ## 🏪 Sales Module
+
 **File:** `SALES_MODULE_DETAILED.md`
 
 ### What's Included:
+
 - ✅ Complete sales workflow (5 phases)
 - ✅ Customer selection and creation
 - ✅ Medication search and cart management
@@ -22,6 +24,7 @@ This folder contains comprehensive documentation for the main pharmacy system mo
 - ✅ Common workflows and edge cases
 
 ### Key Concepts:
+
 1. **Order Creation**: Create sales orders with customer, medications, and payment details
 2. **Payment Methods**: Cash with change calculation, VietQR for mobile payments
 3. **Inventory Management**: Stock checking and quantity validation
@@ -29,6 +32,7 @@ This folder contains comprehensive documentation for the main pharmacy system mo
 5. **Order History**: View, filter, and sort sales orders
 
 ### Main Endpoints:
+
 - `POST /api/sales` - Create new order
 - `GET /api/sales` - List orders with filters
 - `GET /api/sales/{id}` - Get order details
@@ -38,9 +42,11 @@ This folder contains comprehensive documentation for the main pharmacy system mo
 ---
 
 ## 👥 User Management Module
+
 **File:** `USER_MANAGEMENT_DETAILED.md`
 
 ### What's Included:
+
 - ✅ Complete user management workflow (5 phases)
 - ✅ View all staff accounts with filtering
 - ✅ Create new user accounts
@@ -53,6 +59,7 @@ This folder contains comprehensive documentation for the main pharmacy system mo
 - ✅ Error handling and validation rules
 
 ### Key Concepts:
+
 1. **User Roles**: Owner, Admin, Pharmacist, Staff with hierarchical permissions
 2. **Account Status**: Active, Inactive, Suspended states
 3. **Access Control**: Owner can manage all users, self-modification restrictions
@@ -60,6 +67,7 @@ This folder contains comprehensive documentation for the main pharmacy system mo
 5. **Audit Logging**: Track all user management actions
 
 ### Main Endpoints:
+
 - `GET /api/users` - List all users
 - `GET /api/users/staff` - List staff with filters
 - `GET /api/users/{id}` - Get user details
@@ -76,6 +84,7 @@ This folder contains comprehensive documentation for the main pharmacy system mo
 ## 🔄 Data Flow Summary
 
 ### Sales Module Flow:
+
 ```
 Customer → Medications → Payment → Order Created
    ↓           ↓           ↓           ↓
@@ -86,6 +95,7 @@ Customer → Medications → Payment → Order Created
 ```
 
 ### User Management Flow:
+
 ```
 View Users → Create/Edit/Delete → Status Changes → Audit Log
     ↓              ↓                    ↓              ↓
@@ -97,19 +107,25 @@ View Users → Create/Edit/Delete → Status Changes → Audit Log
 ## 📊 Common API Response Structures
 
 ### Success Response (201 Created)
+
 ```json
 {
   "success": true,
   "message": "Resource created successfully",
-  "data": { /* resource object */ }
+  "data": {
+    /* resource object */
+  }
 }
 ```
 
 ### Success Response (200 OK - List)
+
 ```json
 {
   "success": true,
-  "data": [ /* array of resources */ ],
+  "data": [
+    /* array of resources */
+  ],
   "pagination": {
     "page": 1,
     "limit": 50,
@@ -121,11 +137,14 @@ View Users → Create/Edit/Delete → Status Changes → Audit Log
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
   "message": "Descriptive error message",
-  "errors": [ /* optional detailed errors */ ]
+  "errors": [
+    /* optional detailed errors */
+  ]
 }
 ```
 
@@ -134,15 +153,18 @@ View Users → Create/Edit/Delete → Status Changes → Audit Log
 ## 🔐 Authentication & Authorization
 
 All endpoints require:
+
 - **Authentication**: Bearer token in `Authorization` header
 - **Role-based Access**: Different endpoints have different permission requirements
 
 ### Authentication Header:
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### Authorization Levels:
+
 - **Public**: No auth required (login endpoint only)
 - **Authenticated**: Any logged-in user
 - **Owner Only**: Only store manager/owner
@@ -153,21 +175,25 @@ Authorization: Bearer <JWT_TOKEN>
 ## ⚠️ Important Validations
 
 ### Email Validation
+
 - Must be valid email format (user@domain.com)
 - Must be unique in system
 - Cannot be empty when creating customer but CAN be empty → null for optional
 
 ### Phone Validation
+
 - Must be exactly 10 digits (0901234567)
 - Must be unique in system
 - Can be empty (treated as null)
 
 ### Name Validation
+
 - Required for both customers and users
 - 1-100 characters
 - Cannot be empty or whitespace only
 
 ### Quantity Validation
+
 - Must be positive integer (> 0)
 - Cannot exceed available stock
 - Decimal quantities not allowed
@@ -177,6 +203,7 @@ Authorization: Bearer <JWT_TOKEN>
 ## 🎯 Key Dates & Timestamps
 
 All timestamps in responses use ISO 8601 format:
+
 ```
 2025-11-09T10:30:00Z
 ```
@@ -186,11 +213,13 @@ All timestamps in responses use ISO 8601 format:
 ## 📱 Frontend Integration
 
 ### Sales Page
+
 - Located at: `/pages/sales/SalesPage.jsx`
 - Handles: Order creation, payment processing, success modal
 - Components: CustomerSelector, MedicationSearch, VietQRPaymentDialog
 
 ### User Management Page
+
 - Location: `/pages/admin/UserManagement.jsx`
 - Handles: User CRUD, status management, filtering
 - Components: UserList, UserForm, StatusButtons
@@ -220,6 +249,7 @@ All timestamps in responses use ISO 8601 format:
 ## 🔗 Related Documentation
 
 Other relevant documentation:
+
 - **EMPTY_STRING_VALIDATION_FIX.md** - Schema validation fix for optional fields
 - **API_DOCUMENTATION.md** - Complete API reference
 - **CUSTOMER_CREATION_REQUIREMENTS.md** - Customer field specifications
@@ -261,6 +291,7 @@ A: Automatically when order status changes to "paid" and customer has email.
 ## 📞 Support
 
 For issues or questions about:
+
 - **API Endpoints**: Check specific module docs
 - **Error Codes**: See error handling sections
 - **Workflows**: Review phase-by-phase diagrams
