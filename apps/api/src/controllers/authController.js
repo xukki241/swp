@@ -77,18 +77,7 @@ export const login = async (req, res, _next) => {
       });
     }
 
-    // Get device info and IP address
-    const deviceInfo = req.headers["user-agent"] || "Unknown device";
-    const ipAddress =
-      req.headers["x-forwarded-for"] ||
-      req.connection.remoteAddress ||
-      req.socket.remoteAddress ||
-      "Unknown IP";
-
-    const result = await authService.login(email, password, {
-      deviceInfo,
-      ipAddress,
-    });
+    const result = await authService.login(email, password);
 
     res.status(200).json(result);
   } catch (error) {
@@ -104,26 +93,23 @@ export const login = async (req, res, _next) => {
  * Logout user (User Story 4)
  * @route POST /api/auth/logout
  */
-export const logout = async (req, res, _next) => {
+export const logout = async (_req, res, _next) => {
   try {
-    const { refreshToken } = req.body;
-
-    // Revoke refresh token if provided
-    if (refreshToken) {
-      await authService.revokeRefreshToken(refreshToken);
-    }
-
     res.status(200).json({
       success: true,
-      message: "Logout successful. Please remove tokens from client.",
+      message: "Logout successful. Please remove token from client.",
     });
   } catch (error) {
     logger.error("Error in logout controller:", error);
-    // Don't fail logout even if revoke fails
-    res.status(200).json({
-      success: true,
-      message: "Logout successful. Please remove tokens from client.",
-    });
+    // Try to send response, but handle if it fails
+    try {
+      res.status(200).json({
+        success: true,
+        message: "Logout successful. Please remove token from client.",
+      });
+    } catch (innerError) {
+      logger.error("Error sending response in logout controller:", innerError);
+    }
   }
 };
 
@@ -294,33 +280,6 @@ export const verifyOTPAndResetPassword = async (req, res, _next) => {
   } catch (error) {
     logger.error("Error in verifyOTPAndResetPassword controller:", error);
     res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-/**
- * Refresh access token
- * @route POST /api/auth/refresh
- */
-export const refreshToken = async (req, res, _next) => {
-  try {
-    const { refreshToken: token } = req.body;
-
-    if (!token) {
-      return res.status(400).json({
-        success: false,
-        message: "Refresh token is required",
-      });
-    }
-
-    const result = await authService.refreshAccessToken(token);
-
-    res.status(200).json(result);
-  } catch (error) {
-    logger.error("Error in refreshToken controller:", error);
-    res.status(401).json({
       success: false,
       message: error.message,
     });

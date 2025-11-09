@@ -24,16 +24,7 @@ export const getCurrentUser = async () => {
 
 // Logout user
 export const logoutUser = async () => {
-  const refreshToken = localStorage.getItem("refreshToken");
-  const response = await instance.post("/auth/logout", { refreshToken });
-  return response.data;
-};
-
-// Refresh token
-export const refreshToken = async (token) => {
-  const response = await instance.post("/auth/refresh", {
-    refreshToken: token,
-  });
+  const response = await instance.post("/auth/logout");
   return response.data;
 };
 

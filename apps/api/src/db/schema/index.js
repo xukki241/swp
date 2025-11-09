@@ -12,7 +12,6 @@ export * from "./purchaseOrderItems.js";
 export * from "./purchaseOrderReceiptItems.js";
 export * from "./purchaseOrderReceipts.js";
 export * from "./purchaseOrders.js";
-export * from "./refreshTokens.js";
 export * from "./relations.js";
 export * from "./reports.js";
 export * from "./salesOrderItems.js";
