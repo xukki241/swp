@@ -3,6 +3,7 @@
 ## 🚀 Quick Start - Sales Order
 
 ### Minimal Flow
+
 ```
 1. POST /api/customers (create if needed)
    ↓
@@ -16,6 +17,7 @@
 ### Request Examples
 
 **Create Customer (Optional)**
+
 ```bash
 POST /api/customers
 {
@@ -27,6 +29,7 @@ POST /api/customers
 ```
 
 **Create Sales Order**
+
 ```bash
 POST /api/sales
 {
@@ -40,6 +43,7 @@ POST /api/sales
 ```
 
 **Mark as Paid**
+
 ```bash
 PATCH /api/sales/{orderId}
 {
@@ -53,6 +57,7 @@ PATCH /api/sales/{orderId}
 ## 👥 Quick Start - Create User
 
 ### Minimal Flow
+
 ```
 1. POST /api/users (create user)
    ↓
@@ -64,6 +69,7 @@ PATCH /api/sales/{orderId}
 ### Request Examples
 
 **Create User**
+
 ```bash
 POST /api/users
 {
@@ -77,6 +83,7 @@ POST /api/users
 ```
 
 **Activate User**
+
 ```bash
 PATCH /api/users/{userId}/activate
 → Response: 200 OK with updated user
@@ -86,16 +93,16 @@ PATCH /api/users/{userId}/activate
 
 ## 📊 Common Status Codes
 
-| Code | Meaning | Action |
-|------|---------|--------|
-| 200 | Success (GET, PATCH) | Proceed normally |
-| 201 | Created (POST) | Resource created successfully |
-| 400 | Bad Request | Check request format/required fields |
-| 401 | Unauthorized | Add auth token to header |
-| 403 | Forbidden | Check permissions (Owner only?) |
-| 404 | Not Found | Check ID exists |
-| 409 | Conflict | Email/Phone already used, insufficient stock |
-| 500 | Server Error | Server problem, retry later |
+| Code | Meaning              | Action                                       |
+| ---- | -------------------- | -------------------------------------------- |
+| 200  | Success (GET, PATCH) | Proceed normally                             |
+| 201  | Created (POST)       | Resource created successfully                |
+| 400  | Bad Request          | Check request format/required fields         |
+| 401  | Unauthorized         | Add auth token to header                     |
+| 403  | Forbidden            | Check permissions (Owner only?)              |
+| 404  | Not Found            | Check ID exists                              |
+| 409  | Conflict             | Email/Phone already used, insufficient stock |
+| 500  | Server Error         | Server problem, retry later                  |
 
 ---
 
@@ -111,28 +118,31 @@ Content-Type: application/json
 ## 📋 Field Validations at a Glance
 
 ### Customer Fields
-| Field | Required | Rules | Empty Allowed |
-|-------|----------|-------|---------------|
-| name | ✅ | 1-100 chars | ❌ |
-| email | ❌ | Valid email format | ✅ (→ null) |
-| phone | ❌ | Exactly 10 digits | ✅ (→ null) |
-| address | ❌ | Any string | ✅ (→ null) |
+
+| Field   | Required | Rules              | Empty Allowed |
+| ------- | -------- | ------------------ | ------------- |
+| name    | ✅       | 1-100 chars        | ❌            |
+| email   | ❌       | Valid email format | ✅ (→ null)   |
+| phone   | ❌       | Exactly 10 digits  | ✅ (→ null)   |
+| address | ❌       | Any string         | ✅ (→ null)   |
 
 ### User Fields
-| Field | Required | Rules | Notes |
-|-------|----------|-------|-------|
-| name | ✅ | 1-100 chars | - |
-| email | ✅ | Unique, valid format | Must be unique |
-| phone | ✅ | Unique, 10 digits | Must be unique |
-| address | ❌ | Any string | Optional |
-| role | ✅ | owner/admin/pharmacist/staff | - |
-| status | ✅ | active/inactive/suspended | Default: active |
+
+| Field   | Required | Rules                        | Notes           |
+| ------- | -------- | ---------------------------- | --------------- |
+| name    | ✅       | 1-100 chars                  | -               |
+| email   | ✅       | Unique, valid format         | Must be unique  |
+| phone   | ✅       | Unique, 10 digits            | Must be unique  |
+| address | ❌       | Any string                   | Optional        |
+| role    | ✅       | owner/admin/pharmacist/staff | -               |
+| status  | ✅       | active/inactive/suspended    | Default: active |
 
 ---
 
 ## 🔍 Quick Lookup - All Endpoints
 
 ### Sales Endpoints
+
 ```
 POST   /api/sales               Create order
 GET    /api/sales               List orders (paginated)
@@ -142,6 +152,7 @@ DELETE /api/sales/{id}          Cancel order
 ```
 
 ### Customer Endpoints
+
 ```
 POST   /api/customers           Create customer
 GET    /api/customers           List customers (paginated)
@@ -151,6 +162,7 @@ DELETE /api/customers/{id}      Delete customer
 ```
 
 ### User Endpoints
+
 ```
 POST   /api/users               Create user
 GET    /api/users               List all users
@@ -169,40 +181,48 @@ GET    /api/users/{id}/schedule      Get work schedule
 ## 💡 Common Scenarios & Solutions
 
 ### Scenario 1: Create customer without email
+
 ```json
 {
   "name": "Customer Name",
-  "email": "",              // ← Can be empty!
+  "email": "", // ← Can be empty!
   "phone": "0901234567"
 }
 ```
+
 ✅ Works! Email becomes null in database
 
 ### Scenario 2: Customer email already exists
+
 ```
 Response: 409 Conflict
 {
   "message": "Khách hàng với email '...' đã tồn tại"
 }
 ```
+
 ✅ Expected! Create without email or use existing customer
 
 ### Scenario 3: Order has insufficient stock
+
 ```
 Response: 409 Conflict
 {
   "message": "Không đủ hàng trong kho"
 }
 ```
+
 ✅ Expected! Reduce quantity or use different variant
 
 ### Scenario 4: Cannot change own role as user
+
 ```
 Response: 403 Forbidden
 {
   "message": "You cannot change your own role"
 }
 ```
+
 ✅ Expected! Another Owner must change your role
 
 ---
@@ -210,6 +230,7 @@ Response: 403 Forbidden
 ## 📈 Pagination Usage
 
 ### List Request with Pagination
+
 ```bash
 GET /api/sales?page=1&limit=50&status=paid&sortBy=orderDate&sortOrder=desc
 
@@ -227,6 +248,7 @@ Response:
 ```
 
 ### Default Values
+
 - Page: 1
 - Limit: 100
 - Max Limit: 100
@@ -257,6 +279,7 @@ PENDING → PAID → CANCELLED
 ```
 
 ### Status Meanings
+
 - **PENDING**: Created, awaiting payment
 - **PAID**: Payment confirmed, ready for delivery
 - **CANCELLED**: Order cancelled, no payment
@@ -274,6 +297,7 @@ ACTIVE ⟷ INACTIVE ⟷ SUSPENDED
 ```
 
 ### Status Meanings
+
 - **ACTIVE**: User can log in and use system
 - **INACTIVE**: User cannot log in (temporary)
 - **SUSPENDED**: User cannot log in (temporary)
@@ -284,31 +308,37 @@ ACTIVE ⟷ INACTIVE ⟷ SUSPENDED
 ## 🔄 Data Type Formats
 
 ### UUID Format
+
 ```
 550e8400-e29b-41d4-a716-446655440000
 ```
 
 ### Email Format
+
 ```
 user@domain.com
 ```
 
 ### Phone Format
+
 ```
 0901234567  (exactly 10 digits)
 ```
 
 ### Date Format (ISO 8601)
+
 ```
 2025-11-09T10:30:00Z
 ```
 
 ### Date Format (Query Parameter)
+
 ```
 2025-11-09
 ```
 
 ### Amount Format (in Dong, no decimals)
+
 ```
 75000  (75,000₫)
 225000 (225,000₫)
@@ -319,27 +349,30 @@ user@domain.com
 ## 🚨 Error Message Cheat Sheet
 
 ### Customer Creation Errors
-| Message | Cause | Solution |
-|---------|-------|----------|
-| Tên khách hàng là bắt buộc | Empty name | Provide customer name |
-| Email đã tồn tại | Email in use | Use different email |
-| SĐT đã tồn tại | Phone in use | Use different phone |
-| SĐT không hợp lệ | Wrong format | Use 10-digit format |
+
+| Message                    | Cause        | Solution              |
+| -------------------------- | ------------ | --------------------- |
+| Tên khách hàng là bắt buộc | Empty name   | Provide customer name |
+| Email đã tồn tại           | Email in use | Use different email   |
+| SĐT đã tồn tại             | Phone in use | Use different phone   |
+| SĐT không hợp lệ           | Wrong format | Use 10-digit format   |
 
 ### Order Creation Errors
-| Message | Cause | Solution |
-|---------|-------|----------|
-| Không đủ hàng | Low stock | Reduce quantity |
-| Khách hàng không tồn tại | Invalid ID | Check customer ID |
-| Không có sản phẩm | Empty items | Add medications |
+
+| Message                  | Cause       | Solution          |
+| ------------------------ | ----------- | ----------------- |
+| Không đủ hàng            | Low stock   | Reduce quantity   |
+| Khách hàng không tồn tại | Invalid ID  | Check customer ID |
+| Không có sản phẩm        | Empty items | Add medications   |
 
 ### User Creation Errors
-| Message | Cause | Solution |
-|---------|-------|----------|
-| Email bắt buộc | Missing email | Provide email |
-| SĐT bắt buộc | Missing phone | Provide phone |
-| Email đã tồn tại | Email in use | Use different email |
-| You cannot change your own role | Self-edit | Ask another Owner |
+
+| Message                         | Cause         | Solution            |
+| ------------------------------- | ------------- | ------------------- |
+| Email bắt buộc                  | Missing email | Provide email       |
+| SĐT bắt buộc                    | Missing phone | Provide phone       |
+| Email đã tồn tại                | Email in use  | Use different email |
+| You cannot change your own role | Self-edit     | Ask another Owner   |
 
 ---
 
@@ -359,6 +392,7 @@ user@domain.com
 ## 📚 Full Documentation
 
 For complete details, see:
+
 - `SALES_MODULE_DETAILED.md` - Sales workflows & endpoints
 - `USER_MANAGEMENT_DETAILED.md` - User management workflows
 - `MODULES_DOCUMENTATION_INDEX.md` - Overview & navigation

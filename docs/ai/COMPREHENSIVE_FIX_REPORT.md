@@ -1,4 +1,5 @@
 # Sales Backend - Comprehensive Fix Report
+
 ## Customer Creation Requirements - Email Optional, Not Required
 
 **Date:** November 9, 2025  
@@ -10,12 +11,14 @@
 ## Executive Summary
 
 ### Problem
+
 - Email was treated as required field when creating customers
 - Error messages not specific (showing status codes instead of details)
 - HTTP status codes incorrect (400 instead of 409 for conflicts)
 - Frontend couldn't extract detailed error messages from API
 
 ### Solution
+
 - ✅ Email is now completely optional for customer creation
 - ✅ Phone and email must be unique IF provided
 - ✅ Name is the only required field
@@ -24,6 +27,7 @@
 - ✅ Email invoice sent only when customer has email AND order marked as paid
 
 ### Impact
+
 **Zero breaking changes** - All modifications are additive/improved
 
 ---
@@ -36,11 +40,12 @@
 
 ```javascript
 // Phone field length increased for flexibility
-Before: varchar(columnName, { length: 10 })
-After:  varchar(columnName, { length: 20 })
+Before: varchar(columnName, { length: 10 });
+After: varchar(columnName, { length: 20 });
 ```
 
 **Why?** Vietnamese phone numbers are 10 digits, but increasing to 20 allows for:
+
 - Country codes (+84)
 - Extensions
 - Formatting characters
@@ -53,6 +58,7 @@ After:  varchar(columnName, { length: 20 })
 **File:** `apps/api/src/controllers/customerController.js`
 
 #### Key Changes:
+
 1. ✅ **Name Validation** - Now enforced as required
 2. ✅ **Error Structure** - Unified format with `error.message`
 3. ✅ **HTTP Status Codes** - 409 for conflicts (not 400)
@@ -62,11 +68,13 @@ After:  varchar(columnName, { length: 20 })
 #### Example Responses:
 
 **Request:** POST /api/customers
+
 ```json
 { "name": "Nguyễn Văn A", "email": "abc@gmail.com" }
 ```
 
 **Response (201 - Success):**
+
 ```json
 {
   "success": true,
@@ -82,6 +90,7 @@ After:  varchar(columnName, { length: 20 })
 ```
 
 **Response (400 - Name Missing):**
+
 ```json
 {
   "success": false,
@@ -92,6 +101,7 @@ After:  varchar(columnName, { length: 20 })
 ```
 
 **Response (409 - Email Duplicate):**
+
 ```json
 {
   "success": false,
@@ -108,6 +118,7 @@ After:  varchar(columnName, { length: 20 })
 **File:** `apps/api/src/controllers/customerController.js`
 
 **Changes:**
+
 - Updated error structure to match CREATE endpoint
 - Changed HTTP status codes (409 for conflicts)
 - Vietnamese error messages
@@ -120,6 +131,7 @@ After:  varchar(columnName, { length: 20 })
 **File:** `apps/web/src/pages/sales/SalesPage.jsx` - `handleCreateCustomer()`
 
 #### Key Changes:
+
 1. ✅ Proper response data extraction (handles both formats)
 2. ✅ Detailed error message extraction from multiple sources
 3. ✅ Status code-based error handling
@@ -127,6 +139,7 @@ After:  varchar(columnName, { length: 20 })
 5. ✅ Console logging for debugging
 
 #### Error Extraction Flow:
+
 ```javascript
 1. Try: error.response.data.error.message ← Priority 1
 2. Try: error.response.data.message ← Priority 2
@@ -142,6 +155,7 @@ After:  varchar(columnName, { length: 20 })
 **File:** `apps/web/src/pages/sales/components/CustomerSelector.jsx` - `handleSearch()`
 
 #### Changes:
+
 - Detailed error extraction
 - Status code handling (400, 401, 500+)
 - Specific error messages displayed to user
@@ -153,6 +167,7 @@ After:  varchar(columnName, { length: 20 })
 **File:** `apps/web/src/pages/sales/components/EditCustomerForm.jsx` - `handleSubmit()`
 
 #### Changes:
+
 - Comprehensive error extraction
 - Status code handling (400, 404, 409, 500+)
 - Response format handling
@@ -181,12 +196,12 @@ CREATE TABLE customers (
 
 ### Create Customer - Requirements:
 
-| Field | Required | Unique | Notes |
-|-------|----------|--------|-------|
-| **name** | ✅ YES | ❌ No | Must be non-empty string |
-| **phone** | ❌ NO | ✅ YES | Optional, unique if provided |
-| **email** | ❌ NO | ✅ YES | Optional, unique if provided |
-| **address** | ❌ NO | ❌ No | Optional text field |
+| Field       | Required | Unique | Notes                        |
+| ----------- | -------- | ------ | ---------------------------- |
+| **name**    | ✅ YES   | ❌ No  | Must be non-empty string     |
+| **phone**   | ❌ NO    | ✅ YES | Optional, unique if provided |
+| **email**   | ❌ NO    | ✅ YES | Optional, unique if provided |
+| **address** | ❌ NO    | ❌ No  | Optional text field          |
 
 ### Valid Create Requests:
 
@@ -234,6 +249,7 @@ Response: 409 "Khách hàng với số điện thoại '0901234567' đã tồn t
 ## Email Invoice Flow
 
 ### Current Flow:
+
 ```
 1. Create Customer (optional email)
    └─ Success or Error
@@ -250,6 +266,7 @@ Response: 409 "Khách hàng với số điện thoại '0901234567' đã tồn t
 ```
 
 ### Email Details:
+
 - **Sent when:** Order status updated to "paid" AND customer has email
 - **Asynchronous:** Doesn't wait for email to complete
 - **Error handling:** If email fails, order still marked as paid (logged only)
@@ -260,6 +277,7 @@ Response: 409 "Khách hàng với số điện thoại '0901234567' đã tồn t
 ## Error Response Format
 
 ### Standard Format:
+
 ```json
 {
   "success": false,
@@ -270,22 +288,24 @@ Response: 409 "Khách hàng với số điện thoại '0901234567' đã tồn t
 ```
 
 ### HTTP Status Codes:
-| Code | Meaning | Scenarios |
-|------|---------|-----------|
-| **200** | OK | Successful GET/PATCH |
-| **201** | Created | Successful POST |
-| **400** | Bad Request | Invalid input, missing required fields |
-| **401** | Unauthorized | User not authenticated |
-| **403** | Forbidden | User lacks permission |
-| **404** | Not Found | Resource doesn't exist |
-| **409** | Conflict | Duplicate email/phone, data conflict |
-| **500** | Server Error | Internal server error |
+
+| Code    | Meaning      | Scenarios                              |
+| ------- | ------------ | -------------------------------------- |
+| **200** | OK           | Successful GET/PATCH                   |
+| **201** | Created      | Successful POST                        |
+| **400** | Bad Request  | Invalid input, missing required fields |
+| **401** | Unauthorized | User not authenticated                 |
+| **403** | Forbidden    | User lacks permission                  |
+| **404** | Not Found    | Resource doesn't exist                 |
+| **409** | Conflict     | Duplicate email/phone, data conflict   |
+| **500** | Server Error | Internal server error                  |
 
 ---
 
 ## Testing Checklist
 
 ### ✅ Create Customer Tests:
+
 - [ ] Create with name only → Success
 - [ ] Create with name + phone → Success
 - [ ] Create with name + email → Success
@@ -296,6 +316,7 @@ Response: 409 "Khách hàng với số điện thoại '0901234567' đã tồn t
 - [ ] Frontend displays error message (not status code)
 
 ### ✅ Sales Order Tests:
+
 - [ ] Create order with customer (no email) → Success
 - [ ] Mark as paid → No email sent
 - [ ] Create order with customer (has email) → Success
@@ -303,6 +324,7 @@ Response: 409 "Khách hàng với số điện thoại '0901234567' đã tồn t
 - [ ] Email sent asynchronously (order response immediate)
 
 ### ✅ Edit Customer Tests:
+
 - [ ] Edit name → Success
 - [ ] Edit email (unique) → Success
 - [ ] Edit email (duplicate) → Error: 409
@@ -311,6 +333,7 @@ Response: 409 "Khách hàng với số điện thoại '0901234567' đã tồn t
 - [ ] Frontend shows specific error message
 
 ### ✅ Search Customer Tests:
+
 - [ ] Search by name → Results
 - [ ] Search by email → Results
 - [ ] Search by phone → Results
@@ -321,6 +344,7 @@ Response: 409 "Khách hàng với số điện thoại '0901234567' đã tồn t
 ## Frontend Error Handling Pattern
 
 ### Before (❌ Bad):
+
 ```javascript
 catch (error) {
   toast.error("Lỗi tạo khách hàng: " + error.message);
@@ -329,10 +353,11 @@ catch (error) {
 ```
 
 ### After (✅ Good):
+
 ```javascript
 catch (error) {
   let message = "Không thể tạo khách hàng";
-  
+
   if (error?.response?.data?.error?.message) {
     message = error.response.data.error.message;
   } else if (error?.response?.data?.message) {
@@ -340,7 +365,7 @@ catch (error) {
   } else if (error?.response?.status === 409) {
     message = "Dữ liệu đã tồn tại";
   }
-  
+
   toast.error(message);
   // Shows: "Khách hàng với email 'abc@gmail.com' đã tồn tại"
 }
@@ -351,6 +376,7 @@ catch (error) {
 ## Files Modified
 
 ### Backend:
+
 1. ✅ `apps/api/src/db/schema/common.js`
    - Phone field length: 10 → 20
 
@@ -359,6 +385,7 @@ catch (error) {
    - UPDATE: Updated error structure and status codes
 
 ### Frontend:
+
 1. ✅ `apps/web/src/pages/sales/SalesPage.jsx`
    - `handleCreateCustomer()`: Improved error extraction
 
@@ -392,18 +419,21 @@ catch (error) {
 ## Migration & Deployment
 
 ### Database Migration (if needed):
+
 ```sql
-ALTER TABLE customers 
+ALTER TABLE customers
   ALTER COLUMN phone TYPE varchar(20);
 ```
 
 ### No Breaking Changes:
+
 - ✅ Response format unchanged
 - ✅ API endpoints unchanged
 - ✅ New error structure is additive
 - ✅ Backward compatible
 
 ### Deployment Steps:
+
 1. Deploy backend code changes
 2. Run database migration (if production has existing large phone numbers)
 3. Deploy frontend code changes
@@ -431,6 +461,7 @@ ALTER TABLE customers
 ## Future Enhancements
 
 Possible improvements for future iterations:
+
 1. Phone number formatting/validation (country-specific)
 2. Email verification before sending invoices
 3. Customer deduplication on name similarity
@@ -460,6 +491,7 @@ A: Only when you mark sales order as "paid" and customer has email.
 ## Conclusion
 
 This fix resolves the confusion around customer creation requirements by:
+
 - Making email truly optional
 - Providing clear, specific error messages
 - Using proper HTTP status codes

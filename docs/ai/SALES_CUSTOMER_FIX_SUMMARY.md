@@ -9,6 +9,7 @@
 ## Root Cause Analysis
 
 ### Database Schema (✅ Correct)
+
 - ✅ `email` field: Optional (không có `.notNull()`)
 - ✅ `phone` field: Optional (không có `.notNull()`)
 - ❌ `phone` length: Chỉ 10 characters (quá ngắn)
@@ -25,6 +26,7 @@
 ### Frontend (❌ Issues Found)
 
 **File: `apps/web/src/pages/sales/SalesPage.jsx`**
+
 1. **Error message handling sơ sài** → Chỉ show `error.message` (status code)
 2. **Không extract error từ response** → Không biết lỗi cụ thể là gì
 
@@ -69,9 +71,12 @@ if (!payload.name || !payload.name.trim()) {
 
 // ✅ Sửa: Email check - 409 thay vì 400, message cụ thể
 if (payload.email && payload.email.trim()) {
-  const existingCustomer = await customerService.getByEmail(payload.email.trim());
+  const existingCustomer = await customerService.getByEmail(
+    payload.email.trim()
+  );
   if (existingCustomer) {
-    return res.status(409).json({  // 409 Conflict
+    return res.status(409).json({
+      // 409 Conflict
       success: false,
       error: {
         message: `Khách hàng với email '${trimmedEmail}' đã tồn tại`,
@@ -82,9 +87,12 @@ if (payload.email && payload.email.trim()) {
 
 // ✅ Sửa: Phone check - 409 thay vì 400, message cụ thể
 if (payload.phone && payload.phone.trim()) {
-  const existingCustomer = await customerService.getByPhone(payload.phone.trim());
+  const existingCustomer = await customerService.getByPhone(
+    payload.phone.trim()
+  );
   if (existingCustomer) {
-    return res.status(409).json({  // 409 Conflict
+    return res.status(409).json({
+      // 409 Conflict
       success: false,
       error: {
         message: `Khách hàng với số điện thoại '${trimmedPhone}' đã tồn tại`,
@@ -95,6 +103,7 @@ if (payload.phone && payload.phone.trim()) {
 ```
 
 #### UPDATE Endpoint - Similar improvements:
+
 - Consistent error message structure
 - Proper HTTP status codes (409 for duplicates, 404 for not found)
 - Vietnamese error messages
@@ -104,11 +113,13 @@ if (payload.phone && payload.phone.trim()) {
 ### 3. ✅ Frontend Error Handling (Already Applied)
 
 **Files Modified:**
+
 - `apps/web/src/pages/sales/SalesPage.jsx` - `handleCreateCustomer()` method
 - `apps/web/src/pages/sales/components/CustomerSelector.jsx` - Search error handling
 - `apps/web/src/pages/sales/components/EditCustomerForm.jsx` - Update error handling
 
 **Error Extraction Pattern:**
+
 ```javascript
 let message = "Không thể tạo khách hàng";
 if (error?.response?.data?.error?.message) {
@@ -118,7 +129,7 @@ if (error?.response?.data?.error?.message) {
 } else if (error?.response?.status === 409) {
   message = "Dữ liệu đã tồn tại";
 }
-toast.error(message);  // Show specific error message
+toast.error(message); // Show specific error message
 ```
 
 ---
@@ -126,16 +137,18 @@ toast.error(message);  // Show specific error message
 ## New Behavior
 
 ### ✅ Create Customer Requirements:
-| Field | Required | Unique | Notes |
-|-------|----------|--------|-------|
-| **name** | ✅ Yes | ❌ No | Bắt buộc |
-| **phone** | ❌ No | ✅ Yes (if set) | Optional, unique if provided |
-| **email** | ❌ No | ✅ Yes (if set) | Optional, unique if set |
-| **address** | ❌ No | ❌ No | Optional |
+
+| Field       | Required | Unique          | Notes                        |
+| ----------- | -------- | --------------- | ---------------------------- |
+| **name**    | ✅ Yes   | ❌ No           | Bắt buộc                     |
+| **phone**   | ❌ No    | ✅ Yes (if set) | Optional, unique if provided |
+| **email**   | ❌ No    | ✅ Yes (if set) | Optional, unique if set      |
+| **address** | ❌ No    | ❌ No           | Optional                     |
 
 ### ✅ Error Scenarios:
 
 **1. Missing Name (400):**
+
 ```json
 {
   "success": false,
@@ -146,6 +159,7 @@ toast.error(message);  // Show specific error message
 ```
 
 **2. Email Duplicate (409):**
+
 ```json
 {
   "success": false,
@@ -156,6 +170,7 @@ toast.error(message);  // Show specific error message
 ```
 
 **3. Phone Duplicate (409):**
+
 ```json
 {
   "success": false,
@@ -166,6 +181,7 @@ toast.error(message);  // Show specific error message
 ```
 
 **4. Success (201):**
+
 ```json
 {
   "success": true,
@@ -173,8 +189,8 @@ toast.error(message);  // Show specific error message
   "data": {
     "id": "uuid",
     "name": "Nguyễn Văn A",
-    "email": null,  // optional
-    "phone": null,  // optional
+    "email": null, // optional
+    "phone": null, // optional
     "address": null // optional
   }
 }
@@ -185,10 +201,12 @@ toast.error(message);  // Show specific error message
 ## Email Invoice Behavior
 
 ### ❌ Trước:
+
 - Email bắt buộc để tạo khách hàng → Sai
 - Lỗi không rõ ràng → Người dùng confused
 
 ### ✅ Sau:
+
 - Email hoàn toàn optional khi tạo customer
 - Email chỉ được dùng để gửi invoice sau khi order mark as paid:
   1. Customer tạo thành công không cần email
@@ -201,6 +219,7 @@ toast.error(message);  // Show specific error message
 ## Frontend Form - Current State
 
 ### "Add New Customer" Form (SalesPage.jsx):
+
 ```
 ✓ [Required] Tên khách hàng *
 ○ [Optional] Email
@@ -208,6 +227,7 @@ toast.error(message);  // Show specific error message
 ```
 
 ### "Edit Customer" Form (EditCustomerForm.jsx):
+
 ```
 ✓ [Required] Tên khách hàng *
 ✓ [Required] SĐT * (yêu cầu vì đây là form edit)
@@ -236,6 +256,7 @@ toast.error(message);  // Show specific error message
 ## Files Changed
 
 ### Backend:
+
 1. **`apps/api/src/db/schema/common.js`**
    - Increased phone field length from 10 to 20
 
@@ -246,6 +267,7 @@ toast.error(message);  // Show specific error message
    - Standardized error response structure
 
 ### Frontend (Already Applied):
+
 1. **`apps/web/src/pages/sales/SalesPage.jsx`**
 2. **`apps/web/src/pages/sales/components/CustomerSelector.jsx`**
 3. **`apps/web/src/pages/sales/components/EditCustomerForm.jsx`**
@@ -255,17 +277,20 @@ toast.error(message);  // Show specific error message
 ## Key Takeaways
 
 ✅ **Problem Solved:**
+
 - Email is now optional (not required)
 - Error messages are specific and in Vietnamese
 - HTTP status codes are correct (409 for conflicts)
 - Frontend shows actual error message, not status code
 
 ✅ **Behavior:**
+
 - Customer creation only requires name
 - Phone and email are optional but must be unique if provided
 - Email invoice only sent when customer has email AND order marked as paid
 
 ✅ **User Experience:**
+
 - Clear error messages in Vietnamese
 - No confusion about which fields are required
 - Better feedback on duplicate data

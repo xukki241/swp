@@ -15,6 +15,7 @@ export const phone = (columnName = "phone") =>
 ```
 
 **Impact:**
+
 - Phone field now supports up to 20 characters (was 10)
 - Allows for country codes, extensions, formatting, etc.
 
@@ -25,6 +26,7 @@ export const phone = (columnName = "phone") =>
 **File:** `apps/api/src/controllers/customerController.js` (Lines 5-46)
 
 ### ❌ BEFORE:
+
 ```javascript
 create: asyncHandler(async (req, res) => {
   const payload = req.body;
@@ -69,6 +71,7 @@ create: asyncHandler(async (req, res) => {
 ```
 
 ### ✅ AFTER:
+
 ```javascript
 create: asyncHandler(async (req, res) => {
   const payload = req.body;
@@ -151,6 +154,7 @@ create: asyncHandler(async (req, res) => {
 **File:** `apps/api/src/controllers/customerController.js` (Lines 89-140)
 
 ### ❌ BEFORE:
+
 ```javascript
 update: asyncHandler(async (req, res) => {
   const id = req.params.id;
@@ -199,6 +203,7 @@ update: asyncHandler(async (req, res) => {
 ```
 
 ### ✅ AFTER:
+
 ```javascript
 update: asyncHandler(async (req, res) => {
   const id = req.params.id;
@@ -271,6 +276,7 @@ update: asyncHandler(async (req, res) => {
 **File:** `apps/web/src/pages/sales/SalesPage.jsx` (Lines ~300-330)
 
 ### ❌ BEFORE:
+
 ```javascript
 const handleCreateCustomer = useCallback(async () => {
   if (!newCustomerData.name.trim()) {
@@ -281,11 +287,11 @@ const handleCreateCustomer = useCallback(async () => {
   setIsCreatingCustomer(true);
   try {
     const customer = await customerService.createCustomer(newCustomerData);
-    setCustomer(customer);  // ❌ No handling for response format
+    setCustomer(customer); // ❌ No handling for response format
     setShowNewCustomerForm(false);
     setNewCustomerData({ name: "", email: "", phone: "" });
   } catch (error) {
-    toast.error("Lỗi tạo khách hàng: " + error.message);  // ❌ Shows error.message which is just status code
+    toast.error("Lỗi tạo khách hàng: " + error.message); // ❌ Shows error.message which is just status code
   } finally {
     setIsCreatingCustomer(false);
   }
@@ -293,6 +299,7 @@ const handleCreateCustomer = useCallback(async () => {
 ```
 
 ### ✅ AFTER:
+
 ```javascript
 const handleCreateCustomer = useCallback(async () => {
   if (!newCustomerData.name.trim()) {
@@ -303,14 +310,14 @@ const handleCreateCustomer = useCallback(async () => {
   setIsCreatingCustomer(true);
   try {
     const response = await customerService.createCustomer(newCustomerData);
-    const customerData = response?.data || response;  // ✅ Handle response format variations
+    const customerData = response?.data || response; // ✅ Handle response format variations
     setCustomer(customerData);
     setShowNewCustomerForm(false);
     setNewCustomerData({ name: "", email: "", phone: "" });
-    toast.success("Tạo khách hàng thành công!");  // ✅ Show success message
+    toast.success("Tạo khách hàng thành công!"); // ✅ Show success message
   } catch (error) {
-    console.error("Create customer error:", error);  // ✅ Log for debugging
-    
+    console.error("Create customer error:", error); // ✅ Log for debugging
+
     // ✅ Extract detailed error message
     let message = "Không thể tạo khách hàng";
     if (error?.response?.data?.error) {
@@ -322,7 +329,8 @@ const handleCreateCustomer = useCallback(async () => {
       }
     } else if (error?.response?.data?.message) {
       message = error.response.data.message;
-    } else if (error?.response?.status) {  // ✅ Handle by status code
+    } else if (error?.response?.status) {
+      // ✅ Handle by status code
       if (error.response.status === 400) {
         message = error.response.data?.error?.message || "Dữ liệu không hợp lệ";
       } else if (error.response.status === 409) {
@@ -333,8 +341,8 @@ const handleCreateCustomer = useCallback(async () => {
     } else if (error?.message) {
       message = error.message;
     }
-    
-    toast.error(message);  // ✅ Show specific error message
+
+    toast.error(message); // ✅ Show specific error message
   } finally {
     setIsCreatingCustomer(false);
   }
@@ -358,6 +366,7 @@ const handleCreateCustomer = useCallback(async () => {
 **File:** `apps/web/src/pages/sales/components/CustomerSelector.jsx` (Lines ~20-50)
 
 ### ❌ BEFORE:
+
 ```javascript
 const handleSearch = async (term) => {
   setSearchTerm(term);
@@ -382,7 +391,7 @@ const handleSearch = async (term) => {
     setCustomers(Array.isArray(data) ? data : []);
   } catch (error) {
     console.error("[v0] Customer search error:", error);
-    toast.error("Không thể tìm kiếm khách hàng");  // ❌ Generic error
+    toast.error("Không thể tìm kiếm khách hàng"); // ❌ Generic error
     setCustomers([]);
   } finally {
     setIsLoading(false);
@@ -391,6 +400,7 @@ const handleSearch = async (term) => {
 ```
 
 ### ✅ AFTER:
+
 ```javascript
 const handleSearch = async (term) => {
   setSearchTerm(term);
@@ -415,7 +425,7 @@ const handleSearch = async (term) => {
     setCustomers(Array.isArray(data) ? data : []);
   } catch (error) {
     console.error("[v0] Customer search error:", error);
-    
+
     // ✅ Extract detailed error message
     let message = "Không thể tìm kiếm khách hàng";
     if (error?.response?.data?.error) {
@@ -429,7 +439,9 @@ const handleSearch = async (term) => {
       message = error.response.data.message;
     } else if (error?.response?.status) {
       if (error.response.status === 400) {
-        message = error.response.data?.error?.message || "Tham số tìm kiếm không hợp lệ";
+        message =
+          error.response.data?.error?.message ||
+          "Tham số tìm kiếm không hợp lệ";
       } else if (error.response.status === 401) {
         message = "Chưa xác thực. Vui lòng đăng nhập lại";
       } else if (error.response.status >= 500) {
@@ -438,8 +450,8 @@ const handleSearch = async (term) => {
     } else if (error?.message) {
       message = error.message;
     }
-    
-    toast.error(message);  // ✅ Show specific error message
+
+    toast.error(message); // ✅ Show specific error message
     setCustomers([]);
   } finally {
     setIsLoading(false);
@@ -461,6 +473,7 @@ const handleSearch = async (term) => {
 **File:** `apps/web/src/pages/sales/components/EditCustomerForm.jsx` (Lines ~29-80)
 
 ### ❌ BEFORE:
+
 ```javascript
 try {
   const updateData = {
@@ -483,7 +496,7 @@ try {
     updateData
   );
 
-  const updatedCustomer = response.data || response;  // ❌ Inconsistent handling
+  const updatedCustomer = response.data || response; // ❌ Inconsistent handling
   toast.success("Cập nhật thông tin khách hàng thành công!");
   onSuccess(updatedCustomer);
   onClose();
@@ -501,7 +514,7 @@ try {
   } else if (error?.response?.data?.message) {
     message = error.response.data.message;
   } else if (error?.message) {
-    message = error.message;  // ❌ No status code handling
+    message = error.message; // ❌ No status code handling
   }
 
   toast.error(message);
@@ -509,6 +522,7 @@ try {
 ```
 
 ### ✅ AFTER:
+
 ```javascript
 try {
   const updateData = {
@@ -531,7 +545,7 @@ try {
     updateData
   );
 
-  const updatedCustomer = response?.data || response;  // ✅ Consistent handling
+  const updatedCustomer = response?.data || response; // ✅ Consistent handling
   toast.success("Cập nhật thông tin khách hàng thành công!");
   onSuccess(updatedCustomer);
   onClose();
@@ -579,26 +593,28 @@ try {
 
 ## Summary Table
 
-| Component | Change | Impact |
-|-----------|--------|--------|
-| **Database** | Phone length 10→20 | Supports more formats |
-| **Backend - CREATE** | Name validation + error structure | Proper validation |
-| **Backend - UPDATE** | 409 status + error structure | Better error info |
+| Component             | Change                             | Impact                 |
+| --------------------- | ---------------------------------- | ---------------------- |
+| **Database**          | Phone length 10→20                 | Supports more formats  |
+| **Backend - CREATE**  | Name validation + error structure  | Proper validation      |
+| **Backend - UPDATE**  | 409 status + error structure       | Better error info      |
 | **Frontend - Create** | Error extraction + success message | User-friendly feedback |
-| **Frontend - Search** | Detailed error extraction | Better UX |
-| **Frontend - Edit** | Status code handling | Proper error display |
+| **Frontend - Search** | Detailed error extraction          | Better UX              |
+| **Frontend - Edit**   | Status code handling               | Proper error display   |
 
 ---
 
 ## Migration Notes
 
 ### Database Migration (if needed):
+
 ```sql
-ALTER TABLE customers 
+ALTER TABLE customers
 ALTER COLUMN phone TYPE varchar(20);
 ```
 
 ### No API Contract Breaking Changes:
+
 - Response format remains the same
 - New error structure is additive (error.message field added)
 - Backward compatible with existing code

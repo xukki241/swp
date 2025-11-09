@@ -14,6 +14,7 @@ Backend sẽ trả về error với cấu trúc unified:
 ```
 
 Hoặc legacy format:
+
 ```javascript
 {
   "success": false,
@@ -25,14 +26,14 @@ Hoặc legacy format:
 
 ## HTTP Status Codes
 
-| Status | Meaning | Use Case |
-|--------|---------|----------|
-| **400** | Bad Request | Input validation failed (name required, invalid format) |
-| **401** | Unauthorized | User not authenticated |
-| **403** | Forbidden | User has no permission |
-| **404** | Not Found | Resource doesn't exist |
-| **409** | Conflict | Duplicate email/phone, data conflict |
-| **500** | Server Error | Internal server error |
+| Status  | Meaning      | Use Case                                                |
+| ------- | ------------ | ------------------------------------------------------- |
+| **400** | Bad Request  | Input validation failed (name required, invalid format) |
+| **401** | Unauthorized | User not authenticated                                  |
+| **403** | Forbidden    | User has no permission                                  |
+| **404** | Not Found    | Resource doesn't exist                                  |
+| **409** | Conflict     | Duplicate email/phone, data conflict                    |
+| **500** | Server Error | Internal server error                                   |
 
 ---
 
@@ -41,6 +42,7 @@ Hoặc legacy format:
 ### POST /api/customers - Create Customer
 
 #### Success (201):
+
 ```json
 {
   "success": true,
@@ -56,6 +58,7 @@ Hoặc legacy format:
 ```
 
 #### Error - Name Required (400):
+
 ```json
 {
   "success": false,
@@ -66,6 +69,7 @@ Hoặc legacy format:
 ```
 
 #### Error - Email Duplicate (409):
+
 ```json
 {
   "success": false,
@@ -76,6 +80,7 @@ Hoặc legacy format:
 ```
 
 #### Error - Phone Duplicate (409):
+
 ```json
 {
   "success": false,
@@ -90,6 +95,7 @@ Hoặc legacy format:
 ### PATCH /api/customers/{id} - Update Customer
 
 #### Success (200):
+
 ```json
 {
   "success": true,
@@ -105,6 +111,7 @@ Hoặc legacy format:
 ```
 
 #### Error - Not Found (404):
+
 ```json
 {
   "success": false,
@@ -115,6 +122,7 @@ Hoặc legacy format:
 ```
 
 #### Error - Phone Duplicate (409):
+
 ```json
 {
   "success": false,
@@ -129,6 +137,7 @@ Hoặc legacy format:
 ### GET /api/customers/search - Search Customers
 
 #### Success (200):
+
 ```json
 {
   "success": true,
@@ -145,6 +154,7 @@ Hoặc legacy format:
 ```
 
 #### Error - Invalid Search (400):
+
 ```json
 {
   "success": false,
@@ -161,6 +171,7 @@ Hoặc legacy format:
 ### POST /api/sales - Create Sales Order
 
 #### Success (201):
+
 ```json
 {
   "success": true,
@@ -184,6 +195,7 @@ Hoặc legacy format:
 ```
 
 #### Error - Item Out of Stock (400):
+
 ```json
 {
   "success": false,
@@ -194,6 +206,7 @@ Hoặc legacy format:
 ```
 
 #### Error - Customer Not Found (404):
+
 ```json
 {
   "success": false,
@@ -208,6 +221,7 @@ Hoặc legacy format:
 ### PATCH /api/sales/{id} - Update Sales Order Status
 
 #### Success - Mark as Paid (200):
+
 ```json
 {
   "success": true,
@@ -238,7 +252,10 @@ const extractErrorMessage = (error, defaultMessage = "Có lỗi xảy ra") => {
     message = error.response.data.error.message;
   }
   // Try to extract from error.response.data.error (string)
-  else if (error?.response?.data?.error && typeof error.response.data.error === "string") {
+  else if (
+    error?.response?.data?.error &&
+    typeof error.response.data.error === "string"
+  ) {
     message = error.response.data.error;
   }
   // Try to extract from error.response.data.message

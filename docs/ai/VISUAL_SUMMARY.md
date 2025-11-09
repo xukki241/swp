@@ -49,6 +49,7 @@ Error extraction khó khăn           Frontend dễ extract error
 ## 📊 Error Response Examples
 
 ### Create Customer - Success ✅
+
 ```
 Request:  { name: "Nguyễn Văn A", email: "abc@gmail.com" }
 Response: 201
@@ -65,6 +66,7 @@ Toast:    "Tạo khách hàng thành công!" ✅
 ```
 
 ### Missing Name ❌
+
 ```
 Request:  { phone: "0901234567" }
 Response: 400
@@ -78,6 +80,7 @@ Toast:    "Tên khách hàng là bắt buộc" ⚠️
 ```
 
 ### Email Already Exists ❌
+
 ```
 Request:  { name: "Nguyễn Văn B", email: "abc@gmail.com" }
 Response: 409
@@ -91,6 +94,7 @@ Toast:    "Khách hàng với email 'abc@gmail.com' đã tồn tại" ⚠️
 ```
 
 ### Phone Already Exists ❌
+
 ```
 Request:  { name: "Nguyễn Văn C", phone: "0901234567" }
 Response: 409
@@ -143,6 +147,7 @@ Toast:    "Khách hàng với số điện thoại '0901234567' đã tồn tại
 ## 📈 Error Handling Comparison
 
 ### Before ❌
+
 ```javascript
 try {
   const customer = await createCustomer(data);
@@ -153,18 +158,19 @@ try {
 ```
 
 ### After ✅
+
 ```javascript
 try {
   const customer = await createCustomer(data);
 } catch (error) {
   let message = "Cannot create customer";
-  
+
   if (error?.response?.data?.error?.message) {
     message = error.response.data.error.message;
   } else if (error?.response?.status === 409) {
     message = "Customer already exists";
   }
-  
+
   toast.error(message);
   // User sees: "Khách hàng đã tồn tại" ← Clear!
 }
@@ -175,6 +181,7 @@ try {
 ## 🎨 Form Requirements
 
 ### Create Customer Form
+
 ```
 ┌────────────────────────────────┐
 │   TẠO KHÁCH HÀNG MỚI          │
@@ -194,6 +201,7 @@ Fields:
 ```
 
 ### Edit Customer Form
+
 ```
 ┌────────────────────────────────┐
 │   CHỈNH SỬA KHÁCH HÀNG         │
@@ -266,6 +274,7 @@ User Sees
 ## 📋 Changes Checklist
 
 ### Backend
+
 - ✅ Database schema: phone length 10 → 20
 - ✅ CREATE endpoint: name validation
 - ✅ CREATE endpoint: error structure
@@ -276,6 +285,7 @@ User Sees
 - ✅ UPDATE endpoint: Vietnamese messages
 
 ### Frontend
+
 - ✅ handleCreateCustomer: response handling
 - ✅ handleCreateCustomer: error extraction
 - ✅ handleCreateCustomer: success message
@@ -284,6 +294,7 @@ User Sees
 - ✅ handleSubmit (edit): status code handling
 
 ### Documentation
+
 - ✅ CUSTOMER_CREATION_REQUIREMENTS.md
 - ✅ ERROR_RESPONSE_FORMAT.md
 - ✅ SALES_CUSTOMER_FIX_SUMMARY.md
@@ -337,13 +348,13 @@ Mark order paid (has email)   ✅ Email sent
 
 **If users ask:**
 
-| Question | Answer |
-|----------|--------|
-| "Tôi phải nhập email không?" | Không, email hoàn toàn optional. |
-| "Tôi phải nhập SĐT không?" | Không, phone optional. Chỉ name bắt buộc. |
-| "Lỗi ghi gì?" | Lỗi ghi cụ thể bằng tiếng Việt (ví dụ: "Khách hàng đã tồn tại"). |
-| "Email khi nào gửi?" | Khi bạn mark order as "paid" và customer có email. |
-| "Nếu không có email sao?" | Không gửi email, không có lỗi gì. |
+| Question                     | Answer                                                           |
+| ---------------------------- | ---------------------------------------------------------------- |
+| "Tôi phải nhập email không?" | Không, email hoàn toàn optional.                                 |
+| "Tôi phải nhập SĐT không?"   | Không, phone optional. Chỉ name bắt buộc.                        |
+| "Lỗi ghi gì?"                | Lỗi ghi cụ thể bằng tiếng Việt (ví dụ: "Khách hàng đã tồn tại"). |
+| "Email khi nào gửi?"         | Khi bạn mark order as "paid" và customer có email.               |
+| "Nếu không có email sao?"    | Không gửi email, không có lỗi gì.                                |
 
 ---
 

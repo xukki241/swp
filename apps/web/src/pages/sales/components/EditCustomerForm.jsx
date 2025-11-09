@@ -77,11 +77,13 @@ export default function EditCustomerForm({ customer, onClose, onSuccess }) {
         message = error.response.data.message;
       } else if (error?.response?.status) {
         if (error.response.status === 400) {
-          message = error.response.data?.error?.message || "Dữ liệu không hợp lệ";
+          message =
+            error.response.data?.error?.message || "Dữ liệu không hợp lệ";
         } else if (error.response.status === 404) {
           message = "Khách hàng không tồn tại";
         } else if (error.response.status === 409) {
-          message = error.response.data?.error?.message || "Dữ liệu bị xung đột";
+          message =
+            error.response.data?.error?.message || "Dữ liệu bị xung đột";
         } else if (error.response.status >= 500) {
           message = "Lỗi máy chủ. Vui lòng thử lại sau";
         }
