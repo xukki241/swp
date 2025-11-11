@@ -44,7 +44,9 @@ export function VietQRPaymentDialog({
   const handleConfirmPayment = async () => {
     setIsConfirming(true);
     try {
-      await onPaymentConfirmed();
+      // Remove total before sending to API, as it's only for display
+      const { total, ...apiOrderData } = orderData;
+      await onPaymentConfirmed(apiOrderData);
       toast.success("Xác nhận thanh toán thành công!");
       onOpenChange(false);
     } catch (error) {

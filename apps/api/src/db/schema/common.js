@@ -24,7 +24,7 @@ export const email = (columnName = "email") =>
   varchar(columnName, { length: 255 });
 
 export const phone = (columnName = "phone") =>
-  varchar(columnName, { length: 10 });
+  varchar(columnName, { length: 20 });
 
 export const address = (columnName = "address") => text(columnName);
 
