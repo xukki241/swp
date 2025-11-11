@@ -1,4 +1,5 @@
 import { AppLayout } from "@/components/layouts/app-layout";
+import { useCurrentUser } from "@/hooks/useAuth";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -53,16 +54,17 @@ export default function WarehousePage() {
     location: "",
     description: "",
   });
+  const [canEdit, setCanEdit] = useState(false);
+  const { data } = useCurrentUser();
+  console.log(data);
 
-  // Debug: Log zones when they change
   useEffect(() => {
-    console.info("Zones loaded:", zones);
-    console.info("Zones length:", zones?.length);
-    console.info("Zones is array:", Array.isArray(zones));
-  }, [zones]);
+    if (data.user.role === "owner") {
+      setCanEdit(true);
+    }
+  }, [data]);
 
   const handleZoneChange = (zoneId) => {
-    console.info("Zone selected:", zoneId);
     setSelectedZoneId(zoneId);
     if (zoneId) {
       selectZone(zoneId);
@@ -136,10 +138,12 @@ export default function WarehousePage() {
               <CardTitle className="text-lg font-semibold">
                 Chọn khu vực
               </CardTitle>
-              <Button size="sm" onClick={() => setShowAddZoneDialog(true)}>
-                <Plus className="h-4 w-4" />
-                Add Zone
-              </Button>
+              {canEdit && (
+                <Button size="sm" onClick={() => setShowAddZoneDialog(true)}>
+                  <Plus className="h-4 w-4" />
+                  Thêm khu vực
+                </Button>
+              )}
             </CardHeader>
             <CardContent>
               <Select value={selectedZoneId} onValueChange={handleZoneChange}>

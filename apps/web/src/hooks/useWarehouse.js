@@ -33,9 +33,7 @@ export const useWarehouse = () => {
     try {
       setLoading(true);
       const responseData = await getAllZones();
-      console.info("Fetched zones response:", responseData);
       const zonesData = responseData.data || [];
-      console.info("Setting zones:", zonesData);
       setZones(zonesData);
       setError(null);
     } catch (err) {

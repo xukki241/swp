@@ -199,7 +199,7 @@ export default function StockOverviewPage() {
         </Card>
       </div>
 
-      {/* Dialogs */}
+      {/*---------- Dialogs ----------*/}
       <StockDetailsDialog
         medicationItem={currentMedication}
         open={showDetailsDialog}

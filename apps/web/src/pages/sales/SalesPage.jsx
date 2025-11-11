@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { customerService } from "@/services/customerService";
 import { searchMedications } from "@/services/medicationsService";
@@ -509,7 +510,7 @@ export default function SalesPageV3() {
 
   return (
     <AppLayout>
-      <div className="h-full flex flex-col overflow-hidden bg-background">
+      <div className="h-full rounded-xl flex flex-col overflow-hidden bg-background">
         {/* Header */}
         <div className="px-6 py-4 border-b border-border bg-card">
           <div className="flex items-center justify-between mb-4">
@@ -747,13 +748,13 @@ export default function SalesPageV3() {
                 </div>
               </div>
             ) : (
-              <div className="flex-1 bg-card rounded-xl border border-border flex items-center justify-center">
+              <Card className="flex-1 bg-card rounded-xl border border-border flex items-center justify-center">
                 <div className="text-center text-muted-foreground">
                   <ShoppingCart className="h-16 w-16 mx-auto mb-4 opacity-20" />
                   <p className="font-medium">Giỏ hàng trống</p>
                   <p className="text-sm mt-1">Tìm kiếm và thêm sản phẩm</p>
                 </div>
-              </div>
+              </Card>
             )}
 
             {/* Payment Section */}
