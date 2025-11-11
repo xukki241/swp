@@ -114,3 +114,5 @@ azure-acr-credentials.json
 azure-db-info.json
 gitlab-variables.json
 AZURE_SETUP_COMPLETE.md
+
+longchau_products.json
