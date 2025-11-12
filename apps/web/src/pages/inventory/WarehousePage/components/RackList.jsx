@@ -17,7 +17,7 @@ import { Textarea } from "../../../../components/ui/textarea";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
 import { RackItem } from "./RackItem";
 
-export function RackList({ racks, selectedZoneId, refetch }) {
+export function RackList({ racks, selectedZoneId, refetch, canEdit }) {
   const { createRackData } = useWarehouse();
   const [expandedRacks, setExpandedRacks] = useState(new Set());
   const [showAddRackDialog, setShowAddRackDialog] = useState(false);
@@ -81,7 +81,7 @@ export function RackList({ racks, selectedZoneId, refetch }) {
       <Card className="shadow-md rounded-xl border-0">
         <CardContent className="py-12 text-center">
           <p className="text-muted-foreground">
-            Không tìm thấy giá trong khu vực này
+            Không tìm thấy kệ trong khu vực này
           </p>
         </CardContent>
       </Card>
@@ -91,12 +91,14 @@ export function RackList({ racks, selectedZoneId, refetch }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Giá</h2>
+        <h2 className="text-lg font-semibold">Kệ</h2>
         <div className="flex gap-2">
-          <Button size="sm" onClick={() => setShowAddRackDialog(true)}>
-            <Plus className="h-4 w-4" />
-            Thêm giá
-          </Button>
+          {canEdit && (
+            <Button size="sm" onClick={() => setShowAddRackDialog(true)}>
+              <Plus className="h-4 w-4" />
+              Thêm kệ
+            </Button>
+          )}
           <Button
             size="sm"
             variant="outline"
@@ -117,6 +119,7 @@ export function RackList({ racks, selectedZoneId, refetch }) {
             onToggle={() => toggleRack(rack.id)}
             selectedZoneId={selectedZoneId}
             refetch={refetch}
+            canEdit={canEdit}
           />
         ))}
       </div>
@@ -124,14 +127,14 @@ export function RackList({ racks, selectedZoneId, refetch }) {
       <Dialog open={showAddRackDialog} onOpenChange={setShowAddRackDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Thêm giá mới</DialogTitle>
+            <DialogTitle>Thêm kệ mới</DialogTitle>
             <DialogDescription>Tạo giá mới trong khu vực này</DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleAddRackSubmit} className="space-y-4">
             <div>
               <Label className="mb-2" htmlFor="rackName">
-                Tên giá *
+                Tên kệ *
               </Label>
               <Input
                 id="rackName"
@@ -144,7 +147,7 @@ export function RackList({ racks, selectedZoneId, refetch }) {
 
             <div>
               <Label className="mb-2" htmlFor="rackCode">
-                Mã giá *
+                Mã kệ *
               </Label>
               <Input
                 id="rackCode"

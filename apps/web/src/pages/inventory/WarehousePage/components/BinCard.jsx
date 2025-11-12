@@ -43,7 +43,15 @@ function numberToColumn(num) {
   return result;
 }
 
-export function BinCard({ bin, level, number, rackId, rack, refetch }) {
+export function BinCard({
+  bin,
+  level,
+  number,
+  rackId,
+  rack,
+  refetch,
+  canEdit,
+}) {
   const { updateBinData, deleteBinData } = useWarehouse();
   const [showBinDetails, setShowBinDetails] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -309,34 +317,33 @@ export function BinCard({ bin, level, number, rackId, rack, refetch }) {
             )}
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() => {
-                setShowBinDetails(false);
-                setShowDeleteDialog(true);
-              }}
-              disabled={isSubmitting}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Xóa ô
+            {canEdit && (
+              <>
+                <Button
+                  onClick={() => {
+                    setShowBinDetails(false);
+                    setShowEditDialog(true);
+                  }}
+                >
+                  Chỉnh sửa
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => {
+                    setShowBinDetails(false);
+                    setShowDeleteDialog(true);
+                  }}
+                  disabled={isSubmitting}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Xóa ô
+                </Button>
+              </>
+            )}
+            <Button variant="outline" onClick={() => setShowBinDetails(false)}>
+              Đóng
             </Button>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowBinDetails(false)}
-              >
-                Đóng
-              </Button>
-              <Button
-                onClick={() => {
-                  setShowBinDetails(false);
-                  setShowEditDialog(true);
-                }}
-              >
-                Chỉnh sửa
-              </Button>
-            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

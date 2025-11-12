@@ -32,6 +32,7 @@ export function RackItem({
   onToggle,
   selectedZoneId,
   refetch,
+  canEdit,
 }) {
   const { updateRackData, deleteRackData, createBinData } = useWarehouse();
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -173,33 +174,35 @@ export function RackItem({
                 <p className="text-sm text-muted-foreground">{rack.code}</p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setShowAddBinDialog(true)}
-              >
-                <Plus className="h-4 w-4" />
-                Thêm ô
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setShowEditDialog(true)}
-              >
-                <Edit2 className="h-4 w-4" />
-                Sửa giá
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setShowDeleteDialog(true)}
-                className="text-destructive hover:text-destructive"
-              >
-                <Trash2 className="h-4 w-4" />
-                Xóa giá
-              </Button>
-            </div>
+            {canEdit && (
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowAddBinDialog(true)}
+                >
+                  <Plus className="h-4 w-4" />
+                  Thêm ô
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowEditDialog(true)}
+                >
+                  <Edit2 className="h-4 w-4" />
+                  Sửa kệ
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Xóa kệ
+                </Button>
+              </div>
+            )}
           </div>
           {rack.description && (
             <p className="text-sm text-muted-foreground mt-2">
@@ -215,6 +218,7 @@ export function RackItem({
               bins={rack.bins}
               rack={rack}
               refetch={refetch}
+              canEdit={canEdit}
             />
           </CardContent>
         )}
@@ -319,15 +323,15 @@ export function RackItem({
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Sửa giá</DialogTitle>
+            <DialogTitle>Sửa kệ</DialogTitle>
             <DialogDescription>
-              Cập nhật thông tin giá bên dưới
+              Cập nhật thông tin kệ bên dưới
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleEditRackSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="name">Tên giá</Label>
+              <Label htmlFor="name">Tên kệ</Label>
               <Input
                 id="name"
                 name="name"
@@ -340,7 +344,7 @@ export function RackItem({
             </div>
 
             <div>
-              <Label htmlFor="code">Mã giá</Label>
+              <Label htmlFor="code">Mã kệ</Label>
               <Input
                 id="code"
                 name="code"
@@ -389,9 +393,9 @@ export function RackItem({
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Xóa giá</AlertDialogTitle>
+            <AlertDialogTitle>Xóa kệ</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có chắc muốn xóa giá này? Hành động này không thể khôi phục.
+              Bạn có chắc muốn xóa kệ này? Hành động này không thể khôi phục.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

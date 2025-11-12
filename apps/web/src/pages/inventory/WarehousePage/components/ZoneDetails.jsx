@@ -31,7 +31,7 @@ import { Textarea } from "../../../../components/ui/textarea";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
 import { zoneTypeLabel } from "../../../../utils/zoneTypeMap";
 
-export default function ZoneDetails({ zone, refetch }) {
+export default function ZoneDetails({ zone, refetch, canEdit }) {
   const { updateZoneData, deleteZoneData } = useWarehouse();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -94,6 +94,7 @@ export default function ZoneDetails({ zone, refetch }) {
     try {
       await deleteZoneData(zone.id);
       setShowDeleteDialog(false);
+      refetch();
     } catch (error) {
       console.error("Failed to delete zone:", error);
     } finally {
@@ -108,25 +109,27 @@ export default function ZoneDetails({ zone, refetch }) {
           <CardTitle className="text-lg font-semibold">
             Chi tiết khu vực
           </CardTitle>
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setShowEditDialog(true)}
-            >
-              <Edit2 className="h-4 w-4" />
-              Sửa khu vực
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setShowDeleteDialog(true)}
-              className="text-destructive hover:text-destructive"
-            >
-              <Trash2 className="h-4 w-4" />
-              Xóa khu vực
-            </Button>
-          </div>
+          {canEdit && (
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowEditDialog(true)}
+              >
+                <Edit2 className="h-4 w-4" />
+                Sửa khu vực
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowDeleteDialog(true)}
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+                Xóa khu vực
+              </Button>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -257,6 +260,7 @@ export default function ZoneDetails({ zone, refetch }) {
         </DialogContent>
       </Dialog>
 
+      {/* Alert delete zone */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

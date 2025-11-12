@@ -1,4 +1,5 @@
 import { AppLayout } from "@/components/layouts/app-layout";
+import { useCurrentUser } from "@/hooks/useAuth";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -53,28 +54,21 @@ export default function WarehousePage() {
     location: "",
     description: "",
   });
+  const [canEdit, setCanEdit] = useState(false);
+  const { data } = useCurrentUser();
 
-  // Debug: Log zones when they change
   useEffect(() => {
-    console.info("Zones loaded:", zones);
-    console.info("Zones length:", zones?.length);
-    console.info("Zones is array:", Array.isArray(zones));
-  }, [zones]);
+    if (data?.user?.role === "owner") {
+      setCanEdit(true);
+    }
+  }, [data]);
 
   const handleZoneChange = (zoneId) => {
-    console.info("Zone selected:", zoneId);
     setSelectedZoneId(zoneId);
     if (zoneId) {
       selectZone(zoneId);
     }
   };
-
-  // Remove the useEffect since we're calling selectZone directly in handleZoneChange
-  // useEffect(() => {
-  //   if (selectedZoneId) {
-  //     selectZone(selectedZoneId);
-  //   }
-  // }, [selectedZoneId, selectZone]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -125,7 +119,7 @@ export default function WarehousePage() {
         <div>
           <h2 className="text-3xl font-bold text-gray-900">Quản lý kho</h2>
           <p className="text-muted-foreground mt-1">
-            Xem và quản lý khu vực, giá và ô chứa trong kho
+            Xem và quản lý khu vực, kệ và ô chứa trong kho
           </p>
         </div>
 
@@ -136,10 +130,12 @@ export default function WarehousePage() {
               <CardTitle className="text-lg font-semibold">
                 Chọn khu vực
               </CardTitle>
-              <Button size="sm" onClick={() => setShowAddZoneDialog(true)}>
-                <Plus className="h-4 w-4" />
-                Add Zone
-              </Button>
+              {canEdit && (
+                <Button size="sm" onClick={() => setShowAddZoneDialog(true)}>
+                  <Plus className="h-4 w-4" />
+                  Thêm khu
+                </Button>
+              )}
             </CardHeader>
             <CardContent>
               <Select value={selectedZoneId} onValueChange={handleZoneChange}>
@@ -155,7 +151,7 @@ export default function WarehousePage() {
                     ))
                   ) : (
                     <div className="px-2 py-1 text-sm text-muted-foreground">
-                      Không có khu vực nào
+                      Không có khu nào
                     </div>
                   )}
                 </SelectContent>
@@ -163,7 +159,6 @@ export default function WarehousePage() {
             </CardContent>
           </Card>
 
-          {/* Zone Details and Racks */}
           {loading && (
             <div className="space-y-4">
               <Skeleton className="h-32 w-full" />
@@ -171,23 +166,26 @@ export default function WarehousePage() {
             </div>
           )}
 
+          {/* Zone Details and Racks */}
           {selectedZone ? (
             <div className="space-y-6">
               <ZoneDetailsCard
                 zone={selectedZone}
                 refetch={() => refetchZone(selectedZoneId)}
+                canEdit={canEdit}
               />
               <RackList
                 racks={racks}
                 selectedZoneId={selectedZoneId}
                 refetch={() => refetchZone(selectedZoneId)}
+                canEdit={canEdit}
               />
             </div>
           ) : (
             <Card className="shadow-md rounded-xl border-0">
               <CardContent className="py-12 text-center">
                 <p className="text-muted-foreground">
-                  Chọn khu vực để xem chi tiết và giá
+                  Chọn khu vực để xem chi tiết và các kệ của khu
                 </p>
               </CardContent>
             </Card>
@@ -198,8 +196,8 @@ export default function WarehousePage() {
       <Dialog open={showAddZoneDialog} onOpenChange={setShowAddZoneDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Thêm khu vực mới</DialogTitle>
-            <DialogDescription>Tạo khu vực kho mới</DialogDescription>
+            <DialogTitle>Thêm khu mới</DialogTitle>
+            <DialogDescription>Tạo khu mới</DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleAddZoneSubmit} className="space-y-4">
