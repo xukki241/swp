@@ -80,13 +80,6 @@ CREATE TABLE "medication_variants" (
 	"is_for_sale" boolean DEFAULT false NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "notifications" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" uuid NOT NULL,
-	"message" text NOT NULL,
-	"is_read" boolean DEFAULT false NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE "purchase_order_items" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"purchase_order_id" uuid NOT NULL,
@@ -145,15 +138,6 @@ CREATE TABLE "sales_orders" (
 	"status" "sales_order_status" DEFAULT 'pending' NOT NULL,
 	"payment_method" "sales_order_payment_method" DEFAULT 'cash' NOT NULL,
 	"salesperson_id" uuid
-);
---> statement-breakpoint
-CREATE TABLE "settings" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"key" varchar(100) NOT NULL,
-	"name" varchar(100) NOT NULL,
-	"group" varchar(100) DEFAULT 'general' NOT NULL,
-	"value" jsonb NOT NULL,
-	"description" text
 );
 --> statement-breakpoint
 CREATE TABLE "supplier_medication_variants" (
@@ -246,7 +230,6 @@ ALTER TABLE "inventory" ADD CONSTRAINT "inventory_medication_variant_id_medicati
 ALTER TABLE "inventory" ADD CONSTRAINT "inventory_purchase_order_receipt_items_id_purchase_order_receipt_items_id_fk" FOREIGN KEY ("purchase_order_receipt_items_id") REFERENCES "public"."purchase_order_receipt_items"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "inventory" ADD CONSTRAINT "inventory_bin_id_warehouse_bins_id_fk" FOREIGN KEY ("bin_id") REFERENCES "public"."warehouse_bins"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "medication_variants" ADD CONSTRAINT "medication_variants_medication_id_medications_id_fk" FOREIGN KEY ("medication_id") REFERENCES "public"."medications"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE "notifications" ADD CONSTRAINT "notifications_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "purchase_order_items" ADD CONSTRAINT "purchase_order_items_purchase_order_id_purchase_orders_id_fk" FOREIGN KEY ("purchase_order_id") REFERENCES "public"."purchase_orders"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "purchase_order_items" ADD CONSTRAINT "purchase_order_items_supplier_medication_variant_id_supplier_medication_variants_id_fk" FOREIGN KEY ("supplier_medication_variant_id") REFERENCES "public"."supplier_medication_variants"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "purchase_order_receipt_items" ADD CONSTRAINT "purchase_order_receipt_items_purchase_order_receipt_id_purchase_order_receipts_id_fk" FOREIGN KEY ("purchase_order_receipt_id") REFERENCES "public"."purchase_order_receipts"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
@@ -271,7 +254,6 @@ CREATE UNIQUE INDEX "file_attachments_file_id_entity_type_entity_id_unique" ON "
 CREATE UNIQUE INDEX "inventory_medication_variant_id_bin_id_batch_number_unique" ON "inventory" USING btree ("medication_variant_id","bin_id","batch_number");--> statement-breakpoint
 CREATE UNIQUE INDEX "medication_variants_sku_unique" ON "medication_variants" USING btree ("sku");--> statement-breakpoint
 CREATE UNIQUE INDEX "medication_variants_barcode_unique" ON "medication_variants" USING btree ("barcode");--> statement-breakpoint
-CREATE UNIQUE INDEX "settings_key_unique" ON "settings" USING btree ("key");--> statement-breakpoint
 CREATE UNIQUE INDEX "supplier_medication_variants_supplier_id_medication_variant_id_unique" ON "supplier_medication_variants" USING btree ("supplier_id","medication_variant_id");--> statement-breakpoint
 CREATE UNIQUE INDEX "suppliers_email_unique" ON "suppliers" USING btree ("email");--> statement-breakpoint
 CREATE UNIQUE INDEX "suppliers_phone_unique" ON "suppliers" USING btree ("phone");--> statement-breakpoint

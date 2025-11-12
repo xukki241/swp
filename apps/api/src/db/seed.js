@@ -9,7 +9,6 @@ import {
   inventory,
   medications,
   medicationVariants,
-  notifications,
   purchaseOrderItems,
   purchaseOrderReceiptItems,
   purchaseOrderReceipts,
@@ -17,7 +16,6 @@ import {
   reports,
   salesOrderItems,
   salesOrders,
-  settings,
   shiftAssignments,
   shifts,
   supplierMedicationVariants,
@@ -37,7 +35,6 @@ async function seed() {
     // Clear existing data (in reverse dependency order)
     console.log("🧹 Clearing existing data...");
     await db.delete(auditLogs);
-    await db.delete(notifications);
     await db.delete(salesOrderItems);
     await db.delete(salesOrders);
     await db.delete(inventory);
@@ -60,7 +57,6 @@ async function seed() {
     await db.delete(userRegistrations);
     await db.delete(users);
     await db.delete(reports);
-    await db.delete(settings);
 
     // 1. Seed Users
     console.log("👥 Seeding users...");
@@ -1739,38 +1735,7 @@ async function seed() {
       ])
       .returning();
 
-    // 20. Seed Notifications
-    console.log("🔔 Seeding notifications...");
-    await db.insert(notifications).values([
-      {
-        userId: owner.id,
-        message: `Đơn đặt hàng PO-${po1.id.substring(0, 8)} đã được nhận đầy đủ.`,
-        isRead: true,
-      },
-      {
-        userId: staff1.id,
-        message:
-          "Cảnh báo tồn kho thấp: Ibuprofen 400mg Viên nén đã dưới ngưỡng cấu hình.",
-        isRead: false,
-      },
-      {
-        userId: staff2.id,
-        message: `Đơn hàng mới SO-${sale3.id.substring(0, 8)} đang chờ thanh toán.`,
-        isRead: false,
-      },
-      {
-        userId: owner.id,
-        message: "Báo cáo tổng kết bán hàng tháng 5/2024 đã sẵn sàng.",
-        isRead: false,
-      },
-      {
-        userId: staff3.id,
-        message: `Trạng thái tài khoản của bạn đã được thay đổi thành 'không hoạt động'.`,
-        isRead: true,
-      },
-    ]);
-
-    // 22. Seed Audit Logs
+    // 20. Seed Audit Logs
     console.log("📋 Seeding audit logs...");
     await db.insert(auditLogs).values([
       {
@@ -1988,87 +1953,6 @@ async function seed() {
       },
     ]);
 
-    // 26. Seed Settings
-    console.log("⚙️ Seeding settings...");
-    await db.insert(settings).values([
-      {
-        key: "pharmacyInfo.name",
-        name: "Tên Nhà Thuốc",
-        group: "pharmacyInfo",
-        value: { name: "Nhà Thuốc PharmaFlow" },
-        description: "Tên chính thức của doanh nghiệp nhà thuốc.",
-      },
-      {
-        key: "pharmacyInfo.address",
-        name: "Địa Chỉ Nhà Thuốc",
-        group: "pharmacyInfo",
-        value: {
-          address: "123 Đường Y Tế, Khu Y Khoa, Thành phố Hồ Chí Minh",
-        },
-        description: "Địa chỉ vật lý của chi nhánh nhà thuốc chính.",
-      },
-      {
-        key: "pharmacyInfo.phone",
-        name: "Số Điện Thoại",
-        group: "pharmacyInfo",
-        value: { phone: "+84 28 3812 3456" },
-        description: "Số điện thoại liên hệ chính của nhà thuốc.",
-      },
-      {
-        key: "pharmacyInfo.email",
-        name: "Email Nhà Thuốc",
-        group: "pharmacyInfo",
-        value: { email: "support@pharmaflow.vn" },
-        description: "Email liên hệ chính cho hỗ trợ khách hàng.",
-      },
-      {
-        key: "reporting.lowStockThreshold",
-        name: "Ngưỡng Tồn Kho Thấp",
-        group: "reporting",
-        value: { lowStockThreshold: 20 },
-        description:
-          "Số lượng tồn kho mà dưới đó thuốc được coi là tồn kho thấp.",
-      },
-      {
-        key: "reporting.expiryWarningDays",
-        name: "Số Ngày Cảnh Báo Hết Hạn",
-        group: "reporting",
-        value: { expiryWarningDays: 90 },
-        description:
-          "Số ngày trước ngày hết hạn của thuốc để kích hoạt cảnh báo.",
-      },
-      {
-        key: "sales.currency",
-        name: "Đơn Vị Tiền Tệ",
-        group: "sales",
-        value: { currency: "VND" },
-        description: "Đơn vị tiền tệ mặc định cho tất cả giao dịch tài chính.",
-      },
-      {
-        key: "sales.taxRate",
-        name: "Thuế VAT",
-        group: "sales",
-        value: { taxRate: 0.05 },
-        description:
-          "Thuế giá trị gia tăng (VAT) áp dụng cho bán hàng (ví dụ: 0.05 cho 5%).",
-      },
-      {
-        key: "system.timezone",
-        name: "Múi Giờ Hệ Thống",
-        group: "system",
-        value: { timezone: "Asia/Ho_Chi_Minh" },
-        description: "Múi giờ cho tất cả các thao tác ngày và giờ.",
-      },
-      {
-        key: "system.language",
-        name: "Ngôn Ngữ Mặc Định",
-        group: "system",
-        value: { language: "vi" },
-        description:
-          "Ngôn ngữ mặc định cho giao diện người dùng (ví dụ: 'en', 'vi').",
-      },
-    ]);
-
     console.log("✅ Khởi tạo dữ liệu hoàn tất thành công!");
     console.log(`
     📈 Tổng kết dữ liệu đã khởi tạo:
@@ -2097,12 +1981,10 @@ async function seed() {
       * Đơn cancelled không có items (đã hủy trước khi xử lý)
     - Tệp tin: 3
     - Tệp đính kèm: 3
-    - Thông báo: 5
     - Nhật ký kiểm toán: 5
     - Báo cáo: 4
     - Ca làm việc: 4
     - Phân công ca: 8
-    - Cài đặt: 10
         `);
   } catch (error) {
     console.error("❌ Error during seeding:", error);
