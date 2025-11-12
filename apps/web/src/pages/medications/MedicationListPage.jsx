@@ -641,19 +641,22 @@ export default function MedicationListPage() {
               {/* Ảnh preview + input file */}
               <div className="md:col-span-2 flex items-center gap-3 rounded-lg border p-3">
                 <div className="flex-1 flex items-center gap-3">
-                  <label className="cursor-pointer">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={onChangeImage}
-                      className="hidden"
-                      id="med-image-input"
-                    />
-                    <Button type="button" variant="outline" size="sm">
-                      <ImageIcon className="w-4 h-4 mr-1" />
-                      Chọn ảnh
-                    </Button>
-                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={onChangeImage}
+                    className="hidden"
+                    id="med-image-input"
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => document.getElementById('med-image-input').click()}
+                  >
+                    <ImageIcon className="w-4 h-4 mr-1" />
+                    Chọn ảnh
+                  </Button>
 
                   {(editing?.imageId || imagePreview) && (
                     <Button

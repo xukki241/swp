@@ -56,7 +56,7 @@ export const getAllMedications = async ({ search, status, limit = 100, offset = 
     if (whereClause) {
       dataQuery = dataQuery.where(whereClause);
     }
-    const data = await dataQuery.limit(limit).offset(offset);
+    const data = await dataQuery.orderBy(medications.id).limit(limit).offset(offset);
 
     return { data, total };
   } catch (error) {
