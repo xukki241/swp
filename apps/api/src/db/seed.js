@@ -1359,26 +1359,26 @@ async function seed() {
 
     // 17. Seed Sales Orders (Status: pending, paid, cancelled only)
     console.log("💰 Seeding sales orders...");
-    
+
     // Calculate dates based on today's date
     const now = new Date();
-    
+
     // 6 tháng trước (180 ngày)
     const sixMonthsAgo = new Date(now);
     sixMonthsAgo.setDate(sixMonthsAgo.getDate() - 180);
-    
+
     // 90 ngày trước
     const ninetyDaysAgo = new Date(now);
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-    
+
     // 60 ngày trước
     const sixtyDaysAgo = new Date(now);
     sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
-    
+
     // 30 ngày trước
     const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
+
     const [
       sale1, sale2, sale3, sale4, sale5,     // 6 months ago (180+ days)
       sale6, sale7, sale8, sale9, sale10,     // 90-180 days ago
@@ -1429,7 +1429,7 @@ async function seed() {
           paymentMethod: "cash",
           salespersonId: staff3.id,
         },
-        
+
         // ===== 90-180 days ago - MODERATE sales =====
         {
           customerId: customer2.id,
@@ -1471,7 +1471,7 @@ async function seed() {
           paymentMethod: "mobile_payment",
           salespersonId: staff2.id,
         },
-        
+
         // ===== 60-90 days ago - INCREASING sales =====
         {
           customerId: customer3.id,
@@ -1513,7 +1513,7 @@ async function seed() {
           paymentMethod: "cash",
           salespersonId: staff2.id,
         },
-        
+
         // ===== 30-60 days ago - HIGH sales growth =====
         {
           customerId: customer1.id,
@@ -1555,7 +1555,7 @@ async function seed() {
           paymentMethod: "cash",
           salespersonId: staff2.id,
         },
-        
+
         // ===== Recent (0-30 days) - PEAK sales =====
         {
           customerId: customer2.id,
@@ -1679,7 +1679,7 @@ async function seed() {
         unitPrice: 40000,
         totalPrice: 40000,
       },
-      
+
       // ===== 90-180 days ago - MODERATE sales items =====
       // Sale 6 - 450,000
       {
@@ -1742,7 +1742,7 @@ async function seed() {
         unitPrice: 65000,
         totalPrice: 520000,
       },
-      
+
       // ===== 60-90 days ago - INCREASING sales items =====
       // Sale 11 - 850,000
       {
@@ -1812,7 +1812,7 @@ async function seed() {
         unitPrice: 36000,
         totalPrice: 180000,
       },
-      
+
       // ===== 30-60 days ago - HIGH sales growth items =====
       // Sale 16 - 1,250,000
       {
@@ -1889,7 +1889,7 @@ async function seed() {
         unitPrice: 104000,
         totalPrice: 520000,
       },
-      
+
       // ===== Recent (0-30 days) - PEAK sales items =====
       // Sale 21 - 1,890,000
       {
@@ -2223,7 +2223,7 @@ async function seed() {
     ]);
 
     console.log("✅ Khởi tạo dữ liệu hoàn tất thành công!");
-    
+
     // Calculate sales analytics
     const totalSalesCount = 25;
     const sixMonthsAgoCount = 5;
@@ -2231,13 +2231,13 @@ async function seed() {
     const sixtyTo90DaysCount = 5;
     const thirtyTo60DaysCount = 5;
     const recentCount = 5;
-    
+
     const sixMonthsAgoRevenue = 120000 + 180000 + 95000 + 150000 + 210000;
     const ninetyTo180DaysRevenue = 450000 + 620000 + 380000 + 790000 + 520000;
     const sixtyTo90DaysRevenue = 850000 + 1100000 + 650000 + 920000 + 780000;
     const thirtyTo60DaysRevenue = 1250000 + 1450000 + 980000 + 1680000 + 1320000;
     const recentRevenue = 1890000 + 2150000 + 1750000 + 2350000 + 1620000;
-    
+
     console.log(`
     📈 TỔNG KẾT DỮ LIỆU ĐÃ KHỞI TẠO:
     
