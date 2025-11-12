@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useCurrentUser, useLogout } from "@/hooks/useAuth";
-import { Bell, PanelLeft, Settings } from "lucide-react";
+import { PanelLeft } from "lucide-react";
 import { useNavigate } from "react-router";
 
 export function Topbar({ title, onToggleSidebar, sidebarCollapsed }) {
@@ -60,25 +60,6 @@ export function Topbar({ title, onToggleSidebar, sidebarCollapsed }) {
       </div>
 
       <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative rounded-xl hover:bg-secondary cursor-pointer"
-          title="Thông báo"
-        >
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent" />
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-xl hover:bg-secondary cursor-pointer"
-          title="Cài đặt"
-        >
-          <Settings className="h-5 w-5" />
-        </Button>
-
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild className=" cursor-pointer">
             <button className="relative h-10 w-10 rounded-full hover:bg-secondary outline-none focus:ring-2 focus:ring-primary">
@@ -113,12 +94,6 @@ export function Topbar({ title, onToggleSidebar, sidebarCollapsed }) {
               onClick={handleProfileClick}
             >
               Hồ sơ
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="rounded-lg cursor-pointer"
-              onClick={handleSettingClick}
-            >
-              Cài đặt
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
