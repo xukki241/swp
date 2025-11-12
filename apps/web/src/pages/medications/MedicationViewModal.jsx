@@ -48,7 +48,7 @@ function PillPlaceholder({ className = "h-20 w-20" }) {
     </div>
   );
 }
-function MedImage({ medicationId, alt = "", version = 0, onClick }) {
+function MedImage({ medicationId, medication, alt = "", version = 0, onClick }) {
   const [errored, setErrored] = useState(false);
   const src = useMemo(() => {
     if (medication?.imageId)
@@ -149,6 +149,7 @@ export default function MedicationViewModal({
       <div className="flex items-start gap-4">
         <MedImage
           medicationId={medication.id}
+          medication={medication}
           alt={medication.name}
           version={imageVersion}
           onClick={openLightbox}

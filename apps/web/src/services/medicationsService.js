@@ -2,10 +2,10 @@ import instance from "@/lib/axios";
 
 /* ===================== MEDICATIONS ===================== */
 
-// GET /api/medications?search=&status=
+// GET /api/medications?search=&status=&page=&limit=
 export async function getMedications(params = {}) {
   const res = await instance.get("/medications", { params });
-  return res.data?.data ?? res.data;
+  return res.data; // Return full response with data and pagination
 }
 
 // GET /api/medications/:id
@@ -89,10 +89,10 @@ export async function getAllMedicationVariants(params = {}) {
   return getAllMedicationsVariants(params);
 }
 
-// GET /api/medications/:medicationId/variants
-export async function getMedicationVariants(medicationId) {
-  const res = await instance.get(`/medications/${medicationId}/variants`);
-  return res.data?.data ?? res.data;
+// GET /api/medications/:medicationId/variants?page=&limit=
+export async function getMedicationVariants(medicationId, params = {}) {
+  const res = await instance.get(`/medications/${medicationId}/variants`, { params });
+  return res.data; // Return full response with data and pagination
 }
 
 // GET /api/medications/:medicationId/variants/:variantId

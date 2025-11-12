@@ -23,6 +23,7 @@ import { ArrowLeft } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import MedicationImage from "../../components/MedicationImage";
+import { getMedicationImageUrl } from "@/lib/fileUrls";
 
 function PillPlaceholder({ className = "h-20 w-20" }) {
   return (
@@ -55,6 +56,8 @@ export default function MedicationDetailsPage() {
   const [sales, setSales] = useState([]);
   const [inventory, setInventory] = useState([]);
   const [variants, setVariants] = useState([]);
+  const [lightbox, setLightbox] = useState({ open: false, src: "", alt: "" });
+  const [imageVersion, setImageVersion] = useState(0);
 
   useEffect(() => {
     if (!medication && id) {
@@ -111,7 +114,7 @@ export default function MedicationDetailsPage() {
   }, [variants]);
 
   return (
-    <AppLayout>
+    <AppLayout style={lightbox.open ? { display: 'none' } : {}}>
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Button variant="outline" onClick={() => navigate("/medications")}>
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Medications
@@ -138,6 +141,7 @@ export default function MedicationDetailsPage() {
                 fileId={medication?.imageId}
                 alt={medication?.name}
                 size={80}
+                onClick={(src, alt) => setLightbox({ open: true, src, alt })}
               />
               <div style={{ display: "none" }}>
                 <PillPlaceholder />
@@ -351,6 +355,32 @@ export default function MedicationDetailsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Image Lightbox */}
+      {lightbox.open && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+          onClick={() => setLightbox({ open: false, src: "", alt: "" })}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] p-4">
+            <button
+              onClick={() => setLightbox({ open: false, src: "", alt: "" })}
+              className="absolute -top-2 -right-2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 z-10"
+              aria-label="Close image"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <img
+              src={lightbox.src}
+              alt={lightbox.alt || "Medication image"}
+              className="max-h-[85vh] w-auto rounded-lg object-contain shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 }

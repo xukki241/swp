@@ -45,8 +45,10 @@ export default function MedicationVariantsPage() {
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all"); // all | active | inactive
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
-  const { data: variantsRaw = [], refetch } = useMedicationVariants(medId);
+  const { data: variantsRaw = [], refetch } = useMedicationVariants(medId, { page, limit });
   const variants = useMemo(() => {
     let v = Array.isArray(variantsRaw) ? variantsRaw : variantsRaw?.data || [];
     if (statusFilter !== "all") {
@@ -70,6 +72,8 @@ export default function MedicationVariantsPage() {
     }
     return v;
   }, [variantsRaw, appliedSearch, statusFilter]);
+
+  const pagination = variantsRaw?.pagination || { total: 0, totalPages: 1 };
 
   // Popup form state
   const [formOpen, setFormOpen] = useState(false);
@@ -196,11 +200,13 @@ export default function MedicationVariantsPage() {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setAppliedSearch(searchInput.trim());
+    setPage(1);
   };
   const handleClearFilters = () => {
     setSearchInput("");
     setAppliedSearch("");
     setStatusFilter("all");
+    setPage(1);
   };
 
   const medTitle = passedMedication?.name
@@ -343,6 +349,22 @@ export default function MedicationVariantsPage() {
               </TableBody>
             </Table>
           </div>
+
+          {/* Pagination */}
+          {variants.length > 0 && (
+            <div className="flex items-center justify-between pt-4 border-t">
+              <div className="text-sm text-muted-foreground">
+                Hiển thị {(page - 1) * limit + 1}-{Math.min(page * limit, pagination.total)} / {pagination.total}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => setPage(1)} disabled={page === 1}>««</Button>
+                <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page === 1}>‹</Button>
+                <span className="text-sm px-2">Trang {page}/{pagination.totalPages}</span>
+                <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page >= pagination.totalPages}>›</Button>
+                <Button variant="outline" size="sm" onClick={() => setPage(pagination.totalPages)} disabled={page >= pagination.totalPages}>»»</Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

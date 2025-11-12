@@ -1,6 +1,7 @@
 "use client";
 import placeholderImg from "@/assets/medicine-placeholder.jpg";
 import { instance } from "@/lib/axios";
+import { ZoomIn } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function MedicationImage({ fileId, alt = "", size = 56, onClick }) {
@@ -41,6 +42,8 @@ export default function MedicationImage({ fileId, alt = "", size = 56, onClick }
     loadImage();
   }, [fileId]);
 
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <div
       style={{
@@ -54,8 +57,11 @@ export default function MedicationImage({ fileId, alt = "", size = 56, onClick }
         justifyContent: "center",
         overflow: "hidden",
         cursor: onClick ? "zoom-in" : "default",
+        position: "relative",
       }}
       onClick={() => onClick && src && onClick(src, alt)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {src && !error ? (
         <img
@@ -83,6 +89,21 @@ export default function MedicationImage({ fileId, alt = "", size = 56, onClick }
             opacity: 0.6,
           }}
         />
+      )}
+      {onClick && src && !error && isHovered && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 8,
+          }}
+        >
+          <ZoomIn className="text-white" size={size / 3} />
+        </div>
       )}
     </div>
   );
