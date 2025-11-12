@@ -1359,143 +1359,240 @@ async function seed() {
 
     // 17. Seed Sales Orders (Status: pending, paid, cancelled only)
     console.log("💰 Seeding sales orders...");
+    
+    // Calculate dates based on today's date
+    const now = new Date();
+    
+    // 6 tháng trước (180 ngày)
+    const sixMonthsAgo = new Date(now);
+    sixMonthsAgo.setDate(sixMonthsAgo.getDate() - 180);
+    
+    // 90 ngày trước
+    const ninetyDaysAgo = new Date(now);
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    
+    // 60 ngày trước
+    const sixtyDaysAgo = new Date(now);
+    sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+    
+    // 30 ngày trước
+    const thirtyDaysAgo = new Date(now);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
     const [
-      sale1,
-      sale2,
-      sale3,
-      sale4,
-      sale5,
-      sale6,
-      sale7,
-      sale8,
-      sale9,
-      sale10,
-      sale11,
-      sale12,
-      sale13,
-      sale14,
-      sale15,
+      sale1, sale2, sale3, sale4, sale5,     // 6 months ago (180+ days)
+      sale6, sale7, sale8, sale9, sale10,     // 90-180 days ago
+      sale11, sale12, sale13, sale14, sale15, // 60-90 days ago
+      sale16, sale17, sale18, sale19, sale20, // 30-60 days ago
+      sale21, sale22, sale23, sale24, sale25, // Recent (0-30 days)
     ] = await db
       .insert(salesOrders)
       .values([
-        // Old sales from June 2024 (for historical data) - Only paid
+        // ===== 6 months ago (180+ days) - LOW sales =====
         {
           customerId: customer1.id,
-          orderDate: new Date("2024-06-05T10:30:00Z"),
-          totalAmount: 220000,
+          orderDate: new Date(sixMonthsAgo.getTime() + 2 * 24 * 60 * 60 * 1000),
+          totalAmount: 120000,
           status: "paid",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
         {
           customerId: customer2.id,
-          orderDate: new Date("2024-06-08T15:00:00Z"),
-          totalAmount: 340000,
+          orderDate: new Date(sixMonthsAgo.getTime() + 5 * 24 * 60 * 60 * 1000),
+          totalAmount: 180000,
           status: "paid",
           paymentMethod: "cash",
           salespersonId: staff2.id,
         },
         {
           customerId: customer3.id,
-          orderDate: new Date("2024-06-12T09:00:00Z"),
-          totalAmount: 110000,
+          orderDate: new Date(sixMonthsAgo.getTime() + 10 * 24 * 60 * 60 * 1000),
+          totalAmount: 95000,
           status: "paid",
           paymentMethod: "mobile_payment",
           salespersonId: staff1.id,
         },
         {
-          customerId: customer1.id,
-          orderDate: new Date("2024-06-13T11:00:00Z"),
-          totalAmount: 85000,
-          status: "paid",
-          paymentMethod: "cash",
-          salespersonId: staff3.id,
-        },
-        {
           customerId: customer4.id,
-          orderDate: new Date("2024-06-14T16:30:00Z"),
-          totalAmount: 540000,
+          orderDate: new Date(sixMonthsAgo.getTime() + 15 * 24 * 60 * 60 * 1000),
+          totalAmount: 150000,
           status: "paid",
           paymentMethod: "cash",
           salespersonId: staff2.id,
         },
-        // NEW: October 2025 sales orders (current month) - All paid
         {
           customerId: customer1.id,
-          orderDate: new Date("2025-10-02T09:15:00Z"),
+          orderDate: new Date(sixMonthsAgo.getTime() + 20 * 24 * 60 * 60 * 1000),
+          totalAmount: 210000,
+          status: "paid",
+          paymentMethod: "cash",
+          salespersonId: staff3.id,
+        },
+        
+        // ===== 90-180 days ago - MODERATE sales =====
+        {
+          customerId: customer2.id,
+          orderDate: new Date(ninetyDaysAgo.getTime() + 2 * 24 * 60 * 60 * 1000),
           totalAmount: 450000,
           status: "paid",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
         {
+          customerId: customer3.id,
+          orderDate: new Date(ninetyDaysAgo.getTime() + 8 * 24 * 60 * 60 * 1000),
+          totalAmount: 620000,
+          status: "paid",
+          paymentMethod: "mobile_payment",
+          salespersonId: staff2.id,
+        },
+        {
+          customerId: customer4.id,
+          orderDate: new Date(ninetyDaysAgo.getTime() + 12 * 24 * 60 * 60 * 1000),
+          totalAmount: 380000,
+          status: "paid",
+          paymentMethod: "cash",
+          salespersonId: staff1.id,
+        },
+        {
+          customerId: customer1.id,
+          orderDate: new Date(ninetyDaysAgo.getTime() + 18 * 24 * 60 * 60 * 1000),
+          totalAmount: 790000,
+          status: "paid",
+          paymentMethod: "cash",
+          salespersonId: staff3.id,
+        },
+        {
           customerId: customer2.id,
-          orderDate: new Date("2025-10-05T14:30:00Z"),
-          totalAmount: 680000,
+          orderDate: new Date(ninetyDaysAgo.getTime() + 25 * 24 * 60 * 60 * 1000),
+          totalAmount: 520000,
+          status: "paid",
+          paymentMethod: "mobile_payment",
+          salespersonId: staff2.id,
+        },
+        
+        // ===== 60-90 days ago - INCREASING sales =====
+        {
+          customerId: customer3.id,
+          orderDate: new Date(sixtyDaysAgo.getTime() + 1 * 24 * 60 * 60 * 1000),
+          totalAmount: 850000,
+          status: "paid",
+          paymentMethod: "cash",
+          salespersonId: staff1.id,
+        },
+        {
+          customerId: customer4.id,
+          orderDate: new Date(sixtyDaysAgo.getTime() + 5 * 24 * 60 * 60 * 1000),
+          totalAmount: 1100000,
           status: "paid",
           paymentMethod: "cash",
           salespersonId: staff2.id,
         },
         {
-          customerId: customer3.id,
-          orderDate: new Date("2025-10-08T11:00:00Z"),
-          totalAmount: 320000,
+          customerId: customer1.id,
+          orderDate: new Date(sixtyDaysAgo.getTime() + 10 * 24 * 60 * 60 * 1000),
+          totalAmount: 650000,
           status: "paid",
           paymentMethod: "mobile_payment",
+          salespersonId: staff3.id,
+        },
+        {
+          customerId: customer2.id,
+          orderDate: new Date(sixtyDaysAgo.getTime() + 15 * 24 * 60 * 60 * 1000),
+          totalAmount: 920000,
+          status: "paid",
+          paymentMethod: "cash",
           salespersonId: staff1.id,
         },
         {
-          customerId: customer4.id,
-          orderDate: new Date("2025-10-12T16:45:00Z"),
+          customerId: customer3.id,
+          orderDate: new Date(sixtyDaysAgo.getTime() + 20 * 24 * 60 * 60 * 1000),
+          totalAmount: 780000,
+          status: "paid",
+          paymentMethod: "cash",
+          salespersonId: staff2.id,
+        },
+        
+        // ===== 30-60 days ago - HIGH sales growth =====
+        {
+          customerId: customer1.id,
+          orderDate: new Date(thirtyDaysAgo.getTime() - 28 * 24 * 60 * 60 * 1000),
           totalAmount: 1250000,
           status: "paid",
           paymentMethod: "cash",
+          salespersonId: staff1.id,
+        },
+        {
+          customerId: customer2.id,
+          orderDate: new Date(thirtyDaysAgo.getTime() - 22 * 24 * 60 * 60 * 1000),
+          totalAmount: 1450000,
+          status: "paid",
+          paymentMethod: "mobile_payment",
+          salespersonId: staff2.id,
+        },
+        {
+          customerId: customer3.id,
+          orderDate: new Date(thirtyDaysAgo.getTime() - 15 * 24 * 60 * 60 * 1000),
+          totalAmount: 980000,
+          status: "paid",
+          paymentMethod: "cash",
           salespersonId: staff3.id,
         },
         {
+          customerId: customer4.id,
+          orderDate: new Date(thirtyDaysAgo.getTime() - 10 * 24 * 60 * 60 * 1000),
+          totalAmount: 1680000,
+          status: "paid",
+          paymentMethod: "cash",
+          salespersonId: staff1.id,
+        },
+        {
           customerId: customer1.id,
-          orderDate: new Date("2025-10-15T10:20:00Z"),
-          totalAmount: 540000,
+          orderDate: new Date(thirtyDaysAgo.getTime() - 5 * 24 * 60 * 60 * 1000),
+          totalAmount: 1320000,
           status: "paid",
           paymentMethod: "cash",
           salespersonId: staff2.id,
         },
+        
+        // ===== Recent (0-30 days) - PEAK sales =====
         {
           customerId: customer2.id,
-          orderDate: new Date("2025-10-18T13:30:00Z"),
-          totalAmount: 890000,
+          orderDate: new Date(thirtyDaysAgo.getTime() + 3 * 24 * 60 * 60 * 1000),
+          totalAmount: 1890000,
           status: "paid",
-          paymentMethod: "mobile_payment",
+          paymentMethod: "cash",
           salespersonId: staff1.id,
         },
         {
           customerId: customer3.id,
-          orderDate: new Date("2025-10-20T09:00:00Z"),
-          totalAmount: 420000,
+          orderDate: new Date(thirtyDaysAgo.getTime() + 8 * 24 * 60 * 60 * 1000),
+          totalAmount: 2150000,
           status: "paid",
-          paymentMethod: "cash",
+          paymentMethod: "mobile_payment",
           salespersonId: staff2.id,
         },
         {
-          customerId: customer4.id,
-          orderDate: new Date("2025-10-22T15:15:00Z"),
-          totalAmount: 760000,
+          customerId: customer1.id,
+          orderDate: new Date(thirtyDaysAgo.getTime() + 15 * 24 * 60 * 60 * 1000),
+          totalAmount: 1750000,
           status: "paid",
           paymentMethod: "cash",
           salespersonId: staff3.id,
         },
         {
-          customerId: customer1.id,
-          orderDate: new Date("2025-10-25T11:30:00Z"),
-          totalAmount: 350000,
+          customerId: customer4.id,
+          orderDate: new Date(thirtyDaysAgo.getTime() + 20 * 24 * 60 * 60 * 1000),
+          totalAmount: 2350000,
           status: "paid",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
         {
           customerId: customer2.id,
-          orderDate: new Date("2025-10-28T14:00:00Z"),
-          totalAmount: 920000,
+          orderDate: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
+          totalAmount: 1620000,
           status: "paid",
           paymentMethod: "mobile_payment",
           salespersonId: staff2.id,
@@ -1506,7 +1603,8 @@ async function seed() {
     // 18. Seed Sales Order Items
     console.log("🛒 Seeding sales order items...");
     await db.insert(salesOrderItems).values([
-      // Sale 1 items (June 2024)
+      // ===== 6 months ago (180+ days) - LOW sales items =====
+      // Sale 1 - 120,000
       {
         salesOrderId: sale1.id,
         medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
@@ -1516,118 +1614,137 @@ async function seed() {
       },
       {
         salesOrderId: sale1.id,
-        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
-        quantity: 3,
-        unitPrice: 40000,
-        totalPrice: 120000,
-      },
-      // Sale 2 items (June 2024)
-      {
-        salesOrderId: sale2.id,
-        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
-        quantity: 4,
-        unitPrice: 85000,
-        totalPrice: 340000,
-      },
-      // Sale 3 items (June 2024)
-      {
-        salesOrderId: sale3.id,
-        medicationVariantId: medicationVariantsResults[2].id, // Paracetamol Syrup
-        quantity: 2,
-        unitPrice: 45000,
-        totalPrice: 90000,
-      },
-      {
-        salesOrderId: sale3.id,
         medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
         quantity: 1,
         unitPrice: 20000,
         totalPrice: 20000,
       },
-      // October 2025 Sales Items
-      // Sale 6 items (Oct 2, 2025 - 450,000)
+      // Sale 2 - 180,000
       {
-        salesOrderId: sale6.id,
-        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
-        quantity: 5,
-        unitPrice: 50000,
-        totalPrice: 250000,
+        salesOrderId: sale2.id,
+        medicationVariantId: medicationVariantsResults[1].id, // Paracetamol 650mg
+        quantity: 2,
+        unitPrice: 45000,
+        totalPrice: 90000,
       },
       {
-        salesOrderId: sale6.id,
+        salesOrderId: sale2.id,
         medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
-        quantity: 5,
-        unitPrice: 40000,
-        totalPrice: 200000,
+        quantity: 2,
+        unitPrice: 45000,
+        totalPrice: 90000,
       },
-      // Sale 7 items (Oct 5, 2025 - 680,000)
+      // Sale 3 - 95,000
       {
-        salesOrderId: sale7.id,
-        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
-        quantity: 8,
-        unitPrice: 85000,
-        totalPrice: 680000,
-      },
-      // Sale 8 items (Oct 8, 2025 - 340,000)
-      {
-        salesOrderId: sale8.id,
-        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
-        quantity: 4,
-        unitPrice: 85000,
-        totalPrice: 340000,
-      },
-      // Sale 9 items (Oct 12, 2025 - 520,000)
-      {
-        salesOrderId: sale9.id,
-        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
-        quantity: 6,
-        unitPrice: 50000,
-        totalPrice: 300000,
-      },
-      {
-        salesOrderId: sale9.id,
+        salesOrderId: sale3.id,
         medicationVariantId: medicationVariantsResults[2].id, // Paracetamol Syrup
         quantity: 2,
         unitPrice: 45000,
         totalPrice: 90000,
       },
       {
-        salesOrderId: sale9.id,
-        medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
-        quantity: 6,
-        unitPrice: 20000,
+        salesOrderId: sale3.id,
+        medicationVariantId: medicationVariantsResults[10].id, // Cetirizine Syrup
+        quantity: 1,
+        unitPrice: 38000,
+        totalPrice: 38000,
+      },
+      // Sale 4 - 150,000
+      {
+        salesOrderId: sale4.id,
+        medicationVariantId: medicationVariantsResults[6].id, // Ibuprofen 200mg
+        quantity: 3,
+        unitPrice: 40000,
         totalPrice: 120000,
       },
       {
-        salesOrderId: sale9.id,
-        medicationVariantId: medicationVariantsResults[1].id, // Paracetamol 250mg
+        salesOrderId: sale4.id,
+        medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
         quantity: 1,
-        unitPrice: 10000,
-        totalPrice: 10000,
+        unitPrice: 30000,
+        totalPrice: 30000,
       },
-      // Sale 10 items (Oct 15, 2025 - 780,000)
+      // Sale 5 - 210,000
       {
-        salesOrderId: sale10.id,
-        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
-        quantity: 10,
+        salesOrderId: sale5.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 2,
+        unitPrice: 85000,
+        totalPrice: 170000,
+      },
+      {
+        salesOrderId: sale5.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 1,
         unitPrice: 40000,
+        totalPrice: 40000,
+      },
+      
+      // ===== 90-180 days ago - MODERATE sales items =====
+      // Sale 6 - 450,000
+      {
+        salesOrderId: sale6.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 5,
+        unitPrice: 85000,
+        totalPrice: 425000,
+      },
+      {
+        salesOrderId: sale6.id,
+        medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
+        quantity: 1,
+        unitPrice: 25000,
+        totalPrice: 25000,
+      },
+      // Sale 7 - 620,000
+      {
+        salesOrderId: sale7.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 8,
+        unitPrice: 50000,
         totalPrice: 400000,
       },
       {
-        salesOrderId: sale10.id,
+        salesOrderId: sale7.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 5,
+        unitPrice: 44000,
+        totalPrice: 220000,
+      },
+      // Sale 8 - 380,000
+      {
+        salesOrderId: sale8.id,
+        medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
+        quantity: 4,
+        unitPrice: 95000,
+        totalPrice: 380000,
+      },
+      // Sale 9 - 790,000
+      {
+        salesOrderId: sale9.id,
         medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
-        quantity: 3,
+        quantity: 6,
         unitPrice: 85000,
-        totalPrice: 255000,
+        totalPrice: 510000,
       },
       {
-        salesOrderId: sale10.id,
-        medicationVariantId: medicationVariantsResults[6].id, // Omeprazole 20mg
-        quantity: 5,
-        unitPrice: 25000,
-        totalPrice: 125000,
+        salesOrderId: sale9.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 7,
+        unitPrice: 40000,
+        totalPrice: 280000,
       },
-      // Sale 11 items (Oct 18, 2025 - 920,000)
+      // Sale 10 - 520,000
+      {
+        salesOrderId: sale10.id,
+        medicationVariantId: medicationVariantsResults[11].id, // Metformin 500mg
+        quantity: 8,
+        unitPrice: 65000,
+        totalPrice: 520000,
+      },
+      
+      // ===== 60-90 days ago - INCREASING sales items =====
+      // Sale 11 - 850,000
       {
         salesOrderId: sale11.id,
         medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
@@ -1635,67 +1752,219 @@ async function seed() {
         unitPrice: 85000,
         totalPrice: 850000,
       },
-      {
-        salesOrderId: sale11.id,
-        medicationVariantId: medicationVariantsResults[8].id, // Metformin 850mg
-        quantity: 2,
-        unitPrice: 35000,
-        totalPrice: 70000,
-      },
-      // Sale 12 items (Oct 20, 2025 - 560,000)
+      // Sale 12 - 1,100,000
       {
         salesOrderId: sale12.id,
         medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
-        quantity: 8,
+        quantity: 15,
         unitPrice: 50000,
-        totalPrice: 400000,
+        totalPrice: 750000,
       },
       {
         salesOrderId: sale12.id,
         medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
-        quantity: 4,
-        unitPrice: 40000,
-        totalPrice: 160000,
-      },
-      // Sale 13 items (Oct 22, 2025 - 430,000)
-      {
-        salesOrderId: sale13.id,
-        medicationVariantId: medicationVariantsResults[7].id, // Amlodipine 5mg
         quantity: 10,
-        unitPrice: 30000,
-        totalPrice: 300000,
+        unitPrice: 35000,
+        totalPrice: 350000,
+      },
+      // Sale 13 - 650,000
+      {
+        salesOrderId: sale13.id,
+        medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
+        quantity: 6,
+        unitPrice: 95000,
+        totalPrice: 570000,
       },
       {
         salesOrderId: sale13.id,
-        medicationVariantId: medicationVariantsResults[2].id, // Paracetamol Syrup
-        quantity: 2,
-        unitPrice: 45000,
-        totalPrice: 90000,
+        medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
+        quantity: 4,
+        unitPrice: 20000,
+        totalPrice: 80000,
+      },
+      // Sale 14 - 920,000
+      {
+        salesOrderId: sale14.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 10,
+        unitPrice: 85000,
+        totalPrice: 850000,
       },
       {
-        salesOrderId: sale13.id,
-        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
-        quantity: 1,
-        unitPrice: 40000,
-        totalPrice: 40000,
+        salesOrderId: sale14.id,
+        medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
+        quantity: 3,
+        unitPrice: 23333,
+        totalPrice: 70000,
       },
-      // Sale 14 items (Oct 25, 2025 - CANCELLED - NO ITEMS)
-      // Cancelled orders should not have items as they were cancelled before fulfillment
-
-      // Sale 15 items (Oct 28, 2025 - 920,000 - PENDING)
+      // Sale 15 - 780,000
       {
         salesOrderId: sale15.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 12,
+        unitPrice: 50000,
+        totalPrice: 600000,
+      },
+      {
+        salesOrderId: sale15.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 5,
+        unitPrice: 36000,
+        totalPrice: 180000,
+      },
+      
+      // ===== 30-60 days ago - HIGH sales growth items =====
+      // Sale 16 - 1,250,000
+      {
+        salesOrderId: sale16.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 12,
+        unitPrice: 85000,
+        totalPrice: 1020000,
+      },
+      {
+        salesOrderId: sale16.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 6,
+        unitPrice: 38333,
+        totalPrice: 230000,
+      },
+      // Sale 17 - 1,450,000
+      {
+        salesOrderId: sale17.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 18,
+        unitPrice: 50000,
+        totalPrice: 900000,
+      },
+      {
+        salesOrderId: sale17.id,
+        medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
+        quantity: 6,
+        unitPrice: 91667,
+        totalPrice: 550000,
+      },
+      // Sale 18 - 980,000
+      {
+        salesOrderId: sale18.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 10,
+        unitPrice: 85000,
+        totalPrice: 850000,
+      },
+      {
+        salesOrderId: sale18.id,
+        medicationVariantId: medicationVariantsResults[11].id, // Metformin 500mg
+        quantity: 2,
+        unitPrice: 65000,
+        totalPrice: 130000,
+      },
+      // Sale 19 - 1,680,000
+      {
+        salesOrderId: sale19.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 20,
+        unitPrice: 50000,
+        totalPrice: 1000000,
+      },
+      {
+        salesOrderId: sale19.id,
         medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
         quantity: 8,
         unitPrice: 85000,
         totalPrice: 680000,
       },
+      // Sale 20 - 1,320,000
       {
-        salesOrderId: sale15.id,
+        salesOrderId: sale20.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 20,
+        unitPrice: 40000,
+        totalPrice: 800000,
+      },
+      {
+        salesOrderId: sale20.id,
+        medicationVariantId: medicationVariantsResults[7].id, // Omeprazole 20mg
+        quantity: 5,
+        unitPrice: 104000,
+        totalPrice: 520000,
+      },
+      
+      // ===== Recent (0-30 days) - PEAK sales items =====
+      // Sale 21 - 1,890,000
+      {
+        salesOrderId: sale21.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 15,
+        unitPrice: 85000,
+        totalPrice: 1275000,
+      },
+      {
+        salesOrderId: sale21.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 12,
+        unitPrice: 51250,
+        totalPrice: 615000,
+      },
+      // Sale 22 - 2,150,000
+      {
+        salesOrderId: sale22.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 25,
+        unitPrice: 50000,
+        totalPrice: 1250000,
+      },
+      {
+        salesOrderId: sale22.id,
+        medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
+        quantity: 18,
+        unitPrice: 50000,
+        totalPrice: 900000,
+      },
+      // Sale 23 - 1,750,000
+      {
+        salesOrderId: sale23.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 18,
+        unitPrice: 85000,
+        totalPrice: 1530000,
+      },
+      {
+        salesOrderId: sale23.id,
+        medicationVariantId: medicationVariantsResults[9].id, // Cetirizine 10mg
+        quantity: 11,
+        unitPrice: 20000,
+        totalPrice: 220000,
+      },
+      // Sale 24 - 2,350,000
+      {
+        salesOrderId: sale24.id,
+        medicationVariantId: medicationVariantsResults[0].id, // Paracetamol 500mg
+        quantity: 28,
+        unitPrice: 50000,
+        totalPrice: 1400000,
+      },
+      {
+        salesOrderId: sale24.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 10,
+        unitPrice: 95000,
+        totalPrice: 950000,
+      },
+      // Sale 25 - 1,620,000
+      {
+        salesOrderId: sale25.id,
+        medicationVariantId: medicationVariantsResults[3].id, // Amoxicillin 500mg
+        quantity: 16,
+        unitPrice: 85000,
+        totalPrice: 1360000,
+      },
+      {
+        salesOrderId: sale25.id,
         medicationVariantId: medicationVariantsResults[5].id, // Ibuprofen 400mg
         quantity: 6,
-        unitPrice: 40000,
-        totalPrice: 240000,
+        unitPrice: 43333,
+        totalPrice: 260000,
       },
     ]);
 
@@ -1954,35 +2223,71 @@ async function seed() {
     ]);
 
     console.log("✅ Khởi tạo dữ liệu hoàn tất thành công!");
+    
+    // Calculate sales analytics
+    const totalSalesCount = 25;
+    const sixMonthsAgoCount = 5;
+    const ninetyTo180DaysCount = 5;
+    const sixtyTo90DaysCount = 5;
+    const thirtyTo60DaysCount = 5;
+    const recentCount = 5;
+    
+    const sixMonthsAgoRevenue = 120000 + 180000 + 95000 + 150000 + 210000;
+    const ninetyTo180DaysRevenue = 450000 + 620000 + 380000 + 790000 + 520000;
+    const sixtyTo90DaysRevenue = 850000 + 1100000 + 650000 + 920000 + 780000;
+    const thirtyTo60DaysRevenue = 1250000 + 1450000 + 980000 + 1680000 + 1320000;
+    const recentRevenue = 1890000 + 2150000 + 1750000 + 2350000 + 1620000;
+    
     console.log(`
-    📈 Tổng kết dữ liệu đã khởi tạo:
+    📈 TỔNG KẾT DỮ LIỆU ĐÃ KHỞI TẠO:
+    
+    👥 NGƯỜI DÙNG & QUẢN LÝ:
     - Người dùng: 5
     - Thông tin đăng nhập: 5
     - Đăng ký người dùng: 3
+    
+    🛍️ KHÁCH HÀNG & BÁN HÀNG:
     - Khách hàng: 6
+    - 📊 ĐƠNBÁN HÀNG: ${totalSalesCount} đơn (Tất cả trạng thái PAID)
+      * 6 tháng trước (180+ ngày): ${sixMonthsAgoCount} đơn = ${(sixMonthsAgoRevenue / 1000000).toFixed(2)}M VND
+      * 90-180 ngày trước: ${ninetyTo180DaysCount} đơn = ${(ninetyTo180DaysRevenue / 1000000).toFixed(2)}M VND
+      * 60-90 ngày trước: ${sixtyTo90DaysCount} đơn = ${(sixtyTo90DaysRevenue / 1000000).toFixed(2)}M VND
+      * 30-60 ngày trước: ${thirtyTo60DaysCount} đơn = ${(thirtyTo60DaysRevenue / 1000000).toFixed(2)}M VND
+      * Gần đây (0-30 ngày): ${recentCount} đơn = ${(recentRevenue / 1000000).toFixed(2)}M VND
+      
+      📈 TREND TĂNG TRƯỞNG:
+      * 180 ngày trước → Hiện tại: Tăng ${((recentRevenue - sixMonthsAgoRevenue) / sixMonthsAgoRevenue * 100).toFixed(0)}%
+      * Trung bình 30 ngày gần nhất: ${(recentRevenue / recentCount / 1000).toFixed(0)}K VND/đơn
+      * Trung bình 180 ngày: ${(sixMonthsAgoRevenue / sixMonthsAgoCount / 1000).toFixed(0)}K VND/đơn
+      
+    - Mục đơn bán hàng: 58 items
+    
+    💊 THUỐC & NHÀ CUNG CẤP:
     - Nhà cung cấp: 5
     - Thuốc: 12 (6 có hình ảnh)
     - Biến thể thuốc: 26
     - Liên kết Nhà cung cấp-Thuốc: 14
+    
+    📦 NHẬP KHOÀNG VÀ TỒNKHO:
+    - Đơn đặt hàng: 5
+    - Mục đơn đặt hàng: 11
+    - Phiếu nhập kho: 4 (tất cả đã nhận)
+    - Mục phiếu nhập: 9
+    - Bản ghi tồn kho: 11
+    
+    🏪 QUẢN LÝ KHO:
     - Khu vực kho: 4
     - Giá kho: 8
     - Ngăn chứa: 192
-    - Đơn đặt hàng: 5
-    - Mục đơn đặt hàng: 11
-    - Phiếu nhập kho: 4 (PO1, PO2, PO3, PO4 đã nhận)
-    - Mục phiếu nhập: 9 (từ 4 phiếu nhập)
-    - Bản ghi tồn kho: 11 (từ tất cả phiếu nhập + 2 biến thể Paracetamol bổ sung)
-    - Đơn bán hàng: 15 (5 từ tháng 6/2024 + 10 từ tháng 10/2025)
-      * Trạng thái: chờ xử lý (pending), đã thanh toán (paid), đã hủy (cancelled)
-      * Tháng 10/2025: 10 đơn - 8 đã thanh toán, 1 đã hủy, 1 chờ xử lý
-      * Tổng doanh thu tháng 10: 4.890.000 VND (từ 8 đơn đã thanh toán)
-    - Mục đơn bán hàng: 36 (5 từ tháng 6/2024 + 31 từ tháng 10/2025)
-      * Mục tháng 10 (chỉ đơn paid + pending): Paracetamol, Ibuprofen, Amoxicillin, v.v.
-      * Đơn cancelled không có items (đã hủy trước khi xử lý)
+    
+    📁 QUẢN LÝ TẬP TIN:
     - Tệp tin: 3
-    - Tệp đính kèm: 3
+    
+    📋 KIỂM TOÁN & BÁO CÁO:
     - Nhật ký kiểm toán: 5
     - Báo cáo: 4
+    
+    ⏰ QUẢN LÝ CA:
     - Ca làm việc: 4
     - Phân công ca: 8
         `);
