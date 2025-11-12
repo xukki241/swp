@@ -1382,7 +1382,7 @@ async function seed() {
     ] = await db
       .insert(salesOrders)
       .values([
-        // Old sales from June 2024 (for historical data)
+        // Old sales from June 2024 (for historical data) - Only paid
         {
           customerId: customer1.id,
           orderDate: new Date("2024-06-05T10:30:00Z"),
@@ -1396,14 +1396,14 @@ async function seed() {
           orderDate: new Date("2024-06-08T15:00:00Z"),
           totalAmount: 340000,
           status: "paid",
-          paymentMethod: "credit_card",
+          paymentMethod: "cash",
           salespersonId: staff2.id,
         },
         {
           customerId: customer3.id,
           orderDate: new Date("2024-06-12T09:00:00Z"),
           totalAmount: 110000,
-          status: "pending",
+          status: "paid",
           paymentMethod: "mobile_payment",
           salespersonId: staff1.id,
         },
@@ -1411,7 +1411,7 @@ async function seed() {
           customerId: customer1.id,
           orderDate: new Date("2024-06-13T11:00:00Z"),
           totalAmount: 85000,
-          status: "cancelled",
+          status: "paid",
           paymentMethod: "cash",
           salespersonId: staff3.id,
         },
@@ -1420,10 +1420,10 @@ async function seed() {
           orderDate: new Date("2024-06-14T16:30:00Z"),
           totalAmount: 540000,
           status: "paid",
-          paymentMethod: "bank_transfer",
+          paymentMethod: "cash",
           salespersonId: staff2.id,
         },
-        // NEW: October 2025 sales orders (current month) - Only pending, paid, cancelled
+        // NEW: October 2025 sales orders (current month) - All paid
         {
           customerId: customer1.id,
           orderDate: new Date("2025-10-02T09:15:00Z"),
@@ -1437,7 +1437,7 @@ async function seed() {
           orderDate: new Date("2025-10-05T14:30:00Z"),
           totalAmount: 680000,
           status: "paid",
-          paymentMethod: "bank_transfer",
+          paymentMethod: "cash",
           salespersonId: staff2.id,
         },
         {
@@ -1453,7 +1453,7 @@ async function seed() {
           orderDate: new Date("2025-10-12T16:45:00Z"),
           totalAmount: 1250000,
           status: "paid",
-          paymentMethod: "bank_transfer",
+          paymentMethod: "cash",
           salespersonId: staff3.id,
         },
         {
@@ -1476,7 +1476,7 @@ async function seed() {
           customerId: customer3.id,
           orderDate: new Date("2025-10-20T09:00:00Z"),
           totalAmount: 420000,
-          status: "pending",
+          status: "paid",
           paymentMethod: "cash",
           salespersonId: staff2.id,
         },
@@ -1485,14 +1485,14 @@ async function seed() {
           orderDate: new Date("2025-10-22T15:15:00Z"),
           totalAmount: 760000,
           status: "paid",
-          paymentMethod: "bank_transfer",
+          paymentMethod: "cash",
           salespersonId: staff3.id,
         },
         {
           customerId: customer1.id,
           orderDate: new Date("2025-10-25T11:30:00Z"),
           totalAmount: 350000,
-          status: "cancelled",
+          status: "paid",
           paymentMethod: "cash",
           salespersonId: staff1.id,
         },
@@ -1500,7 +1500,7 @@ async function seed() {
           customerId: customer2.id,
           orderDate: new Date("2025-10-28T14:00:00Z"),
           totalAmount: 920000,
-          status: "pending",
+          status: "paid",
           paymentMethod: "mobile_payment",
           salespersonId: staff2.id,
         },

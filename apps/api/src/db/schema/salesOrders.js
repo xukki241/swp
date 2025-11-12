@@ -22,7 +22,7 @@ export const salesOrders = pgTable(
     }).notNull(),
     orderDate: createdAt("order_date"),
     totalAmount: decimalColumn("total_amount").notNull().default(0),
-    status: salesOrderStatus("status").notNull().default("pending"),
+    status: salesOrderStatus("status").notNull().default("paid"),
     paymentMethod: salesOrderPaymentMethod("payment_method")
       .notNull()
       .default("cash"),
