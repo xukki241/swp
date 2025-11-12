@@ -12,7 +12,7 @@ Your Google Gemini API free tier quota was exhausted, causing the AI purchase re
 
 ```javascript
 // Changed from experimental to stable model
-model: "gemini-1.5-flash" // Was: gemini-2.0-flash-exp
+model: "gemini-1.5-flash"; // Was: gemini-2.0-flash-exp
 ```
 
 **Benefits**:
@@ -70,12 +70,12 @@ When quota is exceeded, the system now:
 
 ## 📊 Performance Comparison
 
-| Scenario | Before | After |
-|----------|--------|-------|
-| **First Request** | 2.5s → 500 error | 2.5s → Success |
-| **2nd Request (cached)** | 2.5s → 500 error | 10ms → Success |
-| **Quota Exceeded** | 500 error ❌ | Fallback data ✅ |
-| **API Calls (30 min)** | 15+ | 1 |
+| Scenario                 | Before           | After            |
+| ------------------------ | ---------------- | ---------------- |
+| **First Request**        | 2.5s → 500 error | 2.5s → Success   |
+| **2nd Request (cached)** | 2.5s → 500 error | 10ms → Success   |
+| **Quota Exceeded**       | 500 error ❌     | Fallback data ✅ |
+| **API Calls (30 min)**   | 15+              | 1                |
 
 ## 🔧 How It Works Now
 
@@ -113,16 +113,18 @@ The frontend should detect and display fallback mode:
 
 ```jsx
 // In your React component
-{data?.isFallback && (
-  <Alert variant="warning" className="mb-4">
-    <AlertTriangle className="h-4 w-4" />
-    <AlertTitle>Using Fallback Recommendations</AlertTitle>
-    <AlertDescription>
-      AI quota temporarily exceeded. Showing rule-based recommendations 
-      based on sales patterns. Full AI analysis will resume when quota resets.
-    </AlertDescription>
-  </Alert>
-)}
+{
+  data?.isFallback && (
+    <Alert variant="warning" className="mb-4">
+      <AlertTriangle className="h-4 w-4" />
+      <AlertTitle>Using Fallback Recommendations</AlertTitle>
+      <AlertDescription>
+        AI quota temporarily exceeded. Showing rule-based recommendations based
+        on sales patterns. Full AI analysis will resume when quota resets.
+      </AlertDescription>
+    </Alert>
+  );
+}
 ```
 
 ## 📈 Configuration

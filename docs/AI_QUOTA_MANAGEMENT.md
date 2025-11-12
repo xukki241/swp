@@ -14,7 +14,7 @@ Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_fr
 ### Current Limits (gemini-2.0-flash-exp)
 
 - **Requests per minute**: 15 RPM
-- **Tokens per minute**: 1,000,000 TPM  
+- **Tokens per minute**: 1,000,000 TPM
 - **Requests per day**: 1,500 RPD
 - **Free tier**: $0/month
 
@@ -91,7 +91,7 @@ graph TD
 
 ```
 Request 1: ✅ Success (Gemini API call)
-Request 2: ✅ Success (Gemini API call)  
+Request 2: ✅ Success (Gemini API call)
 Request 3: ✅ Success (Gemini API call)
 Request 4: ❌ 429 Too Many Requests
 ```
@@ -101,7 +101,7 @@ Request 4: ❌ 429 Too Many Requests
 ```
 Request 1: ✅ Success (Gemini API call) - 2.5s
 Request 2: ✅ Success (From cache) - 10ms
-Request 3: ✅ Success (From cache) - 10ms  
+Request 3: ✅ Success (From cache) - 10ms
 Request 4: ✅ Success (From cache) - 10ms
 Request 5 (after 31 min): ✅ Success (New API call) - 2.5s
 ```
@@ -149,11 +149,13 @@ const MIN_API_CALL_INTERVAL_MS = 5000; // Change this value
 
 ```jsx
 // In your React component
-{metadata.cached && (
-  <div className="text-sm text-muted-foreground">
-    📊 Using cached analysis from {formatDistanceToNow(metadata.cachedAt)} ago
-  </div>
-)}
+{
+  metadata.cached && (
+    <div className="text-sm text-muted-foreground">
+      📊 Using cached analysis from {formatDistanceToNow(metadata.cachedAt)} ago
+    </div>
+  );
+}
 ```
 
 ### 3. **Monitor Quota Usage**
@@ -164,11 +166,12 @@ Visit: <https://ai.dev/usage?tab=rate-limit>
 
 ```javascript
 try {
-  const recommendations = await aiAnalysisService.generatePurchaseRecommendations(90);
+  const recommendations =
+    await aiAnalysisService.generatePurchaseRecommendations(90);
 } catch (error) {
-  if (error.message.includes('429') || error.message.includes('quota')) {
+  if (error.message.includes("429") || error.message.includes("quota")) {
     // Show friendly message
-    toast.error('AI analysis temporarily unavailable. Using cached data...');
+    toast.error("AI analysis temporarily unavailable. Using cached data...");
   }
 }
 ```
@@ -209,9 +212,9 @@ const cached = await redis.get(cacheKey);
 
 ```javascript
 // Add endpoint to clear cache
-app.post('/api/ai-analysis/clear-cache', (req, res) => {
+app.post("/api/ai-analysis/clear-cache", (req, res) => {
   recommendationsCache.clear();
-  res.json({ success: true, message: 'Cache cleared' });
+  res.json({ success: true, message: "Cache cleared" });
 });
 ```
 
@@ -219,7 +222,7 @@ app.post('/api/ai-analysis/clear-cache', (req, res) => {
 
 ```javascript
 // Clear cache when new sales are added
-app.post('/api/sales-orders', async (req, res) => {
+app.post("/api/sales-orders", async (req, res) => {
   // ... create order ...
   recommendationsCache.clear(); // Invalidate AI cache
 });
@@ -240,7 +243,9 @@ if (Date.now() - cachedData.timestamp < CACHE_DURATION_MS) {
 
 ```javascript
 // See cache hit/miss ratio
-console.log(`[AI Analysis] Cache hit rate: ${cacheHits}/${totalRequests} (${Math.round(cacheHits/totalRequests*100)}%)`);
+console.log(
+  `[AI Analysis] Cache hit rate: ${cacheHits}/${totalRequests} (${Math.round((cacheHits / totalRequests) * 100)}%)`
+);
 ```
 
 ### Track API Usage
@@ -282,5 +287,5 @@ console.log(`[AI Analysis] Total API calls today: ${apiCallCount}`);
 **Need Help?**
 
 - Gemini API Docs: <https://ai.google.dev/gemini-api/docs>
-- Quota Limits: <https://ai.google.dev/gemini-api/docs/rate-limits>  
+- Quota Limits: <https://ai.google.dev/gemini-api/docs/rate-limits>
 - Pricing: <https://ai.google.dev/pricing>
