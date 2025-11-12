@@ -1,6 +1,6 @@
 {
-  "id": "676206be-4260-422e-8501-d166f84a252b",
-  "prevId": "741cf9f2-0e5f-487f-98d8-86f4ce397c10",
+  "id": "ab4dbafa-6980-4e61-a854-e0d1d4af5ae8",
+  "prevId": "676206be-4260-422e-8501-d166f84a252b",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -2528,9 +2528,7 @@
       "name": "sales_order_status",
       "schema": "public",
       "values": [
-        "pending",
-        "paid",
-        "cancelled"
+        "paid"
       ]
     },
     "public.shift_assignment_status": {

@@ -83,7 +83,7 @@ export const salesOrderService = {
         if (totalAvailable < quantity) {
           throw new Error(
             `Insufficient inventory for ${variant.name} (${variant.sku}). ` +
-              `Requested: ${quantity}, Available: ${totalAvailable}`
+            `Requested: ${quantity}, Available: ${totalAvailable}`
           );
         }
 
@@ -127,7 +127,7 @@ export const salesOrderService = {
           customerId: soData.customer_id,
           paymentMethod: soData.payment_method || "cash",
           totalAmount: totalAmount,
-          status: "pending",
+          status: "paid",
           salespersonId: userId || null,
           prescriptionId: soData.prescription_id || null,
           prescriptionNote: soData.prescription_note || null,
@@ -165,6 +165,7 @@ export const salesOrderService = {
 
   /**
    * Get all sales orders with optional filtering and pagination
+   * Always filters to show only paid orders
    */
   async getAll(filters = {}) {
     const {
@@ -182,12 +183,16 @@ export const salesOrderService = {
 
     const conditions = [];
 
+    // Always filter to show only paid orders
+    conditions.push(eq(salesOrders.status, "paid"));
+
     if (customerId) {
       conditions.push(eq(salesOrders.customerId, customerId));
     }
 
-    if (status) {
-      conditions.push(eq(salesOrders.status, status));
+    // Ignore status filter from request - always show paid orders only
+    if (status && status !== "paid") {
+      // Status parameter is ignored, we only show paid orders
     }
 
     if (paymentMethod) {
