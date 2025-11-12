@@ -44,6 +44,7 @@ export default function WarehousePage() {
     refetchZone,
     createZoneData,
   } = useWarehouse();
+  const { data } = useCurrentUser();
   const [selectedZoneId, setSelectedZoneId] = useState("");
   const [showAddZoneDialog, setShowAddZoneDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,7 +56,6 @@ export default function WarehousePage() {
     description: "",
   });
   const [canEdit, setCanEdit] = useState(false);
-  const { data } = useCurrentUser();
 
   useEffect(() => {
     if (data?.user?.role === "owner") {
@@ -66,7 +66,7 @@ export default function WarehousePage() {
   const handleZoneChange = (zoneId) => {
     setSelectedZoneId(zoneId);
     if (zoneId) {
-      selectZone(zoneId);
+      selectZone(null);
     }
   };
 
@@ -85,7 +85,7 @@ export default function WarehousePage() {
       !formData.zoneType ||
       !formData.location
     ) {
-      toast.error("All fields are required"); // Use toast here
+      toast.error("Phải có đầy đủ các trường"); // Use toast here
       return;
     }
 
@@ -107,7 +107,7 @@ export default function WarehousePage() {
         description: "",
       });
     } catch (error) {
-      console.error("Failed to create zone:", error);
+      console.error("Tạo khu thất bại:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -119,7 +119,7 @@ export default function WarehousePage() {
         <div>
           <h2 className="text-3xl font-bold text-gray-900">Quản lý kho</h2>
           <p className="text-muted-foreground mt-1">
-            Xem và quản lý khu vực, kệ và ô chứa trong kho
+            Xem và quản lý khu vực, giá và ô chứa trong kho
           </p>
         </div>
 
@@ -193,6 +193,7 @@ export default function WarehousePage() {
         </div>
       </div>
 
+      {/* Add Zone Dialog */}
       <Dialog open={showAddZoneDialog} onOpenChange={setShowAddZoneDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>

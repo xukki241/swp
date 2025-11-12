@@ -76,27 +76,15 @@ export function RackList({ racks, selectedZoneId, refetch, canEdit }) {
     }
   };
 
-  if (!racks || racks.length === 0) {
-    return (
-      <Card className="shadow-md rounded-xl border-0">
-        <CardContent className="py-12 text-center">
-          <p className="text-muted-foreground">
-            Không tìm thấy kệ trong khu vực này
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Kệ</h2>
+        <h2 className="text-lg font-semibold">Giá</h2>
         <div className="flex gap-2">
           {canEdit && (
             <Button size="sm" onClick={() => setShowAddRackDialog(true)}>
               <Plus className="h-4 w-4" />
-              Thêm kệ
+              Thêm giá
             </Button>
           )}
           <Button
@@ -110,31 +98,41 @@ export function RackList({ racks, selectedZoneId, refetch, canEdit }) {
         </div>
       </div>
 
-      <div className="space-y-3">
-        {racks.map((rack) => (
-          <RackItem
-            key={rack.id}
-            rack={rack}
-            isExpanded={expandedRacks.has(rack.id)}
-            onToggle={() => toggleRack(rack.id)}
-            selectedZoneId={selectedZoneId}
-            refetch={refetch}
-            canEdit={canEdit}
-          />
-        ))}
-      </div>
+      {!racks || racks.length === 0 ? (
+        <Card className="shadow-md rounded-xl border-0">
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground">
+              Không tìm thấy giá trong khu vực này
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {racks.map((rack) => (
+            <RackItem
+              key={rack.id}
+              rack={rack}
+              isExpanded={expandedRacks.has(rack.id)}
+              onToggle={() => toggleRack(rack.id)}
+              selectedZoneId={selectedZoneId}
+              refetch={refetch}
+              canEdit={canEdit}
+            />
+          ))}
+        </div>
+      )}
 
       <Dialog open={showAddRackDialog} onOpenChange={setShowAddRackDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Thêm kệ mới</DialogTitle>
+            <DialogTitle>Thêm giá mới</DialogTitle>
             <DialogDescription>Tạo giá mới trong khu vực này</DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleAddRackSubmit} className="space-y-4">
             <div>
               <Label className="mb-2" htmlFor="rackName">
-                Tên kệ *
+                Tên giá *
               </Label>
               <Input
                 id="rackName"
@@ -147,7 +145,7 @@ export function RackList({ racks, selectedZoneId, refetch, canEdit }) {
 
             <div>
               <Label className="mb-2" htmlFor="rackCode">
-                Mã kệ *
+                Mã giá *
               </Label>
               <Input
                 id="rackCode"

@@ -90,7 +90,7 @@ export function BinCard({
       await deleteBinData(bin.id, rackId);
       setShowDeleteDialog(false);
       setShowEditDialog(false);
-      if (refetch) refetch();
+      refetch();
     } catch (error) {
       console.error("Failed to delete bin:", error);
     } finally {
@@ -188,13 +188,15 @@ export function BinCard({
           <DialogHeader>
             <DialogTitle>Chi tiết ô {position}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-4">
             {/* Important Information - Top Section */}
             <div className="space-y-3">
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">
-                  {bin?.name || "N/A"}
-                </h3>
+                <div className="flex">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                    {bin?.name || "N/A"}
+                  </h3>
+                </div>
                 <p className="text-sm text-muted-foreground">
                   Mã:{" "}
                   <span className="font-medium text-gray-700">

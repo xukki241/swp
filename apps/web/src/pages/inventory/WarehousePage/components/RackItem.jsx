@@ -26,14 +26,7 @@ import { Textarea } from "../../../../components/ui/textarea";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
 import { BinGrid } from "./BinGrid";
 
-export function RackItem({
-  rack,
-  isExpanded,
-  onToggle,
-  selectedZoneId,
-  refetch,
-  canEdit,
-}) {
+export function RackItem({ rack, isExpanded, onToggle, refetch, canEdit }) {
   const { updateRackData, deleteRackData, createBinData } = useWarehouse();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -94,7 +87,7 @@ export function RackItem({
   const handleDeleteRack = async () => {
     setIsSubmitting(true);
     try {
-      await deleteRackData(selectedZoneId, rack.id);
+      await deleteRackData(rack.id);
       setShowDeleteDialog(false);
       if (refetch) refetch();
     } catch (error) {
@@ -119,7 +112,10 @@ export function RackItem({
     }
 
     // Validate that level and number are numeric
-    if (isNaN(createBinForm.level) || isNaN(createBinForm.number)) {
+    if (
+      Number.isNaN(createBinForm.level) ||
+      Number.isNaN(createBinForm.number)
+    ) {
       console.error("Level and number must be numeric values");
       return;
     }
@@ -148,8 +144,6 @@ export function RackItem({
       setIsSubmitting(false);
     }
   };
-
-  const rackBins = rack.bins || [];
 
   return (
     <>
@@ -190,7 +184,7 @@ export function RackItem({
                   onClick={() => setShowEditDialog(true)}
                 >
                   <Edit2 className="h-4 w-4" />
-                  Sửa kệ
+                  Sửa giá
                 </Button>
                 <Button
                   size="sm"
@@ -199,7 +193,7 @@ export function RackItem({
                   className="text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
-                  Xóa kệ
+                  Xóa giá
                 </Button>
               </div>
             )}
@@ -323,15 +317,15 @@ export function RackItem({
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Sửa kệ</DialogTitle>
+            <DialogTitle>Sửa giá</DialogTitle>
             <DialogDescription>
-              Cập nhật thông tin kệ bên dưới
+              Cập nhật thông tin giá bên dưới
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleEditRackSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="name">Tên kệ</Label>
+              <Label htmlFor="name">Tên giá</Label>
               <Input
                 id="name"
                 name="name"
@@ -344,7 +338,7 @@ export function RackItem({
             </div>
 
             <div>
-              <Label htmlFor="code">Mã kệ</Label>
+              <Label htmlFor="code">Mã giá</Label>
               <Input
                 id="code"
                 name="code"
@@ -393,9 +387,9 @@ export function RackItem({
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Xóa kệ</AlertDialogTitle>
+            <AlertDialogTitle>Xóa giá</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có chắc muốn xóa kệ này? Hành động này không thể khôi phục.
+              Bạn có chắc muốn xóa giá này? Hành động này không thể khôi phục.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

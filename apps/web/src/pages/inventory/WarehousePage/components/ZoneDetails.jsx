@@ -27,9 +27,16 @@ import {
 } from "../../../../components/ui/dialog";
 import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
 import { Textarea } from "../../../../components/ui/textarea";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
-import { zoneTypeLabel } from "../../../../utils/zoneTypeMap";
+import { zoneTypeLabel, zoneTypeMap } from "../../../../utils/zoneTypeMap";
 
 export default function ZoneDetails({ zone, refetch, canEdit }) {
   const { updateZoneData, deleteZoneData } = useWarehouse();
@@ -38,18 +45,18 @@ export default function ZoneDetails({ zone, refetch, canEdit }) {
   const [deleteCountdown, setDeleteCountdown] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    zoneCode: zone.code || "",
-    zoneName: zone.name || "",
-    zoneType: zone.type || "",
+    code: zone.code || "",
+    name: zone.name || "",
+    type: zone.type || "",
     location: zone.location || "",
     description: zone.description || "",
   });
 
   useEffect(() => {
     setFormData({
-      zoneCode: zone.code || "",
-      zoneName: zone.name || "",
-      zoneType: zone.type || "",
+      code: zone.code || "",
+      name: zone.name || "",
+      type: zone.type || "",
       location: zone.location || "",
       description: zone.description || "",
     });
@@ -75,7 +82,7 @@ export default function ZoneDetails({ zone, refetch, canEdit }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleUpdateZone = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
@@ -83,7 +90,7 @@ export default function ZoneDetails({ zone, refetch, canEdit }) {
       setShowEditDialog(false);
       refetch();
     } catch (error) {
-      console.error("Failed to update zone:", error);
+      console.error("Không thể cập nhật khu:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -96,7 +103,7 @@ export default function ZoneDetails({ zone, refetch, canEdit }) {
       setShowDeleteDialog(false);
       refetch();
     } catch (error) {
-      console.error("Failed to delete zone:", error);
+      console.error("Không thể xóa khu:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -177,28 +184,28 @@ export default function ZoneDetails({ zone, refetch, canEdit }) {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleUpdateZone} className="space-y-4">
             <div>
-              <Label className="mb-2" htmlFor="zoneName">
+              <Label className="mb-2" htmlFor="name">
                 Tên khu vực
               </Label>
               <Input
-                id="zoneName"
-                name="zoneName"
-                value={formData.zoneName}
+                id="name"
+                name="name"
+                value={formData.name}
                 onChange={handleInputChange}
                 required
               />
             </div>
 
             <div>
-              <Label className="mb-2" htmlFor="zoneCode">
+              <Label className="mb-2" htmlFor="code">
                 Mã khu vực
               </Label>
               <Input
-                id="zoneCode"
-                name="zoneCode"
-                value={formData.zoneCode}
+                id="code"
+                name="code"
+                value={formData.code}
                 onChange={handleInputChange}
                 required
               />
@@ -208,13 +215,23 @@ export default function ZoneDetails({ zone, refetch, canEdit }) {
               <Label className="mb-2" htmlFor="zoneType">
                 Loại khu vực
               </Label>
-              <Input
-                id="zoneType"
-                name="zoneType"
-                value={formData.zoneType}
-                onChange={handleInputChange}
-                required
-              />
+              <Select
+                value={formData.type}
+                onValueChange={(val) => {
+                  setFormData((prev) => ({ ...prev, type: val }));
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Chọn loại khu vực..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(zoneTypeMap).map((key) => (
+                    <SelectItem key={key} value={key}>
+                      {zoneTypeMap[key]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
