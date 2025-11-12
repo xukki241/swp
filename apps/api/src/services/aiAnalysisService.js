@@ -207,35 +207,33 @@ Trong phần phân tích, hãy LÝ GIẢI RÕ RÀNG:
 
 **TOP SẢN PHẨM BÁN CHẠY:**
 ${dataContext.topSellingProducts
-  .map(
-    (p, i) =>
-      `${i + 1}. ${p.name}
+          .map(
+            (p, i) =>
+              `${i + 1}. ${p.name}
    - Số lượng bán: ${p.quantitySold}
    - Doanh thu: ${p.revenue.toLocaleString("vi-VN")} VNĐ
    - Số đơn hàng: ${p.orderCount}`
-  )
-  .join("\n")}
+          )
+          .join("\n")}
 
 **SẢN PHẨM TỒN KHO THẤP:**
-${
-  dataContext.lowStockProducts.length > 0
-    ? dataContext.lowStockProducts
-        .map((p) => `- ${p.name}: ${p.currentStock} đơn vị còn lại`)
-        .join("\n")
-    : "Không có sản phẩm tồn kho thấp"
-}
+${dataContext.lowStockProducts.length > 0
+          ? dataContext.lowStockProducts
+            .map((p) => `- ${p.name}: ${p.currentStock} đơn vị còn lại`)
+            .join("\n")
+          : "Không có sản phẩm tồn kho thấp"
+        }
 
 **SẢN PHẨM SẮP HẾT HẠN (trong 90 ngày):**
-${
-  dataContext.expiringSoonProducts.length > 0
-    ? dataContext.expiringSoonProducts
-        .map(
-          (p) =>
-            `- ${p.name}: ${p.stock} đơn vị, hết hạn ${new Date(p.expiryDate).toLocaleDateString("vi-VN")}`
-        )
-        .join("\n")
-    : "Không có sản phẩm sắp hết hạn"
-}
+${dataContext.expiringSoonProducts.length > 0
+          ? dataContext.expiringSoonProducts
+            .map(
+              (p) =>
+                `- ${p.name}: ${p.stock} đơn vị, hết hạn ${new Date(p.expiryDate).toLocaleDateString("vi-VN")}`
+            )
+            .join("\n")
+          : "Không có sản phẩm sắp hết hạn"
+        }
 
 **YÊU CẦU PHÂN TÍCH:**
 
@@ -301,7 +299,7 @@ Chỉ trả về JSON, không có text ngoài lề.
 
       // Call Gemini API - Using Gemini 2.0 Flash for faster performance
       const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-2.0-flash", // ✅ ổn định, free-tier có quota
         generationConfig: {
           temperature: 0.7,
           topP: 0.95,
