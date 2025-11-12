@@ -345,139 +345,320 @@ export default function RegisterPage() {
 
       {/* Policy Dialog */}
       <Dialog open={showPolicyDialog} onOpenChange={setShowPolicyDialog}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-2xl">
               <ScrollText className="w-6 h-6 text-primary" />
-              Chính sách bảo mật & Điều khoản dịch vụ
+              Chính sách bảo mật & Bảo vệ dữ liệu cá nhân
             </DialogTitle>
             <DialogDescription>
-              Vui lòng đọc kỹ các điều khoản trước khi đồng ý
+              Tuân thủ Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-6 text-sm">
+            {/* Link to Official Document */}
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-900 mb-3 font-medium">
+                📋 Tham chiếu pháp lý
+              </p>
+              <a
+                href="https://baovedlcn.vn/nghi-dinh-13-ve-bao-ve-du-lieu-ca-nhan-dpvn/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium underline text-sm"
+              >
+                Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  />
+                </svg>
+              </a>
+            </div>
+
             <section>
               <h3 className="font-semibold text-base mb-2">1. Giới thiệu</h3>
               <p className="text-gray-700 leading-relaxed">
                 Chào mừng bạn đến với PharmaFlow - Hệ thống quản lý nhà thuốc.
-                Bằng cách đăng ký tài khoản, bạn đồng ý tuân thủ các điều khoản
-                và điều kiện sau đây.
+                Bằng cách đăng ký tài khoản, bạn đồng ý với chính sách bảo mật
+                và bảo vệ dữ liệu cá nhân của chúng tôi, tuân thủ Nghị định
+                13/2023/NĐ-CP ngày 17/4/2023 của Chính phủ về bảo vệ dữ liệu cá
+                nhân.
               </p>
+            </section>
+
+            <section className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+              <h3 className="font-semibold text-base mb-3 text-amber-900">
+                2. Dữ liệu cá nhân được thu thập
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-2">
+                Theo Nghị định 13/2023/NĐ-CP, chúng tôi thu thập các dữ liệu cá
+                nhân sau:
+              </p>
+              <div className="space-y-3">
+                <div className="pl-4 border-l-4 border-amber-400">
+                  <p className="font-semibold text-gray-800 mb-1">
+                    a) Dữ liệu cá nhân cơ bản:
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 text-gray-700 ml-2">
+                    <li>Họ và tên</li>
+                    <li>Địa chỉ email</li>
+                    <li>Số điện thoại</li>
+                    <li>Địa chỉ liên lạc</li>
+                  </ul>
+                </div>
+                <div className="pl-4 border-l-4 border-amber-400">
+                  <p className="font-semibold text-gray-800 mb-1">
+                    b) Dữ liệu tài khoản:
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 text-gray-700 ml-2">
+                    <li>Tên đăng nhập (email)</li>
+                    <li>Mật khẩu (được mã hóa bảo mật)</li>
+                    <li>Vai trò và quyền hạn</li>
+                  </ul>
+                </div>
+                <div className="pl-4 border-l-4 border-amber-400">
+                  <p className="font-semibold text-gray-800 mb-1">
+                    c) Dữ liệu hoạt động:
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 text-gray-700 ml-2">
+                    <li>Lịch sử giao dịch và đơn hàng</li>
+                    <li>Nhật ký truy cập hệ thống</li>
+                    <li>Thông tin về các thao tác trong hệ thống</li>
+                  </ul>
+                </div>
+              </div>
             </section>
 
             <section>
               <h3 className="font-semibold text-base mb-2">
-                2. Thu thập thông tin
+                3. Mục đích xử lý dữ liệu cá nhân
               </h3>
               <p className="text-gray-700 leading-relaxed mb-2">
-                Chúng tôi thu thập các thông tin sau:
+                Dữ liệu cá nhân của bạn được xử lý cho các mục đích sau:
               </p>
               <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-                <li>Họ tên, email, số điện thoại</li>
-                <li>Địa chỉ liên lạc</li>
-                <li>Thông tin đăng nhập và mật khẩu (được mã hóa)</li>
-                <li>Lịch sử giao dịch và đơn hàng</li>
-              </ul>
-            </section>
-
-            <section>
-              <h3 className="font-semibold text-base mb-2">
-                3. Sử dụng thông tin
-              </h3>
-              <p className="text-gray-700 leading-relaxed mb-2">
-                Thông tin của bạn được sử dụng để:
-              </p>
-              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-                <li>Xử lý đơn hàng và giao dịch</li>
+                <li>Xác thực danh tính và quản lý tài khoản</li>
+                <li>Xử lý đơn hàng và giao dịch bán thuốc</li>
                 <li>Cung cấp dịch vụ hỗ trợ khách hàng</li>
-                <li>Gửi thông báo về đơn hàng và khuyến mãi</li>
-                <li>Cải thiện chất lượng dịch vụ</li>
+                <li>
+                  Tuân thủ quy định pháp luật về kinh doanh dược phẩm (lưu trữ
+                  đơn thuốc, ghi chép giao dịch)
+                </li>
+                <li>Gửi thông báo quan trọng về tài khoản và dịch vụ</li>
+                <li>Cải thiện và phát triển dịch vụ</li>
+                <li>Phân tích thống kê và báo cáo quản lý</li>
+              </ul>
+            </section>
+
+            <section className="bg-green-50 p-4 rounded-lg border border-green-200">
+              <h3 className="font-semibold text-base mb-3 text-green-900">
+                4. Quyền của chủ thể dữ liệu (Theo Nghị định 13)
+              </h3>
+              <div className="space-y-2">
+                <div className="pl-4 border-l-4 border-green-400">
+                  <p className="font-semibold text-gray-800 mb-1">
+                    Bạn có các quyền sau đối với dữ liệu cá nhân của mình:
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 text-gray-700 ml-2">
+                    <li>
+                      <strong>Quyền được biết:</strong> Biết về việc thu thập,
+                      xử lý dữ liệu cá nhân của mình
+                    </li>
+                    <li>
+                      <strong>Quyền đồng ý:</strong> Đồng ý hoặc không đồng ý
+                      cho phép xử lý dữ liệu cá nhân
+                    </li>
+                    <li>
+                      <strong>Quyền truy cập:</strong> Được truy cập, xem xét dữ
+                      liệu cá nhân của mình
+                    </li>
+                    <li>
+                      <strong>Quyền chỉnh sửa:</strong> Yêu cầu sửa chữa, bổ
+                      sung dữ liệu không chính xác
+                    </li>
+                    <li>
+                      <strong>Quyền xóa dữ liệu:</strong> Yêu cầu xóa dữ liệu cá
+                      nhân trong các trường hợp theo quy định
+                    </li>
+                    <li>
+                      <strong>Quyền hạn chế xử lý:</strong> Yêu cầu hạn chế xử
+                      lý dữ liệu cá nhân
+                    </li>
+                    <li>
+                      <strong>Quyền cung cấp lại:</strong> Yêu cầu cung cấp lại
+                      dữ liệu cá nhân đã cung cấp
+                    </li>
+                    <li>
+                      <strong>Quyền phản đối:</strong> Phản đối việc xử lý dữ
+                      liệu cá nhân
+                    </li>
+                    <li>
+                      <strong>Quyền rút lại sự đồng ý:</strong> Rút lại sự đồng
+                      ý đã cấp (trừ trường hợp pháp luật yêu cầu)
+                    </li>
+                    <li>
+                      <strong>Quyền khiếu nại:</strong> Khiếu nại, tố cáo hoặc
+                      khởi kiện về bảo vệ dữ liệu cá nhân
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                5. Bảo mật và bảo vệ dữ liệu
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-2">
+                Chúng tôi áp dụng các biện pháp kỹ thuật và tổ chức phù hợp để
+                bảo vệ dữ liệu cá nhân:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                <li>
+                  Mã hóa dữ liệu nhạy cảm (mật khẩu, thông tin thanh toán)
+                </li>
+                <li>Sử dụng kết nối HTTPS/SSL cho toàn bộ hệ thống</li>
+                <li>Kiểm soát truy cập dựa trên vai trò (RBAC)</li>
+                <li>
+                  Lưu trữ nhật ký hoạt động để phát hiện truy cập trái phép
+                </li>
+                <li>Sao lưu dữ liệu định kỳ và bảo mật</li>
+                <li>Đào tạo nhân viên về bảo mật và bảo vệ dữ liệu cá nhân</li>
+                <li>Kiểm tra và cập nhật bảo mật thường xuyên</li>
               </ul>
             </section>
 
             <section>
               <h3 className="font-semibold text-base mb-2">
-                4. Bảo mật thông tin
-              </h3>
-              <p className="text-gray-700 leading-relaxed">
-                Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn bằng các biện
-                pháp bảo mật hiện đại. Thông tin của bạn sẽ không được chia sẻ
-                với bên thứ ba mà không có sự đồng ý của bạn, trừ khi được yêu
-                cầu bởi pháp luật.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="font-semibold text-base mb-2">
-                5. Quyền và trách nhiệm
+                6. Chia sẻ dữ liệu với bên thứ ba
               </h3>
               <p className="text-gray-700 leading-relaxed mb-2">
-                Người dùng có quyền:
+                Dữ liệu cá nhân của bạn có thể được chia sẻ trong các trường hợp
+                sau:
               </p>
               <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-                <li>Truy cập và cập nhật thông tin cá nhân</li>
-                <li>Yêu cầu xóa tài khoản và dữ liệu</li>
-                <li>Từ chối nhận email marketing</li>
+                <li>
+                  Với cơ quan nhà nước có thẩm quyền khi có yêu cầu theo quy
+                  định pháp luật
+                </li>
+                <li>
+                  Với đơn vị cung cấp dịch vụ thanh toán (nếu sử dụng thanh toán
+                  trực tuyến)
+                </li>
+                <li>
+                  Với bên cung cấp dịch vụ kỹ thuật hỗ trợ vận hành hệ thống (đã
+                  ký hợp đồng bảo mật)
+                </li>
               </ul>
               <p className="text-gray-700 leading-relaxed mt-2">
-                Người dùng có trách nhiệm:
+                <strong>Cam kết:</strong> Chúng tôi KHÔNG bán, cho thuê hoặc
+                trao đổi dữ liệu cá nhân của bạn cho mục đích thương mại với bên
+                thứ ba.
               </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                7. Thời gian lưu trữ dữ liệu
+              </h3>
               <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-                <li>Cung cấp thông tin chính xác và đầy đủ</li>
-                <li>Bảo mật thông tin đăng nhập</li>
-                <li>Tuân thủ quy định và pháp luật hiện hành</li>
-              </ul>
-            </section>
-
-            <section>
-              <h3 className="font-semibold text-base mb-2">
-                6. Chính sách đặt hàng
-              </h3>
-              <p className="text-gray-700 leading-relaxed">
-                Đơn hàng sẽ được xử lý sau khi xác nhận thanh toán. Chúng tôi có
-                quyền từ chối hoặc hủy đơn hàng trong trường hợp phát hiện thông
-                tin sai lệch hoặc hành vi gian lận.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="font-semibold text-base mb-2">
-                7. Chính sách đổi trả
-              </h3>
-              <p className="text-gray-700 leading-relaxed">
-                Khách hàng có thể đổi trả sản phẩm trong vòng 7 ngày kể từ ngày
-                mua hàng, với điều kiện sản phẩm còn nguyên vẹn, chưa sử dụng và
-                có hóa đơn. Thuốc kê đơn không được phép đổi trả.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="font-semibold text-base mb-2">
-                8. Điều khoản thay đổi
-              </h3>
-              <p className="text-gray-700 leading-relaxed">
-                Chúng tôi có quyền cập nhật điều khoản này bất cứ lúc nào. Các
-                thay đổi sẽ được thông báo qua email hoặc trên trang web. Việc
-                tiếp tục sử dụng dịch vụ sau khi có thay đổi đồng nghĩa với việc
-                bạn chấp nhận các điều khoản mới.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="font-semibold text-base mb-2">9. Liên hệ</h3>
-              <p className="text-gray-700 leading-relaxed">
-                Nếu có bất kỳ câu hỏi nào về chính sách này, vui lòng liên hệ
-                với chúng tôi:
-              </p>
-              <ul className="list-none space-y-1 text-gray-700 ml-4 mt-2">
                 <li>
-                  <strong>Email:</strong> support@pharmaflow.com
+                  <strong>Dữ liệu tài khoản:</strong> Lưu trữ trong suốt thời
+                  gian tài khoản hoạt động + 2 năm sau khi đóng tài khoản
                 </li>
                 <li>
-                  <strong>Hotline:</strong> 1900 1234
+                  <strong>Dữ liệu giao dịch thuốc:</strong> Tối thiểu 5 năm theo
+                  quy định quản lý dược
+                </li>
+                <li>
+                  <strong>Đơn thuốc kê đơn:</strong> Tối thiểu 2 năm theo Luật
+                  Dược
+                </li>
+                <li>
+                  <strong>Nhật ký hệ thống:</strong> 12 tháng cho mục đích bảo
+                  mật và kiểm toán
                 </li>
               </ul>
+            </section>
+
+            <section className="bg-red-50 p-4 rounded-lg border border-red-200">
+              <h3 className="font-semibold text-base mb-2 text-red-900">
+                8. Thông báo sự cố dữ liệu cá nhân
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Trong trường hợp xảy ra sự cố mất an toàn dữ liệu cá nhân, chúng
+                tôi cam kết:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4 mt-2">
+                <li>Thông báo cho chủ thể dữ liệu trong vòng 72 giờ</li>
+                <li>Thông báo cho cơ quan quản lý nhà nước có thẩm quyền</li>
+                <li>Áp dụng biện pháp khắc phục và ngăn chặn ngay lập tức</li>
+                <li>
+                  Hỗ trợ chủ thể dữ liệu trong việc bảo vệ quyền và lợi ích hợp
+                  pháp
+                </li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                9. Cập nhật chính sách
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Chúng tôi có thể cập nhật chính sách này để phản ánh các thay
+                đổi trong hoạt động kinh doanh hoặc pháp luật. Mọi thay đổi quan
+                trọng sẽ được thông báo qua email hoặc thông báo trên hệ thống
+                trước khi có hiệu lực.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-base mb-2">
+                10. Liên hệ về bảo vệ dữ liệu cá nhân
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-2">
+                Nếu bạn có bất kỳ câu hỏi, yêu cầu hoặc khiếu nại nào về bảo vệ
+                dữ liệu cá nhân, vui lòng liên hệ:
+              </p>
+              <div className="bg-gray-50 p-3 rounded border">
+                <ul className="list-none space-y-2 text-gray-700">
+                  <li>
+                    <strong>Người phụ trách bảo vệ dữ liệu:</strong> Ban Quản lý
+                    PharmaFlow
+                  </li>
+                  <li>
+                    <strong>Email:</strong> privacy@pharmaflow.com
+                  </li>
+                  <li>
+                    <strong>Hotline:</strong> 1900 1234
+                  </li>
+                  <li>
+                    <strong>Địa chỉ:</strong> [Địa chỉ công ty]
+                  </li>
+                </ul>
+              </div>
+            </section>
+
+            <section className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+              <h3 className="font-semibold text-base mb-2 text-primary">
+                Cam kết tuân thủ
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Bằng cách đồng ý với chính sách này, bạn xác nhận đã đọc, hiểu
+                và đồng ý với các điều khoản về thu thập, xử lý và bảo vệ dữ
+                liệu cá nhân theo Nghị định 13/2023/NĐ-CP và các quy định pháp
+                luật liên quan.
+              </p>
             </section>
           </div>
 

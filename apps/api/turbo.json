@@ -8,8 +8,7 @@
     },
     "db:migrate": {
       "cache": false,
-      "dependsOn": ["db:generate"],
-      "inputs": ["drizzle/**", ".env"]
+      "inputs": ["src/db/migrations/**", ".env"]
     },
     "db:push": {
       "cache": false,
