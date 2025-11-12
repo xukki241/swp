@@ -8,18 +8,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCurrentUser } from "@/hooks/useAuth";
 import { useInventory } from "@/hooks/useInventory";
+import { useEffect, useState } from "react";
 import MedicineCard from "./components/MedicineCard";
 
 const InventoryTracking = () => {
-  const {
-    lowStock,
-    expiring,
-    loading,
-    error,
-    refetchLowStock,
-    refetchExpiring,
-  } = useInventory();
+  const { lowStock, expiring, loading, error } = useInventory();
+  const [canEdit, setCanEdit] = useState(false);
+  const { data } = useCurrentUser();
+
+  useEffect(() => {
+    if (data?.user?.role === "owner") {
+      setCanEdit(true);
+    }
+  }, [data]);
 
   function renderLowStock() {
     if (loading.lowStock) {
@@ -123,7 +126,7 @@ const InventoryTracking = () => {
               Xem các mặt hàng tồn kho thấp và sắp hết hạn
             </p>
           </div>
-          <Button className="w-50">Tạo Đơn Mua Hàng</Button>
+          {canEdit && <Button className="w-50">Tạo Đơn Mua Hàng</Button>}
         </div>
         <Card className="relative shadow-md rounded-xl border-0 p-6">
           <Accordion
