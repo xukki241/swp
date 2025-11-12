@@ -38,7 +38,6 @@ async function seed() {
     console.log("🧹 Clearing existing data...");
     await db.delete(auditLogs);
     await db.delete(notifications);
-    await db.delete(files);
     await db.delete(salesOrderItems);
     await db.delete(salesOrders);
     await db.delete(inventory);
@@ -49,6 +48,7 @@ async function seed() {
     await db.delete(supplierMedicationVariants);
     await db.delete(medicationVariants);
     await db.delete(medications);
+    await db.delete(files);
     await db.delete(warehouseBins);
     await db.delete(warehouseRacks);
     await db.delete(warehouseZones);
@@ -1033,7 +1033,7 @@ async function seed() {
           supplierId: supplier2.id,
           orderDate: new Date("2024-06-01T14:00:00Z"),
           expectedDate: new Date("2024-06-07T14:00:00Z"),
-          status: "ordered",
+          status: "received",
           totalAmount: 11250000,
           createdBy: staff1.id,
         },
@@ -1041,7 +1041,7 @@ async function seed() {
           supplierId: supplier3.id,
           orderDate: new Date("2024-06-10T11:30:00Z"),
           expectedDate: new Date("2024-06-24T11:30:00Z"),
-          status: "pending",
+          status: "received",
           totalAmount: 24750000,
           createdBy: staff2.id,
         },
@@ -1049,7 +1049,7 @@ async function seed() {
           supplierId: supplier1.id,
           orderDate: new Date("2024-06-12T16:00:00Z"),
           expectedDate: new Date("2024-06-19T16:00:00Z"),
-          status: "pending",
+          status: "received",
           totalAmount: 9750000,
           createdBy: owner.id,
         },
