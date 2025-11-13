@@ -34,10 +34,12 @@ import {
   Users,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 
 export default function DashboardPage() {
   const { data: currentUser } = useCurrentUser();
   const userName = currentUser?.user?.name || "User";
+  const navigate = useNavigate();
 
   // AI Analytics Dialog state
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
