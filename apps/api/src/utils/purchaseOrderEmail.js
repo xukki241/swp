@@ -465,3 +465,245 @@ export const sendConfirmationNotificationEmail = async (confirmationData) => {
     throw new Error("Failed to send confirmation email");
   }
 };
+
+/**
+ * Send purchase order update notification email to supplier
+ * @param {Object} updateData - Update details
+ * @returns {Promise<boolean>} Success status
+ */
+export const sendPurchaseOrderUpdateEmail = async (updateData) => {
+  try {
+    const {
+      supplierEmail,
+      supplierName,
+      orderNumber,
+      oldStatus,
+      newStatus,
+      updateReason,
+    } = updateData;
+
+    if (!supplierEmail) {
+      logger.warn("No supplier email provided for update notification");
+      return false;
+    }
+
+    const transporter = createTransporter();
+
+    const mailOptions = {
+      from: config.smtpFrom || "noreply@pharmaflow.com",
+      to: supplierEmail,
+      subject: `Purchase Order #${orderNumber} Updated - PharmaFlow`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>PO Update</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 20px;">
+            <tr>
+              <td align="center">
+                <table width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                  
+                  <!-- Header -->
+                  <tr>
+                    <td style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 30px; text-align: center;">
+                      <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 700;">Order Updated</h1>
+                      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 14px;">Purchase Order #${orderNumber}</p>
+                    </td>
+                  </tr>
+
+                  <!-- Message -->
+                  <tr>
+                    <td style="padding: 30px;">
+                      <h3 style="color: #1f2937; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">Dear ${supplierName},</h3>
+                      <p style="color: #6b7280; margin: 0 0 20px 0; line-height: 1.6;">
+                        This is to inform you that Purchase Order <strong>#${orderNumber}</strong> has been updated.
+                      </p>
+                      <div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                        <p style="margin: 0; color: #1e40af; font-size: 14px;">
+                          <strong>Update Reason:</strong> ${updateReason}
+                        </p>
+                      </div>
+                      ${
+                        oldStatus !== newStatus
+                          ? `
+                      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0;">
+                        <tr>
+                          <td style="padding: 12px; background-color: #fef3c7; border-radius: 6px; text-align: center;">
+                            <p style="margin: 0; color: #92400e; font-size: 14px;">
+                              Status changed: <strong>${oldStatus}</strong> → <strong>${newStatus}</strong>
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                      `
+                          : ""
+                      }
+                      <p style="color: #6b7280; margin: 20px 0 0 0; line-height: 1.6;">
+                        Please review the updated order details in your system. If you have any questions, please contact us immediately.
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- Footer -->
+                  <tr>
+                    <td style="background-color: #f9fafb; padding: 20px 30px; border-top: 1px solid #e5e7eb;">
+                      <p style="margin: 0; color: #6b7280; font-size: 13px; text-align: center; line-height: 1.6;">
+                        This is an automated email from PharmaFlow.<br/>
+                        For inquiries, contact us at <a href="mailto:${config.smtpFrom}" style="color: #2563eb; text-decoration: none;">${config.smtpFrom}</a>
+                      </p>
+                      <p style="margin: 15px 0 0 0; color: #9ca3af; font-size: 12px; text-align: center;">
+                        © 2025 PharmaFlow - Pharmacy Management System
+                      </p>
+                    </td>
+                  </tr>
+
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    logger.info(`PO update email sent to ${supplierEmail}`, {
+      messageId: info.messageId,
+    });
+    return true;
+  } catch (error) {
+    logger.error("Error sending PO update email:", error);
+    throw new Error("Failed to send update email");
+  }
+};
+
+/**
+ * Send purchase order cancellation email to supplier
+ * @param {Object} cancellationData - Cancellation details
+ * @returns {Promise<boolean>} Success status
+ */
+export const sendPurchaseOrderCancellationEmail = async (cancellationData) => {
+  try {
+    const { supplierEmail, supplierName, orderNumber, orderDate, totalAmount } =
+      cancellationData;
+
+    if (!supplierEmail) {
+      logger.warn("No supplier email provided for cancellation notification");
+      return false;
+    }
+
+    const transporter = createTransporter();
+
+    const mailOptions = {
+      from: config.smtpFrom || "noreply@pharmaflow.com",
+      to: supplierEmail,
+      subject: `Purchase Order #${orderNumber} Cancelled - PharmaFlow`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>PO Cancellation</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 20px;">
+            <tr>
+              <td align="center">
+                <table width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                  
+                  <!-- Header -->
+                  <tr>
+                    <td style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 30px; text-align: center;">
+                      <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 700;">Order Cancelled</h1>
+                      <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 14px;">Purchase Order #${orderNumber}</p>
+                    </td>
+                  </tr>
+
+                  <!-- Message -->
+                  <tr>
+                    <td style="padding: 30px;">
+                      <h3 style="color: #1f2937; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">Dear ${supplierName},</h3>
+                      <p style="color: #6b7280; margin: 0 0 20px 0; line-height: 1.6;">
+                        We regret to inform you that Purchase Order <strong>#${orderNumber}</strong> has been cancelled.
+                      </p>
+
+                      <!-- Order Summary -->
+                      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border-radius: 8px; overflow: hidden; margin: 20px 0;">
+                        <tr>
+                          <td style="padding: 20px;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                              <tr>
+                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Order Number:</td>
+                                <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">#${orderNumber}</td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Order Date:</td>
+                                <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${orderDate}</td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Total Amount:</td>
+                                <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${totalAmount.toLocaleString()} ₫</td>
+                              </tr>
+                              <tr>
+                                <td colspan="2" style="padding: 12px 0 0 0; border-top: 1px solid #e5e7eb;">
+                                  <div style="background-color: #fee2e2; padding: 12px; border-radius: 6px; text-align: center;">
+                                    <p style="margin: 0; color: #991b1b; font-size: 13px; font-weight: 600;">
+                                      ✗ Status: CANCELLED
+                                    </p>
+                                  </div>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <p style="color: #6b7280; margin: 20px 0 0 0; line-height: 1.6;">
+                        Please disregard any previous communications regarding this order. We apologize for any inconvenience this may cause.
+                      </p>
+
+                      <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                        <p style="margin: 0; color: #92400e; font-size: 14px; line-height: 1.6;">
+                          <strong>Important:</strong> If you have already processed this order, please contact us immediately to arrange for return or refund.
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Footer -->
+                  <tr>
+                    <td style="background-color: #f9fafb; padding: 20px 30px; border-top: 1px solid #e5e7eb;">
+                      <p style="margin: 0; color: #6b7280; font-size: 13px; text-align: center; line-height: 1.6;">
+                        This is an automated email from PharmaFlow.<br/>
+                        For inquiries, contact us at <a href="mailto:${config.smtpFrom}" style="color: #2563eb; text-decoration: none;">${config.smtpFrom}</a>
+                      </p>
+                      <p style="margin: 15px 0 0 0; color: #9ca3af; font-size: 12px; text-align: center;">
+                        © 2025 PharmaFlow - Pharmacy Management System
+                      </p>
+                    </td>
+                  </tr>
+
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    logger.info(`PO cancellation email sent to ${supplierEmail}`, {
+      messageId: info.messageId,
+    });
+    return true;
+  } catch (error) {
+    logger.error("Error sending PO cancellation email:", error);
+    throw new Error("Failed to send cancellation email");
+  }
+};
