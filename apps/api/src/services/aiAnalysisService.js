@@ -301,7 +301,7 @@ Chỉ trả về JSON, không có text ngoài lề.
 
       // Call Gemini API - Using Gemini 2.0 Flash for faster performance
       const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash",
+        model: process.env.GOOGLE_AI_MODEL || "gemini-2.0-flash",
         generationConfig: {
           temperature: 0.7,
           topP: 0.95,
