@@ -74,7 +74,7 @@ export const sidebarConfig = [
       {
         label: "Lịch của tôi",
         path: "/shifts/my-schedule",
-        roles: ["owner", "staff"],
+        roles: ["staff"],
       },
     ],
   },
