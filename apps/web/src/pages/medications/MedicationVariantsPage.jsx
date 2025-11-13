@@ -26,6 +26,7 @@ import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
+import MedicationImage from "../../components/MedicationImage";
 
 import { useMedicationVariants } from "@/hooks/useMedications";
 import {
@@ -41,35 +42,27 @@ export default function MedicationVariantsPage() {
   const location = useLocation();
   const passedMedication = location.state?.medication;
 
-  // Giống UserListPage: searchInput / appliedSearch + statusFilter
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all"); // all | active | inactive
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [page, setPage] = useState(1);
 
-  const { data: variantsRaw = [], refetch } = useMedicationVariants(medId);
-  const variants = useMemo(() => {
-    let v = Array.isArray(variantsRaw) ? variantsRaw : variantsRaw?.data || [];
-    if (statusFilter !== "all") {
-      const wantActive = statusFilter === "active";
-      v = v.filter((x) => !!x.isActive === wantActive);
-    }
-    if (appliedSearch.trim()) {
-      const q = appliedSearch.trim().toLowerCase();
-      v = v.filter(
-        (x) =>
-          String(x.sku || "")
-            .toLowerCase()
-            .includes(q) ||
-          String(x.name || "")
-            .toLowerCase()
-            .includes(q) ||
-          String(x.barcode || "")
-            .toLowerCase()
-            .includes(q)
-      );
-    }
-    return v;
-  }, [variantsRaw, appliedSearch, statusFilter]);
+  const filters = useMemo(
+    () => ({
+      search: appliedSearch || undefined,
+      isActive: statusFilter !== "all" ? statusFilter === "active" : undefined,
+      page,
+      limit: 10,
+    }),
+    [appliedSearch, statusFilter, page]
+  );
+
+  const { data: response = {}, refetch } = useMedicationVariants(
+    medId,
+    filters
+  );
+  const variants = response?.data || [];
+  const pagination = response?.pagination || { total: 0, totalPages: 1 };
 
   // Popup form state
   const [formOpen, setFormOpen] = useState(false);
@@ -192,20 +185,25 @@ export default function MedicationVariantsPage() {
     }
   };
 
-  // Handlers filter inline (giống UserListPage)
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setAppliedSearch(searchInput.trim());
+    setPage(1);
   };
   const handleClearFilters = () => {
     setSearchInput("");
     setAppliedSearch("");
     setStatusFilter("all");
+    setPage(1);
   };
 
   const medTitle = passedMedication?.name
     ? `${passedMedication.name} • Variants`
     : `Medication #${medId} • Variants`;
+
+  const [lightbox, setLightbox] = useState({ open: false, src: "", alt: "" });
+  const openLightbox = (src, alt) => setLightbox({ open: true, src, alt });
+  const closeLightbox = () => setLightbox({ open: false, src: "", alt: "" });
 
   return (
     <AppLayout>
@@ -226,8 +224,18 @@ export default function MedicationVariantsPage() {
       </div>
 
       <Card>
-        <CardHeader className="flex items-center justify-between">
-          <CardTitle>{medTitle}</CardTitle>
+        <CardHeader>
+          <div className="flex items-center gap-4">
+            {passedMedication?.imageId && (
+              <MedicationImage
+                fileId={passedMedication.imageId}
+                alt={passedMedication.name}
+                size={64}
+                onClick={openLightbox}
+              />
+            )}
+            <CardTitle>{medTitle}</CardTitle>
+          </div>
         </CardHeader>
 
         <CardContent className="space-y-4">
@@ -343,11 +351,94 @@ export default function MedicationVariantsPage() {
               </TableBody>
             </Table>
           </div>
+
+          {/* Pagination */}
+          {variants.length > 0 && (
+            <div className="flex items-center justify-between pt-4 border-t">
+              <div className="text-sm text-muted-foreground">
+                Showing {(page - 1) * 10 + 1}-
+                {Math.min(page * 10, pagination.total)} / {pagination.total}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(1)}
+                  disabled={page === 1}
+                >
+                  ««
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 1}
+                >
+                  ‹
+                </Button>
+                <span className="text-sm px-2">
+                  Page {page}/{pagination.totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(page + 1)}
+                  disabled={page >= pagination.totalPages}
+                >
+                  ›
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(pagination.totalPages)}
+                  disabled={page >= pagination.totalPages}
+                >
+                  »»
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
+      {/* Image Lightbox */}
+      {lightbox.open && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+          onClick={closeLightbox}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] p-4">
+            <button
+              onClick={closeLightbox}
+              className="absolute -top-2 -right-2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 z-10"
+              aria-label="Close image"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+            <img
+              src={lightbox.src}
+              alt={lightbox.alt || "Medication image"}
+              className="max-h-[85vh] w-auto rounded-lg object-contain shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Popup Add/Edit Variant */}
-      <Dialog open={formOpen} onOpenChange={setFormOpen}>
+      <Dialog open={formOpen && !lightbox.open} onOpenChange={setFormOpen}>
         <DialogContent
           className="max-w-2xl"
           aria-describedby="variant-form-desc"
