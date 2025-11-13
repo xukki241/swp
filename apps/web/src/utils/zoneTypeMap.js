@@ -1,6 +1,6 @@
 export const zoneTypeMap = {
-  normal: "Kho thông thường",
-  cold: "Kho lạnh",
+  normal: "Khu thông thường",
+  cold: "Khu lạnh",
   hazard: "Khu vực nguy hiểm",
   quarantine: "Khu cách ly",
 };

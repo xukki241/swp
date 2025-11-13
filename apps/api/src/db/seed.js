@@ -1380,11 +1380,31 @@ async function seed() {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const [
-      sale1, sale2, sale3, sale4, sale5,     // 6 months ago (180+ days)
-      sale6, sale7, sale8, sale9, sale10,     // 90-180 days ago
-      sale11, sale12, sale13, sale14, sale15, // 60-90 days ago
-      sale16, sale17, sale18, sale19, sale20, // 30-60 days ago
-      sale21, sale22, sale23, sale24, sale25, // Recent (0-30 days)
+      sale1,
+      sale2,
+      sale3,
+      sale4,
+      sale5, // 6 months ago (180+ days)
+      sale6,
+      sale7,
+      sale8,
+      sale9,
+      sale10, // 90-180 days ago
+      sale11,
+      sale12,
+      sale13,
+      sale14,
+      sale15, // 60-90 days ago
+      sale16,
+      sale17,
+      sale18,
+      sale19,
+      sale20, // 30-60 days ago
+      sale21,
+      sale22,
+      sale23,
+      sale24,
+      sale25, // Recent (0-30 days)
     ] = await db
       .insert(salesOrders)
       .values([
@@ -1407,7 +1427,9 @@ async function seed() {
         },
         {
           customerId: customer3.id,
-          orderDate: new Date(sixMonthsAgo.getTime() + 10 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            sixMonthsAgo.getTime() + 10 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 95000,
           status: "paid",
           paymentMethod: "mobile_payment",
@@ -1415,7 +1437,9 @@ async function seed() {
         },
         {
           customerId: customer4.id,
-          orderDate: new Date(sixMonthsAgo.getTime() + 15 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            sixMonthsAgo.getTime() + 15 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 150000,
           status: "paid",
           paymentMethod: "cash",
@@ -1423,7 +1447,9 @@ async function seed() {
         },
         {
           customerId: customer1.id,
-          orderDate: new Date(sixMonthsAgo.getTime() + 20 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            sixMonthsAgo.getTime() + 20 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 210000,
           status: "paid",
           paymentMethod: "cash",
@@ -1433,7 +1459,9 @@ async function seed() {
         // ===== 90-180 days ago - MODERATE sales =====
         {
           customerId: customer2.id,
-          orderDate: new Date(ninetyDaysAgo.getTime() + 2 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            ninetyDaysAgo.getTime() + 2 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 450000,
           status: "paid",
           paymentMethod: "cash",
@@ -1441,7 +1469,9 @@ async function seed() {
         },
         {
           customerId: customer3.id,
-          orderDate: new Date(ninetyDaysAgo.getTime() + 8 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            ninetyDaysAgo.getTime() + 8 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 620000,
           status: "paid",
           paymentMethod: "mobile_payment",
@@ -1449,7 +1479,9 @@ async function seed() {
         },
         {
           customerId: customer4.id,
-          orderDate: new Date(ninetyDaysAgo.getTime() + 12 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            ninetyDaysAgo.getTime() + 12 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 380000,
           status: "paid",
           paymentMethod: "cash",
@@ -1457,7 +1489,9 @@ async function seed() {
         },
         {
           customerId: customer1.id,
-          orderDate: new Date(ninetyDaysAgo.getTime() + 18 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            ninetyDaysAgo.getTime() + 18 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 790000,
           status: "paid",
           paymentMethod: "cash",
@@ -1465,7 +1499,9 @@ async function seed() {
         },
         {
           customerId: customer2.id,
-          orderDate: new Date(ninetyDaysAgo.getTime() + 25 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            ninetyDaysAgo.getTime() + 25 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 520000,
           status: "paid",
           paymentMethod: "mobile_payment",
@@ -1491,7 +1527,9 @@ async function seed() {
         },
         {
           customerId: customer1.id,
-          orderDate: new Date(sixtyDaysAgo.getTime() + 10 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            sixtyDaysAgo.getTime() + 10 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 650000,
           status: "paid",
           paymentMethod: "mobile_payment",
@@ -1499,7 +1537,9 @@ async function seed() {
         },
         {
           customerId: customer2.id,
-          orderDate: new Date(sixtyDaysAgo.getTime() + 15 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            sixtyDaysAgo.getTime() + 15 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 920000,
           status: "paid",
           paymentMethod: "cash",
@@ -1507,7 +1547,9 @@ async function seed() {
         },
         {
           customerId: customer3.id,
-          orderDate: new Date(sixtyDaysAgo.getTime() + 20 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            sixtyDaysAgo.getTime() + 20 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 780000,
           status: "paid",
           paymentMethod: "cash",
@@ -1517,7 +1559,9 @@ async function seed() {
         // ===== 30-60 days ago - HIGH sales growth =====
         {
           customerId: customer1.id,
-          orderDate: new Date(thirtyDaysAgo.getTime() - 28 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            thirtyDaysAgo.getTime() - 28 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 1250000,
           status: "paid",
           paymentMethod: "cash",
@@ -1525,7 +1569,9 @@ async function seed() {
         },
         {
           customerId: customer2.id,
-          orderDate: new Date(thirtyDaysAgo.getTime() - 22 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            thirtyDaysAgo.getTime() - 22 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 1450000,
           status: "paid",
           paymentMethod: "mobile_payment",
@@ -1533,7 +1579,9 @@ async function seed() {
         },
         {
           customerId: customer3.id,
-          orderDate: new Date(thirtyDaysAgo.getTime() - 15 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            thirtyDaysAgo.getTime() - 15 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 980000,
           status: "paid",
           paymentMethod: "cash",
@@ -1541,7 +1589,9 @@ async function seed() {
         },
         {
           customerId: customer4.id,
-          orderDate: new Date(thirtyDaysAgo.getTime() - 10 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            thirtyDaysAgo.getTime() - 10 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 1680000,
           status: "paid",
           paymentMethod: "cash",
@@ -1549,7 +1599,9 @@ async function seed() {
         },
         {
           customerId: customer1.id,
-          orderDate: new Date(thirtyDaysAgo.getTime() - 5 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            thirtyDaysAgo.getTime() - 5 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 1320000,
           status: "paid",
           paymentMethod: "cash",
@@ -1559,7 +1611,9 @@ async function seed() {
         // ===== Recent (0-30 days) - PEAK sales =====
         {
           customerId: customer2.id,
-          orderDate: new Date(thirtyDaysAgo.getTime() + 3 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            thirtyDaysAgo.getTime() + 3 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 1890000,
           status: "paid",
           paymentMethod: "cash",
@@ -1567,7 +1621,9 @@ async function seed() {
         },
         {
           customerId: customer3.id,
-          orderDate: new Date(thirtyDaysAgo.getTime() + 8 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            thirtyDaysAgo.getTime() + 8 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 2150000,
           status: "paid",
           paymentMethod: "mobile_payment",
@@ -1575,7 +1631,9 @@ async function seed() {
         },
         {
           customerId: customer1.id,
-          orderDate: new Date(thirtyDaysAgo.getTime() + 15 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            thirtyDaysAgo.getTime() + 15 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 1750000,
           status: "paid",
           paymentMethod: "cash",
@@ -1583,7 +1641,9 @@ async function seed() {
         },
         {
           customerId: customer4.id,
-          orderDate: new Date(thirtyDaysAgo.getTime() + 20 * 24 * 60 * 60 * 1000),
+          orderDate: new Date(
+            thirtyDaysAgo.getTime() + 20 * 24 * 60 * 60 * 1000
+          ),
           totalAmount: 2350000,
           status: "paid",
           paymentMethod: "cash",
@@ -2235,7 +2295,8 @@ async function seed() {
     const sixMonthsAgoRevenue = 120000 + 180000 + 95000 + 150000 + 210000;
     const ninetyTo180DaysRevenue = 450000 + 620000 + 380000 + 790000 + 520000;
     const sixtyTo90DaysRevenue = 850000 + 1100000 + 650000 + 920000 + 780000;
-    const thirtyTo60DaysRevenue = 1250000 + 1450000 + 980000 + 1680000 + 1320000;
+    const thirtyTo60DaysRevenue =
+      1250000 + 1450000 + 980000 + 1680000 + 1320000;
     const recentRevenue = 1890000 + 2150000 + 1750000 + 2350000 + 1620000;
 
     console.log(`
@@ -2256,7 +2317,7 @@ async function seed() {
       * Gần đây (0-30 ngày): ${recentCount} đơn = ${(recentRevenue / 1000000).toFixed(2)}M VND
       
       📈 TREND TĂNG TRƯỞNG:
-      * 180 ngày trước → Hiện tại: Tăng ${((recentRevenue - sixMonthsAgoRevenue) / sixMonthsAgoRevenue * 100).toFixed(0)}%
+      * 180 ngày trước → Hiện tại: Tăng ${(((recentRevenue - sixMonthsAgoRevenue) / sixMonthsAgoRevenue) * 100).toFixed(0)}%
       * Trung bình 30 ngày gần nhất: ${(recentRevenue / recentCount / 1000).toFixed(0)}K VND/đơn
       * Trung bình 180 ngày: ${(sixMonthsAgoRevenue / sixMonthsAgoCount / 1000).toFixed(0)}K VND/đơn
       

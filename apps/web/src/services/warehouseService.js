@@ -50,10 +50,8 @@ export const createRack = async (zoneId, rackData) => {
   return response.data;
 };
 
-export const deleteRack = async (zoneId, rackId) => {
-  const response = await instance.delete(
-    `/warehouse/zones/${zoneId}/racks/${rackId}`
-  );
+export const deleteRack = async (rackId) => {
+  const response = await instance.delete(`/warehouse/racks/${rackId}`);
   return response.data;
 };
 
