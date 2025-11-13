@@ -157,14 +157,12 @@ export default function DashboardPage() {
         },
       ];
     }
-
     const reportData = monthlyReport.data.data || monthlyReport.data;
     const { summary, topSellingMedications } = reportData;
     const totalOrders = summary?.totalOrders || 0;
     const totalRevenue = summary?.totalRevenue || 0;
     const avgOrder = totalOrders > 0 ? totalRevenue / totalOrders : 0;
     const topProducts = topSellingMedications?.length || 0;
-
     return [
       {
         title: "Tổng đơn hàng",
