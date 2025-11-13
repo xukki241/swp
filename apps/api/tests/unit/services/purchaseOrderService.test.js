@@ -199,7 +199,21 @@ describe("PurchaseOrderService", () => {
     it("should update purchase order", async () => {
       const poData = { status: "approved" };
       const mockPO = { id: 1, supplierId: 1, status: "approved" };
+      const mockExistingPo = {
+        id: 1,
+        status: "pending",
+        supplierEmail: "supplier@test.com",
+        supplierName: "Test Supplier",
+      };
 
+      // Mock the initial select to get existing PO
+      db.select.mockReturnValue({
+        from: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([mockExistingPo]),
+      });
+
+      // Mock the transaction
       db.transaction.mockImplementation(async (callback) => {
         const tx = {
           update: vi.fn().mockReturnThis(),
@@ -208,12 +222,10 @@ describe("PurchaseOrderService", () => {
           returning: vi.fn().mockResolvedValue([mockPO]),
           select: vi.fn().mockReturnThis(),
           from: vi.fn().mockReturnThis(),
-          leftJoin: vi.fn().mockReturnThis(),
         };
 
         tx.select.mockReturnValue({
           from: vi.fn().mockReturnThis(),
-          leftJoin: vi.fn().mockReturnThis(),
           where: vi.fn().mockResolvedValue([]),
         });
 
@@ -226,14 +238,11 @@ describe("PurchaseOrderService", () => {
     });
 
     it("should return null for non-existent purchase order", async () => {
-      db.transaction.mockImplementation(async (callback) => {
-        const tx = {
-          update: vi.fn().mockReturnThis(),
-          set: vi.fn().mockReturnThis(),
-          where: vi.fn().mockReturnThis(),
-          returning: vi.fn().mockResolvedValue([]),
-        };
-        return callback(tx);
+      // Mock the initial select to return empty (no existing PO)
+      db.select.mockReturnValue({
+        from: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([]),
       });
 
       const result = await purchaseOrderService.update(999, { status: "test" });
@@ -245,12 +254,30 @@ describe("PurchaseOrderService", () => {
   describe("delete", () => {
     it("should delete purchase order", async () => {
       const mockPO = { id: 1, supplierId: 1, status: "pending" };
-
-      const mockQuery = {
-        where: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([mockPO]),
+      const mockExistingPo = {
+        id: 1,
+        orderDate: new Date("2025-10-09"),
+        totalAmount: 1000,
+        supplierEmail: "supplier@test.com",
+        supplierName: "Test Supplier",
       };
-      db.delete.mockReturnValue(mockQuery);
+
+      // Mock the initial select to get existing PO
+      db.select.mockReturnValue({
+        from: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([mockExistingPo]),
+      });
+
+      // Mock the transaction
+      db.transaction.mockImplementation(async (callback) => {
+        const tx = {
+          delete: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          returning: vi.fn().mockResolvedValue([mockPO]),
+        };
+        return callback(tx);
+      });
 
       const result = await purchaseOrderService.delete(1);
 

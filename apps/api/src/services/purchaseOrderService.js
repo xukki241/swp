@@ -218,25 +218,25 @@ export const purchaseOrderService = {
 
   // Update purchase order with optional items
   async update(id, data) {
+    const { items, ...poData } = data;
+
+    // Get existing PO with supplier info for email (before update)
+    const [existingPo] = await db
+      .select({
+        id: purchaseOrders.id,
+        status: purchaseOrders.status,
+        supplierEmail: suppliers.email,
+        supplierName: suppliers.name,
+      })
+      .from(purchaseOrders)
+      .leftJoin(suppliers, eq(purchaseOrders.supplierId, suppliers.id))
+      .where(eq(purchaseOrders.id, id));
+
+    if (!existingPo) {
+      return null;
+    }
+
     return await db.transaction(async (tx) => {
-      const { items, ...poData } = data;
-
-      // Get existing PO with supplier info for email
-      const [existingPo] = await tx
-        .select({
-          id: purchaseOrders.id,
-          status: purchaseOrders.status,
-          supplierEmail: suppliers.email,
-          supplierName: suppliers.name,
-        })
-        .from(purchaseOrders)
-        .leftJoin(suppliers, eq(purchaseOrders.supplierId, suppliers.id))
-        .where(eq(purchaseOrders.id, id));
-
-      if (!existingPo) {
-        return null;
-      }
-
       // Update purchase order
       const [po] = await tx
         .update(purchaseOrders)
@@ -265,7 +265,7 @@ export const purchaseOrderService = {
         }
       } else {
         // If no items provided, fetch existing ones
-        updatedItems = await tx
+        updatedItems = await db
           .select()
           .from(purchaseOrderItems)
           .where(eq(purchaseOrderItems.purchaseOrderId, id));
@@ -303,24 +303,24 @@ export const purchaseOrderService = {
 
   // Delete purchase order
   async delete(id) {
+    // First get PO with supplier info for email (before deletion)
+    const [existingPo] = await db
+      .select({
+        id: purchaseOrders.id,
+        orderDate: purchaseOrders.orderDate,
+        totalAmount: purchaseOrders.totalAmount,
+        supplierEmail: suppliers.email,
+        supplierName: suppliers.name,
+      })
+      .from(purchaseOrders)
+      .leftJoin(suppliers, eq(purchaseOrders.supplierId, suppliers.id))
+      .where(eq(purchaseOrders.id, id));
+
+    if (!existingPo) {
+      return null;
+    }
+
     return await db.transaction(async (tx) => {
-      // First get PO with supplier info for email
-      const [existingPo] = await tx
-        .select({
-          id: purchaseOrders.id,
-          orderDate: purchaseOrders.orderDate,
-          totalAmount: purchaseOrders.totalAmount,
-          supplierEmail: suppliers.email,
-          supplierName: suppliers.name,
-        })
-        .from(purchaseOrders)
-        .leftJoin(suppliers, eq(purchaseOrders.supplierId, suppliers.id))
-        .where(eq(purchaseOrders.id, id));
-
-      if (!existingPo) {
-        return null;
-      }
-
       // Delete related purchase order items first
       await tx
         .delete(purchaseOrderItems)
@@ -332,25 +332,26 @@ export const purchaseOrderService = {
         .where(eq(purchaseOrders.id, id))
         .returning();
 
-      // Send cancellation email to supplier
+      // Send cancellation email to supplier (async, don't block)
       if (existingPo.supplierEmail) {
-        try {
-          const { sendPurchaseOrderCancellationEmail } = await import(
-            "../utils/purchaseOrderEmail.js"
-          );
-          await sendPurchaseOrderCancellationEmail({
-            supplierEmail: existingPo.supplierEmail,
-            supplierName: existingPo.supplierName,
-            orderNumber: id.substring(0, 8).toUpperCase(),
-            orderDate: existingPo.orderDate
-              ? new Date(existingPo.orderDate).toLocaleDateString("vi-VN")
-              : "N/A",
-            totalAmount: existingPo.totalAmount,
-          });
-        } catch (emailError) {
-          console.error("Failed to send cancellation email:", emailError);
-          // Don't fail the deletion if email fails
-        }
+        setImmediate(async () => {
+          try {
+            const { sendPurchaseOrderCancellationEmail } = await import(
+              "../utils/purchaseOrderEmail.js"
+            );
+            await sendPurchaseOrderCancellationEmail({
+              supplierEmail: existingPo.supplierEmail,
+              supplierName: existingPo.supplierName,
+              orderNumber: id.substring(0, 8).toUpperCase(),
+              orderDate: existingPo.orderDate
+                ? new Date(existingPo.orderDate).toLocaleDateString("vi-VN")
+                : "N/A",
+              totalAmount: existingPo.totalAmount,
+            });
+          } catch (emailError) {
+            console.error("Failed to send cancellation email:", emailError);
+          }
+        });
       }
 
       return po;
