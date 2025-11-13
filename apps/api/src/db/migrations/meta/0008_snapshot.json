@@ -2389,9 +2389,7 @@
     "public.sales_order_status": {
       "name": "sales_order_status",
       "schema": "public",
-      "values": [
-        "paid"
-      ]
+      "values": ["paid"]
     },
     "public.shift_assignment_status": {
       "name": "shift_assignment_status",

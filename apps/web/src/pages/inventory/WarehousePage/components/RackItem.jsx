@@ -26,13 +26,7 @@ import { Textarea } from "../../../../components/ui/textarea";
 import { useWarehouse } from "../../../../hooks/useWarehouse";
 import { BinGrid } from "./BinGrid";
 
-export function RackItem({
-  rack,
-  isExpanded,
-  onToggle,
-  selectedZoneId,
-  refetch,
-}) {
+export function RackItem({ rack, isExpanded, onToggle, refetch, canEdit }) {
   const { updateRackData, deleteRackData, createBinData } = useWarehouse();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -93,7 +87,7 @@ export function RackItem({
   const handleDeleteRack = async () => {
     setIsSubmitting(true);
     try {
-      await deleteRackData(selectedZoneId, rack.id);
+      await deleteRackData(rack.id);
       setShowDeleteDialog(false);
       if (refetch) refetch();
     } catch (error) {
@@ -118,7 +112,10 @@ export function RackItem({
     }
 
     // Validate that level and number are numeric
-    if (isNaN(createBinForm.level) || isNaN(createBinForm.number)) {
+    if (
+      Number.isNaN(createBinForm.level) ||
+      Number.isNaN(createBinForm.number)
+    ) {
       console.error("Level and number must be numeric values");
       return;
     }
@@ -148,8 +145,6 @@ export function RackItem({
     }
   };
 
-  const rackBins = rack.bins || [];
-
   return (
     <>
       <Card className="shadow-sm rounded-lg border">
@@ -173,33 +168,35 @@ export function RackItem({
                 <p className="text-sm text-muted-foreground">{rack.code}</p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setShowAddBinDialog(true)}
-              >
-                <Plus className="h-4 w-4" />
-                Thêm ô
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setShowEditDialog(true)}
-              >
-                <Edit2 className="h-4 w-4" />
-                Sửa giá
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setShowDeleteDialog(true)}
-                className="text-destructive hover:text-destructive"
-              >
-                <Trash2 className="h-4 w-4" />
-                Xóa giá
-              </Button>
-            </div>
+            {canEdit && (
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowAddBinDialog(true)}
+                >
+                  <Plus className="h-4 w-4" />
+                  Thêm ô
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowEditDialog(true)}
+                >
+                  <Edit2 className="h-4 w-4" />
+                  Sửa giá
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Xóa giá
+                </Button>
+              </div>
+            )}
           </div>
           {rack.description && (
             <p className="text-sm text-muted-foreground mt-2">
@@ -215,6 +212,7 @@ export function RackItem({
               bins={rack.bins}
               rack={rack}
               refetch={refetch}
+              canEdit={canEdit}
             />
           </CardContent>
         )}

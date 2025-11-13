@@ -6,7 +6,6 @@ import { files } from "./files.js";
 import { inventory } from "./inventory.js";
 import { medications } from "./medications.js";
 import { medicationVariants } from "./medicationVariants.js";
-import { notifications } from "./notifications.js";
 import { purchaseOrderItems } from "./purchaseOrderItems.js";
 import { purchaseOrderReceiptItems } from "./purchaseOrderReceiptItems.js";
 import { purchaseOrderReceipts } from "./purchaseOrderReceipts.js";
@@ -29,7 +28,6 @@ export const usersRelations = relations(users, ({ many }) => ({
   receivedPurchaseOrderReceipts: many(purchaseOrderReceipts),
   salesOrders: many(salesOrders),
   uploadedFiles: many(files),
-  notifications: many(notifications),
   auditLogs: many(auditLogs),
   shiftAssignments: many(shiftAssignments, { relationName: "userShifts" }),
   createdShiftAssignments: many(shiftAssignments, {
@@ -240,13 +238,6 @@ export const filesRelations = relations(files, ({ one, many }) => ({
   medicationImages: many(medications),
   supplierContracts: many(supplierMedicationVariants),
   salesOrderPrescriptions: many(salesOrders),
-}));
-
-export const notificationsRelations = relations(notifications, ({ one }) => ({
-  user: one(users, {
-    fields: [notifications.userId],
-    references: [users.id],
-  }),
 }));
 
 export const auditLogsRelations = relations(auditLogs, ({ one }) => ({

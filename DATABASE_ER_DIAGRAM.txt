@@ -1,0 +1,285 @@
+---
+config:
+  layout: elk
+  look: classic
+---
+erDiagram
+direction LR
+
+%% ===== USER & AUTH DOMAIN =====
+users {
+    uuid id PK
+    string name
+    string email UK
+    string phone UK
+    text address
+    user_status status
+    user_role role
+}
+
+user_credentials {
+    uuid id PK
+    uuid user_id FK
+    string provider
+    string identifier
+    string secret
+}
+
+password_reset_tokens {
+    uuid id PK
+    uuid user_id FK
+    string token
+    timestamp expires_at
+    boolean is_used
+    timestamp created_at
+}
+
+user_registrations {
+    uuid id PK
+    string name
+    string email UK
+    string phone UK
+    text address
+    string password
+    user_registration_status status
+}
+
+audit_logs {
+    uuid id PK
+    uuid user_id FK
+    string action
+    string entity
+    uuid entity_id
+    jsonb changes
+    timestamp created_at
+}
+
+files {
+    uuid id PK
+    string filename
+    string file_type
+    string mime_type
+    integer file_size
+    text storage_path
+    uuid uploaded_by FK
+    timestamp uploaded_at
+}
+
+%% ===== SHIFT DOMAIN =====
+shifts {
+    uuid id PK
+    string name
+    string shift_type
+    timestamp start_time
+    timestamp end_time
+}
+
+shift_assignments {
+    uuid id PK
+    uuid user_id FK
+    uuid shift_id FK
+    date assigned_date
+    string status
+}
+
+%% ===== CUSTOMER & SALES DOMAIN =====
+customers {
+    uuid id PK
+    string name
+    string email UK
+    string phone UK
+    text address
+}
+
+sales_orders {
+    uuid id PK
+    uuid customer_id FK
+    timestamp order_date
+    double total_amount
+    sales_order_status status
+    sales_order_payment_method payment_method
+    uuid salesperson_id FK
+}
+
+sales_order_items {
+    uuid id PK
+    uuid sales_order_id FK
+    uuid medication_variant_id FK
+    integer quantity
+    double unit_price
+    double total_price
+}
+
+%% ===== MEDICATION & SUPPLIER DOMAIN =====
+medications {
+    uuid id PK
+    string name
+    string brand
+    text description
+    boolean is_prescription_required
+    boolean is_controlled_substance
+    medication_status status
+}
+
+medication_variants {
+    uuid id PK
+    uuid medication_id FK
+    string sku UK
+    string name
+    string unit
+    double unit_factor
+    string barcode UK
+    double sell_price
+    boolean is_active
+    boolean is_for_sale
+}
+
+suppliers {
+    uuid id PK
+    string name
+    string contact_name
+    string email UK
+    string phone UK
+    text address
+    supplier_status status
+}
+
+supplier_medication_variants {
+    uuid id PK
+    uuid supplier_id FK
+    uuid medication_variant_id FK
+    string supplier_sku
+    integer lead_time_days
+}
+
+%% ===== PURCHASE & INVENTORY DOMAIN =====
+purchase_orders {
+    uuid id PK
+    uuid supplier_id FK
+    timestamp order_date
+    timestamp expected_date
+    purchase_order_status status
+    double total_amount
+    uuid created_by FK
+}
+
+purchase_order_items {
+    uuid id PK
+    uuid purchase_order_id FK
+    uuid supplier_medication_variant_id FK
+    integer quantity
+    double unit_price
+    double total_price
+}
+
+purchase_order_receipts {
+    uuid id PK
+    uuid purchase_order_id FK
+    timestamp received_date
+    uuid received_by FK
+}
+
+purchase_order_receipt_items {
+    uuid id PK
+    uuid purchase_order_receipt_id FK
+    uuid purchase_order_item_id FK
+    integer quantity
+}
+
+inventory {
+    uuid id PK
+    uuid medication_variant_id FK
+    uuid purchase_order_receipt_items_id FK
+    uuid bin_id FK
+    string batch_number
+    date manufacture_date
+    date expiry_date
+    double quantity
+    double quantity_reserved
+}
+
+%% ===== WAREHOUSE DOMAIN =====
+warehouse_zones {
+    uuid id PK
+    string code UK
+    string name
+    warehouse_zone_type type
+    text location
+    text description
+}
+
+warehouse_racks {
+    uuid id PK
+    uuid zone_id FK
+    string code
+    string name
+    text description
+}
+
+warehouse_bins {
+    uuid id PK
+    uuid rack_id FK
+    string code
+    string name
+    integer level
+    integer number
+    text description
+}
+
+%% ===== REPORTS DOMAIN =====
+reports {
+    uuid id PK
+    report_type type
+    timestamp report_date
+    jsonb data
+    jsonb parameters
+}
+
+%% ===== RELATIONSHIPS =====
+
+%% USER & AUTH RELATIONSHIPS
+users ||--o{ user_credentials : "has"
+users ||--o{ password_reset_tokens : "has"
+users ||--o{ shift_assignments : "assigned_to"
+users ||--o{ audit_logs : "performs"
+users ||--o{ files : "uploads"
+users ||--o{ purchase_orders : "creates"
+users ||--o{ purchase_order_receipts : "receives"
+users ||--o{ sales_orders : "manages_as_salesperson"
+
+%% SHIFT RELATIONSHIPS
+shifts ||--o{ shift_assignments : "has"
+
+%% CUSTOMER & SALES RELATIONSHIPS
+customers ||--o{ sales_orders : "places"
+sales_orders ||--o{ sales_order_items : "contains"
+sales_order_items }o--|| medication_variants : "orders"
+
+%% MEDICATION RELATIONSHIPS
+medications ||--o{ medication_variants : "has"
+medication_variants ||--o{ supplier_medication_variants : "provided_by"
+medication_variants ||--o{ inventory : "stocked_in"
+medication_variants ||--o{ sales_order_items : "sold_in"
+
+%% FILE RELATIONSHIPS
+files ||--o{ medications : "image_for"
+files ||--o{ sales_orders : "prescription_for"
+files ||--o{ supplier_medication_variants : "contract_for"
+
+%% SUPPLIER RELATIONSHIPS
+suppliers ||--o{ purchase_orders : "supplies"
+suppliers ||--o{ supplier_medication_variants : "offers"
+supplier_medication_variants ||--o{ purchase_order_items : "listed_in"
+
+%% PURCHASE & INVENTORY RELATIONSHIPS
+purchase_orders ||--o{ purchase_order_items : "contains"
+purchase_orders ||--o{ purchase_order_receipts : "received_as"
+purchase_order_items ||--o{ purchase_order_receipt_items : "recorded_in"
+purchase_order_receipt_items }o--|| purchase_order_items : "records_delivery_of"
+purchase_order_receipts ||--o{ purchase_order_receipt_items : "logs"
+purchase_order_receipt_items ||--o{ inventory : "creates"
+
+%% WAREHOUSE RELATIONSHIPS
+warehouse_zones ||--o{ warehouse_racks : "contains"
+warehouse_racks ||--o{ warehouse_bins : "contains"
+warehouse_bins ||--o{ inventory : "stores"
