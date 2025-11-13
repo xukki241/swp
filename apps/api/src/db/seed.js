@@ -36,7 +36,7 @@ const SEED_CONFIG = {
   medicationVariants: 200,
   warehouseZones: 5,
   warehouseRacks: 20,
-  warehouseBins: 100,
+  warehouseBins: 1000,
   purchaseOrders: 30,
   salesOrders: 50,
   shifts: 3,
@@ -278,7 +278,7 @@ function defineWarehouseZones(count = SEED_CONFIG.warehouseZones) {
   for (let i = 0; i < count; i++) {
     zones.push({
       code: `KHU-${String(i + 1).padStart(2, "0")}`,
-      name: `${randomElement(["Bắc", "Nam", "Đông", "Tây", "Trung Tâm"])} Khu ${i + 1}`,
+      name: `Khu ${randomElement(["Bắc", "Nam", "Đông", "Tây", "Trung Tâm"])} ${i + 1}`,
       type: randomElement(zoneTypes),
       description: faker.lorem.sentence(),
     });
