@@ -11,20 +11,34 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentUser } from "@/hooks/useAuth";
 import { useInventory } from "@/hooks/useInventory";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import MedicineCard from "./components/MedicineCard";
 
 const InventoryTracking = () => {
   const { lowStock, expiring, loading, error } = useInventory();
   const [canEdit, setCanEdit] = useState(false);
   const { data } = useCurrentUser();
-  const navigate = useNavigate();
+  const [displayStock, setDisplayStock] = useState(false);
 
   useEffect(() => {
     if (data?.user?.role === "owner") {
       setCanEdit(true);
     }
   }, [data]);
+
+  useEffect(() => {
+    lowStock.forEach((item) => {
+      if (item?.quantity < 50) {
+        setDisplayStock(true);
+      }
+    });
+  }, [lowStock]);
+
+  function getDaysRemaining(expiryDate) {
+    return Math.ceil(
+      (new Date(expiryDate) - new Date()) / (1000 * 60 * 60 * 24)
+    );
+  }
 
   function renderLowStock() {
     if (loading.lowStock) {
@@ -65,9 +79,18 @@ const InventoryTracking = () => {
 
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {lowStock.map((item) => (
-          <MedicineCard key={item.id} medicine={item} variant="low-stock" />
-        ))}
+        {displayStock &&
+          lowStock.map((item) => {
+            if (item?.quantity < 50) {
+              return (
+                <MedicineCard
+                  key={item.id}
+                  medicine={item}
+                  variant="low-stock"
+                />
+              );
+            }
+          })}
       </div>
     );
   }
@@ -103,7 +126,7 @@ const InventoryTracking = () => {
             Không tìm thấy mặt hàng sắp hết hạn
           </p>
           <p className="text-sm text-muted-foreground mt-1">
-            Tất cả mặt hàng có ngày hết hạn sau 30 ngày
+            Tất cả mặt hàng có ngày hết hạn dưới 90 ngày
           </p>
         </div>
       );
@@ -111,9 +134,13 @@ const InventoryTracking = () => {
 
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {expiring.map((item) => (
-          <MedicineCard key={item.id} medicine={item} variant="expiring" />
-        ))}
+        {expiring.map((item) => {
+          if (getDaysRemaining(item?.expiryDate) < 90) {
+            return (
+              <MedicineCard key={item.id} medicine={item} variant="expiring" />
+            );
+          }
+        })}
       </div>
     );
   }

@@ -88,7 +88,6 @@ export default function ZoneDetails({ zone, refetch, canEdit }) {
     try {
       await updateZoneData(zone.id, formData);
       setShowEditDialog(false);
-      refetch();
     } catch (error) {
       console.error("Không thể cập nhật khu:", error);
     } finally {
@@ -101,7 +100,7 @@ export default function ZoneDetails({ zone, refetch, canEdit }) {
     try {
       await deleteZoneData(zone.id);
       setShowDeleteDialog(false);
-      refetch();
+      location.reload();
     } catch (error) {
       console.error("Không thể xóa khu:", error);
     } finally {

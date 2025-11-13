@@ -66,7 +66,7 @@ export default function WarehousePage() {
   const handleZoneChange = (zoneId) => {
     setSelectedZoneId(zoneId);
     if (zoneId) {
-      selectZone(null);
+      selectZone(zoneId);
     }
   };
 
@@ -115,7 +115,7 @@ export default function WarehousePage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen p-6 space-y-6">
+      <div className="min-h-screen space-y-6">
         <div>
           <h2 className="text-3xl font-bold text-gray-900">Quản lý kho</h2>
           <p className="text-muted-foreground mt-1">
