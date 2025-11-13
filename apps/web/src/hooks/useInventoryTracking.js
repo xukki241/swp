@@ -15,10 +15,10 @@ export const useInventoryTracking = () => {
     try {
       const data = await getLowStock();
       setLowStock(data);
-      toast.success("Successfully fetched low stock items.");
+      toast.success("Lấy danh sách tồn kho thấp thành công.");
     } catch (err) {
       setError((prev) => ({ ...prev, lowStock: err }));
-      toast.error("Failed to fetch low stock items.");
+      toast.error("Không thể lấy danh sách tồn kho thấp.");
     } finally {
       setLoading((prev) => ({ ...prev, lowStock: false }));
     }
@@ -30,10 +30,10 @@ export const useInventoryTracking = () => {
     try {
       const data = await getExpiring();
       setExpiring(data);
-      toast.success("Successfully fetched expiring items.");
+      toast.success("Lấy danh sách sắp hết hạn thành công.");
     } catch (err) {
       setError((prev) => ({ ...prev, expiring: err }));
-      toast.error("Failed to fetch expiring items.");
+      toast.error("Không thể lấy danh sách sắp hết hạn.");
     } finally {
       setLoading((prev) => ({ ...prev, expiring: false }));
     }

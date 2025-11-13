@@ -7,10 +7,16 @@ import { useInventory } from "@/hooks/useInventory";
 import { useSuppliers } from "@/hooks/useSuppliers";
 import { Eye, Search, Settings2 } from "lucide-react";
 import { useEffect, useState } from "react";
+
 import AddStockDialog from "./components/dialogs/AddStockDialog";
 import AddjustStockDialog from "./components/dialogs/AdjustStockDialog";
 import StockDetailsDialog from "./components/dialogs/StockDetailsDialog";
 import InventorySearching from "./components/filters/InventorySearching";
+import {
+  calculateRemainingDays,
+  getExpiryWarningBadge,
+  getLowStockBadge,
+} from "./utils/stockHelpers";
 
 export default function StockOverviewPage() {
   const { inventory, refetchInventory } = useInventory();
@@ -166,6 +172,12 @@ export default function StockOverviewPage() {
                               ).toLocaleString("vi-VN")}{" "}
                               VND
                             </p>
+                            <div className="flex gap-2 mt-2">
+                              {getExpiryWarningBadge(
+                                calculateRemainingDays(medication.expiryDate)
+                              )}
+                              {getLowStockBadge(medication.quantity)}
+                            </div>
                           </div>
                         </div>
                         <div className="flex gap-2">

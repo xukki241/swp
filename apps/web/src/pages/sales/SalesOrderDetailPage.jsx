@@ -262,10 +262,10 @@ export default function SalesOrderDetailPage() {
                               </div>
                               {item.medicationVariant?.medication
                                 ?.isPrescriptionRequired && (
-                                  <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300 rounded">
-                                    Kê đơn
-                                  </span>
-                                )}
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300 rounded">
+                                  Kê đơn
+                                </span>
+                              )}
                             </div>
                           </td>
                           <td className="px-6 py-4 text-center text-gray-700">

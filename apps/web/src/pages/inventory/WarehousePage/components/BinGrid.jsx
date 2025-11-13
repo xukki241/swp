@@ -1,10 +1,10 @@
 import { BinCard } from "./BinCard";
 
-export function BinGrid({ rackId, bins, refetch, rack }) {
+export function BinGrid({ rackId, bins, refetch, rack, canEdit }) {
   if (!bins || bins.length === 0) {
     return (
       <div className="py-8 text-center">
-        <p className="text-muted-foreground">Không có ô trong giá này</p>
+        <p className="text-muted-foreground">Không có ô trong kệ này</p>
       </div>
     );
   }
@@ -28,7 +28,7 @@ export function BinGrid({ rackId, bins, refetch, rack }) {
   return (
     <div className="space-y-2">
       <div className="text-sm text-muted-foreground mb-4">
-        Bố cục lưới: {maxLevel} tầng × {maxNumber} cột
+        Bố cục lưới: {maxLevel} tầng x {maxNumber} cột
       </div>
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full">
@@ -47,7 +47,7 @@ export function BinGrid({ rackId, bins, refetch, rack }) {
           {grid.map((row, levelIndex) => (
             <div key={levelIndex} className="flex gap-2 mb-2">
               <div className="w-12 flex items-center justify-center text-sm font-medium text-muted-foreground">
-                L{levelIndex + 1}
+                {levelIndex + 1}
               </div>
               {row.map((bin, numberIndex) => (
                 <BinCard
@@ -58,6 +58,7 @@ export function BinGrid({ rackId, bins, refetch, rack }) {
                   rackId={rackId}
                   rack={rack}
                   refetch={refetch}
+                  canEdit={canEdit}
                 />
               ))}
             </div>

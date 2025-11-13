@@ -42,8 +42,6 @@ export default function SalesOrderListPage() {
     }
   };
 
-
-
   const filteredOrders = orders.filter((order) => {
     const searchLower = searchTerm.toLowerCase();
     return (
