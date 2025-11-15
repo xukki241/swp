@@ -21,7 +21,9 @@ describe("MedicationVariantService", () => {
         limit: vi.fn().mockReturnThis(),
         offset: vi.fn().mockResolvedValue(mockVariants),
       };
-      db.select.mockReturnValueOnce(mockCountQuery).mockReturnValueOnce(mockDataQuery);
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationVariantService.getAllMedicationVariants();
 
@@ -45,7 +47,9 @@ describe("MedicationVariantService", () => {
         limit: vi.fn().mockReturnThis(),
         offset: vi.fn().mockResolvedValue(mockVariants),
       };
-      db.select.mockReturnValueOnce(mockCountQuery).mockReturnValueOnce(mockDataQuery);
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationVariantService.getAllMedicationVariants({
         search: "ASP-100",
@@ -71,7 +75,9 @@ describe("MedicationVariantService", () => {
         limit: vi.fn().mockReturnThis(),
         offset: vi.fn().mockResolvedValue(mockVariants),
       };
-      db.select.mockReturnValueOnce(mockCountQuery).mockReturnValueOnce(mockDataQuery);
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationVariantService.getAllMedicationVariants({
         medicationId: 1,
@@ -97,7 +103,9 @@ describe("MedicationVariantService", () => {
         limit: vi.fn().mockReturnThis(),
         offset: vi.fn().mockResolvedValue(mockVariants),
       };
-      db.select.mockReturnValueOnce(mockCountQuery).mockReturnValueOnce(mockDataQuery);
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationVariantService.getAllMedicationVariants({
         isActive: true,
@@ -286,7 +294,9 @@ describe("MedicationVariantService", () => {
         limit: vi.fn().mockReturnThis(),
         offset: vi.fn().mockResolvedValue(mockVariants),
       };
-      db.select.mockReturnValueOnce(mockCountQuery).mockReturnValueOnce(mockDataQuery);
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationVariantService.getAllMedicationVariants({
         search: "ASP",
@@ -315,7 +325,9 @@ describe("MedicationVariantService", () => {
         limit: vi.fn().mockReturnThis(),
         offset: vi.fn().mockResolvedValue(mockVariants),
       };
-      db.select.mockReturnValueOnce(mockCountQuery).mockReturnValueOnce(mockDataQuery);
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationVariantService.getAllMedicationVariants({
         isActive: false,

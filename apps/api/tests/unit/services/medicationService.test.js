@@ -26,7 +26,9 @@ describe("MedicationService", () => {
         offset: vi.fn().mockResolvedValue(mockMedications),
       };
 
-      db.select.mockReturnValueOnce(mockCountQuery).mockReturnValueOnce(mockDataQuery);
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationService.getAllMedications();
 
@@ -53,7 +55,9 @@ describe("MedicationService", () => {
         offset: vi.fn().mockResolvedValue(mockMedications),
       };
 
-      db.select.mockReturnValueOnce(mockCountQuery).mockReturnValueOnce(mockDataQuery);
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationService.getAllMedications({
         search: "Aspirin",
@@ -81,7 +85,9 @@ describe("MedicationService", () => {
         offset: vi.fn().mockResolvedValue(mockMedications),
       };
 
-      db.select.mockReturnValueOnce(mockCountQuery).mockReturnValueOnce(mockDataQuery);
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationService.getAllMedications({
         status: "active",
@@ -468,7 +474,10 @@ describe("MedicationService", () => {
         offset: vi.fn().mockResolvedValue(mockMedications),
       };
 
-      db.select = vi.fn().mockReturnValueOnce(mockCountQuery).mockReturnValueOnce(mockDataQuery);
+      db.select = vi
+        .fn()
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationService.getAllMedications({
         search: "Aspirin",
