@@ -133,7 +133,7 @@ export default function MedicationViewModal({
           const v = await getMedicationVariants(medication.id);
           setVariants(Array.isArray(v) ? v : v?.data || []);
         }
-      } catch {}
+      } catch { }
     })();
   }, [isModal, open, medication, withVariants]);
 
@@ -184,7 +184,6 @@ export default function MedicationViewModal({
                   <TableHead>SKU</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Unit</TableHead>
-                  <TableHead>Factor</TableHead>
                   <TableHead>Barcode</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Active</TableHead>
@@ -197,7 +196,6 @@ export default function MedicationViewModal({
                     <TableCell>{v.sku}</TableCell>
                     <TableCell>{v.name}</TableCell>
                     <TableCell>{v.unit}</TableCell>
-                    <TableCell>{v.unitFactor}</TableCell>
                     <TableCell>{v.barcode || "-"}</TableCell>
                     <TableCell>{v.sellPrice}</TableCell>
                     <TableCell>{v.isActive ? "Active" : "Inactive"}</TableCell>
@@ -375,15 +373,15 @@ export default function MedicationViewModal({
               {inventory.filter(
                 (inv) => String(inv.medicationId) === String(medication.id)
               ).length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="text-center text-muted-foreground"
-                  >
-                    No inventory
-                  </TableCell>
-                </TableRow>
-              )}
+                  <TableRow>
+                    <TableCell
+                      colSpan={4}
+                      className="text-center text-muted-foreground"
+                    >
+                      No inventory
+                    </TableCell>
+                  </TableRow>
+                )}
             </TableBody>
           </Table>
         </div>

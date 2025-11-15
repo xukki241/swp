@@ -504,7 +504,6 @@ Client should delete token locally. Server may optionally revoke a token dependi
       "sku": "ASP-500",
       "name": "Aspirin 500mg tablet",
       "unit": "tablet",
-      "unitFactor": "1.00",
       "barcode": "1234567890123",
       "sellPrice": 1000,
       "isActive": true,
@@ -514,7 +513,6 @@ Client should delete token locally. Server may optionally revoke a token dependi
       "sku": "ASP-1000",
       "name": "Aspirin 1000mg capsule",
       "unit": "capsule",
-      "unitFactor": "1.00",
       "sellPrice": 2000,
       "isActive": true,
       "isForSale": true
@@ -623,7 +621,6 @@ Client should delete token locally. Server may optionally revoke a token dependi
   "sku": "ASP-250",
   "name": "Aspirin 250mg tablet",
   "unit": "tablet",
-  "unitFactor": "1.00",
   "barcode": "9876543210987",
   "sellPrice": 800,
   "isActive": true,

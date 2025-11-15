@@ -38,6 +38,7 @@ export default function StockOverviewPage() {
   });
 
   useEffect(() => {
+    // Inventory API already filters out items with quantity = 0
     setMedications(inventory);
     // Preload images for visible medications
     inventory.forEach(async (item) => {
@@ -176,7 +177,9 @@ export default function StockOverviewPage() {
                               {item.medicationVariant.name}
                             </h3>
                             <p className="text-sm text-muted-foreground mt-1">
-                              Tồn kho: {item.quantity}
+                              Tồn kho:{" "}
+                              {medication?.quantity -
+                                medication?.quantityReserved}
                             </p>
                             <p className="text-sm text-muted-foreground mt-1">
                               Giá:{" "}

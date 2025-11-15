@@ -147,7 +147,7 @@ describe("MedicationVariantController", () => {
           sku: "ASP-100-TAB",
           name: "Aspirin 100mg Tablet",
           unit: "tablet",
-          unitFactor: 1.0,
+
           barcode: "123456",
           sellPrice: 10.0,
           isActive: true,
@@ -161,7 +161,7 @@ describe("MedicationVariantController", () => {
         sku: "ASP-100-TAB",
         name: "Aspirin 100mg Tablet",
         unit: "tablet",
-        unitFactor: "1.0",
+
         barcode: "123456",
         sellPrice: "10.0",
         isActive: true,
@@ -186,7 +186,7 @@ describe("MedicationVariantController", () => {
         sku: "ASP-100-TAB",
         name: "Aspirin 100mg Tablet",
         unit: "tablet",
-        unitFactor: "1",
+
         barcode: "123456",
         sellPrice: "10",
         isActive: true,
@@ -255,7 +255,7 @@ describe("MedicationVariantController", () => {
         sku: "ASP-100-TAB",
         name: "Aspirin 100mg Tablet",
         unit: "tablet",
-        unitFactor: "1.0",
+
         barcode: null,
         sellPrice: "10.0",
         isActive: true,
@@ -278,7 +278,7 @@ describe("MedicationVariantController", () => {
         sku: "ASP-100-TAB",
         name: "Aspirin 100mg Tablet",
         unit: "tablet",
-        unitFactor: "1.0",
+
         barcode: null,
         sellPrice: "10",
         isActive: true,
@@ -518,3 +518,4 @@ describe("MedicationVariantController", () => {
     });
   });
 });
+
