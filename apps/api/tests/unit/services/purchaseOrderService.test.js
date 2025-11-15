@@ -198,24 +198,42 @@ describe("PurchaseOrderService", () => {
   describe("update", () => {
     it("should update purchase order", async () => {
       const poData = { status: "approved" };
-      const mockPO = { id: 1, supplierId: 1, status: "approved" };
+      const mockExistingPO = {
+        id: 1,
+        status: "pending",
+        supplierEmail: "supplier@example.com",
+        supplierName: "Supplier A",
+      };
+      const mockUpdatedPO = { id: 1, supplierId: 1, status: "approved" };
+      const mockItems = [
+        { id: 1, purchaseOrderId: 1, quantity: 10, unitPrice: 50 },
+      ];
 
       db.transaction.mockImplementation(async (callback) => {
         const tx = {
           update: vi.fn().mockReturnThis(),
           set: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
-          returning: vi.fn().mockResolvedValue([mockPO]),
-          select: vi.fn().mockReturnThis(),
-          from: vi.fn().mockReturnThis(),
-          leftJoin: vi.fn().mockReturnThis(),
+          returning: vi.fn().mockResolvedValue([mockUpdatedPO]),
         };
 
-        tx.select.mockReturnValue({
+        // Create the select chain for getting existing PO
+        const selectChain = {
           from: vi.fn().mockReturnThis(),
           leftJoin: vi.fn().mockReturnThis(),
-          where: vi.fn().mockResolvedValue([]),
-        });
+          where: vi.fn().mockResolvedValue([mockExistingPO]),
+        };
+
+        // Create the select chain for getting existing items
+        const itemsSelectChain = {
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockResolvedValue(mockItems),
+        };
+
+        tx.select = vi
+          .fn()
+          .mockReturnValueOnce(selectChain)
+          .mockReturnValueOnce(itemsSelectChain);
 
         return callback(tx);
       });
@@ -233,6 +251,16 @@ describe("PurchaseOrderService", () => {
           where: vi.fn().mockReturnThis(),
           returning: vi.fn().mockResolvedValue([]),
         };
+
+        // Mock select for checking if PO exists
+        const selectChain = {
+          from: vi.fn().mockReturnThis(),
+          leftJoin: vi.fn().mockReturnThis(),
+          where: vi.fn().mockResolvedValue([]), // Empty array = PO not found
+        };
+
+        tx.select = vi.fn().mockReturnValue(selectChain);
+
         return callback(tx);
       });
 
@@ -244,17 +272,37 @@ describe("PurchaseOrderService", () => {
 
   describe("delete", () => {
     it("should delete purchase order", async () => {
-      const mockPO = { id: 1, supplierId: 1, status: "pending" };
-
-      const mockQuery = {
-        where: vi.fn().mockReturnThis(),
-        returning: vi.fn().mockResolvedValue([mockPO]),
+      const mockExistingPO = {
+        id: 1,
+        orderDate: new Date("2025-10-09"),
+        totalAmount: 1000,
+        supplierEmail: "supplier@example.com",
+        supplierName: "Supplier A",
       };
-      db.delete.mockReturnValue(mockQuery);
+      const mockDeletedPO = { id: 1, supplierId: 1, status: "pending" };
+
+      db.transaction.mockImplementation(async (callback) => {
+        const tx = {
+          delete: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          returning: vi.fn().mockResolvedValue([mockDeletedPO]),
+        };
+
+        // Mock select for getting existing PO
+        const selectChain = {
+          from: vi.fn().mockReturnThis(),
+          leftJoin: vi.fn().mockReturnThis(),
+          where: vi.fn().mockResolvedValue([mockExistingPO]),
+        };
+
+        tx.select = vi.fn().mockReturnValue(selectChain);
+
+        return callback(tx);
+      });
 
       const result = await purchaseOrderService.delete(1);
 
-      expect(result).toEqual(mockPO);
+      expect(result).toEqual(mockDeletedPO);
     });
   });
 });

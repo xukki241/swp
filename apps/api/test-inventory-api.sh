@@ -28,7 +28,7 @@ echo -e "${GRAY}METHOD: POST | ENDPOINT: /auth/login${NC}"
 LOGIN_RESPONSE=$(curl -s -X POST "$BASE_URL/auth/login" \
   -H "Content-Type: $CONTENT_TYPE" \
   -d '{
-    "email": "owner@pharmaflow.com",
+    "email": "tranhuypro30305@gmail.com",
     "password": "admin123"
   }')
 

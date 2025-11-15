@@ -65,7 +65,7 @@ async function seed() {
       .values([
         {
           name: "Dr. Sarah Chen",
-          email: "owner@pharmaflow.com",
+          email: "tranhuypro30305@gmail.com",
           phone: "0901234567",
           address: "123 Medical Plaza, District 1, Ho Chi Minh City",
           status: "active",
@@ -112,7 +112,7 @@ async function seed() {
       {
         userId: owner.id,
         provider: "local",
-        identifier: "owner@pharmaflow.com",
+        identifier: "tranhuypro30305@gmail.com",
         secret: "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
       },
       {

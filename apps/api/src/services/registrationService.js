@@ -6,6 +6,10 @@ import {
   userRegistrations,
   users,
 } from "../db/schema/index.js";
+import {
+  sendRegistrationApprovalEmail,
+  sendRegistrationRejectionEmail,
+} from "../utils/registrationEmail.js";
 
 /**
  * Get all registration requests (User Story 2)
@@ -111,6 +115,21 @@ export const approveRegistration = async (registrationId, role = "staff") => {
       .set({ status: "approved" })
       .where(eq(userRegistrations.id, registrationId));
 
+    // Send approval email to candidate
+    try {
+      await sendRegistrationApprovalEmail({
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+      });
+    } catch (emailError) {
+      console.error(
+        "Warning: Failed to send registration approval email:",
+        emailError
+      );
+      // Continue even if email fails
+    }
+
     return {
       success: true,
       message: "Registration approved and user created successfully",
@@ -149,6 +168,20 @@ export const rejectRegistration = async (registrationId) => {
       .set({ status: "rejected" })
       .where(eq(userRegistrations.id, registrationId))
       .returning();
+
+    // Send rejection email to candidate
+    try {
+      await sendRegistrationRejectionEmail({
+        name: registration.name,
+        email: registration.email,
+      });
+    } catch (emailError) {
+      console.error(
+        "Warning: Failed to send registration rejection email:",
+        emailError
+      );
+      // Continue even if email fails
+    }
 
     return {
       success: true,

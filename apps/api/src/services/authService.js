@@ -12,6 +12,7 @@ import {
 } from "../db/schema/index.js";
 import { sendOTPEmail } from "../utils/email.js";
 import { generateOTP, getOTPExpiration, isOTPExpired } from "../utils/otp.js";
+import { sendRegistrationNotificationToOwner } from "../utils/registrationEmail.js";
 
 /**
  * Register a new user (User Story 1)
@@ -141,6 +142,22 @@ export const register = async ({ name, email, phone, address, password }) => {
           status: "pending",
         })
         .returning();
+
+      // Send registration notification email to owner
+      try {
+        await sendRegistrationNotificationToOwner({
+          name,
+          email,
+          phone,
+          address,
+        });
+      } catch (emailError) {
+        console.error(
+          "Warning: Failed to send registration notification email:",
+          emailError
+        );
+        // Continue with registration even if email fails
+      }
 
       return {
         success: true,
