@@ -31,11 +31,16 @@ export default function SupplierCreatePage() {
     data: allMedicationsData,
     isLoading: isLoadingMedications,
     error: medicationsError,
-  } = useMedications();
+  } = useMedications({ limit: 1000 });
 
   const allMedications = Array.isArray(allMedicationsData)
     ? allMedicationsData
     : allMedicationsData?.data || [];
+
+  // Debug log
+  console.log("🔍 allMedicationsData:", allMedicationsData);
+  console.log("📦 allMedications:", allMedications);
+  console.log("❌ medicationsError:", medicationsError);
 
   const [form, setForm] = useState({
     name: "",

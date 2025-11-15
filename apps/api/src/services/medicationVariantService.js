@@ -16,7 +16,7 @@ export const getAllMedicationVariants = async ({
   search,
   medicationId,
   isActive,
-  limit = 10,
+  limit = 100,
   offset = 0,
 } = {}) => {
   try {
