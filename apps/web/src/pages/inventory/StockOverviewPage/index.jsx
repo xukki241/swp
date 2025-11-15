@@ -163,7 +163,9 @@ export default function StockOverviewPage() {
                               {medication.medicationVariant.name}
                             </h3>
                             <p className="text-sm text-muted-foreground mt-1">
-                              Tồn kho: {medication.quantity}
+                              Tồn kho:{" "}
+                              {medication?.quantity -
+                                medication?.quantityReserved}
                             </p>
                             <p className="text-sm text-muted-foreground mt-1">
                               Giá:{" "}

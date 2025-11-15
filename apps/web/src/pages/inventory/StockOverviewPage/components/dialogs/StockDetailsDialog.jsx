@@ -56,9 +56,15 @@ export default function StockDetailsDialog({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Số lượng</Label>
+                <Label className="text-muted-foreground">Tồn kho</Label>
                 <p className="text-lg font-semibold">
-                  {medicationItem.quantity}
+                  {medicationItem?.quantity - medicationItem?.quantityReserved}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Đã bán</Label>
+                <p className="text-lg font-semibold">
+                  {medicationItem?.quantityReserved}
                 </p>
               </div>
               <div className="space-y-1">
