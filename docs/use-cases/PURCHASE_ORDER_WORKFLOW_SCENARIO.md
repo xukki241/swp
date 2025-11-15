@@ -13,10 +13,10 @@ Tài liệu này mô tả chi tiết kịch bản quy trình nhập hàng từ k
 
 ## 🎯 Các Vai Trò Tham Gia
 
-| Vai Trò | Mô Tả | Quyền Hạn |
-|---------|-------|-----------|
-| **Owner** | Chủ nhà thuốc | Tạo, quản lý Purchase Order |
-| **Supplier** | Nhà cung cấp | Xác nhận đơn hàng qua email |
+| Vai Trò             | Mô Tả         | Quyền Hạn                        |
+| ------------------- | ------------- | -------------------------------- |
+| **Owner**           | Chủ nhà thuốc | Tạo, quản lý Purchase Order      |
+| **Supplier**        | Nhà cung cấp  | Xác nhận đơn hàng qua email      |
 | **Warehouse Staff** | Nhân viên kho | Nhận hàng, tạo Receipt, nhập kho |
 
 ---
@@ -85,8 +85,8 @@ const handleAddMedication = (medicationVariant) => {
       medicationName: medicationVariant.medicationName,
       variantName: medicationVariant.variantName,
       quantity: 1,
-      unit_price: medicationVariant.supplierPrice
-    }
+      unit_price: medicationVariant.supplierPrice,
+    },
   ]);
 };
 
@@ -100,22 +100,22 @@ const handleQuantityChange = (index, newQuantity) => {
 // 4. Tạo Purchase Order
 const handleCreatePO = async () => {
   const totalAmount = orderItems.reduce(
-    (sum, item) => sum + (item.quantity * item.unit_price), 
+    (sum, item) => sum + item.quantity * item.unit_price,
     0
   );
 
   const payload = {
     supplier_id: selectedSupplier,
     expected_date: expectedDeliveryDate,
-    items: orderItems.map(item => ({
+    items: orderItems.map((item) => ({
       supplier_medication_variant_id: item.supplier_medication_variant_id,
       quantity: item.quantity,
-      unit_price: item.unit_price
-    }))
+      unit_price: item.unit_price,
+    })),
   };
 
   await createPurchaseOrder(payload);
-  showSuccessNotification('Purchase Order created successfully!');
+  showSuccessNotification("Purchase Order created successfully!");
 };
 ```
 
@@ -136,7 +136,7 @@ export const createPurchaseOrder = async (req, res) => {
     // Gửi email cho từng supplier
     for (const order of createdOrders) {
       const po = await purchaseOrderService.getById(order.id);
-      
+
       if (po.supplierEmail) {
         await sendPurchaseOrderEmail({
           purchaseOrderId: po.id,
@@ -146,31 +146,31 @@ export const createPurchaseOrder = async (req, res) => {
           buyerInfo: {
             contact: req.user.name,
             email: req.user.email,
-            phone: req.user.phone || 'N/A',
-            address: 'PharmaFlow Pharmacy'
+            phone: req.user.phone || "N/A",
+            address: "PharmaFlow Pharmacy",
           },
           items: po.items,
           totalAmount: po.totalAmount,
-          expectedDeliveryDate: po.expectedDate 
-            ? new Date(po.expectedDate).toLocaleDateString('vi-VN') 
-            : 'N/A',
+          expectedDeliveryDate: po.expectedDate
+            ? new Date(po.expectedDate).toLocaleDateString("vi-VN")
+            : "N/A",
           orderNumber: po.id.substring(0, 8).toUpperCase(),
-          orderDate: new Date(po.orderDate).toLocaleDateString('vi-VN')
+          orderDate: new Date(po.orderDate).toLocaleDateString("vi-VN"),
         });
       }
     }
 
     return res.status(201).json({
       success: true,
-      message: 'Purchase order(s) created successfully',
-      data: createdOrders
+      message: "Purchase order(s) created successfully",
+      data: createdOrders,
     });
   } catch (error) {
-    logger.error('Error creating purchase order:', error);
+    logger.error("Error creating purchase order:", error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to create purchase order',
-      error: error.message
+      message: "Failed to create purchase order",
+      error: error.message,
     });
   }
 };
@@ -233,7 +233,7 @@ export const confirmPurchaseOrder = async (req, res) => {
 
     // Gọi service để xác nhận
     const result = await purchaseOrderService.confirmOrder(
-      purchaseOrderId, 
+      purchaseOrderId,
       token
     );
 
@@ -242,10 +242,10 @@ export const confirmPurchaseOrder = async (req, res) => {
       `${process.env.WEB_URL}/supplier/order-confirmed?orderNumber=${result.orderNumber}`
     );
   } catch (error) {
-    logger.error('Error confirming purchase order:', error);
+    logger.error("Error confirming purchase order:", error);
     return res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -276,7 +276,7 @@ async confirmOrder(purchaseOrderId, token) {
 
     // 4. Cập nhật status → "ordered"
     const updatedPo = await tx.update(purchaseOrders)
-      .set({ 
+      .set({
         status: 'ordered',
         updatedAt: new Date()
       })
@@ -346,15 +346,15 @@ const CreateReceiptForm = ({ purchaseOrder }) => {
 
   // Load PO items khi mở form
   useEffect(() => {
-    const items = purchaseOrder.items.map(item => ({
+    const items = purchaseOrder.items.map((item) => ({
       purchaseOrderItemId: item.id,
       medicationName: item.medicationName,
       variantName: item.variantName,
       orderedQuantity: item.quantity,
       receivedQuantity: item.quantity, // Default = ordered
-      batchNumber: '',
+      batchNumber: "",
       manufactureDate: null,
-      expiryDate: null
+      expiryDate: null,
     }));
     setReceiptItems(items);
   }, [purchaseOrder]);
@@ -369,24 +369,24 @@ const CreateReceiptForm = ({ purchaseOrder }) => {
   // Tìm bin trống gần nhất trong zone đã chọn
   const handleFindAvailableBins = async () => {
     if (!selectedZone) {
-      showError('Please select a zone first');
+      showError("Please select a zone first");
       return;
     }
 
-    const items = receiptItems.map(item => ({
+    const items = receiptItems.map((item) => ({
       medicationVariantId: item.medicationVariantId,
-      quantity: item.receivedQuantity
+      quantity: item.receivedQuantity,
     }));
 
     const bins = await findAvailableBinsForItems({
       zoneId: selectedZone,
-      items
+      items,
     });
 
     // Gán bin ID cho từng item
     const updated = receiptItems.map((item, idx) => ({
       ...item,
-      binId: bins[idx]?.binId
+      binId: bins[idx]?.binId,
     }));
     setReceiptItems(updated);
   };
@@ -397,18 +397,18 @@ const CreateReceiptForm = ({ purchaseOrder }) => {
       purchaseOrderId: purchaseOrder.id,
       receivedDate: new Date().toISOString(),
       receivedBy: currentUser.id,
-      items: receiptItems.map(item => ({
+      items: receiptItems.map((item) => ({
         purchaseOrderItemId: item.purchaseOrderItemId,
         quantity: item.receivedQuantity,
         batchNumber: item.batchNumber,
         manufactureDate: item.manufactureDate,
         expiryDate: item.expiryDate,
-        binId: item.binId
-      }))
+        binId: item.binId,
+      })),
     };
 
     await createPurchaseOrderReceipt(payload);
-    showSuccess('Receipt created and inventory updated!');
+    showSuccess("Receipt created and inventory updated!");
   };
 
   return (
@@ -422,19 +422,19 @@ const CreateReceiptForm = ({ purchaseOrder }) => {
       {/* 2. Chọn Zone để phân bổ hàng */}
       <div>
         <label>Storage Zone</label>
-        <select 
-          value={selectedZone} 
+        <select
+          value={selectedZone}
           onChange={(e) => setSelectedZone(e.target.value)}
         >
           <option value="">Select Zone</option>
-          {zones.map(zone => (
+          {zones.map((zone) => (
             <option key={zone.id} value={zone.id}>
               {zone.code} - {zone.name}
             </option>
           ))}
         </select>
-        <button 
-          type="button" 
+        <button
+          type="button"
           onClick={handleFindAvailableBins}
           disabled={!selectedZone}
         >
@@ -458,14 +458,20 @@ const CreateReceiptForm = ({ purchaseOrder }) => {
         <tbody>
           {receiptItems.map((item, idx) => (
             <tr key={idx}>
-              <td>{item.medicationName} - {item.variantName}</td>
+              <td>
+                {item.medicationName} - {item.variantName}
+              </td>
               <td>{item.orderedQuantity}</td>
               <td>
                 <input
                   type="number"
                   value={item.receivedQuantity}
-                  onChange={(e) => 
-                    handleBatchInfoChange(idx, 'receivedQuantity', e.target.value)
+                  onChange={(e) =>
+                    handleBatchInfoChange(
+                      idx,
+                      "receivedQuantity",
+                      e.target.value
+                    )
                   }
                 />
               </td>
@@ -474,8 +480,8 @@ const CreateReceiptForm = ({ purchaseOrder }) => {
                   type="text"
                   placeholder="LOT-2025-001"
                   value={item.batchNumber}
-                  onChange={(e) => 
-                    handleBatchInfoChange(idx, 'batchNumber', e.target.value)
+                  onChange={(e) =>
+                    handleBatchInfoChange(idx, "batchNumber", e.target.value)
                   }
                   required
                 />
@@ -483,29 +489,25 @@ const CreateReceiptForm = ({ purchaseOrder }) => {
               <td>
                 <DatePicker
                   value={item.manufactureDate}
-                  onChange={(date) => 
-                    handleBatchInfoChange(idx, 'manufactureDate', date)
+                  onChange={(date) =>
+                    handleBatchInfoChange(idx, "manufactureDate", date)
                   }
                 />
               </td>
               <td>
                 <DatePicker
                   value={item.expiryDate}
-                  onChange={(date) => 
-                    handleBatchInfoChange(idx, 'expiryDate', date)
+                  onChange={(date) =>
+                    handleBatchInfoChange(idx, "expiryDate", date)
                   }
                   required
                 />
               </td>
               <td>
                 {item.binId ? (
-                  <span className="text-green-600">
-                    ✓ {item.binCode}
-                  </span>
+                  <span className="text-green-600">✓ {item.binCode}</span>
                 ) : (
-                  <span className="text-red-600">
-                    Not assigned
-                  </span>
+                  <span className="text-red-600">Not assigned</span>
                 )}
               </td>
             </tr>
@@ -535,25 +537,28 @@ export const findAvailableBins = async (req, res) => {
     if (!zoneId) {
       return res.status(400).json({
         success: false,
-        message: 'Zone ID is required'
+        message: "Zone ID is required",
       });
     }
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'Items array is required'
+        message: "Items array is required",
       });
     }
 
     // Tìm bins trống trong zone
-    const availableBins = await inventoryAllocationService
-      .findAvailableBinsInZone(zoneId, items.length);
+    const availableBins =
+      await inventoryAllocationService.findAvailableBinsInZone(
+        zoneId,
+        items.length
+      );
 
     if (availableBins.length < items.length) {
       return res.status(400).json({
         success: false,
-        message: `Not enough available bins in zone. Found ${availableBins.length}, needed ${items.length}`
+        message: `Not enough available bins in zone. Found ${availableBins.length}, needed ${items.length}`,
       });
     }
 
@@ -565,19 +570,19 @@ export const findAvailableBins = async (req, res) => {
       binCode: availableBins[index].binCode,
       binName: availableBins[index].binName,
       rackCode: availableBins[index].rackCode,
-      zoneCode: availableBins[index].zoneCode
+      zoneCode: availableBins[index].zoneCode,
     }));
 
     return res.json({
       success: true,
-      data: assignments
+      data: assignments,
     });
   } catch (error) {
-    logger.error('Error finding available bins:', error);
+    logger.error("Error finding available bins:", error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to find available bins',
-      error: error.message
+      message: "Failed to find available bins",
+      error: error.message,
     });
   }
 };
@@ -642,13 +647,13 @@ export const createReceipt = async (req, res) => {
       purchaseOrderId,
       receivedDate,
       receivedBy,
-      items
+      items,
     });
 
     if (!validationResult.valid) {
       return res.status(400).json({
         success: false,
-        message: validationResult.errors.join(', ')
+        message: validationResult.errors.join(", "),
       });
     }
 
@@ -657,20 +662,20 @@ export const createReceipt = async (req, res) => {
       purchaseOrderId,
       receivedDate,
       receivedBy,
-      items
+      items,
     });
 
     return res.status(201).json({
       success: true,
-      message: 'Receipt created and inventory allocated successfully',
-      data: receipt
+      message: "Receipt created and inventory allocated successfully",
+      data: receipt,
     });
   } catch (error) {
-    logger.error('Error creating receipt:', error);
+    logger.error("Error creating receipt:", error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to create receipt',
-      error: error.message
+      message: "Failed to create receipt",
+      error: error.message,
     });
   }
 };
@@ -739,7 +744,7 @@ async create(data) {
         .from(purchaseOrderItems)
         .leftJoin(
           supplierMedicationVariants,
-          eq(purchaseOrderItems.supplierMedicationVariantId, 
+          eq(purchaseOrderItems.supplierMedicationVariantId,
              supplierMedicationVariants.id)
         )
         .where(eq(purchaseOrderItems.id, receiptItem.purchaseOrderItemId));
@@ -806,8 +811,8 @@ async allocateInventory(allocationData, tx = db) {
   }
 
   // B. Lấy danh sách bins trong zone (hoặc tất cả nếu không chỉ định)
-  const queryConditions = preferredZoneId 
-    ? [eq(warehouseZones.id, preferredZoneId)] 
+  const queryConditions = preferredZoneId
+    ? [eq(warehouseZones.id, preferredZoneId)]
     : [];
 
   const binsWithInventory = await tx
@@ -834,7 +839,7 @@ async allocateInventory(allocationData, tx = db) {
 
   // C. Ưu tiên bin trống, nếu không có thì dùng bin có hàng
   let emptyBins = binsWithInventory.filter(b => !b.hasInventory);
-  
+
   if (emptyBins.length === 0) {
     logger.warn('No empty bins available, using occupied bins');
     emptyBins = binsWithInventory;
@@ -878,10 +883,10 @@ async allocateInventory(allocationData, tx = db) {
 
 **Inventory Table:**
 
-| ID | Variant ID | Receipt Item ID | Bin ID | Batch | Mfg Date | Exp Date | Quantity |
-|----|------------|----------------|---------|-------|----------|----------|----------|
-| inv-1 | var-1 | rcpt-item-1 | bin-A01 | LOT-001 | 2025-10-01 | 2027-10-01 | 100 |
-| inv-2 | var-2 | rcpt-item-2 | bin-A02 | LOT-002 | 2025-10-15 | 2027-10-15 | 50 |
+| ID    | Variant ID | Receipt Item ID | Bin ID  | Batch   | Mfg Date   | Exp Date   | Quantity |
+| ----- | ---------- | --------------- | ------- | ------- | ---------- | ---------- | -------- |
+| inv-1 | var-1      | rcpt-item-1     | bin-A01 | LOT-001 | 2025-10-01 | 2027-10-01 | 100      |
+| inv-2 | var-2      | rcpt-item-2     | bin-A02 | LOT-002 | 2025-10-15 | 2027-10-15 | 50       |
 
 **Warehouse Structure:**
 
@@ -905,12 +910,14 @@ Zone A (Thuốc thường)
 // Owner đặt: 100 boxes
 // Supplier chỉ giao: 80 boxes
 
-const receiptItems = [{
-  purchaseOrderItemId: 'item-1',
-  quantity: 80, // Chỉ nhận 80
-  batchNumber: 'LOT-001',
-  // ...
-}];
+const receiptItems = [
+  {
+    purchaseOrderItemId: "item-1",
+    quantity: 80, // Chỉ nhận 80
+    batchNumber: "LOT-001",
+    // ...
+  },
+];
 
 // Hệ thống sẽ:
 // - Tạo receipt với quantity = 80
@@ -929,15 +936,15 @@ const receiptItems = [{
 
 if (emptyBins.length === 0) {
   // Option 1: Dùng bin có hàng
-  const existingBins = binsWithInventory.filter(b => b.hasInventory);
-  
+  const existingBins = binsWithInventory.filter((b) => b.hasInventory);
+
   if (existingBins.length > 0) {
-    logger.warn('Using occupied bins for allocation');
+    logger.warn("Using occupied bins for allocation");
     targetBin = existingBins[0];
   } else {
     // Option 2: Throw error
     throw new Error(
-      'No available bins in selected zone. Please select another zone.'
+      "No available bins in selected zone. Please select another zone."
     );
   }
 }
@@ -950,19 +957,19 @@ if (emptyBins.length === 0) {
 
 const receiptItems = [
   {
-    purchaseOrderItemId: 'item-1',
+    purchaseOrderItemId: "item-1",
     quantity: 50,
-    batchNumber: 'LOT-001',
-    expiryDate: '2027-10-01',
+    batchNumber: "LOT-001",
+    expiryDate: "2027-10-01",
     // Bin riêng cho lô 1
   },
   {
-    purchaseOrderItemId: 'item-1',
+    purchaseOrderItemId: "item-1",
     quantity: 50,
-    batchNumber: 'LOT-002',
-    expiryDate: '2027-12-01',
+    batchNumber: "LOT-002",
+    expiryDate: "2027-12-01",
     // Bin riêng cho lô 2
-  }
+  },
 ];
 
 // Mỗi lô sẽ được phân bổ vào bin riêng
@@ -1107,14 +1114,14 @@ CREATE TABLE inventory (
 
 ## 🚀 API Endpoints Summary
 
-| Method | Endpoint | Mô Tả |
-|--------|----------|-------|
-| POST | `/api/purchases` | Tạo Purchase Order + gửi email |
-| GET | `/api/purchases/:id` | Xem chi tiết PO |
-| GET | `/api/purchases/confirm/:id?token=xxx` | Supplier xác nhận PO |
-| POST | `/api/purchases/:id/receipts` | Tạo Receipt + auto-allocate inventory |
-| POST | `/api/inventory/find-available-bins` | Tìm bins trống trong zone |
-| GET | `/api/inventory` | Xem inventory sau khi nhập |
+| Method | Endpoint                               | Mô Tả                                 |
+| ------ | -------------------------------------- | ------------------------------------- |
+| POST   | `/api/purchases`                       | Tạo Purchase Order + gửi email        |
+| GET    | `/api/purchases/:id`                   | Xem chi tiết PO                       |
+| GET    | `/api/purchases/confirm/:id?token=xxx` | Supplier xác nhận PO                  |
+| POST   | `/api/purchases/:id/receipts`          | Tạo Receipt + auto-allocate inventory |
+| POST   | `/api/inventory/find-available-bins`   | Tìm bins trống trong zone             |
+| GET    | `/api/inventory`                       | Xem inventory sau khi nhập            |
 
 ---
 

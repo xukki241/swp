@@ -19,7 +19,8 @@ import {
 } from "./utils/stockHelpers";
 
 export default function StockOverviewPage() {
-  const { inventory, refetchInventory } = useInventory();
+  const { inventory, refetchInventory, fetchMedicationImage, imageCache } =
+    useInventory();
   const { data: suppliers = [] } = useSuppliers();
   const [medications, setMedications] = useState([]);
   const [currentMedication, setCurrentMedication] = useState({});
@@ -39,7 +40,14 @@ export default function StockOverviewPage() {
   useEffect(() => {
     // Inventory API already filters out items with quantity = 0
     setMedications(inventory);
-  }, [inventory]);
+    // Preload images for visible medications
+    inventory.forEach(async (item) => {
+      const imageId = item.medicationVariant?.medication?.imageId;
+      if (imageId && !imageCache[imageId]) {
+        await fetchMedicationImage(imageId);
+      }
+    });
+  }, [inventory, imageCache, fetchMedicationImage]);
 
   function handleShowDialog(type, medication = null) {
     setCurrentMedication(medication);
@@ -71,22 +79,22 @@ export default function StockOverviewPage() {
         const matchesPrice =
           (!searchPayload.priceMin ||
             item.medicationVariant.sellPrice >=
-            Number(searchPayload.priceMin)) &&
+              Number(searchPayload.priceMin)) &&
           (!searchPayload.priceMax ||
             item.medicationVariant.sellPrice <= Number(searchPayload.priceMax));
 
         const matchesManufactureDate =
           (!searchPayload.manufactureDateMin ||
             new Date(item.manufactureDate) >=
-            new Date(searchPayload.manufactureDateMin)) &&
+              new Date(searchPayload.manufactureDateMin)) &&
           (!searchPayload.manufactureDateMax ||
             new Date(item.manufactureDate) <=
-            new Date(searchPayload.manufactureDateMax));
+              new Date(searchPayload.manufactureDateMax));
 
         const matchesExpiryDate =
           (!searchPayload.expiryDateMin ||
             new Date(item.expiryDate) >=
-            new Date(searchPayload.expiryDateMin)) &&
+              new Date(searchPayload.expiryDateMin)) &&
           (!searchPayload.expiryDateMax ||
             new Date(item.expiryDate) <= new Date(searchPayload.expiryDateMax));
 
@@ -147,39 +155,41 @@ export default function StockOverviewPage() {
 
               {!isSearching && medications.length > 0 && (
                 <div className="space-y-3">
-                  {medications.map((medication) => (
+                  {medications.map((item) => (
                     <Card
-                      key={medication.id}
+                      key={item.id}
                       className="border shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                     >
                       <CardContent className="flex justify-between items-center flex-wrap gap-3">
                         <div className="flex items-center gap-4">
                           <img
-                            src={medication.img_url || MedicinePlaceholder}
-                            alt={medication.medicationVariant.name}
+                            src={
+                              imageCache[
+                                item.medicationVariant?.medication?.imageId
+                              ] || MedicinePlaceholder
+                            }
+                            alt={item.medicationVariant.name}
                             className="w-20 h-20 rounded-lg object-cover border"
                           />
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold text-gray-900 truncate">
-                              {medication.medicationVariant.name}
+                              {item.medicationVariant.name}
                             </h3>
                             <p className="text-sm text-muted-foreground mt-1">
-                              Tồn kho:{" "}
-                              {medication?.quantity -
-                                medication?.quantityReserved}
+                              Tồn kho: {item?.quantity - item?.quantityReserved}
                             </p>
                             <p className="text-sm text-muted-foreground mt-1">
                               Giá:{" "}
                               {Number(
-                                medication.medicationVariant.sellPrice
+                                item.medicationVariant.sellPrice
                               ).toLocaleString("vi-VN")}{" "}
                               VND
                             </p>
                             <div className="flex gap-2 mt-2">
                               {getExpiryWarningBadge(
-                                calculateRemainingDays(medication.expiryDate)
+                                calculateRemainingDays(item.expiryDate)
                               )}
-                              {getLowStockBadge(medication.quantity)}
+                              {getLowStockBadge(item.quantity)}
                             </div>
                           </div>
                         </div>
@@ -188,7 +198,7 @@ export default function StockOverviewPage() {
                             size="sm"
                             variant="outline"
                             className="flex-1 bg-transparent"
-                            onClick={() => handleShowDialog("view", medication)}
+                            onClick={() => handleShowDialog("view", item)}
                           >
                             <Eye className="h-4 w-4 mr-1" />
                             Xem
@@ -198,9 +208,7 @@ export default function StockOverviewPage() {
                               size="sm"
                               variant="outline"
                               className="flex-1 bg-transparent"
-                              onClick={() =>
-                                handleShowDialog("adjust", medication)
-                              }
+                              onClick={() => handleShowDialog("adjust", item)}
                             >
                               <Settings2 className="h-4 w-4 mr-1" />
                               Điều chỉnh

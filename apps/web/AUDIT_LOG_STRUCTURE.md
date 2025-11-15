@@ -180,18 +180,20 @@ AuditLogPage
 
 ```javascript
 const getActionBadgeColor = (action) => {
-  return {
-    CREATE:          "bg-green-100 text-green-800",
-    UPDATE:          "bg-blue-100 text-blue-800",
-    DELETE:          "bg-red-100 text-red-800",
-    LOGIN:           "bg-purple-100 text-purple-800",
-    LOGOUT:          "bg-gray-100 text-gray-800",
-    PASSWORD_CHANGE: "bg-orange-100 text-orange-800",
-    PASSWORD_RESET:  "bg-yellow-100 text-yellow-800",
-    VIEW:            "bg-cyan-100 text-cyan-800",
-    EXPORT:          "bg-indigo-100 text-indigo-800",
-    IMPORT:          "bg-pink-100 text-pink-800",
-  }[action] || "bg-gray-100 text-gray-800";
+  return (
+    {
+      CREATE: "bg-green-100 text-green-800",
+      UPDATE: "bg-blue-100 text-blue-800",
+      DELETE: "bg-red-100 text-red-800",
+      LOGIN: "bg-purple-100 text-purple-800",
+      LOGOUT: "bg-gray-100 text-gray-800",
+      PASSWORD_CHANGE: "bg-orange-100 text-orange-800",
+      PASSWORD_RESET: "bg-yellow-100 text-yellow-800",
+      VIEW: "bg-cyan-100 text-cyan-800",
+      EXPORT: "bg-indigo-100 text-indigo-800",
+      IMPORT: "bg-pink-100 text-pink-800",
+    }[action] || "bg-gray-100 text-gray-800"
+  );
 };
 ```
 
@@ -210,6 +212,7 @@ const getActionBadgeColor = (action) => {
 ## Key Features Implementation
 
 ### 1. Filtering
+
 ```javascript
 // State management
 const [filters, setFilters] = useState({
@@ -223,7 +226,7 @@ const [filters, setFilters] = useState({
 
 // Filter change handler
 const handleFilterChange = (key, value) => {
-  setFilters(prev => ({
+  setFilters((prev) => ({
     ...prev,
     [key]: value,
     page: 1, // Reset pagination
@@ -232,27 +235,31 @@ const handleFilterChange = (key, value) => {
 ```
 
 ### 2. Pagination
+
 ```javascript
 // Pagination component
-{pagination.totalPages > 1 && (
-  <div className="pagination-controls">
-    <Button 
-      onClick={() => handlePageChange(currentPage - 1)}
-      disabled={!hasPrevPage}
-    >
-      <ChevronLeft /> Trước
-    </Button>
-    <Button 
-      onClick={() => handlePageChange(currentPage + 1)}
-      disabled={!hasNextPage}
-    >
-      Sau <ChevronRight />
-    </Button>
-  </div>
-)}
+{
+  pagination.totalPages > 1 && (
+    <div className="pagination-controls">
+      <Button
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={!hasPrevPage}
+      >
+        <ChevronLeft /> Trước
+      </Button>
+      <Button
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={!hasNextPage}
+      >
+        Sau <ChevronRight />
+      </Button>
+    </div>
+  );
+}
 ```
 
 ### 3. Detail View
+
 ```javascript
 // Detail dialog trigger
 <Button onClick={() => handleViewDetail(log)}>
@@ -268,16 +275,13 @@ const handleFilterChange = (key, value) => {
 ```
 
 ### 4. Date Formatting
+
 ```javascript
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 
 const formatDate = (dateString) => {
-  return format(
-    new Date(dateString), 
-    "dd/MM/yyyy HH:mm:ss", 
-    { locale: vi }
-  );
+  return format(new Date(dateString), "dd/MM/yyyy HH:mm:ss", { locale: vi });
 };
 ```
 
@@ -293,22 +297,28 @@ const formatDate = (dateString) => {
 
 ```javascript
 // Loading state
-{isLoading && <Loader2 className="animate-spin" />}
+{
+  isLoading && <Loader2 className="animate-spin" />;
+}
 
 // Empty state
-{!isLoading && logs.length === 0 && (
-  <div className="empty-state">
-    <FileText />
-    <p>Không có nhật ký</p>
-  </div>
-)}
+{
+  !isLoading && logs.length === 0 && (
+    <div className="empty-state">
+      <FileText />
+      <p>Không có nhật ký</p>
+    </div>
+  );
+}
 
 // Error state (from React Query)
-{isError && (
-  <div className="error-state">
-    <p>Có lỗi xảy ra khi tải dữ liệu</p>
-  </div>
-)}
+{
+  isError && (
+    <div className="error-state">
+      <p>Có lỗi xảy ra khi tải dữ liệu</p>
+    </div>
+  );
+}
 ```
 
 ## Accessibility

@@ -161,13 +161,6 @@ export default function MedicationListPage() {
   useEffect(() => {
     const ids = medications.map((m) => m.id);
     const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
-    if (duplicates.length > 0) {
-      console.warn("⚠️ Duplicate medication IDs found:", duplicates);
-      console.log(
-        "All medications:",
-        medications.map((m) => ({ id: m.id, name: m.name }))
-      );
-    }
   }, [medications]);
 
   const createMed = useCreateMedication();
@@ -243,11 +236,6 @@ export default function MedicationListPage() {
   }
 
   const onSubmitMed = async (data) => {
-    console.log(`💾 Starting ${editing ? "update" : "create"} medication:`, {
-      editing: !!editing,
-      removeImage,
-      data,
-    });
     try {
       let savedId = editing?.id;
 
@@ -260,12 +248,12 @@ export default function MedicationListPage() {
 
       if (savedId) {
         if (removeImage) {
-          console.log(`🗑️ Removing image for medication: ${savedId}`);
+          console.log(`Removing image for medication: ${savedId}`);
           clearMedicationImage(savedId);
           const deleteResponse = await instance.delete(
             `/medications/${savedId}/image`
           );
-          console.log(`✅ Image deleted successfully:`, deleteResponse.data);
+          console.log(`Image deleted successfully:`, deleteResponse.data);
         } else if (imageFile) {
           const formData = new FormData();
           formData.append("image", imageFile);
@@ -287,15 +275,7 @@ export default function MedicationListPage() {
 
       // Đợi một chút để backend xử lý xong
       await new Promise((resolve) => setTimeout(resolve, 500));
-      console.log(
-        `🔄 Refetching medications after ${editing ? "update" : "create"}...`
-      );
       const refetchResult = await refetch();
-      console.log(
-        `✅ Refetch completed:`,
-        refetchResult?.data?.length || 0,
-        "medications found"
-      );
     } catch (e) {
       toast.error("Failed to save medication", {
         description: e?.response?.data?.message || e.message,

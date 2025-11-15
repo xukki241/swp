@@ -26,6 +26,7 @@ apps/web/
 ## 🚀 Features
 
 ### ✅ Core Features
+
 - 📊 **Table View** - Display logs in a sortable table
 - 🔍 **Advanced Filtering** - Filter by action, entity, date range
 - 📄 **Pagination** - Navigate through pages (50 items per page)
@@ -34,6 +35,7 @@ apps/web/
 - ♻️ **Manual Refresh** - Reload data on demand
 
 ### 🎨 UI Components
+
 - Cards for filters and content
 - Responsive table with hover effects
 - Modal dialog for details
@@ -42,6 +44,7 @@ apps/web/
 - Empty states with helpful messages
 
 ### 🔐 Security
+
 - Protected route (authentication required)
 - Owner-only access via sidebar
 - Backend enforces additional permissions
@@ -56,7 +59,7 @@ apps/web/
 ## 🎨 Action Color Codes
 
 - 🟢 **CREATE** - Green
-- 🔵 **UPDATE** - Blue  
+- 🔵 **UPDATE** - Blue
 - 🔴 **DELETE** - Red
 - 🟣 **LOGIN** - Purple
 - ⚪ **LOGOUT** - Gray
@@ -69,10 +72,12 @@ apps/web/
 ## 📍 How to Access
 
 ### Option 1: Sidebar Navigation
+
 1. Login as **owner** user
 2. Click **"Nhật ký kiểm toán"** in sidebar
 
 ### Option 2: Direct URL
+
 Navigate to: `http://localhost:5173/audit-logs`
 
 ## 🧪 Testing
@@ -118,7 +123,7 @@ function MyComponent() {
     action: "CREATE",
     entity: "medication",
     page: 1,
-    limit: 50
+    limit: 50,
   });
 
   const logs = data?.data || [];
@@ -131,12 +136,14 @@ function MyComponent() {
 ## 📸 Screenshots
 
 ### Main View
+
 - Header with title and refresh button
 - Filter section with dropdowns and date pickers
 - Table with logs (timestamp, user, action, entity, actions)
 - Pagination controls
 
 ### Detail Dialog
+
 - Log timestamp
 - User information
 - Action badge
@@ -175,7 +182,7 @@ Component → Hook (useAuditLogs) → Service (auditService) → API
 ✅ Color-coded actions  
 ✅ Pagination working  
 ✅ Filtering working  
-✅ Detail view working  
+✅ Detail view working
 
 ## 🚀 Next Steps
 

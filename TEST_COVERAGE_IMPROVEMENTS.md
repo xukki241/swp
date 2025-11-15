@@ -263,6 +263,6 @@ npm test inventoryController.test.js
 
 ---
 
-*Generated: November 13, 2025*
-*Total Test Suite Execution Time: ~3.6 seconds*
-*All 206 tests passing with no failures*
+_Generated: November 13, 2025_
+_Total Test Suite Execution Time: ~3.6 seconds_
+_All 206 tests passing with no failures_

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
+import { useNavigate } from "react-router";
 import {
   calculateRemainingDays,
   getExpiryBadge,
@@ -21,6 +22,8 @@ export default function StockDetailsDialog({
   open,
   onOpenChange,
 }) {
+  const navigate = useNavigate();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
@@ -147,16 +150,20 @@ export default function StockDetailsDialog({
                   {medicationItem?.medicationVariant?.medication?.brand}
                 </p>
               </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground">Nhà cung cấp</Label>
-                <p className="text-lg font-semibold">
-                  {medicationItem?.supplier?.name || "N/A"}
-                </p>
-              </div>
             </div>
           </div>
         )}
         <DialogFooter>
+          <Button
+            className="bg-primary hover:bg-primary/90"
+            onClick={() =>
+              navigate(
+                `/medications/${medicationItem?.medicationVariant?.medication?.id}`
+              )
+            }
+          >
+            Xem chi tiết thuốc
+          </Button>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Đóng
           </Button>

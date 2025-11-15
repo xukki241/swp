@@ -14,7 +14,6 @@ export default function MedicationImage({
 
   useEffect(() => {
     if (!fileId) {
-      console.log("🔍 No fileId provided, showing placeholder");
       setSrc(null);
       setError(false);
       return;
@@ -22,7 +21,6 @@ export default function MedicationImage({
 
     const loadImage = async () => {
       try {
-        console.log(`🔍 Loading image for fileId: ${fileId}`);
         const token = localStorage.getItem("token");
         const res = await instance.get(`/files/${fileId}/view`, {
           responseType: "blob",
@@ -31,17 +29,13 @@ export default function MedicationImage({
 
         const reader = new FileReader();
         reader.onloadend = () => {
-          console.log(
-            `✅ Image loaded successfully for fileId: ${fileId}`,
-            reader.result?.substring(0, 50) + "..."
-          );
           setSrc(reader.result);
           setError(false);
         };
         reader.readAsDataURL(res.data);
       } catch (err) {
         console.warn(
-          `❌ Load image failed for fileId: ${fileId}`,
+          `Load image failed for fileId: ${fileId}`,
           err.response?.status,
           err.response?.data
         );
@@ -79,10 +73,8 @@ export default function MedicationImage({
             objectFit: "cover",
           }}
           onError={(e) => {
-            console.log(`❌ Image render error for fileId: ${fileId}`, e);
             setError(true);
           }}
-          onLoad={() => console.log(`🖼️ Image rendered for fileId: ${fileId}`)}
         />
       ) : (
         <img

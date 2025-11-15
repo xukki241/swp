@@ -5,12 +5,14 @@ import {
   getExpiring,
   getInventory,
   getLowStock,
+  getMedicationImage,
 } from "@/services/inventoryService";
 
 export const useInventory = () => {
   const [inventory, setInventory] = useState([]);
   const [lowStock, setLowStock] = useState([]);
   const [expiring, setExpiring] = useState([]);
+  const [imageCache, setImageCache] = useState({});
   const [loading, setLoading] = useState({
     inventory: false,
     lowStock: false,
@@ -29,9 +31,9 @@ export const useInventory = () => {
     setError((prev) => ({ ...prev, inventory: null }));
     try {
       const responseData = await getInventory();
-      setInventory(responseData.data);
+      setInventory(responseData.data || responseData);
     } catch (err) {
-      setError((prev) => ({ ...prev, inventory: err }));
+      setError((prev) => ({ ...prev, inventory: err.message || err }));
     } finally {
       setLoading((prev) => ({ ...prev, inventory: false }));
     }
@@ -42,9 +44,9 @@ export const useInventory = () => {
     setError((prev) => ({ ...prev, lowStock: null }));
     try {
       const responseData = await getLowStock();
-      setLowStock(responseData.data);
+      setLowStock(responseData.data || responseData);
     } catch (err) {
-      setError((prev) => ({ ...prev, lowStock: err }));
+      setError((prev) => ({ ...prev, lowStock: err.message || err }));
     } finally {
       setLoading((prev) => ({ ...prev, lowStock: false }));
     }
@@ -55,9 +57,9 @@ export const useInventory = () => {
     setError((prev) => ({ ...prev, expiring: null }));
     try {
       const responseData = await getExpiring();
-      setExpiring(responseData.data);
+      setExpiring(responseData.data || responseData);
     } catch (err) {
-      setError((prev) => ({ ...prev, expiring: err }));
+      setError((prev) => ({ ...prev, expiring: err.message || err }));
     } finally {
       setLoading((prev) => ({ ...prev, expiring: false }));
     }
@@ -80,11 +82,52 @@ export const useInventory = () => {
     }
   }, []);
 
+  // Fetch image by ID
+  const fetchMedicationImage = useCallback(
+    async (imageId) => {
+      if (!imageId) {
+        return null;
+      }
+
+      // Return cached image if exists
+      if (imageCache[imageId]) {
+        return imageCache[imageId];
+      }
+
+      setLoading((prev) => ({ ...prev, image: true }));
+      try {
+        const imageUrl = await getMedicationImage(imageId);
+
+        // Cache the image URL
+        setImageCache((prev) => ({ ...prev, [imageId]: imageUrl }));
+
+        setError((prev) => ({ ...prev, image: null }));
+        return imageUrl;
+      } catch (err) {
+        console.error(`Failed to fetch image ${imageId}:`, err);
+        setError((prev) => ({ ...prev, image: err.message }));
+        return null;
+      } finally {
+        setLoading((prev) => ({ ...prev, image: false }));
+      }
+    },
+    [imageCache]
+  );
+
+  // Cleanup image URLs on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(imageCache).forEach((url) => {
+        URL.revokeObjectURL(url);
+      });
+    };
+  }, [imageCache]);
+
   useEffect(() => {
     fetchInventory();
     fetchLowStock();
     fetchExpiring();
-  }, []);
+  }, [fetchExpiring, fetchInventory, fetchLowStock]);
 
   return {
     inventory,
@@ -92,9 +135,9 @@ export const useInventory = () => {
     expiring,
     loading,
     error,
-    refetchLowStock: fetchLowStock,
-    refetchExpiring: fetchExpiring,
+    imageCache,
     refetchInventory: fetchInventory,
     fetchAdjustStock,
+    fetchMedicationImage,
   };
 };

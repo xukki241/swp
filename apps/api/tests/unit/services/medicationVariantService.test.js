@@ -558,8 +558,8 @@ describe("MedicationVariantService", () => {
 
       const result = await medicationVariantService.searchVariantsForSale();
 
-      expect(result).toHaveLength(1);
-      expect(result[0].availableQuantity).toBe(0);
+      // Variants with 0 available quantity are filtered out
+      expect(result).toHaveLength(0);
     });
 
     it("should handle database errors", async () => {

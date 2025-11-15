@@ -7,24 +7,28 @@ Enhanced audit log middleware with better error handling, security features, and
 ## ✨ Key Improvements
 
 ### 1. **Enhanced Error Handling**
+
 - ✅ Prevents duplicate logging with `isLogged` flag
 - ✅ Better error messages with structured logging
 - ✅ Graceful failure - errors don't break main operations
 - ✅ Overrides both `res.send()` and `res.json()` for comprehensive coverage
 
 ### 2. **Security Enhancements**
+
 - ✅ Automatic redaction of sensitive fields (passwords, tokens, API keys)
 - ✅ Configurable field exclusion via `excludeFields` option
 - ✅ Sensitive data filtering in all change tracking
 - ✅ Failed login attempt tracking
 
 ### 3. **Improved Data Extraction**
+
 - ✅ Smart response parsing (handles JSON and objects)
 - ✅ Better entity ID extraction from multiple sources
 - ✅ Comprehensive metadata collection (IP, user agent, method, path)
 - ✅ Action-specific change extraction
 
 ### 4. **New Features**
+
 - ✅ `auditPasswordReset` - Track password reset requests
 - ✅ `logAuditBatch` - Batch logging for bulk operations
 - ✅ Failed authentication tracking
@@ -32,6 +36,7 @@ Enhanced audit log middleware with better error handling, security features, and
 - ✅ Success/failure indicators
 
 ### 5. **Customization Options**
+
 - ✅ `skipOnError` - Control error logging behavior
 - ✅ `shouldLog` - Custom function to determine if logging should occur
 - ✅ `excludeFields` - Exclude specific fields from logging
@@ -44,6 +49,7 @@ Enhanced audit log middleware with better error handling, security features, and
 Main audit middleware with enhanced features.
 
 **Parameters:**
+
 - `action` (string): Action type (CREATE, UPDATE, DELETE, etc.)
 - `entity` (string): Entity type (user, medication, sale, etc.)
 - `options` (object):
@@ -54,6 +60,7 @@ Main audit middleware with enhanced features.
   - `excludeFields` (array): Fields to exclude from logging
 
 **Example:**
+
 ```javascript
 router.put(
   "/:id",
@@ -61,7 +68,7 @@ router.put(
   createAuditLog("UPDATE", "medication", {
     excludeFields: ["internalNotes", "costPrice"],
     getEntityId: (req) => req.params.id,
-    shouldLog: (req, res) => res.statusCode === 200
+    shouldLog: (req, res) => res.statusCode === 200,
   }),
   controller.update
 );
@@ -72,6 +79,7 @@ router.put(
 Enhanced login tracking with failed attempts.
 
 **Features:**
+
 - Tracks successful logins
 - Logs failed login attempts
 - Records email/username used
@@ -79,6 +87,7 @@ Enhanced login tracking with failed attempts.
 - Timestamp tracking
 
 **Example:**
+
 ```javascript
 router.post("/login", auditLogin, authController.login);
 ```
@@ -88,12 +97,14 @@ router.post("/login", auditLogin, authController.login);
 Enhanced logout tracking.
 
 **Features:**
+
 - User identification
 - IP tracking
 - User agent capture
 - Timestamp
 
 **Example:**
+
 ```javascript
 router.post("/logout", authenticate, auditLogout, authController.logout);
 ```
@@ -103,12 +114,14 @@ router.post("/logout", authenticate, auditLogout, authController.logout);
 Enhanced password change tracking.
 
 **Features:**
+
 - Tracks success/failure
 - Differentiates between change and reset
 - Records IP and user agent
 - Timestamp tracking
 
 **Example:**
+
 ```javascript
 router.post(
   "/change-password",
@@ -123,18 +136,16 @@ router.post(
 **NEW** - Track password reset requests.
 
 **Features:**
+
 - Logs reset requests
 - Captures email address
 - Records IP and user agent
 - Timestamp tracking
 
 **Example:**
+
 ```javascript
-router.post(
-  "/reset-password",
-  auditPasswordReset,
-  authController.requestReset
-);
+router.post("/reset-password", auditPasswordReset, authController.requestReset);
 ```
 
 ### `logAudit(auditData)`
@@ -142,6 +153,7 @@ router.post(
 Manual audit logging helper.
 
 **Parameters:**
+
 - `auditData` (object): Audit log data
   - `userId` (string)
   - `action` (string)
@@ -150,6 +162,7 @@ Manual audit logging helper.
   - `changes` (object, optional)
 
 **Example:**
+
 ```javascript
 import { logAudit } from "../middleware/auditLog.js";
 
@@ -160,8 +173,8 @@ await logAudit({
   entityId: report.id,
   changes: {
     format: "PDF",
-    filters: req.query
-  }
+    filters: req.query,
+  },
 });
 ```
 
@@ -170,21 +183,24 @@ await logAudit({
 **NEW** - Batch logging for multiple operations.
 
 **Parameters:**
+
 - `auditDataArray` (array): Array of audit data objects
 
 **Returns:**
+
 - Promise with results array
 
 **Example:**
+
 ```javascript
 import { logAuditBatch } from "../middleware/auditLog.js";
 
-const auditLogs = items.map(item => ({
+const auditLogs = items.map((item) => ({
   userId: req.user.id,
   action: "CREATE",
   entity: "inventory_item",
   entityId: item.id,
-  changes: { created: item }
+  changes: { created: item },
 }));
 
 await logAuditBatch(auditLogs);
@@ -204,11 +220,12 @@ const sensitiveFields = [
   "refreshToken",
   "secret",
   "apiKey",
-  ...excludeFields // Custom fields
+  ...excludeFields, // Custom fields
 ];
 ```
 
 **Before:**
+
 ```json
 {
   "email": "user@example.com",
@@ -218,6 +235,7 @@ const sensitiveFields = [
 ```
 
 **After:**
+
 ```json
 {
   "email": "user@example.com",
@@ -247,48 +265,77 @@ Failed login attempts are now logged:
 ## 📊 Change Tracking by Action
 
 ### CREATE
+
 ```json
 {
-  "created": { /* full entity data */ },
-  "input": { /* request body */ },
-  "metadata": { /* request metadata */ }
+  "created": {
+    /* full entity data */
+  },
+  "input": {
+    /* request body */
+  },
+  "metadata": {
+    /* request metadata */
+  }
 }
 ```
 
 ### UPDATE
+
 ```json
 {
-  "updates": { /* fields being updated */ },
-  "before": { /* old values (if available) */ },
-  "after": { /* new values */ },
-  "metadata": { /* request metadata */ }
+  "updates": {
+    /* fields being updated */
+  },
+  "before": {
+    /* old values (if available) */
+  },
+  "after": {
+    /* new values */
+  },
+  "metadata": {
+    /* request metadata */
+  }
 }
 ```
 
 ### DELETE
+
 ```json
 {
   "deletedId": "uuid",
-  "deletedEntity": { /* entity data before deletion */ },
-  "metadata": { /* request metadata */ }
+  "deletedEntity": {
+    /* entity data before deletion */
+  },
+  "metadata": {
+    /* request metadata */
+  }
 }
 ```
 
 ### EXPORT
+
 ```json
 {
   "exportType": "PDF",
-  "filters": { /* query parameters */ },
-  "metadata": { /* request metadata */ }
+  "filters": {
+    /* query parameters */
+  },
+  "metadata": {
+    /* request metadata */
+  }
 }
 ```
 
 ### IMPORT
+
 ```json
 {
   "itemCount": 150,
   "source": "CSV upload",
-  "metadata": { /* request metadata */ }
+  "metadata": {
+    /* request metadata */
+  }
 }
 ```
 
@@ -319,9 +366,9 @@ router.put(
     getChanges: (req, res, data) => ({
       before: req.oldMedication,
       after: data?.data,
-      fields: Object.keys(req.body)
+      fields: Object.keys(req.body),
     }),
-    shouldLog: (req, res) => res.statusCode === 200
+    shouldLog: (req, res) => res.statusCode === 200,
   }),
   medicationController.update
 );
@@ -357,12 +404,12 @@ router.put(
 // In your service/controller
 const results = await bulkCreateMedications(medications);
 
-const auditLogs = results.map(med => ({
+const auditLogs = results.map((med) => ({
   userId: req.user.id,
   action: "CREATE",
   entity: "medication",
   entityId: med.id,
-  changes: { created: med }
+  changes: { created: med },
 }));
 
 await logAuditBatch(auditLogs);
@@ -374,12 +421,19 @@ await logAuditBatch(auditLogs);
 
 ```javascript
 // ✅ Good
-router.post("/", authenticate, createAuditLog("CREATE", "user"), controller.create);
+router.post(
+  "/",
+  authenticate,
+  createAuditLog("CREATE", "user"),
+  controller.create
+);
 
 // ❌ Avoid manual logging unless necessary
 router.post("/", authenticate, async (req, res) => {
   const user = await createUser(req.body);
-  await logAudit({ /* ... */ }); // Only if middleware can't be used
+  await logAudit({
+    /* ... */
+  }); // Only if middleware can't be used
   res.json(user);
 });
 ```
@@ -388,7 +442,12 @@ router.post("/", authenticate, async (req, res) => {
 
 ```javascript
 // ✅ Good - Store old values
-router.put("/:id", loadEntity, createAuditLog("UPDATE", "entity"), controller.update);
+router.put(
+  "/:id",
+  loadEntity,
+  createAuditLog("UPDATE", "entity"),
+  controller.update
+);
 
 // ❌ Missing context - can't see what changed
 router.put("/:id", createAuditLog("UPDATE", "entity"), controller.update);
@@ -411,11 +470,11 @@ for (const item of items) {
 ```javascript
 // ✅ Good - Exclude sensitive data
 createAuditLog("UPDATE", "user", {
-  excludeFields: ["internalNotes", "costPrice", "profitMargin"]
-})
+  excludeFields: ["internalNotes", "costPrice", "profitMargin"],
+});
 
 // ❌ Risk - Logging sensitive data
-createAuditLog("UPDATE", "user") // Logs everything
+createAuditLog("UPDATE", "user"); // Logs everything
 ```
 
 ## 📈 Performance Considerations
@@ -451,9 +510,9 @@ const res = await request(app)
   .send(medicationData);
 
 // Check audit log was created
-const logs = await auditService.getAll({ 
-  action: "CREATE", 
-  entity: "medication" 
+const logs = await auditService.getAll({
+  action: "CREATE",
+  entity: "medication",
 });
 expect(logs.data).toHaveLength(1);
 expect(logs.data[0].userId).toBe(userId);
@@ -464,19 +523,22 @@ expect(logs.data[0].userId).toBe(userId);
 ### From Old to New Middleware
 
 **Old:**
+
 ```javascript
-createAuditLog("UPDATE", "medication")
+createAuditLog("UPDATE", "medication");
 ```
 
 **New (same usage, better features):**
+
 ```javascript
 createAuditLog("UPDATE", "medication", {
   excludeFields: ["sensitiveField"],
-  shouldLog: (req, res) => res.statusCode === 200
-})
+  shouldLog: (req, res) => res.statusCode === 200,
+});
 ```
 
 **New password reset tracking:**
+
 ```javascript
 // Add this to your routes
 router.post("/forgot-password", auditPasswordReset, controller.forgotPassword);
