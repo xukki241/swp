@@ -120,7 +120,7 @@ export const sendPurchaseOrderEmail = async (purchaseOrderData) => {
 
     // Generate confirmation token and link
     const confirmationToken = generateConfirmationToken(purchaseOrderId);
-    const confirmationLink = `${config.apiUrl}/api/purchases/confirm/${purchaseOrderId}?token=${confirmationToken}`;
+    const confirmationLink = `${config.frontendUrl}/api/purchases/confirm/${purchaseOrderId}?token=${confirmationToken}`;
 
     const transporter = createTransporter();
 
