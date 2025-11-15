@@ -236,13 +236,13 @@ export const searchVariantsForSale = async ({ search } = {}) => {
             expiryDate: item.expiryDate,
             location: item.bin
               ? {
-                  zone: item.bin.rack?.zone?.name || "N/A",
-                  rack: item.bin.rack?.code || "N/A",
-                  bin: `${item.bin.level || ""}${item.bin.number || ""}`,
-                  fullLocation: item.bin.rack?.zone?.name
-                    ? `${item.bin.rack.zone.name} - ${item.bin.rack.code} - Bin ${item.bin.level || ""}${item.bin.number || ""}`
-                    : "Location N/A",
-                }
+                zone: item.bin.rack?.zone?.name || "N/A",
+                rack: item.bin.rack?.code || "N/A",
+                bin: `${item.bin.level || ""}${item.bin.number || ""}`,
+                fullLocation: item.bin.rack?.zone?.name
+                  ? `${item.bin.rack.zone.name} - ${item.bin.rack.code} - Bin ${item.bin.level || ""}${item.bin.number || ""}`
+                  : "Location N/A",
+              }
               : null,
           }));
 
@@ -264,8 +264,14 @@ export const searchVariantsForSale = async ({ search } = {}) => {
       })
     );
 
-    return variantsWithLocations;
+    // Filter to only variants with available stock (availableQuantity > 0)
+    const inStockVariants = variantsWithLocations.filter(
+      (v) => v.availableQuantity > 0
+    );
+
+    return inStockVariants;
   } catch (error) {
     throw new Error(`Failed to search variants for sale: ${error.message}`);
   }
 };
+
