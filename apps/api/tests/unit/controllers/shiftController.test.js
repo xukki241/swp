@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import * as shiftController from "../../../src/controllers/shiftController.js";
 import * as shiftService from "../../../src/services/shiftService.js";
 import logger from "../../../src/utils/logger.js";
