@@ -95,11 +95,12 @@ function StatusBadge({ status }) {
     s === "active"
       ? "bg-emerald-50 text-emerald-700 border-emerald-200"
       : "bg-zinc-50 text-zinc-600 border-zinc-200";
+  const text = s === "active" ? "Hoạt động" : "Ngừng";
   return (
     <span
-      className={`px-2 py-0.5 text-xs rounded-full border ${style} capitalize`}
+      className={`px-2 py-0.5 text-xs rounded-full border ${style}`}
     >
-      {s}
+      {text}
     </span>
   );
 }
@@ -283,7 +284,7 @@ export default function MedicationListPage() {
         bumpImageVersion(savedId);
       }
 
-      toast.success(editing ? "Medication updated" : "Medication created");
+      toast.success(editing ? "Đã cập nhật thuốc" : "Đã thêm thuốc mới");
       setMedFormOpen(false);
 
       // Đợi một chút để backend xử lý xong
@@ -298,7 +299,7 @@ export default function MedicationListPage() {
         "medications found"
       );
     } catch (e) {
-      toast.error("Failed to save medication", {
+      toast.error("Không thể lưu thuốc", {
         description: e?.response?.data?.message || e.message,
       });
     }
@@ -378,19 +379,16 @@ export default function MedicationListPage() {
       if (!ok) {
         setVarError("barcode", {
           type: "validate",
-          message: "Barcode already exists for another variant.",
+          message: "Mã vạch đã tồn tại cho biến thể khác.",
         });
-        toast.error("Barcode already exists for another variant.");
+        toast.error("Mã vạch đã tồn tại cho biến thể khác.");
         return;
       }
       const payload = {
         sku: (form.sku || "").trim(),
         name: (form.name || "").trim(),
         unit: (form.unit || "").trim(),
-        unitFactor:
-          form.unitFactor === "" || form.unitFactor == null
-            ? 1
-            : Number(form.unitFactor),
+        unitFactor: 1.00, // Cố định = 1.00
         barcode: (form.barcode || "").trim() || null,
         sellPrice:
           form.sellPrice === "" || form.sellPrice == null
@@ -406,20 +404,20 @@ export default function MedicationListPage() {
           !payload.unit ||
           !payload.sellPrice
         ) {
-          toast.error("Please fill in SKU, Name, Unit and Sell Price.");
+          toast.error("Vui lòng điền đầy đủ SKU, Tên, Đơn vị và Giá bán.");
           return;
         }
         if (Number.isNaN(payload.sellPrice)) {
-          toast.error("Sell Price must be a number.");
+          toast.error("Giá bán phải là số.");
           return;
         }
       }
       if (editingVar) {
         await svcUpdateVariant(medId, editingVar.id, payload);
-        toast.success("Variant updated");
+        toast.success("Đã cập nhật biến thể");
       } else {
         await svcCreateVariant(medId, [payload]);
-        toast.success("Variant created");
+        toast.success("Đã tạo biến thể");
       }
       setEditingVar(null);
       resetVar({
@@ -434,16 +432,16 @@ export default function MedicationListPage() {
       });
       await refetchVariants();
     } catch (err) {
-      toast.error("Failed to save variant", {
+      toast.error("Không thể lưu biến thể", {
         description: err?.response?.data?.message || err.message,
       });
     }
   };
   const handleDeleteVariant = async (variantId) => {
     if (!medId) return;
-    if (confirm("Delete this variant?")) {
+    if (confirm("Xóa biến thể này?")) {
       await svcDeleteVariant(medId, variantId);
-      toast.success("Deleted variant");
+      toast.success("Đã xóa biến thể");
       await refetchVariants();
     }
   };
@@ -671,7 +669,7 @@ export default function MedicationListPage() {
           open={medFormOpen && !lightbox.open}
           onOpenChange={setMedFormOpen}
         >
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editing ? "Chỉnh sửa Thuốc" : "Thêm Thuốc mới"}
@@ -748,32 +746,37 @@ export default function MedicationListPage() {
               </div>
 
               {/* fields */}
-              <Controller
-                name="name"
-                control={control}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <Input {...field} placeholder="Tên thuốc" />
-                )}
-              />
-              <Controller
-                name="brand"
-                control={control}
-                render={({ field }) => (
-                  <Input {...field} placeholder="Thương hiệu" />
-                )}
-              />
-              <Controller
-                name="description"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    className="md:col-span-2"
-                    placeholder="Mô tả"
-                  />
-                )}
-              />
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Tên thuốc *</label>
+                <Controller
+                  name="name"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Input {...field} placeholder="Nhập tên thuốc" />
+                  )}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Thương hiệu</label>
+                <Controller
+                  name="brand"
+                  control={control}
+                  render={({ field }) => (
+                    <Input {...field} placeholder="Nhập thương hiệu" />
+                  )}
+                />
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-sm font-medium">Mô tả</label>
+                <Controller
+                  name="description"
+                  control={control}
+                  render={({ field }) => (
+                    <Input {...field} placeholder="Nhập mô tả" />
+                  )}
+                />
+              </div>
 
               <div className="flex items-center gap-2">
                 <Controller

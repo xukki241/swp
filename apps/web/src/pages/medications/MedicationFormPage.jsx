@@ -60,20 +60,20 @@ export default function MedicationFormPage() {
   if (isLoading && isEdit)
     return (
       <AppLayout>
-        <div className="p-6">Loading...</div>
+        <div className="p-6">Đang tải...</div>
       </AppLayout>
     );
 
   return (
-    <AppLayout title={isEdit ? "Edit Medication" : "Add Medication"}>
+    <AppLayout title={isEdit ? "Sửa thuốc" : "Thêm thuốc"}>
       <div className="max-w-2xl mx-auto space-y-6 p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
             {...register("name", { required: true })}
-            placeholder="Medication Name"
+            placeholder="Tên thuốc"
           />
-          <Input {...register("brand")} placeholder="Brand" />
-          <Input {...register("description")} placeholder="Description" />
+          <Input {...register("brand")} placeholder="Thương hiệu" />
+          <Input {...register("description")} placeholder="Mô tả" />
 
           <div className="flex flex-wrap items-center gap-6">
             <div className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export default function MedicationFormPage() {
                       checked={!!value}
                       onCheckedChange={(c) => onChange(!!c)}
                     />
-                    <span>Prescription required</span>
+                    <span>Cần đơn thuốc</span>
                   </>
                 )}
               />
@@ -101,7 +101,7 @@ export default function MedicationFormPage() {
                       checked={!!value}
                       onCheckedChange={(c) => onChange(!!c)}
                     />
-                    <span>Controlled substance</span>
+                    <span>Chất kiểm soát</span>
                   </>
                 )}
               />
@@ -114,11 +114,11 @@ export default function MedicationFormPage() {
               render={({ field: { value, onChange } }) => (
                 <Select value={value} onValueChange={onChange}>
                   <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Status" />
+                    <SelectValue placeholder="Trạng thái" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="active">Đang hoạt động</SelectItem>
+                    <SelectItem value="inactive">Ngừng hoạt động</SelectItem>
                   </SelectContent>
                 </Select>
               )}
@@ -131,13 +131,13 @@ export default function MedicationFormPage() {
               variant="outline"
               onClick={() => navigate("/medications")}
             >
-              Cancel
+              Hủy
             </Button>
             <Button
               type="submit"
               disabled={addMutation.isPending || updateMutation.isPending}
             >
-              {isEdit ? "Save Changes" : "Add Medication"}
+              {isEdit ? "Lưu thay đổi" : "Thêm thuốc"}
             </Button>
           </div>
         </form>
