@@ -37,9 +37,10 @@ describe("MedicationVariantController", () => {
         { id: 2n, name: "Tablet 200mg", isActive: true },
       ];
 
-      medicationVariantService.getAllMedicationVariants.mockResolvedValue(
-        mockVariants
-      );
+      medicationVariantService.getAllMedicationVariants.mockResolvedValue({
+        data: mockVariants,
+        total: 2,
+      });
 
       await medicationVariantController.getAllMedicationVariants(
         req,

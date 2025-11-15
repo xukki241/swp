@@ -33,7 +33,10 @@ describe("MedicationController", () => {
         { id: 2n, name: "Aspirin Plus", status: "active" },
       ];
 
-      medicationService.getAllMedications.mockResolvedValue(mockMedications);
+      medicationService.getAllMedications.mockResolvedValue({
+        data: mockMedications,
+        total: 2,
+      });
 
       await medicationController.getAllMedications(req, res, next);
 
