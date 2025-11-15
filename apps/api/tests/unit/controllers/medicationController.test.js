@@ -43,7 +43,7 @@ describe("MedicationController", () => {
       expect(medicationService.getAllMedications).toHaveBeenCalledWith({
         search: "aspirin",
         status: "active",
-        limit: 10,
+        limit: 100,
         offset: 0,
       });
       expect(res.status).toHaveBeenCalledWith(200);
