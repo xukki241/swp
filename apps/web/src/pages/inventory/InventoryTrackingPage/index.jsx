@@ -15,10 +15,16 @@ import { Link } from "react-router";
 import MedicineCard from "./components/MedicineCard";
 
 const InventoryTracking = () => {
-  const { lowStock, expiring, loading, error } = useInventory();
+  const {
+    lowStock,
+    expiring,
+    loading,
+    error,
+    fetchMedicationImage,
+    imageCache,
+  } = useInventory();
   const [canEdit, setCanEdit] = useState(false);
   const { data } = useCurrentUser();
-  const [displayStock, setDisplayStock] = useState(false);
 
   useEffect(() => {
     if (data?.user?.role === "owner") {
@@ -26,19 +32,25 @@ const InventoryTracking = () => {
     }
   }, [data]);
 
+  // Preload images for low stock items
   useEffect(() => {
-    lowStock.forEach((item) => {
-      if (item?.quantity < 50) {
-        setDisplayStock(true);
+    lowStock.forEach(async (item) => {
+      const imageId = item?.medicationVariant?.medication?.imageId;
+      if (imageId && !imageCache[imageId]) {
+        await fetchMedicationImage(imageId);
       }
     });
-  }, [lowStock]);
+  }, [lowStock, imageCache, fetchMedicationImage]);
 
-  function getDaysRemaining(expiryDate) {
-    return Math.ceil(
-      (new Date(expiryDate) - new Date()) / (1000 * 60 * 60 * 24)
-    );
-  }
+  // Preload images for expiring items
+  useEffect(() => {
+    expiring.forEach(async (item) => {
+      const imageId = item?.medicationVariant?.medication?.imageId;
+      if (imageId && !imageCache[imageId]) {
+        await fetchMedicationImage(imageId);
+      }
+    });
+  }, [expiring, imageCache, fetchMedicationImage]);
 
   function renderLowStock() {
     if (loading.lowStock) {
@@ -79,18 +91,18 @@ const InventoryTracking = () => {
 
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {displayStock &&
-          lowStock.map((item) => {
-            if (item?.quantity < 50) {
-              return (
-                <MedicineCard
-                  key={item.id}
-                  medicine={item}
-                  variant="low-stock"
-                />
-              );
-            }
-          })}
+        {lowStock.map((item) => {
+          return (
+            <MedicineCard
+              key={item.id}
+              medicine={item}
+              variant="low-stock"
+              imageUrl={
+                imageCache[item?.medicationVariant?.medication?.imageId]
+              }
+            />
+          );
+        })}
       </div>
     );
   }
@@ -135,11 +147,16 @@ const InventoryTracking = () => {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {expiring.map((item) => {
-          if (getDaysRemaining(item?.expiryDate) < 90) {
-            return (
-              <MedicineCard key={item.id} medicine={item} variant="expiring" />
-            );
-          }
+          return (
+            <MedicineCard
+              key={item.id}
+              medicine={item}
+              variant="expiring"
+              imageUrl={
+                imageCache[item?.medicationVariant?.medication?.imageId]
+              }
+            />
+          );
         })}
       </div>
     );

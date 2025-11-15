@@ -41,7 +41,7 @@ export const sidebarConfig = [
     children: [
       { label: "Tồn kho", path: "/inventory/stock" },
       { label: "Sơ đồ kho", path: "/inventory/warehouse" },
-      { label: "Theo dõi nhập/xuất", path: "/inventory/tracking" },
+      { label: "Theo dõi kho", path: "/inventory/tracking" },
     ],
   },
   {
