@@ -1,0 +1,56 @@
+
+> @pharmaflow/api@0.0.1 test D:\FLM\Ki5\SWP391\AI\g4-se1961-nj-swp391-fal25\apps\api
+> vitest run "tests/unit/controllers/medicationVariantController.test.js"
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mD:/FLM/Ki5/SWP391/AI/g4-se1961-nj-swp391-fal25/apps/api[39m
+
+ [31m❯[39m tests/unit/controllers/medicationVariantController.test.js [2m([22m[2m19 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 15[2mms[22m[39m
+[31m   [31m×[31m MedicationVariantController[2m > [22mgetAllMedicationVariants[2m > [22mshould return all medication variants with filters[39m[32m 9[2mms[22m[39m
+[31m     → expected "spy" to be called with arguments: [ ObjectContaining{…} ][90m
+
+Number of calls: [1m0[22m
+[31m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mgetAllMedicationVariants[2m > [22mshould handle errors[32m 1[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mgetMedicationVariantById[2m > [22mshould return medication variant by id[32m 1[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mgetMedicationVariantById[2m > [22mshould return 404 if variant not found[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mgetMedicationVariantById[2m > [22mshould handle errors[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mcreateMedicationVariant[2m > [22mshould create a new medication variant[32m 1[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mcreateMedicationVariant[2m > [22mshould return 400 if required fields are missing[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mcreateMedicationVariant[2m > [22mshould return 409 if SKU already exists[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mcreateMedicationVariant[2m > [22mshould use default values for optional fields[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mcreateMedicationVariant[2m > [22mshould handle errors[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mupdateMedicationVariant[2m > [22mshould update medication variant successfully[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mupdateMedicationVariant[2m > [22mshould return 404 if variant not found[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mupdateMedicationVariant[2m > [22mshould return 400 if SKU already exists for another variant[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mupdateMedicationVariant[2m > [22mshould handle errors[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mdeleteMedicationVariant[2m > [22mshould delete medication variant successfully[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mdeleteMedicationVariant[2m > [22mshould return 404 if variant not found[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mgetMedicationVariantInventory[2m > [22mshould return inventory for a medication variant[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mgetMedicationVariantInventory[2m > [22mshould return empty array if no inventory found[32m 0[2mms[22m[39m
+   [32m✓[39m MedicationVariantController[2m > [22mgetMedicationVariantInventory[2m > [22mshould handle errors[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/unit/controllers/medicationVariantController.test.js[2m > [22mMedicationVariantController[2m > [22mgetAllMedicationVariants[2m > [22mshould return all medication variants with filters
+[31m[1mAssertionError[22m: expected "spy" to be called with arguments: [ ObjectContaining{…} ][90m
+
+Number of calls: [1m0[22m
+[31m[39m
+[36m [2m❯[22m tests/unit/controllers/medicationVariantController.test.js:[2m60:24[22m[39m
+    [90m 58| [39m      })[33m;[39m
+    [90m 59| [39m      [34mexpect[39m(res[33m.[39mstatus)[33m.[39m[34mtoHaveBeenCalledWith[39m([34m200[39m)[33m;[39m
+    [90m 60| [39m      [34mexpect[39m(res[33m.[39mjson)[33m.[39m[34mtoHaveBeenCalledWith[39m(
+    [90m   | [39m                       [31m^[39m
+    [90m 61| [39m        expect[33m.[39m[34mobjectContaining[39m({
+    [90m 62| [39m          success[33m:[39m [35mtrue[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m18 passed[39m[22m[90m (19)[39m
+[2m   Start at [22m 16:56:45
+[2m   Duration [22m 1.30s[2m (transform 130ms, setup 51ms, collect 649ms, tests 15ms, environment 0ms, prepare 266ms)[22m
+
+ ELIFECYCLE  Test failed. See above for more details.

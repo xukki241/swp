@@ -33,20 +33,26 @@ describe("MedicationController", () => {
         { id: 2n, name: "Aspirin Plus", status: "active" },
       ];
 
-      medicationService.getAllMedications.mockResolvedValue(mockMedications);
+      medicationService.getAllMedications.mockResolvedValue({
+        data: mockMedications,
+        total: 2,
+      });
 
       await medicationController.getAllMedications(req, res, next);
 
       expect(medicationService.getAllMedications).toHaveBeenCalledWith({
         search: "aspirin",
         status: "active",
+        limit: 10,
+        offset: 0,
       });
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
-        success: true,
-        count: 2,
-        data: mockMedications,
-      });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          data: mockMedications,
+        })
+      );
     });
 
     it("should handle errors", async () => {
