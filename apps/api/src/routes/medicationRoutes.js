@@ -130,7 +130,9 @@ medicationRouter.post(
   validateParams(idParamSchema),
   uploadSingle("image"),
   handleMulterError,
-  createAuditLog("UPDATE", "medication"),
+  createAuditLog("UPDATE", "medication", {
+    excludeFields: ["costPrice", "supplierCost"],
+  }),
   medicationController.uploadMedicationImage
 );
 
@@ -143,7 +145,9 @@ medicationRouter.delete(
   "/:id/image",
   authorize("owner"),
   validateParams(idParamSchema),
-  createAuditLog("DELETE", "medication"),
+  createAuditLog("DELETE", "medication", {
+    excludeFields: ["costPrice", "supplierCost"],
+  }),
   medicationController.deleteMedicationImage
 );
 
@@ -168,7 +172,9 @@ medicationRouter.post(
   "/",
   authorize("owner"),
   validateBody(createMedicationsRequestSchema),
-  createAuditLog("CREATE", "medication"),
+  createAuditLog("CREATE", "medication", {
+    excludeFields: ["costPrice", "supplierCost"],
+  }),
   medicationController.createMedication
 );
 
@@ -182,7 +188,9 @@ medicationRouter.patch(
   authorize("owner"),
   validateParams(idParamSchema),
   validateBody(updateMedicationRequestSchema),
-  createAuditLog("UPDATE", "medication"),
+  createAuditLog("UPDATE", "medication", {
+    excludeFields: ["costPrice", "supplierCost"],
+  }),
   medicationController.updateMedication
 );
 
@@ -190,6 +198,7 @@ medicationRouter.patch(
  * @route   DELETE /api/medications/:id
  * @desc    Delete medication by ID
  * @access  Private (Owner only)
+ * Note: Consider storing medication entity data before delete for better audit trail
  */
 medicationRouter.delete(
   "/:id",

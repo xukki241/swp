@@ -2,24 +2,36 @@ import { inventoryService } from "../services/inventoryService.js";
 import * as medicationVariantService from "../services/medicationVariantService.js";
 import logger from "../utils/logger.js";
 /**
- * Get all medication variants
+ * Get all medication variants with pagination
  * @route GET /api/medication-variants
  */
 export const getAllMedicationVariants = async (req, res, next) => {
   try {
+    const page = req.query.page ? Number.parseInt(req.query.page) : 1;
+    const limit = req.query.limit ? Number.parseInt(req.query.limit) : 10;
+    const offset = (page - 1) * limit;
+
     const { search, isActive } = req.query;
     const { medicationId } = req.params;
 
-    const variants = await medicationVariantService.getAllMedicationVariants({
+    const result = await medicationVariantService.getAllMedicationVariants({
       search,
       medicationId: medicationId || undefined,
       isActive: isActive !== undefined ? isActive === "true" : undefined,
+      limit,
+      offset,
     });
 
     res.status(200).json({
       success: true,
-      count: variants.length,
-      data: variants,
+      data: result.data,
+      pagination: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+        hasMore: offset + result.data.length < result.total,
+      },
     });
   } catch (error) {
     logger.error("Error in getAllMedicationVariants controller:", error);
@@ -132,9 +144,6 @@ export const createMedicationVariant = async (req, res, next) => {
         sku: variantInput.sku,
         name: variantInput.name,
         unit: variantInput.unit,
-        unitFactor: variantInput.unitFactor
-          ? String(variantInput.unitFactor)
-          : "1.0",
         barcode: variantInput.barcode || null,
         sellPrice: String(variantInput.sellPrice),
         isActive:
@@ -170,7 +179,6 @@ export const updateMedicationVariant = async (req, res, _next) => {
       sku,
       name,
       unit,
-      unitFactor,
       barcode,
       sellPrice,
       isActive,
@@ -211,9 +219,6 @@ export const updateMedicationVariant = async (req, res, _next) => {
     }
     if (unit !== undefined) {
       variantData.unit = unit;
-    }
-    if (unitFactor !== undefined) {
-      variantData.unitFactor = unitFactor;
     }
     if (barcode !== undefined) {
       variantData.barcode = barcode;

@@ -1,4 +1,5 @@
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
+import AuditLogPage from "@/pages/AuditLogPage";
 import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
 import LoginPage from "@/pages/auth/LoginPage";
 import PolicyPage from "@/pages/auth/PolicyPage";
@@ -80,6 +81,15 @@ function App() {
           element={
             <ProtectedRoute>
               <UserProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        {/* Audit Log Routes */}
+        <Route
+          path="/audit-logs"
+          element={
+            <ProtectedRoute>
+              <AuditLogPage />
             </ProtectedRoute>
           }
         />

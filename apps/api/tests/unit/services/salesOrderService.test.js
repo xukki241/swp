@@ -1,8 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import * as inventoryService from "@/services/inventoryService.js";
 import { salesOrderService } from "@/services/salesOrderService.js";
 
 vi.mock("@/db/index.js");
+vi.mock("@/services/inventoryService.js", async () => {
+  const actual = await vi.importActual("@/services/inventoryService.js");
+  return {
+    ...actual,
+    deleteEmptyInventoryTx: vi.fn(),
+  };
+});
 
 describe("salesOrderService", () => {
   let mockDb;
@@ -13,6 +21,9 @@ describe("salesOrderService", () => {
 
     const { db } = await import("@/db/index.js");
     mockDb = db;
+
+    // Mock deleteEmptyInventoryTx
+    vi.spyOn(inventoryService, "deleteEmptyInventoryTx").mockResolvedValue(0);
 
     // Mock transaction
     mockTx = {
@@ -31,7 +42,11 @@ describe("salesOrderService", () => {
       select: vi.fn(),
       insert: vi.fn(),
       update: vi.fn(),
-      delete: vi.fn(),
+      delete: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          returning: vi.fn().mockResolvedValue([]),
+        }),
+      }),
     };
 
     mockDb.transaction = vi.fn((callback) => callback(mockTx));

@@ -1,6 +1,7 @@
 "use client";
 import placeholderImg from "@/assets/medicine-placeholder.jpg";
 import { instance } from "@/lib/axios";
+import { ZoomIn } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function MedicationImage({
@@ -14,7 +15,6 @@ export default function MedicationImage({
 
   useEffect(() => {
     if (!fileId) {
-      console.log("🔍 No fileId provided, showing placeholder");
       setSrc(null);
       setError(false);
       return;
@@ -22,7 +22,6 @@ export default function MedicationImage({
 
     const loadImage = async () => {
       try {
-        console.log(`🔍 Loading image for fileId: ${fileId}`);
         const token = localStorage.getItem("token");
         const res = await instance.get(`/files/${fileId}/view`, {
           responseType: "blob",
@@ -31,17 +30,13 @@ export default function MedicationImage({
 
         const reader = new FileReader();
         reader.onloadend = () => {
-          console.log(
-            `✅ Image loaded successfully for fileId: ${fileId}`,
-            reader.result?.substring(0, 50) + "..."
-          );
           setSrc(reader.result);
           setError(false);
         };
         reader.readAsDataURL(res.data);
       } catch (err) {
         console.warn(
-          `❌ Load image failed for fileId: ${fileId}`,
+          `Load image failed for fileId: ${fileId}`,
           err.response?.status,
           err.response?.data
         );
@@ -52,6 +47,8 @@ export default function MedicationImage({
 
     loadImage();
   }, [fileId]);
+
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
@@ -66,8 +63,11 @@ export default function MedicationImage({
         justifyContent: "center",
         overflow: "hidden",
         cursor: onClick ? "zoom-in" : "default",
+        position: "relative",
       }}
       onClick={() => onClick && src && onClick(src, alt)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {src && !error ? (
         <img
@@ -79,10 +79,8 @@ export default function MedicationImage({
             objectFit: "cover",
           }}
           onError={(e) => {
-            console.log(`❌ Image render error for fileId: ${fileId}`, e);
             setError(true);
           }}
-          onLoad={() => console.log(`🖼️ Image rendered for fileId: ${fileId}`)}
         />
       ) : (
         <img
@@ -95,6 +93,21 @@ export default function MedicationImage({
             opacity: 0.6,
           }}
         />
+      )}
+      {onClick && src && !error && isHovered && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 8,
+          }}
+        >
+          <ZoomIn className="text-white" size={size / 3} />
+        </div>
       )}
     </div>
   );

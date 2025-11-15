@@ -37,7 +37,7 @@ export const purchaseOrderStatusEnum = z.enum([
 ]);
 
 // Sales order enums
-export const salesOrderStatusEnum = z.enum(["pending", "paid", "cancelled"]);
+export const salesOrderStatusEnum = z.enum(["paid"]);
 export const salesOrderPaymentMethodEnum = z.enum(["cash", "mobile_payment"]);
 
 // Report enums

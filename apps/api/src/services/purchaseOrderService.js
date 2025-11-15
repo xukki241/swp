@@ -221,16 +221,28 @@ export const purchaseOrderService = {
     return await db.transaction(async (tx) => {
       const { items, ...poData } = data;
 
+      // Get existing PO with supplier info for email
+      const [existingPo] = await tx
+        .select({
+          id: purchaseOrders.id,
+          status: purchaseOrders.status,
+          supplierEmail: suppliers.email,
+          supplierName: suppliers.name,
+        })
+        .from(purchaseOrders)
+        .leftJoin(suppliers, eq(purchaseOrders.supplierId, suppliers.id))
+        .where(eq(purchaseOrders.id, id));
+
+      if (!existingPo) {
+        return null;
+      }
+
       // Update purchase order
       const [po] = await tx
         .update(purchaseOrders)
         .set(poData)
         .where(eq(purchaseOrders.id, id))
         .returning();
-
-      if (!po) {
-        return null;
-      }
 
       // If items are provided, replace existing ones
       let updatedItems = [];
@@ -259,6 +271,29 @@ export const purchaseOrderService = {
           .where(eq(purchaseOrderItems.purchaseOrderId, id));
       }
 
+      // Send email notification to supplier if status changed or items updated
+      if (
+        existingPo.supplierEmail &&
+        (poData.status !== existingPo.status || items)
+      ) {
+        try {
+          const { sendPurchaseOrderUpdateEmail } = await import(
+            "../utils/purchaseOrderEmail.js"
+          );
+          await sendPurchaseOrderUpdateEmail({
+            supplierEmail: existingPo.supplierEmail,
+            supplierName: existingPo.supplierName,
+            orderNumber: id.substring(0, 8).toUpperCase(),
+            oldStatus: existingPo.status,
+            newStatus: poData.status || existingPo.status,
+            updateReason: "Purchase order has been updated",
+          });
+        } catch (emailError) {
+          console.error("Failed to send update email:", emailError);
+          // Don't fail the update if email fails
+        }
+      }
+
       return {
         ...po,
         items: updatedItems,
@@ -268,11 +303,58 @@ export const purchaseOrderService = {
 
   // Delete purchase order
   async delete(id) {
-    const [po] = await db
-      .delete(purchaseOrders)
-      .where(eq(purchaseOrders.id, id))
-      .returning();
-    return po;
+    return await db.transaction(async (tx) => {
+      // First get PO with supplier info for email
+      const [existingPo] = await tx
+        .select({
+          id: purchaseOrders.id,
+          orderDate: purchaseOrders.orderDate,
+          totalAmount: purchaseOrders.totalAmount,
+          supplierEmail: suppliers.email,
+          supplierName: suppliers.name,
+        })
+        .from(purchaseOrders)
+        .leftJoin(suppliers, eq(purchaseOrders.supplierId, suppliers.id))
+        .where(eq(purchaseOrders.id, id));
+
+      if (!existingPo) {
+        return null;
+      }
+
+      // Delete related purchase order items first
+      await tx
+        .delete(purchaseOrderItems)
+        .where(eq(purchaseOrderItems.purchaseOrderId, id));
+
+      // Then delete the purchase order
+      const [po] = await tx
+        .delete(purchaseOrders)
+        .where(eq(purchaseOrders.id, id))
+        .returning();
+
+      // Send cancellation email to supplier
+      if (existingPo.supplierEmail) {
+        try {
+          const { sendPurchaseOrderCancellationEmail } = await import(
+            "../utils/purchaseOrderEmail.js"
+          );
+          await sendPurchaseOrderCancellationEmail({
+            supplierEmail: existingPo.supplierEmail,
+            supplierName: existingPo.supplierName,
+            orderNumber: id.substring(0, 8).toUpperCase(),
+            orderDate: existingPo.orderDate
+              ? new Date(existingPo.orderDate).toLocaleDateString("vi-VN")
+              : "N/A",
+            totalAmount: existingPo.totalAmount,
+          });
+        } catch (emailError) {
+          console.error("Failed to send cancellation email:", emailError);
+          // Don't fail the deletion if email fails
+        }
+      }
+
+      return po;
+    });
   },
 
   // Confirm purchase order (supplier confirmation)

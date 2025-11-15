@@ -1,6 +1,7 @@
 import {
   Calendar,
   ClipboardList,
+  FileText,
   LayoutDashboard,
   Package,
   Pill,
@@ -41,7 +42,7 @@ export const sidebarConfig = [
     children: [
       { label: "Tồn kho", path: "/inventory/stock" },
       { label: "Sơ đồ kho", path: "/inventory/warehouse" },
-      { label: "Theo dõi nhập/xuất", path: "/inventory/tracking" },
+      { label: "Theo dõi kho", path: "/inventory/tracking" },
     ],
   },
   {
@@ -74,7 +75,7 @@ export const sidebarConfig = [
       {
         label: "Lịch của tôi",
         path: "/shifts/my-schedule",
-        roles: ["owner", "staff"],
+        roles: ["staff"],
       },
     ],
   },
@@ -86,5 +87,11 @@ export const sidebarConfig = [
       { label: "Danh sách", path: "/users/list" },
       { label: "Đăng ký chờ duyệt", path: "/users/registrations" },
     ],
+  },
+  {
+    title: "Nhật ký kiểm toán",
+    icon: FileText,
+    path: "/audit-logs",
+    roles: ["owner"],
   },
 ];

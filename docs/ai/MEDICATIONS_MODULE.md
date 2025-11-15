@@ -76,7 +76,6 @@ In `components/common/parameters.yaml`:
 - `sku` (string, max 50 chars) - Stock Keeping Unit
 - `name` (string, 1-100 chars) - Variant name
 - `unit` (string, max 50 chars) - Unit of measurement (e.g., "Box of 10 tablets")
-- `unitFactor` (number) - Conversion factor to base unit
 - `barcode` (string, max 50 chars, nullable) - Barcode number
 - `sellPrice` (number) - Selling price
 - `isActive` (boolean) - Active status

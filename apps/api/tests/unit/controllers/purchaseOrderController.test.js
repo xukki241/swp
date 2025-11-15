@@ -18,6 +18,7 @@ describe("PurchaseOrderController", () => {
     res = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn().mockReturnThis(),
+      send: vi.fn().mockReturnThis(),
     };
   });
 
@@ -220,6 +221,81 @@ describe("PurchaseOrderController", () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: "Database error" });
+    });
+  });
+
+  describe("confirm", () => {
+    it("should confirm purchase order and return HTML success page", async () => {
+      req.params = { id: "PO-123" };
+      req.query = { token: "valid-token-abc123" };
+
+      const mockResult = {
+        orderNumber: "PO-123",
+        status: "ordered",
+      };
+      purchaseOrderService.confirmOrder.mockResolvedValue(mockResult);
+
+      await purchaseOrderController.confirm(req, res);
+
+      expect(purchaseOrderService.confirmOrder).toHaveBeenCalledWith(
+        "PO-123",
+        "valid-token-abc123"
+      );
+      expect(res.send).toHaveBeenCalled();
+
+      // Verify HTML content contains success message and order number
+      const htmlResponse = res.send.mock.calls[0][0];
+      expect(htmlResponse).toContain("Purchase Order Confirmed!");
+      expect(htmlResponse).toContain("PO-123");
+      expect(htmlResponse).toContain("Status: Ordered");
+    });
+
+    it("should return 400 if token is missing", async () => {
+      req.params = { id: "PO-123" };
+      req.query = {}; // No token
+
+      await purchaseOrderController.confirm(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: "Confirmation token is required",
+      });
+      expect(purchaseOrderService.confirmOrder).not.toHaveBeenCalled();
+    });
+
+    it("should return HTML error page if confirmation fails", async () => {
+      req.params = { id: "PO-123" };
+      req.query = { token: "invalid-token" };
+
+      const error = new Error("Invalid or expired confirmation token");
+      purchaseOrderService.confirmOrder.mockRejectedValue(error);
+
+      await purchaseOrderController.confirm(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalled();
+
+      // Verify HTML error page contains error message
+      const htmlResponse = res.send.mock.calls[0][0];
+      expect(htmlResponse).toContain("Confirmation Failed");
+      expect(htmlResponse).toContain("Invalid or expired confirmation token");
+    });
+
+    it("should handle already confirmed orders", async () => {
+      req.params = { id: "PO-123" };
+      req.query = { token: "used-token" };
+
+      const error = new Error("Order has already been confirmed");
+      purchaseOrderService.confirmOrder.mockRejectedValue(error);
+
+      await purchaseOrderController.confirm(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalled();
+
+      const htmlResponse = res.send.mock.calls[0][0];
+      expect(htmlResponse).toContain("Confirmation Failed");
+      expect(htmlResponse).toContain("Order has already been confirmed");
     });
   });
 });

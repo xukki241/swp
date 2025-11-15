@@ -2,17 +2,25 @@ import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
 import { AppLayout } from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useCurrentUser } from "@/hooks/useAuth";
 import { useInventory } from "@/hooks/useInventory";
 import { useSuppliers } from "@/hooks/useSuppliers";
 import { Eye, Search, Settings2 } from "lucide-react";
 import { useEffect, useState } from "react";
+
 import AddStockDialog from "./components/dialogs/AddStockDialog";
 import AddjustStockDialog from "./components/dialogs/AdjustStockDialog";
 import StockDetailsDialog from "./components/dialogs/StockDetailsDialog";
 import InventorySearching from "./components/filters/InventorySearching";
+import {
+  calculateRemainingDays,
+  getExpiryWarningBadge,
+  getLowStockBadge,
+} from "./utils/stockHelpers";
 
 export default function StockOverviewPage() {
-  const { inventory, refetchInventory } = useInventory();
+  const { inventory, refetchInventory, fetchMedicationImage, imageCache } =
+    useInventory();
   const { data: suppliers = [] } = useSuppliers();
   const [medications, setMedications] = useState([]);
   const [currentMedication, setCurrentMedication] = useState({});
@@ -20,10 +28,26 @@ export default function StockOverviewPage() {
   const [showAdjustDialog, setShowAdjustDialog] = useState(false);
   const [showAddStockDialog, setShowAddStockDialog] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const { data } = useCurrentUser();
+  const [canEdit, setCanEdit] = useState(false);
 
   useEffect(() => {
+    if (data?.user?.role === "owner") {
+      setCanEdit(true);
+    }
+  });
+
+  useEffect(() => {
+    // Inventory API already filters out items with quantity = 0
     setMedications(inventory);
-  }, [inventory]);
+    // Preload images for visible medications
+    inventory.forEach(async (item) => {
+      const imageId = item.medicationVariant?.medication?.imageId;
+      if (imageId && !imageCache[imageId]) {
+        await fetchMedicationImage(imageId);
+      }
+    });
+  }, [inventory, imageCache, fetchMedicationImage]);
 
   function handleShowDialog(type, medication = null) {
     setCurrentMedication(medication);
@@ -114,7 +138,11 @@ export default function StockOverviewPage() {
         <Card className="shadow-md rounded-xl border-0">
           <CardContent>
             {/* Advanced Search and Filters */}
-            <InventorySearching onSearch={handleSearch} suppliers={suppliers} />
+            <InventorySearching
+              earching
+              onSearch={handleSearch}
+              suppliers={suppliers}
+            />
 
             {/* Medication List */}
             <div className="mt-6">
@@ -127,32 +155,42 @@ export default function StockOverviewPage() {
 
               {!isSearching && medications.length > 0 && (
                 <div className="space-y-3">
-                  {medications.map((medication) => (
+                  {medications.map((item) => (
                     <Card
-                      key={medication.id}
+                      key={item.id}
                       className="border shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                     >
                       <CardContent className="flex justify-between items-center flex-wrap gap-3">
                         <div className="flex items-center gap-4">
                           <img
-                            src={medication.img_url || MedicinePlaceholder}
-                            alt={medication.medicationVariant.name}
+                            src={
+                              imageCache[
+                                item.medicationVariant?.medication?.imageId
+                              ] || MedicinePlaceholder
+                            }
+                            alt={item.medicationVariant.name}
                             className="w-20 h-20 rounded-lg object-cover border"
                           />
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold text-gray-900 truncate">
-                              {medication.medicationVariant.name}
+                              {item.medicationVariant.name}
                             </h3>
                             <p className="text-sm text-muted-foreground mt-1">
-                              Tồn kho: {medication.quantity}
+                              Tồn kho: {item?.quantity - item?.quantityReserved}
                             </p>
                             <p className="text-sm text-muted-foreground mt-1">
                               Giá:{" "}
                               {Number(
-                                medication.medicationVariant.sellPrice
+                                item.medicationVariant.sellPrice
                               ).toLocaleString("vi-VN")}{" "}
                               VND
                             </p>
+                            <div className="flex gap-2 mt-2">
+                              {getExpiryWarningBadge(
+                                calculateRemainingDays(item.expiryDate)
+                              )}
+                              {getLowStockBadge(item.quantity)}
+                            </div>
                           </div>
                         </div>
                         <div className="flex gap-2">
@@ -160,22 +198,22 @@ export default function StockOverviewPage() {
                             size="sm"
                             variant="outline"
                             className="flex-1 bg-transparent"
-                            onClick={() => handleShowDialog("view", medication)}
+                            onClick={() => handleShowDialog("view", item)}
                           >
                             <Eye className="h-4 w-4 mr-1" />
                             Xem
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="flex-1 bg-transparent"
-                            onClick={() =>
-                              handleShowDialog("adjust", medication)
-                            }
-                          >
-                            <Settings2 className="h-4 w-4 mr-1" />
-                            Điều chỉnh
-                          </Button>
+                          {canEdit && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="flex-1 bg-transparent"
+                              onClick={() => handleShowDialog("adjust", item)}
+                            >
+                              <Settings2 className="h-4 w-4 mr-1" />
+                              Điều chỉnh
+                            </Button>
+                          )}
                         </div>
                       </CardContent>
                     </Card>

@@ -299,7 +299,7 @@ Lưu ý:
 Chỉ trả về JSON, không có text ngoài lề.
 `;
 
-      // Call Gemini API - Using Gemini 2.0 Flash for faster performance
+      // Call Gemini API - Using Gemini 1.5 Flash for better stability
       const model = genAI.getGenerativeModel({
         model: process.env.GOOGLE_AI_MODEL || "gemini-2.0-flash",
         generationConfig: {
@@ -309,7 +309,42 @@ Chỉ trả về JSON, không có text ngoài lề.
           maxOutputTokens: 8192,
         },
       });
-      const result = await model.generateContent(prompt);
+
+      // Retry logic for rate limiting (429 errors)
+      let result;
+      let retryCount = 0;
+      const maxRetries = 3;
+
+      while (retryCount < maxRetries) {
+        try {
+          result = await model.generateContent(prompt);
+          break; // Success, exit loop
+        } catch (error) {
+          if (error.status === 429 && retryCount < maxRetries - 1) {
+            // Extract retry delay from error (default 30s if not provided)
+            const retryDelay = error.errorDetails?.find(
+              (detail) =>
+                detail["@type"] === "type.googleapis.com/google.rpc.RetryInfo"
+            )?.retryDelay;
+            const delaySeconds = retryDelay
+              ? parseInt(retryDelay.replace("s", ""))
+              : 30;
+
+            console.warn(
+              `AI API rate limited, retrying in ${delaySeconds} seconds (attempt ${retryCount + 1}/${maxRetries})...`
+            );
+
+            // Wait before retry
+            await new Promise((resolve) =>
+              setTimeout(resolve, delaySeconds * 1000)
+            );
+            retryCount++;
+          } else {
+            throw error; // Non-429 error or max retries reached
+          }
+        }
+      }
+
       const response = await result.response;
       const text = response.text();
 
@@ -345,6 +380,7 @@ Chỉ trả về JSON, không có text ngoài lề.
    * Get quick insights without full AI analysis
    */
   async getQuickInsights(daysBack = 30) {
+    // eslint-disable-next-line no-unused-vars
     const { salesData, inventoryData, lowStockItems, expiringSoonItems } =
       await this.getSalesAndInventoryData(daysBack);
 

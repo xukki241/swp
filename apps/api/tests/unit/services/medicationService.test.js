@@ -11,14 +11,29 @@ describe("MedicationService", () => {
         { id: 2, name: "Ibuprofen", brand: "Advil", status: "active" },
       ];
 
-      const mockQuery = {
-        from: vi.fn().mockResolvedValue(mockMedications),
+      const mockCountQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        mockResolvedValue: vi.fn().mockResolvedValue([{ count: 2 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      mockCountQuery.from.mockResolvedValue([{ count: 2 }]);
+
+      const mockDataQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockMedications),
+      };
+
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationService.getAllMedications();
 
-      expect(result).toEqual(mockMedications);
+      expect(result.data).toEqual(mockMedications);
+      expect(result.total).toBe(2);
       expect(db.select).toHaveBeenCalled();
     });
 
@@ -27,17 +42,29 @@ describe("MedicationService", () => {
         { id: 1, name: "Aspirin", brand: "Bayer", status: "active" },
       ];
 
-      const mockQuery = {
+      const mockCountQuery = {
         from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockMedications),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+
+      const mockDataQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockMedications),
+      };
+
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationService.getAllMedications({
         search: "Aspirin",
       });
 
-      expect(result).toEqual(mockMedications);
+      expect(result.data).toEqual(mockMedications);
+      expect(result.total).toBe(1);
     });
 
     it("should filter medications by status", async () => {
@@ -45,17 +72,29 @@ describe("MedicationService", () => {
         { id: 1, name: "Aspirin", brand: "Bayer", status: "active" },
       ];
 
-      const mockQuery = {
+      const mockCountQuery = {
         from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockMedications),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+
+      const mockDataQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockMedications),
+      };
+
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationService.getAllMedications({
         status: "active",
       });
 
-      expect(result).toEqual(mockMedications);
+      expect(result.data).toEqual(mockMedications);
+      expect(result.total).toBe(1);
     });
   });
 
@@ -422,19 +461,32 @@ describe("MedicationService", () => {
         { id: 1, name: "Aspirin", brand: "Bayer", status: "active" },
       ];
 
-      const mockQuery = {
+      const mockCountQuery = {
         from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockMedications),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
       };
-      db.select = vi.fn().mockReturnValue(mockQuery);
+
+      const mockDataQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockMedications),
+      };
+
+      db.select = vi
+        .fn()
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationService.getAllMedications({
         search: "Aspirin",
         status: "active",
       });
 
-      expect(result).toEqual(mockMedications);
-      expect(mockQuery.where).toHaveBeenCalled();
+      expect(result.data).toEqual(mockMedications);
+      expect(result.total).toBe(1);
+      expect(mockDataQuery.where).toHaveBeenCalled();
     });
   });
 

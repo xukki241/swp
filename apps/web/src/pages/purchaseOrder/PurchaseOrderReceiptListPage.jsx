@@ -87,17 +87,31 @@ export default function PurchaseOrderReceiptListPage() {
   };
 
   const getStatusBadge = (status) => {
-    const colorMap = {
-      pending: "bg-yellow-100 text-yellow-700",
-      received: "bg-green-100 text-green-700",
-      cancelled: "bg-red-100 text-red-700",
+    const statusConfig = {
+      pending: {
+        color: "bg-yellow-100 text-yellow-700",
+        label: "CHỜ XỬ LÝ",
+      },
+      ordered: {
+        color: "bg-blue-100 text-blue-700",
+        label: "ĐÃ ĐẶT HÀNG",
+      },
+      received: {
+        color: "bg-green-100 text-green-700",
+        label: "ĐÃ NHẬN HÀNG",
+      },
+      cancelled: {
+        color: "bg-red-100 text-red-700",
+        label: "ĐÃ HỦY",
+      },
+    };
+    const config = statusConfig[status] || {
+      color: "bg-gray-100 text-gray-700",
+      label: status?.toUpperCase() || "KHÔNG XÁC ĐỊNH",
     };
     return (
-      <Badge
-        variant="secondary"
-        className={colorMap[status] || "bg-gray-100 text-gray-700"}
-      >
-        {status?.toUpperCase()}
+      <Badge variant="secondary" className={config.color}>
+        {config.label}
       </Badge>
     );
   };

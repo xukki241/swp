@@ -34,10 +34,12 @@ import {
   Users,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 
 export default function DashboardPage() {
   const { data: currentUser } = useCurrentUser();
   const userName = currentUser?.user?.name || "User";
+  const navigate = useNavigate();
 
   // AI Analytics Dialog state
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
@@ -155,14 +157,12 @@ export default function DashboardPage() {
         },
       ];
     }
-
     const reportData = monthlyReport.data.data || monthlyReport.data;
     const { summary, topSellingMedications } = reportData;
     const totalOrders = summary?.totalOrders || 0;
     const totalRevenue = summary?.totalRevenue || 0;
     const avgOrder = totalOrders > 0 ? totalRevenue / totalOrders : 0;
     const topProducts = topSellingMedications?.length || 0;
-
     return [
       {
         title: "Tổng đơn hàng",

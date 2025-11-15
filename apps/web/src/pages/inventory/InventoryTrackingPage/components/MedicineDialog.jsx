@@ -99,9 +99,6 @@ const MedicineDialog = ({ medicine, open, onOpenChange, variant }) => {
                   <h3 className="font-semibold text-yellow-700 dark:text-yellow-400 text-lg">
                     Cảnh Báo Tồn Kho Thấp
                   </h3>
-                  <p className="text-sm text-yellow-600 dark:text-yellow-500">
-                    Cần chú ý ngay lập tức
-                  </p>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-4 mt-3">
@@ -281,7 +278,7 @@ const MedicineDialog = ({ medicine, open, onOpenChange, variant }) => {
               </div>
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground">Giá Bán</p>
-                <p className="text-sm font-medium">${sellPrice}</p>
+                <p className="text-sm font-medium">{sellPrice} VND</p>
               </div>
             </div>
           </div>
@@ -347,21 +344,13 @@ const MedicineDialog = ({ medicine, open, onOpenChange, variant }) => {
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">Mức Bin</p>
-                <p className="text-sm font-medium">Mức {binLevel}</p>
+                <p className="text-xs text-muted-foreground">Hàng</p>
+                <p className="text-sm font-medium">{binLevel}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">Số Bin</p>
-                <p className="text-sm font-medium">#{binNumber}</p>
+                <p className="text-xs text-muted-foreground">Cột</p>
+                <p className="text-sm font-medium">{binNumber}</p>
               </div>
-            </div>
-            <div className="mt-3 p-3 bg-muted rounded-lg">
-              <p className="text-xs text-muted-foreground mb-1">
-                Vị Trí Đầy Đủ
-              </p>
-              <p className="text-sm font-mono font-semibold">
-                {zoneCode}-{rackCode}-L{binLevel}-{binNumber}
-              </p>
             </div>
           </div>
 

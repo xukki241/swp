@@ -55,6 +55,9 @@ export default function MedicationDetailsPage() {
   const [sales, setSales] = useState([]);
   const [inventory, setInventory] = useState([]);
   const [variants, setVariants] = useState([]);
+  const [lightbox, setLightbox] = useState({ open: false, src: "", alt: "" });
+  const openLightbox = (src, alt) => setLightbox({ open: true, src, alt });
+  const closeLightbox = () => setLightbox({ open: false, src: "", alt: "" });
 
   useEffect(() => {
     if (!medication && id) {
@@ -114,7 +117,7 @@ export default function MedicationDetailsPage() {
     <AppLayout>
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Button variant="outline" onClick={() => navigate("/medications")}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Medications
+          <ArrowLeft className="w-4 h-4 mr-2" /> Quay lại Danh sách
         </Button>
         <Button
           onClick={() =>
@@ -123,13 +126,13 @@ export default function MedicationDetailsPage() {
             })
           }
         >
-          Manage Variants
+          Quản lý Biến thể
         </Button>
       </div>
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Medication • {medication?.name || "-"}</CardTitle>
+          <CardTitle>Thuốc • {medication?.name || "-"}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-start gap-4">
@@ -138,28 +141,26 @@ export default function MedicationDetailsPage() {
                 fileId={medication?.imageId}
                 alt={medication?.name}
                 size={80}
+                onClick={openLightbox}
               />
-              <div style={{ display: "none" }}>
-                <PillPlaceholder />
-              </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm flex-1">
               <div>
-                <b>Brand:</b> {medication?.brand || "-"}
+                <b>Thương hiệu:</b> {medication?.brand || "-"}
               </div>
               <div>
-                <b>Status:</b> {medication?.status || "-"}
+                <b>Trạng thái:</b> {medication?.status || "-"}
               </div>
               <div>
-                <b>Prescription:</b>{" "}
-                {medication?.isPrescriptionRequired ? "Yes" : "No"}
+                <b>Cần đơn:</b>{" "}
+                {medication?.isPrescriptionRequired ? "Có" : "Không"}
               </div>
               <div>
-                <b>Controlled:</b>{" "}
-                {medication?.isControlledSubstance ? "Yes" : "No"}
+                <b>Chất kiểm soát:</b>{" "}
+                {medication?.isControlledSubstance ? "Có" : "Không"}
               </div>
               <div className="col-span-2 md:col-span-4">
-                <b>Description:</b> {medication?.description || "-"}
+                <b>Mô tả:</b> {medication?.description || "-"}
               </div>
             </div>
           </div>
@@ -169,16 +170,16 @@ export default function MedicationDetailsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Suppliers</CardTitle>
+            <CardTitle>Nhà cung cấp</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Contact</TableHead>
+                  <TableHead>Tên</TableHead>
+                  <TableHead>Người liên hệ</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>Phone</TableHead>
+                  <TableHead>SĐT</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -196,7 +197,7 @@ export default function MedicationDetailsPage() {
                       colSpan={4}
                       className="text-center text-muted-foreground"
                     >
-                      No suppliers found
+                      Chưa có nhà cung cấp
                     </TableCell>
                   </TableRow>
                 )}
@@ -207,17 +208,17 @@ export default function MedicationDetailsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Sales Orders</CardTitle>
+            <CardTitle>Đơn bán hàng</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Order Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Payment</TableHead>
-                  <TableHead>Total</TableHead>
+                  <TableHead>Khách hàng</TableHead>
+                  <TableHead>Ngày đặt</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead>Thanh toán</TableHead>
+                  <TableHead>Tổng tiền</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -241,7 +242,7 @@ export default function MedicationDetailsPage() {
                       colSpan={5}
                       className="text-center text-muted-foreground"
                     >
-                      No sales found
+                      Chưa có đơn bán
                     </TableCell>
                   </TableRow>
                 )}
@@ -252,17 +253,17 @@ export default function MedicationDetailsPage() {
 
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Purchase Orders</CardTitle>
+            <CardTitle>Đơn nhập hàng</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Supplier</TableHead>
-                  <TableHead>Order Date</TableHead>
-                  <TableHead>Expected Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Total</TableHead>
+                  <TableHead>Nhà cung cấp</TableHead>
+                  <TableHead>Ngày đặt</TableHead>
+                  <TableHead>Ngày dự kiến</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead>Tổng tiền</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -288,7 +289,7 @@ export default function MedicationDetailsPage() {
                       colSpan={5}
                       className="text-center text-muted-foreground"
                     >
-                      No purchases found
+                      Chưa có đơn nhập
                     </TableCell>
                   </TableRow>
                 )}
@@ -299,16 +300,16 @@ export default function MedicationDetailsPage() {
 
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Inventory Summary</CardTitle>
+            <CardTitle>Tồn kho</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Variant</TableHead>
-                  <TableHead>Total Qty</TableHead>
-                  <TableHead>Reserved</TableHead>
-                  <TableHead>Available</TableHead>
+                  <TableHead>Biến thể</TableHead>
+                  <TableHead>Tổng số</TableHead>
+                  <TableHead>Đã đặt</TableHead>
+                  <TableHead>Còn lại</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -342,7 +343,7 @@ export default function MedicationDetailsPage() {
                       colSpan={4}
                       className="text-center text-muted-foreground"
                     >
-                      No inventory found
+                      Chưa có tồn kho
                     </TableCell>
                   </TableRow>
                 )}
@@ -351,6 +352,42 @@ export default function MedicationDetailsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Image Lightbox */}
+      {lightbox.open && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+          onClick={closeLightbox}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] p-4">
+            <button
+              onClick={closeLightbox}
+              className="absolute -top-2 -right-2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 z-10"
+              aria-label="Đóng ảnh"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+            <img
+              src={lightbox.src}
+              alt={lightbox.alt || "Medication image"}
+              className="max-h-[85vh] w-auto rounded-lg object-contain shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 }

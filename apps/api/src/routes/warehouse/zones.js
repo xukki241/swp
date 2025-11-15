@@ -47,6 +47,7 @@ warehouseZonesRouter.patch(
 );
 
 // DELETE /api/warehouse/zones/:id
+// Note: The controller should store the complete warehouse zone data before deletion in metadata.entityData
 warehouseZonesRouter.delete(
   "/zones/:id",
   authorize("owner"),

@@ -1,22 +1,25 @@
-import { and, eq, ilike, or, sum } from "drizzle-orm";
+import { and, count, eq, ilike, or, sum } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import { inventory, medicationVariants } from "../db/schema/index.js";
 /**
- * Get all medication variants with optional search and filters
+ * Get all medication variants with optional search, filters and pagination
  * @param {Object} options - Query options
  * @param {string} options.search - Search term for name, sku, or barcode
  * @param {number} options.medicationId - Filter by medication ID
  * @param {boolean} options.isActive - Filter by active status
- * @returns {Promise<Array>} List of medication variants
+ * @param {number} options.limit - Number of items per page
+ * @param {number} options.offset - Number of items to skip
+ * @returns {Promise<Object>} Object with data and total count
  */
 export const getAllMedicationVariants = async ({
   search,
   medicationId,
   isActive,
+  limit = 10,
+  offset = 0,
 } = {}) => {
   try {
-    let query = db.select().from(medicationVariants);
     const conditions = [];
     if (search) {
       conditions.push(
@@ -33,13 +36,33 @@ export const getAllMedicationVariants = async ({
     if (isActive !== undefined) {
       conditions.push(eq(medicationVariants.isActive, isActive));
     }
-    if (conditions.length > 0) {
-      query = query.where(
-        conditions.length > 1 ? and(...conditions) : conditions[0]
-      );
+
+    const whereClause =
+      conditions.length > 0
+        ? conditions.length > 1
+          ? and(...conditions)
+          : conditions[0]
+        : undefined;
+
+    // Get total count
+    let countQuery = db.select({ count: count() }).from(medicationVariants);
+    if (whereClause) {
+      countQuery = countQuery.where(whereClause);
     }
-    const result = await query;
-    return result;
+    const countResult = await countQuery;
+    const total = Number(countResult[0]?.count || 0);
+
+    // Get paginated data
+    let dataQuery = db.select().from(medicationVariants);
+    if (whereClause) {
+      dataQuery = dataQuery.where(whereClause);
+    }
+    const data = await dataQuery
+      .orderBy(medicationVariants.name)
+      .limit(limit)
+      .offset(offset);
+
+    return { data, total };
   } catch (error) {
     throw new Error(`Failed to fetch medication variants: ${error.message}`);
   }
@@ -264,7 +287,12 @@ export const searchVariantsForSale = async ({ search } = {}) => {
       })
     );
 
-    return variantsWithLocations;
+    // Filter to only variants with available stock (availableQuantity > 0)
+    const inStockVariants = variantsWithLocations.filter(
+      (v) => v.availableQuantity > 0
+    );
+
+    return inStockVariants;
   } catch (error) {
     throw new Error(`Failed to search variants for sale: ${error.message}`);
   }

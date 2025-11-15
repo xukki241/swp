@@ -272,4 +272,248 @@ describe("SupplierService", () => {
       expect(result).toEqual(mockSupplier);
     });
   });
+
+  describe("create - additional validation tests", () => {
+    it("should throw error for empty name", async () => {
+      const supplierData = [
+        {
+          name: "   ",
+          email: "test@example.com",
+          phone: "123456789",
+          address: "123 Main St",
+        },
+      ];
+
+      await expect(supplierService.create(supplierData)).rejects.toThrow(
+        "name cannot be empty"
+      );
+    });
+
+    it("should throw error for invalid email format", async () => {
+      const supplierData = [
+        {
+          name: "Supplier A",
+          email: "invalid-email",
+          phone: "123456789",
+          address: "123 Main St",
+        },
+      ];
+
+      await expect(supplierService.create(supplierData)).rejects.toThrow(
+        "Email format is invalid"
+      );
+    });
+
+    it("should throw error for empty phone", async () => {
+      const supplierData = [
+        {
+          name: "Supplier A",
+          email: "test@example.com",
+          phone: "",
+          address: "123 Main St",
+        },
+      ];
+
+      await expect(supplierService.create(supplierData)).rejects.toThrow(
+        "Phone number is required"
+      );
+    });
+
+    it("should throw error for duplicate email", async () => {
+      const supplierData = [
+        {
+          name: "Supplier A",
+          email: "existing@example.com",
+          phone: "123456789",
+          address: "123 Main St",
+        },
+      ];
+
+      db.query = {
+        suppliers: {
+          findFirst: vi.fn().mockResolvedValueOnce({
+            id: 1,
+            email: "existing@example.com",
+          }),
+        },
+      };
+
+      await expect(supplierService.create(supplierData)).rejects.toThrow(
+        "Supplier with this email already exists"
+      );
+    });
+
+    it("should throw error for duplicate phone", async () => {
+      const supplierData = [
+        {
+          name: "Supplier A",
+          email: "new@example.com",
+          phone: "123456789",
+          address: "123 Main St",
+        },
+      ];
+
+      db.query = {
+        suppliers: {
+          findFirst: vi
+            .fn()
+            .mockResolvedValueOnce(null) // email check passes
+            .mockResolvedValueOnce({ id: 1, phone: "123456789" }), // phone check fails
+        },
+      };
+
+      await expect(supplierService.create(supplierData)).rejects.toThrow(
+        "Supplier with this phone number already exists"
+      );
+    });
+
+    it("should throw error for empty variant SKU", async () => {
+      const supplierData = [
+        {
+          name: "Supplier A",
+          email: "test@example.com",
+          phone: "123456789",
+          address: "123 Main St",
+          medicationVariants: [
+            {
+              medication_variant_id: "var-1",
+              supplier_sku: "   ",
+              lead_time_days: 5,
+            },
+          ],
+        },
+      ];
+
+      await expect(supplierService.create(supplierData)).rejects.toThrow(
+        "Supplier SKU is required"
+      );
+    });
+
+    it("should throw error for missing variant medication", async () => {
+      const supplierData = [
+        {
+          name: "Supplier A",
+          email: "test@example.com",
+          phone: "123456789",
+          address: "123 Main St",
+          medicationVariants: [
+            {
+              medication_variant_id: null,
+              supplier_sku: "SKU-001",
+              lead_time_days: 5,
+            },
+          ],
+        },
+      ];
+
+      await expect(supplierService.create(supplierData)).rejects.toThrow(
+        "Medication Variant must be selected"
+      );
+    });
+  });
+
+  describe("update - additional tests", () => {
+    it("should throw error when updating to duplicate email", async () => {
+      const updateData = {
+        name: "Updated Name",
+        email: "duplicate@example.com",
+      };
+
+      const mockExistingSupplier = {
+        id: 1,
+        email: "original@example.com",
+        phone: "123",
+      };
+
+      db.query = {
+        suppliers: {
+          findFirst: vi
+            .fn()
+            .mockResolvedValueOnce(mockExistingSupplier) // existence check
+            .mockResolvedValueOnce({ id: 2, email: "duplicate@example.com" }), // email duplicate check
+        },
+      };
+
+      await expect(supplierService.update(1, updateData)).rejects.toThrow(
+        "Supplier with this email already exists"
+      );
+    });
+
+    it("should throw error when updating to duplicate phone", async () => {
+      const updateData = {
+        phone: "987654321",
+      };
+
+      const mockExistingSupplier = {
+        id: 1,
+        email: "test@example.com",
+        phone: "123",
+      };
+
+      db.query = {
+        suppliers: {
+          findFirst: vi
+            .fn()
+            .mockResolvedValueOnce(mockExistingSupplier) // existence check
+            .mockResolvedValueOnce({ id: 2, phone: "987654321" }), // phone duplicate check
+        },
+      };
+
+      await expect(supplierService.update(1, updateData)).rejects.toThrow(
+        "Supplier with this phone number already exists"
+      );
+    });
+
+    it("should update supplier with medication variants", async () => {
+      const updateData = {
+        name: "Updated Supplier",
+        medicationVariants: [
+          {
+            medication_variant_id: "var-1",
+            supplier_sku: "NEW-SKU",
+            lead_time_days: 10,
+            purchase_price: 50000,
+          },
+        ],
+      };
+
+      const mockExistingSupplier = {
+        id: 1,
+        name: "Old Name",
+        email: "test@example.com",
+        phone: "123",
+      };
+
+      const mockUpdatedSupplier = {
+        ...mockExistingSupplier,
+        name: "Updated Supplier",
+      };
+
+      db.query = {
+        suppliers: {
+          findFirst: vi.fn().mockResolvedValue(mockExistingSupplier),
+        },
+      };
+
+      const mockReturning = vi.fn().mockResolvedValue([mockUpdatedSupplier]);
+      const mockWhere = vi.fn().mockReturnValue({ returning: mockReturning });
+      const mockSet = vi.fn().mockReturnValue({ where: mockWhere });
+      db.update = vi.fn().mockReturnValue({ set: mockSet });
+
+      const mockDeleteWhere = vi.fn().mockResolvedValue([]);
+      db.delete = vi.fn().mockReturnValue({ where: mockDeleteWhere });
+
+      const mockInsertReturning = vi.fn().mockResolvedValue([]);
+      const mockInsertValues = vi.fn().mockReturnValue({
+        returning: mockInsertReturning,
+      });
+      db.insert = vi.fn().mockReturnValue({ values: mockInsertValues });
+
+      const result = await supplierService.update(1, updateData);
+
+      expect(result.name).toBe("Updated Supplier");
+      expect(db.delete).toHaveBeenCalled(); // Should delete old variants
+      expect(db.insert).toHaveBeenCalled(); // Should insert new variants
+    });
+  });
 });

@@ -299,5 +299,253 @@ describe("inventoryAllocationService", () => {
 
       expect(result).toBeDefined();
     });
+
+    it("should throw error when preferred bin zone has no empty bins", async () => {
+      const allocationData = {
+        medicationVariantId: "med-1",
+        batchNumber: "BATCH-NEW",
+        quantity: 100,
+        manufactureDate: new Date(),
+        expiryDate: new Date(),
+        preferredBinId: "bin-1",
+      };
+
+      const mockPreferredBinInfo = [
+        {
+          zoneId: "zone-1",
+          zoneCode: "Z01",
+          zoneName: "Zone 1",
+        },
+      ];
+
+      const mockBinsAllOccupied = [
+        {
+          binId: "bin-1",
+          binCode: "B01",
+          hasInventory: true,
+        },
+        {
+          binId: "bin-2",
+          binCode: "B02",
+          hasInventory: true,
+        },
+      ];
+
+      // Mock for preferred bin zone lookup
+      mockDb.select.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          innerJoin: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockResolvedValue(mockPreferredBinInfo),
+        }),
+      });
+
+      // Mock for bin availability query - all occupied
+      mockDb.select.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          innerJoin: vi.fn().mockReturnThis(),
+          leftJoin: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          groupBy: vi.fn().mockReturnThis(),
+          orderBy: vi.fn().mockResolvedValue(mockBinsAllOccupied),
+        }),
+      });
+
+      // Mock for existing inventory check
+      mockDb.select.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          innerJoin: vi.fn().mockReturnThis(),
+          where: vi.fn().mockResolvedValue([]),
+        }),
+      });
+
+      // Mock for zone info query
+      mockDb.select.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          innerJoin: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          limit: vi
+            .fn()
+            .mockResolvedValue([{ zoneCode: "Z01", zoneName: "Zone 1" }]),
+        }),
+      });
+
+      await expect(
+        inventoryAllocationService.allocateInventory(allocationData)
+      ).rejects.toThrow(/Không còn chỗ trống trong khu/);
+    });
+
+    it("should throw error when no empty bins available for new batch", async () => {
+      const allocationData = {
+        medicationVariantId: "med-1",
+        batchNumber: "BATCH-NEW",
+        quantity: 100,
+        manufactureDate: new Date(),
+        expiryDate: new Date(),
+      };
+
+      const mockBinsAllOccupied = [
+        {
+          binId: "bin-1",
+          binCode: "B01",
+          hasInventory: true,
+        },
+      ];
+
+      mockDb.select.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          innerJoin: vi.fn().mockReturnThis(),
+          leftJoin: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          groupBy: vi.fn().mockReturnThis(),
+          orderBy: vi.fn().mockResolvedValue(mockBinsAllOccupied),
+        }),
+      });
+
+      mockDb.select.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          innerJoin: vi.fn().mockReturnThis(),
+          where: vi.fn().mockResolvedValue([]),
+        }),
+      });
+
+      await expect(
+        inventoryAllocationService.allocateInventory(allocationData)
+      ).rejects.toThrow("No empty bins available");
+    });
+
+    it("should use first available bin when preferred bin is occupied", async () => {
+      const allocationData = {
+        medicationVariantId: "med-1",
+        batchNumber: "BATCH-NEW",
+        quantity: 100,
+        manufactureDate: new Date(),
+        expiryDate: new Date(),
+        preferredBinId: "bin-1",
+      };
+
+      const mockPreferredBinInfo = [
+        {
+          zoneId: "zone-1",
+          zoneCode: "Z01",
+          zoneName: "Zone 1",
+        },
+      ];
+
+      const mockBins = [
+        {
+          binId: "bin-2",
+          binCode: "B02",
+          hasInventory: false,
+          zoneCode: "Z01",
+        },
+        {
+          binId: "bin-1",
+          binCode: "B01",
+          hasInventory: true,
+        },
+      ];
+
+      mockDb.select.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          innerJoin: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockResolvedValue(mockPreferredBinInfo),
+        }),
+      });
+
+      mockDb.select.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          innerJoin: vi.fn().mockReturnThis(),
+          leftJoin: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          groupBy: vi.fn().mockReturnThis(),
+          orderBy: vi.fn().mockResolvedValue(mockBins),
+        }),
+      });
+
+      mockDb.select.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          innerJoin: vi.fn().mockReturnThis(),
+          where: vi.fn().mockResolvedValue([]),
+        }),
+      });
+
+      mockDb.insert.mockReturnValue({
+        values: vi.fn().mockReturnValue({
+          returning: vi.fn().mockResolvedValue([
+            {
+              id: "inv-1",
+              binId: "bin-2",
+            },
+          ]),
+        }),
+      });
+
+      const result =
+        await inventoryAllocationService.allocateInventory(allocationData);
+
+      expect(result).toBeDefined();
+      expect(mockDb.insert).toHaveBeenCalled();
+    });
+  });
+
+  describe("getReceiptAllocations", () => {
+    it("should return empty array when receipt has no items", async () => {
+      mockDb.select.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([]),
+        }),
+      });
+
+      const result =
+        await inventoryAllocationService.getReceiptAllocations("receipt-1");
+
+      expect(result).toEqual([]);
+    });
+
+    it("should return allocations for receipt with items", async () => {
+      const mockReceiptItems = [{ id: "item-1" }, { id: "item-2" }];
+
+      const mockAllocations = [
+        {
+          inventoryId: "inv-1",
+          medicationVariantId: "var-1",
+          batchNumber: "BATCH-001",
+          quantity: 100,
+          binCode: "B01",
+          zoneCode: "Z01",
+        },
+        {
+          inventoryId: "inv-2",
+          medicationVariantId: "var-2",
+          batchNumber: "BATCH-002",
+          quantity: 50,
+          binCode: "B02",
+          zoneCode: "Z01",
+        },
+      ];
+
+      // Mock receipt items query
+      mockDb.select.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue(mockReceiptItems),
+        }),
+      });
+
+      // Mock allocations query
+      mockDb.select.mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          innerJoin: vi.fn().mockReturnThis(),
+          where: vi.fn().mockResolvedValue(mockAllocations),
+        }),
+      });
+
+      const result =
+        await inventoryAllocationService.getReceiptAllocations("receipt-1");
+
+      expect(result).toEqual(mockAllocations);
+      expect(result.length).toBe(2);
+    });
   });
 });

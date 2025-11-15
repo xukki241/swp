@@ -1,4 +1,4 @@
-import { and, eq, ilike, or, sum } from "drizzle-orm";
+import { and, count, eq, ilike, or, sum } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import {
@@ -14,16 +14,21 @@ import {
 } from "../db/schema/index.js";
 
 /**
- * Get all medications with optional search and filters
+ * Get all medications with optional search, filters and pagination
  * @param {Object} options - Query options
  * @param {string} options.search - Search term for name or brand
  * @param {string} options.status - Filter by status
- * @returns {Promise<Array>} List of medications
+ * @param {number} options.limit - Number of items per page
+ * @param {number} options.offset - Number of items to skip
+ * @returns {Promise<Object>} Object with data and total count
  */
-export const getAllMedications = async ({ search, status } = {}) => {
+export const getAllMedications = async ({
+  search,
+  status,
+  limit = 10,
+  offset = 0,
+} = {}) => {
   try {
-    let query = db.select().from(medications);
-
     const conditions = [];
 
     if (search) {
@@ -39,14 +44,32 @@ export const getAllMedications = async ({ search, status } = {}) => {
       conditions.push(eq(medications.status, status));
     }
 
-    if (conditions.length > 0) {
-      query = query.where(
-        conditions.length === 1 ? conditions[0] : and(...conditions)
-      );
-    }
+    const whereClause =
+      conditions.length > 0
+        ? conditions.length === 1
+          ? conditions[0]
+          : and(...conditions)
+        : undefined;
 
-    const result = await query;
-    return result;
+    // Get total count
+    let countQuery = db.select({ count: count() }).from(medications);
+    if (whereClause) {
+      countQuery = countQuery.where(whereClause);
+    }
+    const countResult = await countQuery;
+    const total = Number(countResult[0]?.count || 0);
+
+    // Get paginated data
+    let dataQuery = db.select().from(medications);
+    if (whereClause) {
+      dataQuery = dataQuery.where(whereClause);
+    }
+    const data = await dataQuery
+      .orderBy(medications.name)
+      .limit(limit)
+      .offset(offset);
+
+    return { data, total };
   } catch (error) {
     throw new Error(`Failed to fetch medications: ${error.message}`);
   }
@@ -389,6 +412,91 @@ export const getMedicationSales = async (medicationId) => {
   } catch (error) {
     throw new Error(
       `Failed to fetch sales orders for medication: ${error.message}`
+    );
+  }
+};
+
+/**
+ * Get all medications with variants and available inventory
+ * Only returns medications that have at least one variant with available stock
+ * @param {Object} options - Query options
+ * @param {string} options.search - Search term for name, brand or variant name
+ * @param {boolean} options.inStockOnly - Filter to only show in-stock items (default: true)
+ * @returns {Promise<Array>} List of medications with variants and inventory info
+ */
+export const getMedicationsWithInventory = async ({
+  search,
+  inStockOnly = true,
+} = {}) => {
+  try {
+    // Get all medications with variants using query API
+    const allMeds = await db.query.medications.findMany({
+      with: {
+        variants: {
+          with: {
+            inventory: true,
+          },
+        },
+      },
+    });
+
+    // Filter medications
+    let filtered = allMeds;
+
+    // Filter by search term
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter((med) => {
+        const medsMatch =
+          med.name.toLowerCase().includes(searchLower) ||
+          med.brand?.toLowerCase().includes(searchLower);
+        const variantMatch = med.variants.some((v) =>
+          v.name.toLowerCase().includes(searchLower)
+        );
+        return medsMatch || variantMatch;
+      });
+    }
+
+    // Filter by in-stock status if requested
+    if (inStockOnly) {
+      filtered = filtered.filter((med) => {
+        // Check if any variant has available inventory
+        return med.variants.some((variant) => {
+          const totalQty = variant.inventory.reduce(
+            (sum, inv) => sum + (inv.quantity - inv.quantityReserved),
+            0
+          );
+          return totalQty > 0;
+        });
+      });
+    }
+
+    // Add inventory summary to each variant
+    const result = filtered.map((med) => ({
+      ...med,
+      variants: med.variants.map((variant) => {
+        const totalQty = variant.inventory.reduce(
+          (sum, inv) => sum + inv.quantity,
+          0
+        );
+        const availableQty = variant.inventory.reduce(
+          (sum, inv) => sum + (inv.quantity - inv.quantityReserved),
+          0
+        );
+        return {
+          ...variant,
+          totalQuantity: totalQty,
+          availableQuantity: availableQty,
+          // Remove detailed inventory array from response to reduce payload
+          // inventory: undefined,
+        };
+      }),
+    }));
+
+    return result;
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch medications with inventory: ${error.message}`
     );
   }
 };

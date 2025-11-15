@@ -12,7 +12,7 @@ import { AlertTriangle, Box, Calendar, Package } from "lucide-react";
 import { useState } from "react";
 import MedicineDialog from "./MedicineDialog";
 
-const MedicineCard = ({ medicine = {}, variant }) => {
+const MedicineCard = ({ medicine = {}, variant, imageUrl }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Map API data to component data
@@ -20,7 +20,7 @@ const MedicineCard = ({ medicine = {}, variant }) => {
     medicine?.medicationVariant?.medication?.name || "Unknown";
   const variantName = medicine?.medicationVariant?.name || "";
   const variantUnit = medicine?.medicationVariant?.unit || "";
-  const imageUrl = medicine?.medicationVariant?.medication?.image_url;
+  const displayImage = imageUrl || MedicinePlaceholder;
   const batchNumber = medicine?.batchNumber || "N/A";
   const quantity = medicine?.quantity || 0;
   const quantityReserved = medicine?.quantityReserved || 0;
@@ -63,7 +63,7 @@ const MedicineCard = ({ medicine = {}, variant }) => {
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
               <img
-                src={imageUrl || MedicinePlaceholder}
+                src={displayImage}
                 alt={medicationName}
                 className="w-16 h-16 object-cover rounded-lg border"
               />

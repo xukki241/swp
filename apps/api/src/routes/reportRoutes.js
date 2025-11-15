@@ -43,6 +43,7 @@ reportRouter.get("/monthly", reportController.generateMonthly);
 reportRouter.get("/:id", reportController.getById);
 
 // DELETE /api/reports/:id - Delete a report
+// Note: The controller should store the complete report data before deletion in metadata.entityData
 reportRouter.delete(
   "/:id",
   authorize("owner"),

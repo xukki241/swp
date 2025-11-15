@@ -36,10 +36,6 @@ export default function ActiveFilters({ filters, onRemoveFilter }) {
         return value.from || value.to
           ? `Ngày hết hạn: ${value.from || "bất kỳ"} - ${value.to || "bất kỳ"} `
           : null;
-      case "supplier":
-        return Array.isArray(value) && value.length > 0
-          ? renderSupplierNames(value)
-          : null;
       case "prescription":
         return value ? "Thuốc cần kê đơn" : null;
       default:

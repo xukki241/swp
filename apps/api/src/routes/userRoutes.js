@@ -101,7 +101,9 @@ userRouter.post(
   "/",
   authenticate,
   authorize("owner"),
-  createAuditLog("CREATE", "user"),
+  createAuditLog("CREATE", "user", {
+    excludeFields: ["password", "passwordHash"],
+  }),
   userController.createUser
 );
 
@@ -115,7 +117,9 @@ userRouter.put(
   "/:id",
   authenticate,
   authorize("owner"),
-  createAuditLog("UPDATE", "user"),
+  createAuditLog("UPDATE", "user", {
+    excludeFields: ["password", "passwordHash"],
+  }),
   userController.updateUser
 );
 
@@ -123,6 +127,7 @@ userRouter.put(
  * @route   DELETE /api/users/:id
  * @desc    Delete user by ID (owner only)
  * @access  Private (Owner)
+ * Note: Consider storing user entity data before delete for better audit trail
  */
 userRouter.delete(
   "/:id",

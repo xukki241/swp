@@ -1,5 +1,4 @@
 import { AppLayout } from "@/components/layouts/app-layout";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,7 +13,6 @@ export default function SalesOrderListPage() {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [updatingOrderId, setUpdatingOrderId] = useState(null);
 
   useEffect(() => {
     fetchOrders();
@@ -44,61 +42,11 @@ export default function SalesOrderListPage() {
     }
   };
 
-  const handleMarkAsCompleted = async (orderId) => {
-    setUpdatingOrderId(orderId);
-    try {
-      await salesService.updateSalesOrder(orderId, { status: "paid" });
-      fetchOrders();
-    } catch (error) {
-      console.error("Error updating order:", error);
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Không thể cập nhật đơn hàng";
-      toast.error(message);
-    } finally {
-      setUpdatingOrderId(null);
-    }
-  };
-
-  const handleCancelOrder = async (orderId) => {
-    if (!confirm("Bạn có chắc muốn hủy đơn hàng này không?")) return;
-
-    setUpdatingOrderId(orderId);
-    try {
-      await salesService.updateSalesOrder(orderId, { status: "cancelled" });
-      fetchOrders();
-    } catch (error) {
-      console.error("Error cancelling order:", error);
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Không thể hủy đơn hàng";
-      toast.error(message);
-    } finally {
-      setUpdatingOrderId(null);
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "paid":
-        return "bg-green-100 text-green-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
   const filteredOrders = orders.filter((order) => {
     const searchLower = searchTerm.toLowerCase();
     return (
       order.id?.toLowerCase().includes(searchLower) ||
-      order.customerName?.toLowerCase().includes(searchLower) ||
-      order.status?.toLowerCase().includes(searchLower)
+      order.customerName?.toLowerCase().includes(searchLower)
     );
   });
 
@@ -131,7 +79,7 @@ export default function SalesOrderListPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                 <Input
-                  placeholder="Tìm theo mã đơn, tên khách hàng hoặc trạng thái..."
+                  placeholder="Tìm theo mã đơn hoặc tên khách hàng..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -174,15 +122,6 @@ export default function SalesOrderListPage() {
                           <p className="font-semibold text-gray-900">
                             Đơn hàng #{order.id?.slice(0, 8)}
                           </p>
-                          <Badge className={getStatusColor(order.status)}>
-                            {order.status === "paid"
-                              ? "Đã thanh toán"
-                              : order.status === "pending"
-                                ? "Chờ thanh toán"
-                                : order.status === "cancelled"
-                                  ? "Đã hủy"
-                                  : order.status}
-                          </Badge>
                         </div>
                         <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
                           <div>

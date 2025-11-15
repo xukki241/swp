@@ -33,20 +33,26 @@ describe("MedicationController", () => {
         { id: 2n, name: "Aspirin Plus", status: "active" },
       ];
 
-      medicationService.getAllMedications.mockResolvedValue(mockMedications);
+      medicationService.getAllMedications.mockResolvedValue({
+        data: mockMedications,
+        total: 2,
+      });
 
       await medicationController.getAllMedications(req, res, next);
 
       expect(medicationService.getAllMedications).toHaveBeenCalledWith({
         search: "aspirin",
         status: "active",
+        limit: 10,
+        offset: 0,
       });
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
-        success: true,
-        count: 2,
-        data: mockMedications,
-      });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          data: mockMedications,
+        })
+      );
     });
 
     it("should handle errors", async () => {
@@ -359,6 +365,231 @@ describe("MedicationController", () => {
 
       expect(logger.error).toHaveBeenCalled();
       expect(next).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe("getMedicationSuppliers", () => {
+    it("should return suppliers for a medication", async () => {
+      req.params = { id: "1" };
+      const mockSuppliers = [
+        { id: 1, name: "Supplier A", contactPerson: "John Doe" },
+        { id: 2, name: "Supplier B", contactPerson: "Jane Smith" },
+      ];
+      medicationService.getMedicationSuppliers.mockResolvedValue(mockSuppliers);
+
+      await medicationController.getMedicationSuppliers(req, res, next);
+
+      expect(medicationService.getMedicationSuppliers).toHaveBeenCalledWith(
+        "1"
+      );
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 2,
+        data: mockSuppliers,
+      });
+    });
+
+    it("should return empty array if no suppliers found", async () => {
+      req.params = { id: "999" };
+      medicationService.getMedicationSuppliers.mockResolvedValue([]);
+
+      await medicationController.getMedicationSuppliers(req, res, next);
+
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 0,
+        data: [],
+      });
+    });
+
+    it("should handle errors", async () => {
+      req.params = { id: "1" };
+      const error = new Error("Database error");
+      medicationService.getMedicationSuppliers.mockRejectedValue(error);
+
+      await medicationController.getMedicationSuppliers(req, res, next);
+
+      expect(logger.error).toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe("getMedicationPurchases", () => {
+    it("should return purchase orders for a medication", async () => {
+      req.params = { id: "1" };
+      const mockPurchases = [
+        { id: 1, orderNumber: "PO-001", totalAmount: 1000 },
+        { id: 2, orderNumber: "PO-002", totalAmount: 2000 },
+      ];
+      medicationService.getMedicationPurchases.mockResolvedValue(mockPurchases);
+
+      await medicationController.getMedicationPurchases(req, res, next);
+
+      expect(medicationService.getMedicationPurchases).toHaveBeenCalledWith(
+        "1"
+      );
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 2,
+        data: mockPurchases,
+      });
+    });
+
+    it("should handle errors", async () => {
+      req.params = { id: "1" };
+      const error = new Error("Database error");
+      medicationService.getMedicationPurchases.mockRejectedValue(error);
+
+      await medicationController.getMedicationPurchases(req, res, next);
+
+      expect(logger.error).toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe("getMedicationSales", () => {
+    it("should return sales orders for a medication", async () => {
+      req.params = { id: "1" };
+      const mockSales = [
+        { id: 1, orderNumber: "SO-001", totalAmount: 500 },
+        { id: 2, orderNumber: "SO-002", totalAmount: 750 },
+      ];
+      medicationService.getMedicationSales.mockResolvedValue(mockSales);
+
+      await medicationController.getMedicationSales(req, res, next);
+
+      expect(medicationService.getMedicationSales).toHaveBeenCalledWith("1");
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 2,
+        data: mockSales,
+      });
+    });
+
+    it("should handle errors", async () => {
+      req.params = { id: "1" };
+      const error = new Error("Database error");
+      medicationService.getMedicationSales.mockRejectedValue(error);
+
+      await medicationController.getMedicationSales(req, res, next);
+
+      expect(logger.error).toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe("createMedication - bulk operations", () => {
+    it("should create multiple medications", async () => {
+      req.body = [
+        { name: "Aspirin", brand: "Bayer" },
+        { name: "Ibuprofen", brand: "Advil" },
+      ];
+
+      const mockMedications = [
+        { id: 1n, name: "Aspirin", brand: "Bayer" },
+        { id: 2n, name: "Ibuprofen", brand: "Advil" },
+      ];
+      medicationService.createMedication
+        .mockResolvedValueOnce(mockMedications[0])
+        .mockResolvedValueOnce(mockMedications[1]);
+
+      await medicationController.createMedication(req, res, next);
+
+      expect(medicationService.createMedication).toHaveBeenCalledTimes(2);
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: "2 medication(s) created successfully",
+        data: mockMedications,
+      });
+    });
+
+    it("should validate all medications in bulk create", async () => {
+      req.body = [{ name: "Aspirin" }, { brand: "Bayer" }]; // Second one missing name
+
+      await medicationController.createMedication(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: "Validation failed",
+        errors: ["Medication at index 1: name is required"],
+      });
+    });
+  });
+
+  describe("updateMedication - field updates", () => {
+    it("should update isPrescriptionRequired", async () => {
+      req.params = { id: "1" };
+      req.body = { is_prescription_required: true };
+      const existingMedication = {
+        id: 1n,
+        name: "Aspirin",
+        isPrescriptionRequired: false,
+      };
+      const updatedMedication = {
+        ...existingMedication,
+        isPrescriptionRequired: true,
+      };
+
+      medicationService.getMedicationById.mockResolvedValue(existingMedication);
+      medicationService.updateMedication.mockResolvedValue(updatedMedication);
+
+      await medicationController.updateMedication(req, res, next);
+
+      expect(medicationService.updateMedication).toHaveBeenCalledWith("1", {
+        isPrescriptionRequired: true,
+      });
+    });
+
+    it("should update isControlledSubstance", async () => {
+      req.params = { id: "1" };
+      req.body = { is_controlled_substance: true };
+      const existingMedication = {
+        id: 1n,
+        name: "Morphine",
+        isControlledSubstance: false,
+      };
+      const updatedMedication = {
+        ...existingMedication,
+        isControlledSubstance: true,
+      };
+
+      medicationService.getMedicationById.mockResolvedValue(existingMedication);
+      medicationService.updateMedication.mockResolvedValue(updatedMedication);
+
+      await medicationController.updateMedication(req, res, next);
+
+      expect(medicationService.updateMedication).toHaveBeenCalledWith("1", {
+        isControlledSubstance: true,
+      });
+    });
+
+    it("should update variants", async () => {
+      req.params = { id: "1" };
+      req.body = {
+        variants: [
+          { strength: "500mg", form: "tablet" },
+          { strength: "1000mg", form: "tablet" },
+        ],
+      };
+      const existingMedication = { id: 1n, name: "Aspirin", variants: [] };
+      const updatedMedication = {
+        ...existingMedication,
+        variants: req.body.variants,
+      };
+
+      medicationService.getMedicationById.mockResolvedValue(existingMedication);
+      medicationService.updateMedication.mockResolvedValue(updatedMedication);
+
+      await medicationController.updateMedication(req, res, next);
+
+      expect(medicationService.updateMedication).toHaveBeenCalledWith("1", {
+        variants: req.body.variants,
+      });
     });
   });
 });

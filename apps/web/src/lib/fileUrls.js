@@ -1,11 +1,16 @@
 // apps/web/src/lib/fileUrls.js
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+import instance from "./axios";
+
+const API_BASE_URL = instance.defaults.baseURL || "/api";
 
 export function getMedicationImageUrl(id, imageId) {
-  return imageId
+  if (!imageId) {
+    return "/images/no-image.png";
+  }
+  // Nếu API_BASE_URL đã có http/https thì dùng trực tiếp, không thì dùng relative path
+  return API_BASE_URL.startsWith("http")
     ? `${API_BASE_URL}/files/${imageId}/view`
-    : "/images/no-image.png";
+    : `/api/files/${imageId}/view`;
 }
 
 export function getMedicationImageLocal(id) {

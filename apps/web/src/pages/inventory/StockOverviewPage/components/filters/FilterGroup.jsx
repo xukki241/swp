@@ -78,17 +78,6 @@ export default function FilterGroup({ filters, onFilterChange, suppliers }) {
           isActive={isFilterActive("expiryDate")}
         />
 
-        {/* Supplier Filter */}
-        <FilterDropdown
-          label="Nhà cung cấp"
-          filterType="multiSelect"
-          value={filters.supplier}
-          options={suppliers}
-          onSave={(value) => handleMultiSelectFilter("supplier", value)}
-          onCancel={() => handleCancelFilter("supplier")}
-          isActive={isFilterActive("supplier")}
-        />
-
         {/* Prescription Toggle */}
         <div className="flex items-center gap-2 px-3 py-2 border rounded-md bg-background hover:bg-accent/50 transition-colors">
           <Checkbox

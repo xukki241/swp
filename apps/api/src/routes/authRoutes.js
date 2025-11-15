@@ -5,6 +5,7 @@ import {
   auditLogin,
   auditLogout,
   auditPasswordChange,
+  auditPasswordReset,
 } from "../middleware/auditLog.js";
 import { authenticate } from "../middleware/checkAuth.js";
 
@@ -67,7 +68,11 @@ authRouter.get("/me", authenticate, authController.getCurrentUser);
  * @access  Public
  * @body    { identifier (email or phone), method ('email' or 'sms') }
  */
-authRouter.post("/forgot-password", authController.requestPasswordReset);
+authRouter.post(
+  "/forgot-password",
+  auditPasswordReset,
+  authController.requestPasswordReset
+);
 
 /**
  * @route   POST /api/auth/verify-reset-otp

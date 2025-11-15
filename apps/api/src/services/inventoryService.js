@@ -29,6 +29,7 @@ const transformInventoryItem = (item) => {
 export const inventoryService = {
   /**
    * Get all inventory items with filters and pagination
+   * Excludes items where quantity = 0 (out of stock)
    */
   async getAll(filters = {}) {
     const {
@@ -44,6 +45,9 @@ export const inventoryService = {
     } = filters;
 
     const conditions = [];
+
+    // Always exclude out-of-stock items
+    conditions.push(sql`${inventory.quantity} > 0`);
 
     if (medicationVariantId) {
       conditions.push(eq(inventory.medicationVariantId, medicationVariantId));
@@ -506,5 +510,54 @@ export const inventoryService = {
 
       return { success: true };
     });
+  },
+
+  /**
+   * Delete inventory entries where quantity <= 0
+   * Called after inventory transactions to clean up depleted entries
+   * @param {string} medicationVariantId - Optional: only clean specific variant
+   * @returns {Promise<number>} Number of deleted entries
+   */
+  async deleteEmptyInventory(medicationVariantId = null) {
+    const conditions = [];
+
+    // Filter by quantity = 0 and quantityReserved = 0
+    conditions.push(sql`${inventory.quantity} <= 0`);
+    conditions.push(sql`${inventory.quantityReserved} <= 0`);
+
+    if (medicationVariantId) {
+      conditions.push(eq(inventory.medicationVariantId, medicationVariantId));
+    }
+
+    const deleted = await db
+      .delete(inventory)
+      .where(and(...conditions))
+      .returning({ id: inventory.id });
+
+    return deleted.length;
+  },
+
+  /**
+   * Delete inventory entries where quantity <= 0 within a transaction
+   * @param {string} medicationVariantId - Optional: only clean specific variant
+   * @param {Object} tx - Database transaction object
+   * @returns {Promise<number>} Number of deleted entries
+   */
+  async deleteEmptyInventoryTx(medicationVariantId = null, tx = db) {
+    const conditions = [];
+
+    conditions.push(sql`${inventory.quantity} <= 0`);
+    conditions.push(sql`${inventory.quantityReserved} <= 0`);
+
+    if (medicationVariantId) {
+      conditions.push(eq(inventory.medicationVariantId, medicationVariantId));
+    }
+
+    const deleted = await tx
+      .delete(inventory)
+      .where(and(...conditions))
+      .returning({ id: inventory.id });
+
+    return deleted.length;
   },
 };

@@ -37,9 +37,10 @@ describe("MedicationVariantController", () => {
         { id: 2n, name: "Tablet 200mg", isActive: true },
       ];
 
-      medicationVariantService.getAllMedicationVariants.mockResolvedValue(
-        mockVariants
-      );
+      medicationVariantService.getAllMedicationVariants.mockResolvedValue({
+        data: mockVariants,
+        total: 2,
+      });
 
       await medicationVariantController.getAllMedicationVariants(
         req,
@@ -53,13 +54,16 @@ describe("MedicationVariantController", () => {
         search: "tablet",
         medicationId: undefined,
         isActive: true,
+        limit: 10,
+        offset: 0,
       });
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
-        success: true,
-        count: 2,
-        data: mockVariants,
-      });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          data: mockVariants,
+        })
+      );
     });
 
     it("should handle errors", async () => {
@@ -147,7 +151,7 @@ describe("MedicationVariantController", () => {
           sku: "ASP-100-TAB",
           name: "Aspirin 100mg Tablet",
           unit: "tablet",
-          unitFactor: 1.0,
+
           barcode: "123456",
           sellPrice: 10.0,
           isActive: true,
@@ -161,7 +165,7 @@ describe("MedicationVariantController", () => {
         sku: "ASP-100-TAB",
         name: "Aspirin 100mg Tablet",
         unit: "tablet",
-        unitFactor: "1.0",
+
         barcode: "123456",
         sellPrice: "10.0",
         isActive: true,
@@ -186,7 +190,7 @@ describe("MedicationVariantController", () => {
         sku: "ASP-100-TAB",
         name: "Aspirin 100mg Tablet",
         unit: "tablet",
-        unitFactor: "1",
+
         barcode: "123456",
         sellPrice: "10",
         isActive: true,
@@ -255,7 +259,7 @@ describe("MedicationVariantController", () => {
         sku: "ASP-100-TAB",
         name: "Aspirin 100mg Tablet",
         unit: "tablet",
-        unitFactor: "1.0",
+
         barcode: null,
         sellPrice: "10.0",
         isActive: true,
@@ -278,7 +282,7 @@ describe("MedicationVariantController", () => {
         sku: "ASP-100-TAB",
         name: "Aspirin 100mg Tablet",
         unit: "tablet",
-        unitFactor: "1.0",
+
         barcode: null,
         sellPrice: "10",
         isActive: true,

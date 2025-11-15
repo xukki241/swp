@@ -67,7 +67,9 @@ supplierMedicationVariantRouter.post(
   authorize("owner"),
   validateParams(supplierIdParamSchema),
   validateBody(createSupplierMedicationsRequestSchema),
-  createAuditLog("CREATE", "supplier_medication_variant"),
+  createAuditLog("CREATE", "supplier_medication_variant", {
+    excludeFields: ["costPrice", "supplierCost"],
+  }),
   supplierMedicationVariantController.create
 );
 
@@ -82,6 +84,7 @@ supplierMedicationVariantRouter.patch(
   validateParams(supplierIdAndIdParamSchema),
   validateBody(updateSupplierMedicationRequestSchema),
   createAuditLog("UPDATE", "supplier_medication_variant", {
+    excludeFields: ["costPrice", "supplierCost"],
     getChanges: (req) => ({ supplierMedicationVariant: req.body }),
   }),
   supplierMedicationVariantController.update
@@ -92,11 +95,14 @@ supplierMedicationVariantRouter.patch(
  * @desc    Remove medication variant from supplier
  * @access  Private (Owner only)
  */
+// Note: The controller should store the complete supplier medication variant data before deletion in metadata.entityData
 supplierMedicationVariantRouter.delete(
   "/:id",
   authorize("owner"),
   validateParams(supplierIdAndIdParamSchema),
-  createAuditLog("DELETE", "supplier_medication_variant"),
+  createAuditLog("DELETE", "supplier_medication_variant", {
+    excludeFields: ["costPrice", "supplierCost"],
+  }),
   supplierMedicationVariantController.delete
 );
 

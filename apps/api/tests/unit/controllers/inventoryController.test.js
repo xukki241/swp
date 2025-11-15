@@ -526,4 +526,241 @@ describe("InventoryController", () => {
       ).rejects.toThrow("Insufficient reserved quantity");
     });
   });
+
+  describe("getSummaryByVariant", () => {
+    it("should return inventory summary by variant with pagination", async () => {
+      req.query = { page: "1", limit: "50" };
+      const mockData = [
+        { medicationVariantId: "1", totalQuantity: 1000 },
+        { medicationVariantId: "2", totalQuantity: 500 },
+      ];
+      inventoryService.getSummaryByVariant.mockResolvedValue({
+        data: mockData,
+        total: 2,
+      });
+
+      await inventoryController.getSummaryByVariant(req, res);
+
+      expect(inventoryService.getSummaryByVariant).toHaveBeenCalledWith({
+        sortBy: undefined,
+        sortOrder: undefined,
+        limit: 50,
+        offset: 0,
+      });
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: mockData,
+        pagination: {
+          page: 1,
+          limit: 50,
+          total: 2,
+          totalPages: 1,
+          hasMore: false,
+        },
+      });
+    });
+
+    it("should handle errors", async () => {
+      inventoryService.getSummaryByVariant.mockRejectedValue(
+        new Error("Database error")
+      );
+
+      await expect(
+        inventoryController.getSummaryByVariant(req, res)
+      ).rejects.toThrow("Database error");
+    });
+  });
+
+  describe("update", () => {
+    it("should update inventory item successfully", async () => {
+      req.params = { inventoryBatchId: "inv-uuid-1" };
+      req.body = { quantity: "500", notes: "Updated" };
+      const mockItem = { id: "inv-uuid-1", quantity: 500, notes: "Updated" };
+      inventoryService.update.mockResolvedValue(mockItem);
+
+      await inventoryController.update(req, res);
+
+      expect(inventoryService.update).toHaveBeenCalledWith("inv-uuid-1", {
+        quantity: "500",
+        notes: "Updated",
+      });
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: "Inventory item updated successfully",
+        data: mockItem,
+      });
+    });
+
+    it("should return 404 if item not found", async () => {
+      req.params = { inventoryBatchId: "inv-uuid-999" };
+      req.body = { quantity: "500" };
+      inventoryService.update.mockResolvedValue(null);
+
+      await inventoryController.update(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: "Inventory item not found",
+      });
+    });
+
+    it("should handle errors", async () => {
+      req.params = { inventoryBatchId: "inv-uuid-1" };
+      req.body = { quantity: "500" };
+      inventoryService.update.mockRejectedValue(new Error("Update error"));
+
+      await expect(inventoryController.update(req, res)).rejects.toThrow(
+        "Update error"
+      );
+    });
+  });
+
+  describe("adjust", () => {
+    it("should adjust inventory quantity successfully", async () => {
+      req.params = { inventoryBatchId: "inv-uuid-1" };
+      req.body = { newQuantity: "600", reason: "Stock correction" };
+      const mockCurrentInventory = {
+        id: "inv-uuid-1",
+        quantity: 500,
+        quantityReserved: 50,
+      };
+      const mockUpdated = { ...mockCurrentInventory, quantity: 600 };
+      inventoryService.getById.mockResolvedValue(mockCurrentInventory);
+      inventoryService.update.mockResolvedValue(mockUpdated);
+
+      await inventoryController.adjust(req, res);
+
+      expect(inventoryService.getById).toHaveBeenCalledWith("inv-uuid-1");
+      expect(inventoryService.update).toHaveBeenCalledWith("inv-uuid-1", {
+        quantity: "600",
+      });
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: "Inventory adjusted successfully. Reason: Stock correction",
+        data: mockUpdated,
+      });
+    });
+
+    it("should return 404 if inventory not found", async () => {
+      req.params = { inventoryBatchId: "inv-uuid-999" };
+      req.body = { newQuantity: "600", reason: "Test" };
+      inventoryService.getById.mockResolvedValue(null);
+
+      await inventoryController.adjust(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: "Inventory item not found",
+      });
+    });
+
+    it("should handle errors", async () => {
+      req.params = { inventoryBatchId: "inv-uuid-1" };
+      req.body = { newQuantity: "600", reason: "Test" };
+      inventoryService.getById.mockRejectedValue(new Error("Database error"));
+
+      await expect(inventoryController.adjust(req, res)).rejects.toThrow(
+        "Database error"
+      );
+    });
+  });
+
+  describe("move", () => {
+    it("should move inventory between bins successfully", async () => {
+      req.body = {
+        fromInventoryId: "inv-uuid-1",
+        toBinId: "bin-uuid-2",
+        quantity: 100,
+        reason: "Reorganization",
+      };
+      const mockFromInventory = {
+        id: "inv-uuid-1",
+        quantity: 500,
+        quantityReserved: 50,
+        medicationVariantId: "var-1",
+        batchNumber: "BATCH001",
+        manufactureDate: "2024-01-01",
+        expiryDate: "2026-01-01",
+        purchaseOrderReceiptItemsId: "receipt-1",
+      };
+      inventoryService.getById.mockResolvedValue(mockFromInventory);
+      inventoryService.move.mockResolvedValue({});
+
+      await inventoryController.move(req, res);
+
+      expect(inventoryService.getById).toHaveBeenCalledWith("inv-uuid-1");
+      expect(inventoryService.move).toHaveBeenCalledWith({
+        fromInventoryId: "inv-uuid-1",
+        toBinId: "bin-uuid-2",
+        quantity: 100,
+        reason: "Reorganization",
+        medicationVariantId: "var-1",
+        batchNumber: "BATCH001",
+        manufactureDate: "2024-01-01",
+        expiryDate: "2026-01-01",
+        purchaseOrderReceiptItemsId: "receipt-1",
+      });
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: "Inventory moved successfully. Reason: Reorganization",
+      });
+    });
+
+    it("should return 404 if source inventory not found", async () => {
+      req.body = {
+        fromInventoryId: "inv-uuid-999",
+        toBinId: "bin-uuid-2",
+        quantity: 100,
+        reason: "Test",
+      };
+      inventoryService.getById.mockResolvedValue(null);
+
+      await inventoryController.move(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: "Source inventory not found",
+      });
+    });
+
+    it("should return 400 if insufficient available quantity", async () => {
+      req.body = {
+        fromInventoryId: "inv-uuid-1",
+        toBinId: "bin-uuid-2",
+        quantity: 500,
+        reason: "Test",
+      };
+      const mockFromInventory = {
+        id: "inv-uuid-1",
+        quantity: 500,
+        quantityReserved: 100,
+      };
+      inventoryService.getById.mockResolvedValue(mockFromInventory);
+
+      await inventoryController.move(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: "Insufficient available quantity in source inventory",
+      });
+    });
+
+    it("should handle errors", async () => {
+      req.body = {
+        fromInventoryId: "inv-uuid-1",
+        toBinId: "bin-uuid-2",
+        quantity: 100,
+        reason: "Test",
+      };
+      inventoryService.getById.mockRejectedValue(new Error("Database error"));
+
+      await expect(inventoryController.move(req, res)).rejects.toThrow(
+        "Database error"
+      );
+    });
+  });
 });

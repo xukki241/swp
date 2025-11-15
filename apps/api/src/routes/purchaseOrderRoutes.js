@@ -79,7 +79,9 @@ purchaseOrderRouter.post(
   "/",
   authorize("owner"),
   validateBody(createPurchaseOrdersRequestSchema),
-  createAuditLog("CREATE", "purchase_order"),
+  createAuditLog("CREATE", "purchase_order", {
+    excludeFields: ["unitCost", "totalCost", "supplierCost"],
+  }),
   purchaseOrderController.create
 );
 
@@ -93,7 +95,9 @@ purchaseOrderRouter.patch(
   authorize("owner"),
   validateParams(idParamSchema),
   validateBody(updatePurchaseOrderRequestSchema),
-  createAuditLog("UPDATE", "purchase_order"),
+  createAuditLog("UPDATE", "purchase_order", {
+    excludeFields: ["unitCost", "totalCost", "supplierCost"],
+  }),
   purchaseOrderController.update
 );
 
@@ -102,11 +106,14 @@ purchaseOrderRouter.patch(
  * @desc    Delete purchase order by ID
  * @access  Private (Owner only)
  */
+// Note: The controller should store the complete purchase order data before deletion in metadata.entityData
 purchaseOrderRouter.delete(
   "/:id",
   authorize("owner"),
   validateParams(idParamSchema),
-  createAuditLog("DELETE", "purchase_order"),
+  createAuditLog("DELETE", "purchase_order", {
+    excludeFields: ["unitCost", "totalCost", "supplierCost"],
+  }),
   purchaseOrderController.delete
 );
 

@@ -11,14 +11,24 @@ describe("MedicationVariantService", () => {
         { id: 2, name: "500mg", sku: "ASP-500", medicationId: 1 },
       ];
 
-      const mockQuery = {
-        from: vi.fn().mockResolvedValue(mockVariants),
+      const mockCountQuery = {
+        from: vi.fn().mockResolvedValue([{ count: 2 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      const mockDataQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockVariants),
+      };
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationVariantService.getAllMedicationVariants();
 
-      expect(result).toEqual(mockVariants);
+      expect(result.data).toEqual(mockVariants);
+      expect(result.total).toBe(2);
     });
 
     it("should filter variants by search term", async () => {
@@ -26,17 +36,27 @@ describe("MedicationVariantService", () => {
         { id: 1, name: "100mg", sku: "ASP-100", medicationId: 1 },
       ];
 
-      const mockQuery = {
+      const mockCountQuery = {
         from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockVariants),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      const mockDataQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockVariants),
+      };
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationVariantService.getAllMedicationVariants({
         search: "ASP-100",
       });
 
-      expect(result).toEqual(mockVariants);
+      expect(result.data).toEqual(mockVariants);
+      expect(result.total).toBe(1);
     });
 
     it("should filter variants by medicationId", async () => {
@@ -44,17 +64,27 @@ describe("MedicationVariantService", () => {
         { id: 1, name: "100mg", sku: "ASP-100", medicationId: 1 },
       ];
 
-      const mockQuery = {
+      const mockCountQuery = {
         from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockVariants),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      const mockDataQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockVariants),
+      };
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationVariantService.getAllMedicationVariants({
         medicationId: 1,
       });
 
-      expect(result).toEqual(mockVariants);
+      expect(result.data).toEqual(mockVariants);
+      expect(result.total).toBe(1);
     });
 
     it("should filter variants by isActive status", async () => {
@@ -62,17 +92,27 @@ describe("MedicationVariantService", () => {
         { id: 1, name: "100mg", sku: "ASP-100", isActive: true },
       ];
 
-      const mockQuery = {
+      const mockCountQuery = {
         from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockVariants),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      const mockDataQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockVariants),
+      };
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationVariantService.getAllMedicationVariants({
         isActive: true,
       });
 
-      expect(result).toEqual(mockVariants);
+      expect(result.data).toEqual(mockVariants);
+      expect(result.total).toBe(1);
     });
   });
 
@@ -243,11 +283,20 @@ describe("MedicationVariantService", () => {
         { id: 1, name: "100mg", sku: "ASP-100", isActive: true },
       ];
 
-      const mockQuery = {
+      const mockCountQuery = {
         from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockVariants),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      const mockDataQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockVariants),
+      };
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationVariantService.getAllMedicationVariants({
         search: "ASP",
@@ -255,8 +304,9 @@ describe("MedicationVariantService", () => {
         isActive: true,
       });
 
-      expect(result).toEqual(mockVariants);
-      expect(mockQuery.where).toHaveBeenCalled();
+      expect(result.data).toEqual(mockVariants);
+      expect(result.total).toBe(1);
+      expect(mockDataQuery.where).toHaveBeenCalled();
     });
 
     it("should handle isActive false filter", async () => {
@@ -264,17 +314,27 @@ describe("MedicationVariantService", () => {
         { id: 1, name: "100mg", sku: "ASP-100", isActive: false },
       ];
 
-      const mockQuery = {
+      const mockCountQuery = {
         from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockVariants),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
       };
-      db.select.mockReturnValue(mockQuery);
+      const mockDataQuery = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockVariants),
+      };
+      db.select
+        .mockReturnValueOnce(mockCountQuery)
+        .mockReturnValueOnce(mockDataQuery);
 
       const result = await medicationVariantService.getAllMedicationVariants({
         isActive: false,
       });
 
-      expect(result).toEqual(mockVariants);
+      expect(result.data).toEqual(mockVariants);
+      expect(result.total).toBe(1);
     });
   });
 
@@ -558,8 +618,8 @@ describe("MedicationVariantService", () => {
 
       const result = await medicationVariantService.searchVariantsForSale();
 
-      expect(result).toHaveLength(1);
-      expect(result[0].availableQuantity).toBe(0);
+      // Variants with 0 available quantity are filtered out
+      expect(result).toHaveLength(0);
     });
 
     it("should handle database errors", async () => {

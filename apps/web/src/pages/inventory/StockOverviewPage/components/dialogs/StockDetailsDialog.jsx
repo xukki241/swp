@@ -1,5 +1,4 @@
 import MedicinePlaceholder from "@/assets/medicine-placeholder.jpg";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,50 +10,19 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
-function calculateRemainingDays(expiryDateString) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const expiryDate = new Date(expiryDateString);
-  const diffTime = expiryDate.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays;
-}
+import { useNavigate } from "react-router";
+import {
+  calculateRemainingDays,
+  getExpiryBadge,
+  getLowStockBadge,
+} from "../../utils/stockHelpers";
 
 export default function StockDetailsDialog({
   medicationItem,
   open,
   onOpenChange,
 }) {
-  function getExpiryBadge(daysRemaining) {
-    if (daysRemaining < 30) {
-      return (
-        <Badge className="bg-red-100 text-red-700 hover:bg-red-100">
-          Sắp hết hạn
-        </Badge>
-      );
-    } else if (daysRemaining < 90) {
-      return (
-        <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100">
-          Gần hết hạn
-        </Badge>
-      );
-    }
-    return (
-      <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-        Tốt
-      </Badge>
-    );
-  }
-
-  function getLowStockBadge() {
-    if (medicationItem.quantity < 10) {
-      return (
-        <Badge className="bg-red-100 text-red-700 hover:bg-red-100">
-          Hết hàng sắp xảy ra
-        </Badge>
-      );
-    }
-  }
+  const navigate = useNavigate();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -84,26 +52,32 @@ export default function StockDetailsDialog({
                   {getExpiryBadge(
                     calculateRemainingDays(medicationItem.expiryDate)
                   )}
-                  {getLowStockBadge()}
+                  {getLowStockBadge(medicationItem.quantity)}
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Quantity</Label>
+                <Label className="text-muted-foreground">Tồn kho</Label>
                 <p className="text-lg font-semibold">
-                  {medicationItem.quantity}
+                  {medicationItem?.quantity - medicationItem?.quantityReserved}
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Unit</Label>
+                <Label className="text-muted-foreground">Đã bán</Label>
+                <p className="text-lg font-semibold">
+                  {medicationItem?.quantityReserved}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground">Đơn vị</Label>
                 <p className="text-lg font-semibold capitalize">
                   {medicationItem?.medicationVariant?.unit}
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Selling Price</Label>
+                <Label className="text-muted-foreground">Giá bán</Label>
                 <p className="text-lg font-semibold">
                   {Number(
                     medicationItem?.medicationVariant?.sellPrice
@@ -112,7 +86,7 @@ export default function StockDetailsDialog({
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Prescription</Label>
+                <Label className="text-muted-foreground">Cần kê đơn</Label>
                 <p className="text-lg font-semibold capitalize">
                   {medicationItem?.medicationVariant?.medication
                     ?.isPrescriptionRequired
@@ -121,71 +95,75 @@ export default function StockDetailsDialog({
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Storage Area</Label>
+                <Label className="text-muted-foreground">Khu vực</Label>
                 <p className="text-lg font-semibold">
                   {medicationItem?.bin?.rack?.zone?.name}
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Rack</Label>
+                <Label className="text-muted-foreground">Giá</Label>
                 <p className="text-lg font-semibold">
                   {medicationItem?.bin?.rack?.name}
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Level</Label>
+                <Label className="text-muted-foreground">Hàng</Label>
                 <p className="text-lg font-semibold">
                   {medicationItem?.bin?.level}
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Number</Label>
+                <Label className="text-muted-foreground">Cột</Label>
                 <p className="text-lg font-semibold">
                   {medicationItem?.bin?.number}
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">
-                  Manifacture Date
-                </Label>
+                <Label className="text-muted-foreground">Ngày sản xuất</Label>
                 <p className="text-lg font-semibold">
                   {medicationItem?.manufactureDate}
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Expiration Date</Label>
+                <Label className="text-muted-foreground">Hạn sử dụng</Label>
                 <p className="text-lg font-semibold">
                   {medicationItem?.expiryDate}
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Days Remaining</Label>
+                <Label className="text-muted-foreground">
+                  Số ngày trước khi hết hạn
+                </Label>
                 <p className="text-lg font-semibold">
                   {calculateRemainingDays(medicationItem?.expiryDate)} ngày
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Batch Number</Label>
+                <Label className="text-muted-foreground">Số lô</Label>
                 <p className="text-lg font-semibold">
                   {medicationItem?.batchNumber}
                 </p>
               </div>
               <div className="space-y-1">
-                <Label className="text-muted-foreground">Brand</Label>
+                <Label className="text-muted-foreground">Thương hiệu</Label>
                 <p className="text-lg font-semibold">
                   {medicationItem?.medicationVariant?.medication?.brand}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground">Supplier</Label>
-                <p className="text-lg font-semibold">
-                  {medicationItem?.supplier?.name || "N/A"}
                 </p>
               </div>
             </div>
           </div>
         )}
         <DialogFooter>
+          <Button
+            className="bg-primary hover:bg-primary/90"
+            onClick={() =>
+              navigate(
+                `/medications/${medicationItem?.medicationVariant?.medication?.id}`
+              )
+            }
+          >
+            Xem chi tiết thuốc
+          </Button>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Đóng
           </Button>

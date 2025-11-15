@@ -232,4 +232,270 @@ describe("WarehouseBinController", () => {
       ).rejects.toThrow("Database error");
     });
   });
+
+  describe("create - batch creation", () => {
+    it("should create multiple bins at once", async () => {
+      req.body = [
+        { rackId: "1", code: "B001", name: "Bin 1", level: "1", number: "1" },
+        { rackId: "1", code: "B002", name: "Bin 2", level: "1", number: "2" },
+      ];
+      const mockBins = [
+        { id: 1, rackId: "1", code: "B001" },
+        { id: 2, rackId: "1", code: "B002" },
+      ];
+      warehouseBinService.create.mockResolvedValue(mockBins);
+
+      await warehouseBinController.create(req, res);
+
+      // Array mode doesn't parse level/number, passes them as-is
+      expect(warehouseBinService.create).toHaveBeenCalledWith([
+        {
+          rackId: "1",
+          code: "B001",
+          name: "Bin 1",
+          level: "1",
+          number: "1",
+          description: undefined,
+        },
+        {
+          rackId: "1",
+          code: "B002",
+          name: "Bin 2",
+          level: "1",
+          number: "2",
+          description: undefined,
+        },
+      ]);
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: "Warehouse bins created successfully",
+        data: mockBins,
+      });
+    });
+
+    it("should handle bins with description", async () => {
+      req.body = {
+        rackId: "1",
+        code: "B001",
+        name: "Bin A",
+        level: "2",
+        number: "3",
+        description: "Heavy items storage",
+      };
+      warehouseBinService.create.mockResolvedValue({ id: 1 });
+
+      await warehouseBinController.create(req, res);
+
+      expect(warehouseBinService.create).toHaveBeenCalledWith({
+        rackId: "1",
+        code: "B001",
+        name: "Bin A",
+        level: 2,
+        number: 3,
+        description: "Heavy items storage",
+      });
+    });
+
+    it("should handle bins without level and number", async () => {
+      req.body = {
+        rackId: "1",
+        code: "B001",
+        name: "Bin A",
+      };
+      warehouseBinService.create.mockResolvedValue({ id: 1 });
+
+      await warehouseBinController.create(req, res);
+
+      expect(warehouseBinService.create).toHaveBeenCalledWith({
+        rackId: "1",
+        code: "B001",
+        name: "Bin A",
+        level: undefined,
+        number: undefined,
+        description: undefined,
+      });
+    });
+  });
+
+  describe("createBatch", () => {
+    it("should create bins in grid mode", async () => {
+      req.params = { rackId: "rack-uuid-1" };
+      req.body = {
+        mode: "grid",
+        levels: 3,
+        binsPerLevel: 5,
+        codePrefix: "BIN",
+        namePrefix: "Bin",
+      };
+      const mockBins = Array.from({ length: 15 }, (_, i) => ({ id: i + 1 }));
+      warehouseBinService.create.mockResolvedValue(mockBins);
+
+      await warehouseBinController.createBatch(req, res);
+
+      expect(warehouseBinService.create).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({
+            rackId: "rack-uuid-1",
+            code: "BIN-001",
+            name: "Bin 1",
+            level: 1,
+            number: 1,
+          }),
+          expect.objectContaining({
+            rackId: "rack-uuid-1",
+            code: "BIN-015",
+            name: "Bin 15",
+            level: 3,
+            number: 5,
+          }),
+        ])
+      );
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: "15 warehouse bins created successfully",
+        data: mockBins,
+      });
+    });
+
+    it("should create bins in list mode", async () => {
+      req.params = { rackId: "rack-uuid-1" };
+      req.body = {
+        mode: "list",
+        binsPerLevelList: [3, 5, 2],
+        codePrefix: "BIN",
+        namePrefix: "Bin",
+      };
+      const mockBins = Array.from({ length: 10 }, (_, i) => ({ id: i + 1 }));
+      warehouseBinService.create.mockResolvedValue(mockBins);
+
+      await warehouseBinController.createBatch(req, res);
+
+      expect(warehouseBinService.create).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({ level: 1, number: 1 }),
+          expect.objectContaining({ level: 1, number: 3 }),
+          expect.objectContaining({ level: 2, number: 5 }),
+          expect.objectContaining({ level: 3, number: 2 }),
+        ])
+      );
+      expect(res.status).toHaveBeenCalledWith(201);
+    });
+
+    it("should use default code and name prefixes", async () => {
+      req.params = { rackId: "rack-uuid-1" };
+      req.body = {
+        mode: "grid",
+        levels: 1,
+        binsPerLevel: 1,
+      };
+      warehouseBinService.create.mockResolvedValue([{ id: 1 }]);
+
+      await warehouseBinController.createBatch(req, res);
+
+      expect(warehouseBinService.create).toHaveBeenCalledWith([
+        expect.objectContaining({
+          code: "BIN-001",
+          name: "Bin 1",
+        }),
+      ]);
+    });
+
+    it("should handle errors", async () => {
+      req.params = { rackId: "rack-uuid-1" };
+      req.body = { mode: "grid", levels: 2, binsPerLevel: 3 };
+      warehouseBinService.create.mockRejectedValue(new Error("Database error"));
+
+      await expect(
+        warehouseBinController.createBatch(req, res)
+      ).rejects.toThrow("Database error");
+    });
+  });
+
+  describe("getAll - with filters", () => {
+    it("should filter by zoneId", async () => {
+      req.query = { zoneId: "zone-uuid-1", limit: "50" };
+      warehouseBinService.getAll.mockResolvedValue([{ id: 1 }, { id: 2 }]);
+
+      await warehouseBinController.getAll(req, res);
+
+      expect(warehouseBinService.getAll).toHaveBeenCalledWith({
+        search: undefined,
+        rackId: undefined,
+        zoneId: "zone-uuid-1",
+        level: undefined,
+        limit: "50",
+        offset: 0,
+      });
+    });
+
+    it("should filter by level", async () => {
+      req.query = { level: "2" };
+      warehouseBinService.getAll.mockResolvedValue([{ id: 1 }]);
+
+      await warehouseBinController.getAll(req, res);
+
+      expect(warehouseBinService.getAll).toHaveBeenCalledWith({
+        search: undefined,
+        rackId: undefined,
+        zoneId: undefined,
+        level: 2,
+        limit: 100,
+        offset: 0,
+      });
+    });
+
+    it("should combine multiple filters", async () => {
+      req.query = {
+        search: "bin",
+        rackId: "rack-1",
+        zoneId: "zone-1",
+        level: "3",
+        limit: "25",
+        offset: "10",
+      };
+      warehouseBinService.getAll.mockResolvedValue([]);
+
+      await warehouseBinController.getAll(req, res);
+
+      expect(warehouseBinService.getAll).toHaveBeenCalledWith({
+        search: "bin",
+        rackId: "rack-1",
+        zoneId: "zone-1",
+        level: 3,
+        limit: "25",
+        offset: "10",
+      });
+    });
+  });
+
+  describe("update - field conversions", () => {
+    it("should convert rackId without parsing", async () => {
+      req.params = { id: "1" };
+      req.body = { rackId: "new-rack-uuid" };
+      warehouseBinService.update.mockResolvedValue({ id: 1 });
+
+      await warehouseBinController.update(req, res);
+
+      expect(warehouseBinService.update).toHaveBeenCalledWith("1", {
+        rackId: "new-rack-uuid",
+      });
+    });
+
+    it("should handle partial updates", async () => {
+      req.params = { id: "1" };
+      req.body = { name: "Updated Bin Name" };
+      warehouseBinService.update.mockResolvedValue({
+        id: 1,
+        name: "Updated Bin Name",
+      });
+
+      await warehouseBinController.update(req, res);
+
+      expect(warehouseBinService.update).toHaveBeenCalledWith("1", {
+        name: "Updated Bin Name",
+      });
+    });
+  });
 });

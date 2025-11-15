@@ -38,7 +38,9 @@ salesOrderRouter.get(
 salesOrderRouter.post(
   "/",
   validateBody(createSalesOrderRequestSchema),
-  createAuditLog("CREATE", "sale"),
+  createAuditLog("CREATE", "sale", {
+    excludeFields: ["paymentMethod", "paymentDetails"],
+  }),
   salesOrderController.create
 );
 
@@ -47,16 +49,21 @@ salesOrderRouter.patch(
   "/:id",
   validateParams(salesOrderIdParamSchema),
   validateBody(updateSalesOrderRequestSchema),
-  createAuditLog("UPDATE", "sale"),
+  createAuditLog("UPDATE", "sale", {
+    excludeFields: ["paymentMethod", "paymentDetails"],
+  }),
   salesOrderController.update
 );
 
 // DELETE /api/sales/:id - Cancel sales order (operationId: cancelSalesOrder - Owner only)
+// Note: The controller should store the complete sale data before deletion in metadata.entityData
 salesOrderRouter.delete(
   "/:id",
   validateParams(salesOrderIdParamSchema),
   authorize("owner"),
-  createAuditLog("DELETE", "sale"),
+  createAuditLog("DELETE", "sale", {
+    excludeFields: ["paymentMethod", "paymentDetails"],
+  }),
   salesOrderController.delete
 );
 

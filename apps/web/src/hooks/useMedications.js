@@ -102,27 +102,26 @@ export const useDeleteMedication = () => {
 /**
  * VARIANTS
  */
-export const useMedicationVariants = (medicationId) =>
+export const useMedicationVariants = (medicationId, filters = {}) =>
   useQuery({
-    queryKey: ["medicationVariants", medicationId],
+    queryKey: ["medicationVariants", medicationId, filters],
     queryFn: async () => {
       if (!medicationId) {
         return { data: [] };
       }
 
       if (typeof api.getMedicationVariants === "function") {
-        return api.getMedicationVariants(medicationId);
-      }
-      if (typeof api.getMedicationById === "function") {
-        const med = await api.getMedicationById(medicationId);
-        return { data: med?.variants ?? [] };
+        return api.getMedicationVariants(medicationId, filters);
       }
 
-      const res = await instance.get(`/medications/${medicationId}/variants`);
+      const res = await instance.get(`/medications/${medicationId}/variants`, {
+        params: filters,
+      });
       return res.data;
     },
     enabled: !!medicationId,
     staleTime: FIVE_MIN,
+    keepPreviousData: true,
   });
 
 export const getAllMedicationsVariants = async () => {

@@ -65,7 +65,7 @@ async function seed() {
       .values([
         {
           name: "Dr. Sarah Chen",
-          email: "owner@pharmaflow.com",
+          email: "tranhuypro30305@gmail.com",
           phone: "0901234567",
           address: "123 Medical Plaza, District 1, Ho Chi Minh City",
           status: "active",
@@ -112,7 +112,7 @@ async function seed() {
       {
         userId: owner.id,
         provider: "local",
-        identifier: "owner@pharmaflow.com",
+        identifier: "tranhuypro30305@gmail.com",
         secret: "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
       },
       {
@@ -473,7 +473,7 @@ async function seed() {
         sku: "PAR-500-TAB-100",
         name: "Paracetamol 500mg Viên nén (Hộp 100 viên)",
         unit: "tablet",
-        unitFactor: 1.0,
+
         barcode: "8934567890001",
         sellPrice: 50000,
         isActive: true,
@@ -484,7 +484,7 @@ async function seed() {
         sku: "PAR-650-TAB-50",
         name: "Paracetamol 650mg Viên nén (Hộp 50 viên)",
         unit: "tablet",
-        unitFactor: 1.0,
+
         barcode: "8934567890002",
         sellPrice: 35000,
         isActive: true,
@@ -495,7 +495,7 @@ async function seed() {
         sku: "PAR-250-SYR-60ML",
         name: "Paracetamol 250mg/5ml Siro (Chai 60ml)",
         unit: "bottle",
-        unitFactor: 1.0,
+
         barcode: "8934567890003",
         sellPrice: 45000,
         isActive: true,
@@ -508,7 +508,7 @@ async function seed() {
         sku: "AMX-500-CAP-20",
         name: "Amoxicillin 500mg Viên nang (Hộp 20 viên)",
         unit: "capsule",
-        unitFactor: 1.0,
+
         barcode: "8934567890011",
         sellPrice: 85000,
         isActive: true,
@@ -519,7 +519,7 @@ async function seed() {
         sku: "AMX-250-SUS-100ML",
         name: "Amoxicillin 250mg/5ml Hỗn dịch (Chai 100ml)",
         unit: "bottle",
-        unitFactor: 1.0,
+
         barcode: "8934567890012",
         sellPrice: 65000,
         isActive: true,
@@ -532,7 +532,7 @@ async function seed() {
         sku: "IBU-400-TAB-30",
         name: "Ibuprofen 400mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
-        unitFactor: 1.0,
+
         barcode: "8934567890021",
         sellPrice: 55000,
         isActive: true,
@@ -543,7 +543,7 @@ async function seed() {
         sku: "IBU-200-TAB-50",
         name: "Ibuprofen 200mg Viên nén (Hộp 50 viên)",
         unit: "tablet",
-        unitFactor: 1.0,
+
         barcode: "8934567890022",
         sellPrice: 40000,
         isActive: true,
@@ -556,7 +556,7 @@ async function seed() {
         sku: "OME-20-CAP-28",
         name: "Omeprazole 20mg Viên nang (Hộp 28 viên)",
         unit: "capsule",
-        unitFactor: 1.0,
+
         barcode: "8934567890031",
         sellPrice: 120000,
         isActive: true,
@@ -567,7 +567,7 @@ async function seed() {
         sku: "OME-40-CAP-14",
         name: "Omeprazole 40mg Viên nang (Hộp 14 viên)",
         unit: "capsule",
-        unitFactor: 1.0,
+
         barcode: "8934567890032",
         sellPrice: 95000,
         isActive: true,
@@ -580,7 +580,7 @@ async function seed() {
         sku: "CET-10-TAB-30",
         name: "Cetirizine 10mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
-        unitFactor: 1.0,
+
         barcode: "8934567890041",
         sellPrice: 45000,
         isActive: true,
@@ -591,7 +591,7 @@ async function seed() {
         sku: "CET-5-SYR-60ML",
         name: "Cetirizine 5mg/5ml Siro (Chai 60ml)",
         unit: "bottle",
-        unitFactor: 1.0,
+
         barcode: "8934567890042",
         sellPrice: 38000,
         isActive: true,
@@ -604,7 +604,7 @@ async function seed() {
         sku: "MET-500-TAB-60",
         name: "Metformin 500mg Viên nén (Hộp 60 viên)",
         unit: "tablet",
-        unitFactor: 1.0,
+
         barcode: "8934567890051",
         sellPrice: 75000,
         isActive: true,
@@ -615,7 +615,7 @@ async function seed() {
         sku: "MET-850-TAB-30",
         name: "Metformin 850mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
-        unitFactor: 1.0,
+
         barcode: "8934567890052",
         sellPrice: 65000,
         isActive: true,
@@ -628,7 +628,7 @@ async function seed() {
         sku: "ATO-10-TAB-30",
         name: "Atorvastatin 10mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
-        unitFactor: 1.0,
+
         barcode: "8934567890061",
         sellPrice: 150000,
         isActive: true,
@@ -639,7 +639,7 @@ async function seed() {
         sku: "ATO-20-TAB-30",
         name: "Atorvastatin 20mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
-        unitFactor: 1.0,
+
         barcode: "8934567890062",
         sellPrice: 220000,
         isActive: true,
@@ -652,7 +652,7 @@ async function seed() {
         sku: "AML-5-TAB-30",
         name: "Amlodipine 5mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
-        unitFactor: 1.0,
+
         barcode: "8934567890071",
         sellPrice: 85000,
         isActive: true,
@@ -663,7 +663,7 @@ async function seed() {
         sku: "AML-10-TAB-30",
         name: "Amlodipine 10mg Viên nén (Hộp 30 viên)",
         unit: "tablet",
-        unitFactor: 1.0,
+
         barcode: "8934567890072",
         sellPrice: 125000,
         isActive: true,
@@ -676,7 +676,7 @@ async function seed() {
         sku: "SAL-100-INH-200",
         name: "Salbutamol 100mcg Xịt hít (200 liều)",
         unit: "inhaler",
-        unitFactor: 1.0,
+
         barcode: "8934567890081",
         sellPrice: 95000,
         isActive: true,
@@ -687,7 +687,7 @@ async function seed() {
         sku: "SAL-2-NEB-20",
         name: "Salbutamol 2mg/2ml Dung dịch xông (Hộp 20 ống)",
         unit: "nebule",
-        unitFactor: 1.0,
+
         barcode: "8934567890082",
         sellPrice: 180000,
         isActive: true,
@@ -700,7 +700,7 @@ async function seed() {
         sku: "VID-1000-CAP-30",
         name: "Vitamin D3 1000IU Viên nang mềm (Hộp 30 viên)",
         unit: "capsule",
-        unitFactor: 1.0,
+
         barcode: "8934567890091",
         sellPrice: 65000,
         isActive: true,
@@ -711,7 +711,7 @@ async function seed() {
         sku: "VID-400-DROP-10ML",
         name: "Vitamin D3 400IU/giọt Dung dịch uống (Chai 10ml)",
         unit: "bottle",
-        unitFactor: 1.0,
+
         barcode: "8934567890092",
         sellPrice: 55000,
         isActive: true,
@@ -724,7 +724,7 @@ async function seed() {
         sku: "AZI-500-TAB-3",
         name: "Azithromycin 500mg Viên nén (Hộp 3 viên)",
         unit: "tablet",
-        unitFactor: 1.0,
+
         barcode: "8934567890101",
         sellPrice: 75000,
         isActive: true,
@@ -735,7 +735,7 @@ async function seed() {
         sku: "AZI-200-SUS-15ML",
         name: "Azithromycin 200mg/5ml Hỗn dịch (Chai 15ml)",
         unit: "bottle",
-        unitFactor: 1.0,
+
         barcode: "8934567890102",
         sellPrice: 85000,
         isActive: true,
@@ -748,7 +748,7 @@ async function seed() {
         sku: "TRA-50-CAP-20",
         name: "Tramadol 50mg Viên nang (Hộp 20 viên)",
         unit: "capsule",
-        unitFactor: 1.0,
+
         barcode: "8934567890111",
         sellPrice: 250000,
         isActive: true,
@@ -759,7 +759,7 @@ async function seed() {
         sku: "TRA-100-TAB-10",
         name: "Tramadol 100mg Viên giải phóng kéo dài (Hộp 10 viên)",
         unit: "tablet",
-        unitFactor: 1.0,
+
         barcode: "8934567890112",
         sellPrice: 180000,
         isActive: true,

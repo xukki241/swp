@@ -6,7 +6,6 @@ MedicationVariant:
     - sku
     - name
     - unit
-    - unitFactor
     - sellPrice
     - isActive
     - isForSale
@@ -27,12 +26,6 @@ MedicationVariant:
       maxLength: 50
       description: Unit of measurement
       example: "Box of 10 tablets"
-    unitFactor:
-      type: number
-      format: float
-      minimum: 0
-      description: Conversion factor to base unit
-      example: 1.0
     barcode:
       type: string
       maxLength: 50
@@ -76,13 +69,6 @@ CreateMedicationVariant:
       maxLength: 50
       description: Unit of measurement
       example: "Box of 10 tablets"
-    unitFactor:
-      type: number
-      format: float
-      minimum: 0
-      default: 1.0
-      description: Conversion factor to base unit
-      example: 1.0
     barcode:
       type: string
       maxLength: 50
@@ -161,11 +147,6 @@ UpdateMedicationVariant:
       minLength: 1
       maxLength: 50
       description: Unit of measurement
-    unitFactor:
-      type: number
-      format: float
-      minimum: 0
-      description: Conversion factor to base unit
     barcode:
       type: string
       maxLength: 50

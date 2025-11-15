@@ -95,11 +95,10 @@ function StatusBadge({ status }) {
     s === "active"
       ? "bg-emerald-50 text-emerald-700 border-emerald-200"
       : "bg-zinc-50 text-zinc-600 border-zinc-200";
+  const text = s === "active" ? "Hoạt động" : "Ngừng";
   return (
-    <span
-      className={`px-2 py-0.5 text-xs rounded-full border ${style} capitalize`}
-    >
-      {s}
+    <span className={`px-2 py-0.5 text-xs rounded-full border ${style}`}>
+      {text}
     </span>
   );
 }
@@ -133,41 +132,35 @@ export default function MedicationListPage() {
   const uploadFile = useUploadFile();
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const isOwner = user.role?.toUpperCase() === "OWNER";
-  /* filters — giống UserListPage: searchInput / appliedSearch + statusFilter */
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [page, setPage] = useState(1);
 
   const debounced = useDebounced(appliedSearch);
 
-  /* modals */
   const [medFormOpen, setMedFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [manageMed, setManageMed] = useState(null);
   const medId = manageMed?.id;
 
-  /* data */
   const filters = useMemo(
     () => ({
       search: debounced || undefined,
       status: statusFilter !== "all" ? statusFilter : undefined,
+      page,
+      limit: 10,
     }),
-    [debounced, statusFilter]
+    [debounced, statusFilter, page]
   );
-  const { data: meds, isLoading, refetch } = useMedications(filters);
-  const medications = Array.isArray(meds) ? meds : meds?.data || [];
+  const { data: response, isLoading, refetch } = useMedications(filters);
+  const medications = response?.data || [];
+  const pagination = response?.pagination || { total: 0, totalPages: 1 };
 
   // Debug: Check for duplicate IDs
   useEffect(() => {
     const ids = medications.map((m) => m.id);
     const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
-    if (duplicates.length > 0) {
-      console.warn("⚠️ Duplicate medication IDs found:", duplicates);
-      console.log(
-        "All medications:",
-        medications.map((m) => ({ id: m.id, name: m.name }))
-      );
-    }
   }, [medications]);
 
   const createMed = useCreateMedication();
@@ -243,11 +236,6 @@ export default function MedicationListPage() {
   }
 
   const onSubmitMed = async (data) => {
-    console.log(`💾 Starting ${editing ? "update" : "create"} medication:`, {
-      editing: !!editing,
-      removeImage,
-      data,
-    });
     try {
       let savedId = editing?.id;
 
@@ -260,12 +248,12 @@ export default function MedicationListPage() {
 
       if (savedId) {
         if (removeImage) {
-          console.log(`🗑️ Removing image for medication: ${savedId}`);
+          console.log(`Removing image for medication: ${savedId}`);
           clearMedicationImage(savedId);
           const deleteResponse = await instance.delete(
             `/medications/${savedId}/image`
           );
-          console.log(`✅ Image deleted successfully:`, deleteResponse.data);
+          console.log(`Image deleted successfully:`, deleteResponse.data);
         } else if (imageFile) {
           const formData = new FormData();
           formData.append("image", imageFile);
@@ -282,22 +270,14 @@ export default function MedicationListPage() {
         bumpImageVersion(savedId);
       }
 
-      toast.success(editing ? "Medication updated" : "Medication created");
+      toast.success(editing ? "Đã cập nhật thuốc" : "Đã thêm thuốc mới");
       setMedFormOpen(false);
 
       // Đợi một chút để backend xử lý xong
       await new Promise((resolve) => setTimeout(resolve, 500));
-      console.log(
-        `🔄 Refetching medications after ${editing ? "update" : "create"}...`
-      );
       const refetchResult = await refetch();
-      console.log(
-        `✅ Refetch completed:`,
-        refetchResult?.data?.length || 0,
-        "medications found"
-      );
     } catch (e) {
-      toast.error("Failed to save medication", {
+      toast.error("Không thể lưu thuốc", {
         description: e?.response?.data?.message || e.message,
       });
     }
@@ -342,7 +322,6 @@ export default function MedicationListPage() {
       sku: "",
       name: "",
       unit: "",
-      unitFactor: "1.00",
       barcode: "",
       sellPrice: "",
       isActive: true,
@@ -356,7 +335,6 @@ export default function MedicationListPage() {
       sku: v.sku ?? "",
       name: v.name ?? "",
       unit: v.unit ?? "",
-      unitFactor: String(v.unitFactor ?? "1.00"),
       barcode: v.barcode ?? "",
       sellPrice: String(v.sellPrice ?? ""),
       isActive: !!v.isActive,
@@ -377,19 +355,16 @@ export default function MedicationListPage() {
       if (!ok) {
         setVarError("barcode", {
           type: "validate",
-          message: "Barcode already exists for another variant.",
+          message: "Mã vạch đã tồn tại cho biến thể khác.",
         });
-        toast.error("Barcode already exists for another variant.");
+        toast.error("Mã vạch đã tồn tại cho biến thể khác.");
         return;
       }
       const payload = {
         sku: (form.sku || "").trim(),
         name: (form.name || "").trim(),
         unit: (form.unit || "").trim(),
-        unitFactor:
-          form.unitFactor === "" || form.unitFactor == null
-            ? 1
-            : Number(form.unitFactor),
+        unitFactor: 1.0, // Cố định = 1.00
         barcode: (form.barcode || "").trim() || null,
         sellPrice:
           form.sellPrice === "" || form.sellPrice == null
@@ -405,27 +380,26 @@ export default function MedicationListPage() {
           !payload.unit ||
           !payload.sellPrice
         ) {
-          toast.error("Please fill in SKU, Name, Unit and Sell Price.");
+          toast.error("Vui lòng điền đầy đủ SKU, Tên, Đơn vị và Giá bán.");
           return;
         }
         if (Number.isNaN(payload.sellPrice)) {
-          toast.error("Sell Price must be a number.");
+          toast.error("Giá bán phải là số.");
           return;
         }
       }
       if (editingVar) {
         await svcUpdateVariant(medId, editingVar.id, payload);
-        toast.success("Variant updated");
+        toast.success("Đã cập nhật biến thể");
       } else {
         await svcCreateVariant(medId, [payload]);
-        toast.success("Variant created");
+        toast.success("Đã tạo biến thể");
       }
       setEditingVar(null);
       resetVar({
         sku: "",
         name: "",
         unit: "",
-        unitFactor: "1.00",
         barcode: "",
         sellPrice: "",
         isActive: true,
@@ -433,29 +407,30 @@ export default function MedicationListPage() {
       });
       await refetchVariants();
     } catch (err) {
-      toast.error("Failed to save variant", {
+      toast.error("Không thể lưu biến thể", {
         description: err?.response?.data?.message || err.message,
       });
     }
   };
   const handleDeleteVariant = async (variantId) => {
     if (!medId) return;
-    if (confirm("Delete this variant?")) {
+    if (confirm("Xóa biến thể này?")) {
       await svcDeleteVariant(medId, variantId);
-      toast.success("Deleted variant");
+      toast.success("Đã xóa biến thể");
       await refetchVariants();
     }
   };
 
-  // Handlers filter inline (giống UserListPage)
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setAppliedSearch(searchInput.trim());
+    setPage(1);
   };
   const handleClearFilters = () => {
     setSearchInput("");
     setAppliedSearch("");
     setStatusFilter("all");
+    setPage(1);
   };
 
   return (
@@ -614,12 +589,62 @@ export default function MedicationListPage() {
                 )}
               </div>
             )}
+
+            {/* Pagination */}
+            {!isLoading && medications.length > 0 && (
+              <div className="flex items-center justify-between pt-4 border-t">
+                <div className="text-sm text-muted-foreground">
+                  Hiển thị {(page - 1) * 10 + 1}-
+                  {Math.min(page * 10, pagination.total)} / {pagination.total}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(1)}
+                    disabled={page === 1}
+                  >
+                    ««
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(page - 1)}
+                    disabled={page === 1}
+                  >
+                    ‹
+                  </Button>
+                  <span className="text-sm px-2">
+                    Trang {page}/{pagination.totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(page + 1)}
+                    disabled={page >= pagination.totalPages}
+                  >
+                    ›
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(pagination.totalPages)}
+                    disabled={page >= pagination.totalPages}
+                  >
+                    »»
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Medication Form (popup) */}
-        <Dialog open={medFormOpen} onOpenChange={setMedFormOpen}>
-          <DialogContent className="max-w-2xl">
+        <Dialog
+          open={medFormOpen && !lightbox.open}
+          onOpenChange={setMedFormOpen}
+        >
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editing ? "Chỉnh sửa Thuốc" : "Thêm Thuốc mới"}
@@ -637,6 +662,43 @@ export default function MedicationListPage() {
             >
               {/* Ảnh preview + input file */}
               <div className="md:col-span-2 flex items-center gap-3 rounded-lg border p-3">
+                <div className="flex-1 flex items-center gap-3">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={onChangeImage}
+                    className="hidden"
+                    id="med-image-input"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      document.getElementById("med-image-input").click()
+                    }
+                  >
+                    <ImageIcon className="w-4 h-4 mr-1" />
+                    Chọn ảnh
+                  </Button>
+
+                  {(editing?.imageId || imagePreview) && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        setRemoveImage(true);
+                        setImageFile(null);
+                        setImagePreview(null);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Xóa ảnh
+                    </Button>
+                  )}
+                </div>
+
                 <div className="shrink-0">
                   {imagePreview ? (
                     <img
@@ -645,94 +707,51 @@ export default function MedicationListPage() {
                       className="h-16 w-16 rounded-lg object-cover border cursor-zoom-in"
                       onClick={() => openLightbox(imagePreview, "Preview")}
                     />
-                  ) : editing ? (
-                    (() => {
-                      const url = getMedicationImageUrl(editing.id);
-                      const src = url.includes("?v=")
-                        ? url
-                        : `${url}?v=${imageVersion[editing.id] || 0}`;
-                      return (
-                        <img
-                          key={
-                            (editing && editing.id) +
-                            ":v" +
-                            (imageVersion[editing.id] || 0)
-                          }
-                          src={src}
-                          alt="Current"
-                          className="h-16 w-16 rounded-lg object-cover border cursor-zoom-in"
-                          onError={(e) =>
-                            (e.currentTarget.style.visibility = "hidden")
-                          }
-                          onClick={() => openLightbox(src, "Current")}
-                        />
-                      );
-                    })()
+                  ) : editing?.imageId && !removeImage ? (
+                    <MedicationImage
+                      fileId={editing.imageId}
+                      alt={editing.name}
+                      size={64}
+                      onClick={openLightbox}
+                    />
                   ) : (
                     <PillPlaceholder className="h-16 w-16" />
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={onChangeImage}
-                      className="hidden"
-                      id="med-image-input"
-                    />
-                    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm">
-                      <ImageIcon className="w-4 h-4" />
-                      Chọn ảnh…
-                    </span>
-                  </label>
-
-                  {(editing?.imageId || imagePreview) && (
-                    <label className="inline-flex items-center gap-2 text-sm">
-                      <Checkbox
-                        checked={removeImage}
-                        onCheckedChange={(c) => {
-                          setRemoveImage(!!c);
-                          if (c) {
-                            setImageFile(null);
-                            setImagePreview(null);
-                          }
-                        }}
-                      />
-                      <span>Xóa ảnh</span>
-                    </label>
                   )}
                 </div>
               </div>
 
               {/* fields */}
-              <Controller
-                name="name"
-                control={control}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <Input {...field} placeholder="Tên thuốc" />
-                )}
-              />
-              <Controller
-                name="brand"
-                control={control}
-                render={({ field }) => (
-                  <Input {...field} placeholder="Thương hiệu" />
-                )}
-              />
-              <Controller
-                name="description"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    className="md:col-span-2"
-                    placeholder="Mô tả"
-                  />
-                )}
-              />
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Tên thuốc *</label>
+                <Controller
+                  name="name"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Input {...field} placeholder="Nhập tên thuốc" />
+                  )}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Thương hiệu</label>
+                <Controller
+                  name="brand"
+                  control={control}
+                  render={({ field }) => (
+                    <Input {...field} placeholder="Nhập thương hiệu" />
+                  )}
+                />
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-sm font-medium">Mô tả</label>
+                <Controller
+                  name="description"
+                  control={control}
+                  render={({ field }) => (
+                    <Input {...field} placeholder="Nhập mô tả" />
+                  )}
+                />
+              </div>
 
               <div className="flex items-center gap-2">
                 <Controller

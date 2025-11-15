@@ -439,7 +439,7 @@ export default function PurchaseOrderCreatePage() {
                     variant="outline"
                     onClick={handleAddItem}
                     className="border border-gray-300 bg-transparent"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !supplierId || meds.length === 0}
                   >
                     <Plus className="w-4 h-4 mr-1" />
                     Add Item
@@ -477,16 +477,44 @@ export default function PurchaseOrderCreatePage() {
                       </tr>
                     </thead>
                     <tbody className="bg-white">
-                      {selectedItems.length === 0 ? (
+                      {!supplierId || meds.length === 0 ? (
                         <tr>
                           <td
                             colSpan={8}
                             className="text-center py-12 text-gray-400"
                           >
                             <Package className="w-12 h-12 mx-auto mb-2 opacity-30" />
-                            <p className="font-medium">No items added yet</p>
+                            {!supplierId ? (
+                              <>
+                                <p className="font-medium">
+                                  Chưa chọn nhà cung cấp
+                                </p>
+                                <p className="text-xs mt-1">
+                                  Vui lòng chọn nhà cung cấp trước để thêm thuốc
+                                </p>
+                              </>
+                            ) : (
+                              <>
+                                <p className="font-medium">
+                                  Không có thuốc cho nhà cung cấp này
+                                </p>
+                                <p className="text-xs mt-1">
+                                  Nhà cung cấp này chưa có thuốc nào để đặt hàng
+                                </p>
+                              </>
+                            )}
+                          </td>
+                        </tr>
+                      ) : selectedItems.length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={8}
+                            className="text-center py-12 text-gray-400"
+                          >
+                            <Package className="w-12 h-12 mx-auto mb-2 opacity-30" />
+                            <p className="font-medium">Chưa thêm thuốc nào</p>
                             <p className="text-xs mt-1">
-                              Click "Add Item" to start building your order
+                              Nhấn "Add Item" để bắt đầu thêm thuốc vào đơn hàng
                             </p>
                           </td>
                         </tr>
@@ -524,6 +552,8 @@ export default function PurchaseOrderCreatePage() {
                                       meds.map((m) => (
                                         <SelectItem key={m.id} value={m.id}>
                                           {m.medicationName}
+                                          {m.variantName &&
+                                            ` - ${m.variantName}`}
                                         </SelectItem>
                                       ))
                                     )}
@@ -567,8 +597,8 @@ export default function PurchaseOrderCreatePage() {
                                       e.target.value
                                     )
                                   }
-                                  className="w-28 text-center mx-auto"
-                                  disabled={isSubmitting}
+                                  className="w-28 text-center mx-auto bg-gray-50"
+                                  disabled={true}
                                 />
                               </td>
                               <td className="p-3 text-center font-bold text-gray-900">

@@ -33,15 +33,12 @@ export const useWarehouse = () => {
     try {
       setLoading(true);
       const responseData = await getAllZones();
-      console.info("Fetched zones response:", responseData);
       const zonesData = responseData.data || [];
-      console.info("Setting zones:", zonesData);
       setZones(zonesData);
       setError(null);
     } catch (err) {
-      console.error("Error fetching zones:", err);
       setError(err.message);
-      toast.error("Failed to fetch zones");
+      toast.error(`Lỗi lấy dữ liệu khu vực ${error ? ": " + error : ""}`);
     } finally {
       setLoading(false);
     }
@@ -71,7 +68,7 @@ export const useWarehouse = () => {
       setError(null);
     } catch (err) {
       setError(err.message);
-      toast.error("Failed to refresh zone data");
+      toast.error(`Lỗi làm mới trang ${error ? ": " + error : ""}`);
     } finally {
       setLoading(false);
     }
@@ -97,7 +94,9 @@ export const useWarehouse = () => {
       setError(null);
     } catch (err) {
       setError(err.message);
-      toast.error(err.message || "Failed to fetch zone details");
+      toast.error(
+        `Lỗi khi lấy thông tin của khu: ${error ? ": " + error : ""}`
+      );
     } finally {
       setLoading(false);
     }
@@ -107,10 +106,11 @@ export const useWarehouse = () => {
     try {
       const response = await createZone(zoneData);
       setZones((prevZones) => [...prevZones, response.data]);
-      toast.success("Zone created successfully");
+      toast.success("Tạo khu thành công");
       return response.data;
     } catch (err) {
-      toast.error("Failed to create zone");
+      setError(err.message);
+      toast.error(`Lỗi không thể tạo khu ${error ? ": " + error : ""}`);
       throw err;
     }
   }, []);
@@ -121,9 +121,9 @@ export const useWarehouse = () => {
       setZones((prevZones) => prevZones.filter((z) => z.id !== zoneId));
       setSelectedZone(null);
       setRacks([]);
-      toast.success("Zone deleted successfully");
+      toast.success("Xóa khu vực thành công");
     } catch (err) {
-      toast.error("Failed to delete zone");
+      toast.error("Khu vực còn thông tin, không thể xóa");
       throw err;
     }
   }, []);
@@ -136,10 +136,10 @@ export const useWarehouse = () => {
       setZones((prevZones) =>
         prevZones.map((z) => (z.id === zoneId ? response.data : z))
       );
-      toast.success("Zone updated successfully");
+      toast.success("Cập nhật khu vực thành công");
       return response.data;
     } catch (err) {
-      toast.error("Failed to update zone");
+      toast.error("Không thể cập nhật khu vực");
       throw err;
     }
   }, []);
@@ -148,21 +148,21 @@ export const useWarehouse = () => {
     try {
       const response = await createRack(zoneId, rackData);
       setRacks((prevRacks) => [...prevRacks, response.data]);
-      toast.success("Rack created successfully");
+      toast.success("Tạo giá thành công");
       return response.data;
     } catch (err) {
-      toast.error("Failed to create rack");
+      toast.error("Không thể tạo giá");
       throw err;
     }
   }, []);
 
-  const deleteRackData = useCallback(async (zoneId, rackId) => {
+  const deleteRackData = useCallback(async (rackId) => {
     try {
-      await deleteRack(zoneId, rackId);
+      await deleteRack(rackId);
       setRacks((prevRacks) => prevRacks.filter((r) => r.id !== rackId));
-      toast.success("Rack deleted successfully");
+      toast.success("Xóa giá thành công");
     } catch (err) {
-      toast.error("Failed to delete rack");
+      toast.error("Giá còn thông tin, không thể xóa");
       throw err;
     }
   }, []);
@@ -174,10 +174,10 @@ export const useWarehouse = () => {
       setRacks((prevRacks) =>
         prevRacks.map((r) => (r.id === rackId ? response.data : r))
       );
-      toast.success("Rack updated successfully");
+      toast.success("Cập nhật giá thành công");
       return response.data;
     } catch (err) {
-      toast.error("Failed to update rack");
+      toast.error("Không thể cập nhật giá");
       throw err;
     }
   }, []);
@@ -194,10 +194,10 @@ export const useWarehouse = () => {
             : r
         )
       );
-      toast.success("Bin created successfully");
+      toast.success("Tạo ô chứa thành công");
       return response.data;
     } catch (err) {
-      toast.error("Failed to create bin");
+      toast.error("Không thể tạo ô chứa");
       throw err;
     }
   }, []);
@@ -215,11 +215,10 @@ export const useWarehouse = () => {
           ),
         }))
       );
-
-      toast.success("Bin updated successfully");
+      toast.success("Cập nhật ô chứa thành công");
       return response.data;
     } catch (err) {
-      toast.error("Failed to update bin");
+      toast.error("Không thể cập nhật ô chứa");
       throw err;
     }
   }, []);
@@ -240,9 +239,9 @@ export const useWarehouse = () => {
         )
       );
 
-      toast.success("Bin deleted successfully");
+      toast.success("Xóa ô chứa thành công");
     } catch (err) {
-      toast.error("Failed to delete bin");
+      toast.error("Không thể xóa ô");
       throw err;
     }
   }, []);

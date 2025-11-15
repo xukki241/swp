@@ -5,7 +5,8 @@ import instance from "@/lib/axios";
 // GET /api/medications?search=&status=
 export async function getMedications(params = {}) {
   const res = await instance.get("/medications", { params });
-  return res.data?.data ?? res.data;
+  // Return full response with pagination
+  return res.data;
 }
 
 // GET /api/medications/:id
@@ -90,9 +91,11 @@ export async function getAllMedicationVariants(params = {}) {
 }
 
 // GET /api/medications/:medicationId/variants
-export async function getMedicationVariants(medicationId) {
-  const res = await instance.get(`/medications/${medicationId}/variants`);
-  return res.data?.data ?? res.data;
+export async function getMedicationVariants(medicationId, params = {}) {
+  const res = await instance.get(`/medications/${medicationId}/variants`, {
+    params,
+  });
+  return res.data;
 }
 
 // GET /api/medications/:medicationId/variants/:variantId
