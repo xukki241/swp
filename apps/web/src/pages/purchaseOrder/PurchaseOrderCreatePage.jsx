@@ -524,6 +524,8 @@ export default function PurchaseOrderCreatePage() {
                                       meds.map((m) => (
                                         <SelectItem key={m.id} value={m.id}>
                                           {m.medicationName}
+                                          {m.variantName &&
+                                            ` - ${m.variantName}`}
                                         </SelectItem>
                                       ))
                                     )}
@@ -567,8 +569,8 @@ export default function PurchaseOrderCreatePage() {
                                       e.target.value
                                     )
                                   }
-                                  className="w-28 text-center mx-auto"
-                                  disabled={isSubmitting}
+                                  className="w-28 text-center mx-auto bg-gray-50"
+                                  disabled={true}
                                 />
                               </td>
                               <td className="p-3 text-center font-bold text-gray-900">
