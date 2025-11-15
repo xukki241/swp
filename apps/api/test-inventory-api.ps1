@@ -54,7 +54,7 @@ function Invoke-ApiRequest {
 # Step 1: Login to get auth token
 Write-Host "`n=== STEP 1: Authentication ===" -ForegroundColor Cyan
 $loginBody = @{
-    email = "owner@pharmaflow.com"
+    email = "tranhuypro30305@gmail.com"
     password = "Owner123!"
 } | ConvertTo-Json
 
