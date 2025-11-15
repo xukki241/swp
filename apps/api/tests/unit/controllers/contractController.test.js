@@ -356,8 +356,9 @@ describe("contractController", () => {
 
       await contractController.parseContract(req, res, next);
 
+      // Check that final match log was called (not just any info log)
       expect(logger.info).toHaveBeenCalledWith(
-        expect.stringContaining("✅ Matched variant")
+        expect.stringContaining("✅ Final match:")
       );
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({

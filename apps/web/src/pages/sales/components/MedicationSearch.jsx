@@ -119,10 +119,10 @@ export default function MedicationSearch({
                   </p>
                   {(medication.isPrescriptionRequired ||
                     medication.is_prescription_required) && (
-                      <Badge className="bg-amber-500 hover:bg-amber-600 text-white text-xs">
-                        Thuốc kê đơn
-                      </Badge>
-                    )}
+                    <Badge className="bg-amber-500 hover:bg-amber-600 text-white text-xs">
+                      Thuốc kê đơn
+                    </Badge>
+                  )}
                 </div>
                 <p className="text-sm text-gray-600">
                   {medication.variantName}

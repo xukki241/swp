@@ -26,7 +26,7 @@ export const purchaseOrderService = {
           throw new Error("items must be a non-empty array");
         }
 
-        // ✅ Tính tổng tiền, đảm bảo numbers
+        // Tính tổng tiền, đảm bảo numbers
         const totalAmount = items.reduce((sum, item) => {
           const q = Number(item.quantity);
           const p = Number(item.unit_price);
@@ -60,7 +60,6 @@ export const purchaseOrderService = {
             }
             return val;
           }
-          // other types - ignore
           return null;
         };
 
@@ -79,7 +78,6 @@ export const purchaseOrderService = {
           })
           .returning();
 
-        // ✅ Tạo items
         const createdItems = await tx
           .insert(purchaseOrderItems)
           .values(
