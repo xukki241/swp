@@ -274,7 +274,7 @@ deploy_azure_next:
     # Configure API Environment Variables
     - echo "Configuring API environment variables..."
     - |
-      DATABASE_URL="postgresql://${AZURE_DB_USER_NEXT}:${AZURE_DB_PASSWORD_NEXT}@${AZURE_DB_HOST_NEXT}:5432/${AZURE_DB_NAME_NEXT}?sslmode=require"
+      DATABASE_URL="postgresql://${AZURE_DB_USER}:${AZURE_DB_PASSWORD}@${AZURE_DB_HOST}:${AZURE_DB_PORT}/${AZURE_DB_NAME_NEXT}?sslmode=require"
       az webapp config appsettings set \
         --resource-group $AZURE_RESOURCE_GROUP \
         --name $AZURE_API_APP_NAME_NEXT \
@@ -356,7 +356,7 @@ deploy_azure_production:
     # Configure API Environment Variables
     - echo "Configuring API environment variables..."
     - |
-      DATABASE_URL="postgresql://${AZURE_DB_USER_PROD}:${AZURE_DB_PASSWORD_PROD}@${AZURE_DB_HOST_PROD}:5432/${AZURE_DB_NAME_PROD}?sslmode=require"
+      DATABASE_URL="postgresql://${AZURE_DB_USER}:${AZURE_DB_PASSWORD}@${AZURE_DB_HOST}:${AZURE_DB_PORT}/${AZURE_DB_NAME_PROD}?sslmode=require"
       az webapp config appsettings set \
         --resource-group $AZURE_RESOURCE_GROUP \
         --name $AZURE_API_APP_NAME_PROD \
