@@ -59,14 +59,6 @@ export default function MedicationSearch({
   return (
     <div className="space-y-4">
       {/* Global scanning indicator - always visible at top */}
-      {isScanning && (
-        <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2">
-          <Badge className="bg-blue-600 text-white shadow-lg px-4 py-2 text-sm font-semibold animate-pulse">
-            <Scan className="w-4 h-4 mr-2 animate-spin" />
-            Đang quét mã vạch...
-          </Badge>
-        </div>
-      )}
 
       <div className="relative">
         <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
@@ -127,10 +119,10 @@ export default function MedicationSearch({
                   </p>
                   {(medication.isPrescriptionRequired ||
                     medication.is_prescription_required) && (
-                    <Badge className="bg-amber-500 hover:bg-amber-600 text-white text-xs">
-                      Thuốc kê đơn
-                    </Badge>
-                  )}
+                      <Badge className="bg-amber-500 hover:bg-amber-600 text-white text-xs">
+                        Thuốc kê đơn
+                      </Badge>
+                    )}
                 </div>
                 <p className="text-sm text-gray-600">
                   {medication.variantName}
