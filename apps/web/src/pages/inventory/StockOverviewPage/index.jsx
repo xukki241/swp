@@ -71,22 +71,22 @@ export default function StockOverviewPage() {
         const matchesPrice =
           (!searchPayload.priceMin ||
             item.medicationVariant.sellPrice >=
-            Number(searchPayload.priceMin)) &&
+              Number(searchPayload.priceMin)) &&
           (!searchPayload.priceMax ||
             item.medicationVariant.sellPrice <= Number(searchPayload.priceMax));
 
         const matchesManufactureDate =
           (!searchPayload.manufactureDateMin ||
             new Date(item.manufactureDate) >=
-            new Date(searchPayload.manufactureDateMin)) &&
+              new Date(searchPayload.manufactureDateMin)) &&
           (!searchPayload.manufactureDateMax ||
             new Date(item.manufactureDate) <=
-            new Date(searchPayload.manufactureDateMax));
+              new Date(searchPayload.manufactureDateMax));
 
         const matchesExpiryDate =
           (!searchPayload.expiryDateMin ||
             new Date(item.expiryDate) >=
-            new Date(searchPayload.expiryDateMin)) &&
+              new Date(searchPayload.expiryDateMin)) &&
           (!searchPayload.expiryDateMax ||
             new Date(item.expiryDate) <= new Date(searchPayload.expiryDateMax));
 

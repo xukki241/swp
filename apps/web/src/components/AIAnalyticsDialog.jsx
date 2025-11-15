@@ -159,7 +159,10 @@ export default function AIAnalyticsDialog({ open, onOpenChange }) {
           </DialogDescription>
           <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
             <p className="text-xs text-blue-700">
-              <span className="font-semibold">ℹ️ Lưu ý:</span> Phân tích AI chỉ là tham khảo và không thay thế được quyết định kinh doanh thực tế. Vui lòng kết hợp với kinh nghiệm và kiến thức chuyên ngành của bạn.
+              <span className="font-semibold">ℹ️ Lưu ý:</span> Phân tích AI chỉ
+              là tham khảo và không thay thế được quyết định kinh doanh thực tế.
+              Vui lòng kết hợp với kinh nghiệm và kiến thức chuyên ngành của
+              bạn.
             </p>
           </div>
         </DialogHeader>

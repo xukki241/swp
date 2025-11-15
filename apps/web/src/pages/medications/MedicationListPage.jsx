@@ -97,9 +97,7 @@ function StatusBadge({ status }) {
       : "bg-zinc-50 text-zinc-600 border-zinc-200";
   const text = s === "active" ? "Hoạt động" : "Ngừng";
   return (
-    <span
-      className={`px-2 py-0.5 text-xs rounded-full border ${style}`}
-    >
+    <span className={`px-2 py-0.5 text-xs rounded-full border ${style}`}>
       {text}
     </span>
   );
@@ -386,7 +384,7 @@ export default function MedicationListPage() {
         sku: (form.sku || "").trim(),
         name: (form.name || "").trim(),
         unit: (form.unit || "").trim(),
-        unitFactor: 1.00, // Cố định = 1.00
+        unitFactor: 1.0, // Cố định = 1.00
         barcode: (form.barcode || "").trim() || null,
         sellPrice:
           form.sellPrice === "" || form.sellPrice == null

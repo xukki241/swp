@@ -57,18 +57,24 @@ export default function MedicationVariantsPage() {
   const filters = useMemo(
     () => ({
       search: appliedSearch || undefined,
-      isActive: statusFilter !== "all" ? statusFilter === "active" : undefined,
       page,
       limit: 10,
     }),
-    [appliedSearch, statusFilter, page]
+    [appliedSearch, page]
   );
 
   const { data: response = {}, refetch } = useMedicationVariants(
     medId,
     filters
   );
-  const variants = response?.data || [];
+  const allVariants = response?.data || [];
+  const filteredVariants = useMemo(() => {
+    if (statusFilter === "all") return allVariants;
+    return allVariants.filter((v) =>
+      statusFilter === "active" ? v.isActive : !v.isActive
+    );
+  }, [allVariants, statusFilter]);
+  const variants = filteredVariants;
   const pagination = response?.pagination || { total: 0, totalPages: 1 };
 
   // Popup form state
@@ -156,7 +162,9 @@ export default function MedicationVariantsPage() {
           payload.sellPrice == null ||
           Number.isNaN(payload.sellPrice)
         ) {
-          toast.error("Vui lòng điền đầy đủ SKU, Tên, Đơn vị và Giá bán hợp lệ.");
+          toast.error(
+            "Vui lòng điền đầy đủ SKU, Tên, Đơn vị và Giá bán hợp lệ."
+          );
           return;
         }
         await svcCreateVariant(medId, [payload]); // batch API
@@ -296,7 +304,6 @@ export default function MedicationVariantsPage() {
                   <TableHead>SKU</TableHead>
                   <TableHead>Tên</TableHead>
                   <TableHead>Đơn vị</TableHead>
-                  <TableHead>Hệ số</TableHead>
                   <TableHead>Mã vạch</TableHead>
                   <TableHead>Giá bán</TableHead>
                   <TableHead>Trạng thái</TableHead>
@@ -319,11 +326,7 @@ export default function MedicationVariantsPage() {
                     <TableCell>{v.isActive ? "Hoạt động" : "Ngừng"}</TableCell>
                     <TableCell>{v.isForSale ? "Có" : "Không"}</TableCell>
                     <TableCell className="text-right space-x-2">
-                      <Button
-                        size="sm"
-                        onClick={() => openEdit(v)}
-                        title="Sửa"
-                      >
+                      <Button size="sm" onClick={() => openEdit(v)} title="Sửa">
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button
@@ -340,7 +343,7 @@ export default function MedicationVariantsPage() {
                 {variants.length === 0 && (
                   <TableRow>
                     <TableCell
-                      colSpan={9}
+                      colSpan={8}
                       className="text-center text-sm text-muted-foreground"
                     >
                       Chưa có biến thể
@@ -460,7 +463,9 @@ export default function MedicationVariantsPage() {
               <Controller
                 name="sku"
                 control={control}
-                render={({ field }) => <Input {...field} placeholder="Nhập SKU" />}
+                render={({ field }) => (
+                  <Input {...field} placeholder="Nhập SKU" />
+                )}
               />
             </div>
 
@@ -469,7 +474,9 @@ export default function MedicationVariantsPage() {
               <Controller
                 name="name"
                 control={control}
-                render={({ field }) => <Input {...field} placeholder="Nhập tên" />}
+                render={({ field }) => (
+                  <Input {...field} placeholder="Nhập tên" />
+                )}
               />
             </div>
 
@@ -478,7 +485,9 @@ export default function MedicationVariantsPage() {
               <Controller
                 name="unit"
                 control={control}
-                render={({ field }) => <Input {...field} placeholder="VD: viên, hộp" />}
+                render={({ field }) => (
+                  <Input {...field} placeholder="VD: viên, hộp" />
+                )}
               />
             </div>
 
@@ -487,7 +496,9 @@ export default function MedicationVariantsPage() {
               <Controller
                 name="barcode"
                 control={control}
-                render={({ field }) => <Input {...field} placeholder="Nhập mã vạch" />}
+                render={({ field }) => (
+                  <Input {...field} placeholder="Nhập mã vạch" />
+                )}
               />
             </div>
 
@@ -497,7 +508,12 @@ export default function MedicationVariantsPage() {
                 name="sellPrice"
                 control={control}
                 render={({ field }) => (
-                  <Input {...field} placeholder="Nhập giá" type="number" step="0.01" />
+                  <Input
+                    {...field}
+                    placeholder="Nhập giá"
+                    type="number"
+                    step="0.01"
+                  />
                 )}
               />
             </div>

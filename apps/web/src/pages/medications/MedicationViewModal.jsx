@@ -133,7 +133,7 @@ export default function MedicationViewModal({
           const v = await getMedicationVariants(medication.id);
           setVariants(Array.isArray(v) ? v : v?.data || []);
         }
-      } catch { }
+      } catch {}
     })();
   }, [isModal, open, medication, withVariants]);
 
@@ -161,11 +161,11 @@ export default function MedicationViewModal({
             <b>Trạng thái:</b> {medication.status || "-"}
           </div>
           <div>
-            <b>Cần đơn:</b>{" "}
-            {medication.isPrescriptionRequired ? "Có" : "Không"}
+            <b>Cần đơn:</b> {medication.isPrescriptionRequired ? "Có" : "Không"}
           </div>
           <div>
-            <b>Chất kiểm soát:</b> {medication.isControlledSubstance ? "Có" : "Không"}
+            <b>Chất kiểm soát:</b>{" "}
+            {medication.isControlledSubstance ? "Có" : "Không"}
           </div>
           <div className="col-span-2 md:col-span-4">
             <b>Mô tả:</b> {medication.description || "-"}
