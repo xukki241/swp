@@ -6,7 +6,7 @@ Write-Host ""
 
 # Configuration
 $baseUrl = "http://localhost:5000/api"
-$loginEmail = "owner@pharmaflow.com"
+$loginEmail = "tranhuypro30305@gmail.com"
 $loginPassword = "admin123"
 
 # Step 1: Login to get token
