@@ -21,7 +21,6 @@ export const medicationVariants = pgTable(
     sku: varchar("sku", { length: 50 }).notNull(),
     name: name(),
     unit: varchar("unit", { length: 50 }).notNull(),
-    unitFactor: decimalColumn("unit_factor").notNull().default(1.0),
     barcode: varchar("barcode", { length: 50 }),
     sellPrice: decimalColumn("sell_price").notNull(),
     isActive: isActive(),

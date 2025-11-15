@@ -79,7 +79,6 @@ export default function MedicationVariantsPage() {
       sku: "",
       name: "",
       unit: "",
-      unitFactor: "1.00",
       barcode: "",
       sellPrice: "",
       isActive: true,
@@ -93,7 +92,6 @@ export default function MedicationVariantsPage() {
       sku: "",
       name: "",
       unit: "",
-      unitFactor: "1.00",
       barcode: "",
       sellPrice: "",
       isActive: true,
@@ -108,7 +106,6 @@ export default function MedicationVariantsPage() {
       sku: v.sku ?? "",
       name: v.name ?? "",
       unit: v.unit ?? "",
-      unitFactor: String(v.unitFactor ?? "1.00"),
       barcode: v.barcode ?? "",
       sellPrice: String(v.sellPrice ?? ""),
       isActive: !!v.isActive,
@@ -142,10 +139,6 @@ export default function MedicationVariantsPage() {
         sku: (form.sku || "").trim(),
         name: (form.name || "").trim(),
         unit: (form.unit || "").trim(),
-        unitFactor:
-          form.unitFactor === "" || form.unitFactor == null
-            ? 1
-            : Number(form.unitFactor),
         barcode: (form.barcode || "").trim() || null,
         sellPrice:
           form.sellPrice === "" || form.sellPrice == null
@@ -288,7 +281,6 @@ export default function MedicationVariantsPage() {
                   <TableHead>SKU</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Unit</TableHead>
-                  <TableHead>Factor</TableHead>
                   <TableHead>Barcode</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Active</TableHead>
@@ -302,7 +294,6 @@ export default function MedicationVariantsPage() {
                     <TableCell>{v.sku}</TableCell>
                     <TableCell>{v.name}</TableCell>
                     <TableCell>{v.unit}</TableCell>
-                    <TableCell>{v.unitFactor}</TableCell>
                     <TableCell>{v.barcode || "-"}</TableCell>
                     <TableCell>
                       {typeof v.sellPrice === "number"
@@ -379,11 +370,6 @@ export default function MedicationVariantsPage() {
               name="unit"
               control={control}
               render={({ field }) => <Input {...field} placeholder="Unit" />}
-            />
-            <Controller
-              name="unitFactor"
-              control={control}
-              render={({ field }) => <Input {...field} placeholder="Factor" />}
             />
             <Controller
               name="barcode"
