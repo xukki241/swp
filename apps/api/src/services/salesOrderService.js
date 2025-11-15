@@ -6,6 +6,7 @@ import { medicationVariants } from "../db/schema/medicationVariants.js";
 import { salesOrderItems } from "../db/schema/salesOrderItems.js";
 import { salesOrders } from "../db/schema/salesOrders.js";
 import logger from "../utils/logger.js";
+import { inventoryService } from "./inventoryService.js";
 
 import { inventoryService } from "./inventoryService.js";
 

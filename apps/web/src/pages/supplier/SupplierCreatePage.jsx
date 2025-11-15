@@ -33,7 +33,6 @@ export default function SupplierCreatePage() {
     error: medicationsError,
   } = useMedications();
 
-  // Handle both response formats: { data: [...] } or [...]
   const allMedications = Array.isArray(allMedicationsData)
     ? allMedicationsData
     : allMedicationsData?.data || [];
@@ -80,7 +79,6 @@ export default function SupplierCreatePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     const allowedTypes = [
       "application/pdf",
       "application/msword",
@@ -94,7 +92,6 @@ export default function SupplierCreatePage() {
       return;
     }
 
-    // Validate file size (10MB max)
     if (file.size > 10 * 1024 * 1024) {
       toast.error("File too large", {
         description: "Maximum file size is 10MB.",
@@ -103,7 +100,6 @@ export default function SupplierCreatePage() {
     }
 
     try {
-      // Upload file
       const uploadResult = await uploadFile.mutateAsync(file);
       const fileId = uploadResult.data.id;
       const filename = uploadResult.data.filename;
@@ -113,27 +109,16 @@ export default function SupplierCreatePage() {
       toast.success("Contract uploaded!", {
         description: "Parsing contract...",
       });
-
-      // Parse contract
       const parseResult = await parseContract.mutateAsync(fileId);
 
-      console.log("📦 Parse result from backend:", parseResult);
 
       if (parseResult.success && parseResult.data.medications.length > 0) {
-        // Autofill medications
         const newMeds = parseResult.data.medications.map((med) => {
           const matchedMed = allMedications.find(
             (m) =>
               m.name.toLowerCase().trim() ===
               med.medicationName.toLowerCase().trim()
           );
-
-          console.log("🔍 Matching medication:", {
-            parsedName: med.medicationName,
-            matchedMed: matchedMed,
-            matchedId: matchedMed?.id,
-            variantIdFromBackend: med.medicationVariantId, // ✅ Log variant ID from backend
-          });
 
           return {
             medicationId: matchedMed?.id || "",
@@ -148,7 +133,6 @@ export default function SupplierCreatePage() {
           };
         });
 
-        console.log("📋 New meds array:", newMeds);
         setMeds(newMeds);
 
         // Check if any medication was not found

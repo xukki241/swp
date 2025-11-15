@@ -378,7 +378,7 @@ export default function MedicationViewModal({
                     colSpan={4}
                     className="text-center text-muted-foreground"
                   >
-                    Chưa có tồn kho
+                    No inventory
                   </TableCell>
                 </TableRow>
               )}

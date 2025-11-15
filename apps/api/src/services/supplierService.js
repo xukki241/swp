@@ -26,7 +26,6 @@ export const supplierService = {
         medicationVariants: variantsToCreate,
       } = supplierData;
 
-      // Validate only if field is provided
       if (name !== undefined && !name.trim()) {
         validationErrors.push("Supplier name cannot be empty.");
       }
@@ -69,7 +68,6 @@ export const supplierService = {
       }
 
       try {
-        // Check duplicate email
         if (email) {
           const existingSupplier = await db.query.suppliers.findFirst({
             where: eq(suppliers.email, email.trim()),
