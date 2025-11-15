@@ -44,6 +44,12 @@ const config = {
   smtpUser: getEnv("SMTP_USER", ""),
   smtpPass: getEnv("SMTP_PASS", ""),
   smtpFrom: getEnv("SMTP_FROM", "noreply@pharmaflow.com"),
+
+  // Frontend URL
+  frontendUrl: getEnv("FRONTEND_URL", "http://localhost:3000"),
+
+  // Backend/API URL (for email links, webhooks, etc.)
+  apiUrl: getEnv("API_URL", "http://localhost:3000"),
 };
 // SMS Configuration removed - only email OTP supported
 

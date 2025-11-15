@@ -16,7 +16,7 @@ export const purchaseOrderController = {
   async getAll(req, res) {
     try {
       const filters = {
-        supplierId: req.query.supplierId || undefined, // UUID is a string
+        supplierId: req.query.supplierId || undefined,
         status: req.query.status,
         startDate: req.query.startDate,
         endDate: req.query.endDate,
