@@ -5,8 +5,9 @@ import { inventory } from "../db/schema/inventory.js";
 import { medicationVariants } from "../db/schema/medicationVariants.js";
 import { salesOrderItems } from "../db/schema/salesOrderItems.js";
 import { salesOrders } from "../db/schema/salesOrders.js";
-import { inventoryService } from "./inventoryService.js";
 import logger from "../utils/logger.js";
+
+import { inventoryService } from "./inventoryService.js";
 
 export const salesOrderService = {
   /**
@@ -85,7 +86,7 @@ export const salesOrderService = {
         if (totalAvailable < quantity) {
           throw new Error(
             `Insufficient inventory for ${variant.name} (${variant.sku}). ` +
-            `Requested: ${quantity}, Available: ${totalAvailable}`
+              `Requested: ${quantity}, Available: ${totalAvailable}`
           );
         }
 
@@ -100,13 +101,24 @@ export const salesOrderService = {
           const availableInBatch = Number(inv.quantityAvailable);
           const toSell = Math.min(remainingQuantity, availableInBatch);
 
-          // Reduce quantity directly (as inventory was sold)
-          await tx
-            .update(inventory)
-            .set({
-              quantity: sql`${inventory.quantity} - ${toSell}`,
-            })
-            .where(eq(inventory.id, inv.id));
+          // Calculate the new quantity after reduction
+          const currentQuantity = Number(inv.quantity);
+          const currentReserved = Number(inv.quantityReserved);
+          const newQuantity = currentQuantity - toSell;
+
+          // If quantity becomes equal to quantityReserved (all available stock used),
+          // delete the inventory record (unlink batch from bin)
+          if (newQuantity <= currentReserved) {
+            await tx.delete(inventory).where(eq(inventory.id, inv.id));
+          } else {
+            // Otherwise, reduce quantity normally
+            await tx
+              .update(inventory)
+              .set({
+                quantity: sql`${inventory.quantity} - ${toSell}`,
+              })
+              .where(eq(inventory.id, inv.id));
+          }
 
           remainingQuantity -= toSell;
         }
@@ -157,9 +169,14 @@ export const salesOrderService = {
         itemsToCreate.map((item) => item.medicationVariantId)
       );
       for (const variantId of variantsInOrder) {
-        const deletedCount = await inventoryService.deleteEmptyInventoryTx(variantId, tx);
+        const deletedCount = await inventoryService.deleteEmptyInventoryTx(
+          variantId,
+          tx
+        );
         if (deletedCount > 0) {
-          logger.info(`Deleted ${deletedCount} empty inventory entries for variant ${variantId}`);
+          logger.info(
+            `Deleted ${deletedCount} empty inventory entries for variant ${variantId}`
+          );
         }
       }
 
@@ -351,13 +368,23 @@ export const salesOrderService = {
               const reserved = Number(inv.quantityReserved);
               const toDeduct = Math.min(remainingQuantity, reserved);
 
-              await tx
-                .update(inventory)
-                .set({
-                  quantity: sql`${inventory.quantity} - ${toDeduct}`,
-                  quantityReserved: sql`${inventory.quantityReserved} - ${toDeduct}`,
-                })
-                .where(eq(inventory.id, inv.id));
+              // Calculate the new quantity after deduction
+              const currentQuantity = Number(inv.quantity);
+              const newQuantity = currentQuantity - toDeduct;
+
+              // If quantity becomes 0, delete the inventory record (unlink batch from bin)
+              if (newQuantity <= 0) {
+                await tx.delete(inventory).where(eq(inventory.id, inv.id));
+              } else {
+                // Otherwise, update the quantities
+                await tx
+                  .update(inventory)
+                  .set({
+                    quantity: sql`${inventory.quantity} - ${toDeduct}`,
+                    quantityReserved: sql`${inventory.quantityReserved} - ${toDeduct}`,
+                  })
+                  .where(eq(inventory.id, inv.id));
+              }
 
               remainingQuantity -= toDeduct;
             }
