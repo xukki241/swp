@@ -17,12 +17,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { usePurchaseOrder } from "@/hooks/usePurchaseOrders";
+import {
+  usePurchaseOrder,
+  usePurchaseOrderReceiptsByOrder,
+} from "@/hooks/usePurchaseOrders";
 import {
   ArrowLeft,
   Building2,
   Calendar,
   DollarSign,
+  Eye,
   FileText,
   Package,
   User,
@@ -33,6 +37,10 @@ export default function PurchaseOrderDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: order, isLoading, error } = usePurchaseOrder(id);
+  const { data: receipts = [] } = usePurchaseOrderReceiptsByOrder(id);
+
+  // Check if this PO has any receipts
+  const hasReceipts = receipts && receipts.length > 0;
 
   const getStatusBadge = (status) => {
     const statusConfig = {
@@ -319,16 +327,25 @@ export default function PurchaseOrderDetailPage() {
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" /> Quay lại danh sách
                 </Button>
-                {(order.status === "ordered" ||
-                  order.status === "received") && (
-                  <Button
-                    onClick={() =>
-                      navigate(`/purchase-orders/${order.id}/receipts/create`)
-                    }
-                  >
-                    <FileText className="w-4 h-4 mr-2" /> Tạo phiếu nhập
-                  </Button>
-                )}
+                {(order.status === "ordered" || order.status === "received") &&
+                  (hasReceipts ? (
+                    <Button
+                      onClick={() =>
+                        navigate(`/procurement/receipts/${receipts[0].id}`)
+                      }
+                      variant="secondary"
+                    >
+                      <Eye className="w-4 h-4 mr-2" /> Xem phiếu nhập
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() =>
+                        navigate(`/purchase-orders/${order.id}/receipts/create`)
+                      }
+                    >
+                      <FileText className="w-4 h-4 mr-2" /> Tạo phiếu nhập
+                    </Button>
+                  ))}
               </div>
             </div>
           </CardContent>
