@@ -17,21 +17,27 @@ purchaseOrderItemRouter.get("/:id", purchaseOrderItemController.getById);
 purchaseOrderItemRouter.post(
   "/",
   authorize("owner"),
-  createAuditLog("CREATE", "purchase_order_item"),
+  createAuditLog("CREATE", "purchase_order_item", {
+    excludeFields: ["unitCost", "totalCost", "supplierCost"],
+  }),
   purchaseOrderItemController.create
 );
 purchaseOrderItemRouter.put(
   "/:id",
   authorize("owner"),
   createAuditLog("UPDATE", "purchase_order_item", {
+    excludeFields: ["unitCost", "totalCost", "supplierCost"],
     getChanges: (req) => ({ purchaseOrderItem: req.body }),
   }),
   purchaseOrderItemController.update
 );
+// Note: The controller should store the complete purchase order item data before deletion in metadata.entityData
 purchaseOrderItemRouter.delete(
   "/:id",
   authorize("owner"),
-  createAuditLog("DELETE", "purchase_order_item"),
+  createAuditLog("DELETE", "purchase_order_item", {
+    excludeFields: ["unitCost", "totalCost", "supplierCost"],
+  }),
   purchaseOrderItemController.delete
 );
 

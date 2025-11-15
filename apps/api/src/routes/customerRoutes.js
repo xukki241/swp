@@ -39,6 +39,7 @@ customerRouter.patch(
 );
 
 // DELETE /api/customers/:id - Delete customer
+// Note: Consider storing customer entity data before delete for better audit trail
 customerRouter.delete(
   "/:id",
   authorize("owner"),

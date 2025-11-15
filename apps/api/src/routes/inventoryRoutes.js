@@ -65,7 +65,9 @@ inventoryRouter.patch(
   validateParams(inventoryBatchIdParamSchema),
   authorize("owner"),
   validateBody(updateInventorySchema),
-  createAuditLog("UPDATE", "inventory"),
+  createAuditLog("UPDATE", "inventory", {
+    excludeFields: ["costPrice", "supplierCost"],
+  }),
   inventoryController.update
 );
 
@@ -76,6 +78,7 @@ inventoryRouter.patch(
   authorize("owner"),
   validateBody(adjustInventoryRequestSchema),
   createAuditLog("UPDATE", "inventory", {
+    excludeFields: ["costPrice", "supplierCost"],
     getChanges: (req) => ({ adjustment: req.body }),
   }),
   inventoryController.adjust
@@ -87,6 +90,7 @@ inventoryRouter.post(
   authorize("owner"),
   validateBody(moveInventoryRequestSchema),
   createAuditLog("UPDATE", "inventory", {
+    excludeFields: ["costPrice", "supplierCost"],
     getChanges: (req) => ({ movement: req.body }),
   }),
   inventoryController.move

@@ -62,7 +62,9 @@ medicationVariantRouter.post(
   authorize("owner"),
   validateParams(medicationIdParamSchema),
   validateBody(createVariantsRequestSchema),
-  createAuditLog("CREATE", "medication_variant"),
+  createAuditLog("CREATE", "medication_variant", {
+    excludeFields: ["costPrice", "supplierCost"],
+  }),
   medicationVariantController.createMedicationVariant
 );
 
@@ -77,6 +79,7 @@ medicationVariantRouter.patch(
   validateParams(medicationIdAndIdParamSchema),
   validateBody(updateVariantRequestSchema),
   createAuditLog("UPDATE", "medication_variant", {
+    excludeFields: ["costPrice", "supplierCost"],
     getChanges: (req) => ({ medicationVariant: req.body }),
   }),
   medicationVariantController.updateMedicationVariant
@@ -87,11 +90,14 @@ medicationVariantRouter.patch(
  * @desc    Delete medication variant by ID
  * @access  Private (Owner only)
  */
+// Note: The controller should store the complete medication variant data before deletion in metadata.entityData
 medicationVariantRouter.delete(
   "/:id",
   authorize("owner"),
   validateParams(medicationIdAndIdParamSchema),
-  createAuditLog("DELETE", "medication_variant"),
+  createAuditLog("DELETE", "medication_variant", {
+    excludeFields: ["costPrice", "supplierCost"],
+  }),
   medicationVariantController.deleteMedicationVariant
 );
 

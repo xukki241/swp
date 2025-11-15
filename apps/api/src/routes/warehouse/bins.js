@@ -30,6 +30,7 @@ warehouseBinsRouter.patch(
 );
 
 // DELETE /api/warehouse/bins/:id
+// Note: The controller should store the complete warehouse bin data before deletion in metadata.entityData
 warehouseBinsRouter.delete(
   "/bins/:id",
   authorize("owner"),

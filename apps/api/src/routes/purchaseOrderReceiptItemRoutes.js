@@ -23,21 +23,27 @@ purchaseOrderReceiptItemRouter.get(
 purchaseOrderReceiptItemRouter.post(
   "/",
   authorize("owner"),
-  createAuditLog("CREATE", "purchase_receipt_item"),
+  createAuditLog("CREATE", "purchase_receipt_item", {
+    excludeFields: ["unitCost", "totalCost", "supplierCost"],
+  }),
   purchaseOrderReceiptItemController.create
 );
 purchaseOrderReceiptItemRouter.put(
   "/:id",
   authorize("owner"),
   createAuditLog("UPDATE", "purchase_receipt_item", {
+    excludeFields: ["unitCost", "totalCost", "supplierCost"],
     getChanges: (req) => ({ purchaseOrderReceiptItem: req.body }),
   }),
   purchaseOrderReceiptItemController.update
 );
+// Note: The controller should store the complete purchase order receipt item data before deletion in metadata.entityData
 purchaseOrderReceiptItemRouter.delete(
   "/:id",
   authorize("owner"),
-  createAuditLog("DELETE", "purchase_receipt_item"),
+  createAuditLog("DELETE", "purchase_receipt_item", {
+    excludeFields: ["unitCost", "totalCost", "supplierCost"],
+  }),
   purchaseOrderReceiptItemController.delete
 );
 

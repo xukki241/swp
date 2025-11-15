@@ -84,6 +84,7 @@ supplierRouter.patch(
  * @route   DELETE /api/suppliers/:id
  * @desc    Delete supplier by ID
  * @access  Private (Owner only)
+ * Note: Consider storing supplier entity data before delete for better audit trail
  */
 supplierRouter.delete(
   "/:id",
