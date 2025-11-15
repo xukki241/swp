@@ -44,11 +44,12 @@ describe("MedicationController", () => {
         offset: 0,
       });
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        success: true,
-        data: mockMedications,
-      }));
-    });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          data: mockMedications,
+        })
+      );
     });
 
     it("should handle errors", async () => {
