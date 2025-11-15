@@ -579,13 +579,18 @@ export async function parseContractFile(fileBuffer, mimeType) {
 /**
  * Match medication names from contract with database medications
  * @param {Array} contractMedications - Medications from contract
- * @param {Array} dbMedications - Medications from database
+ * @param {Array} dbMedications - Medications from database (must be array)
  * @returns {Array} Matched medications with IDs
  */
 export function matchMedicationsWithDatabase(
   contractMedications,
   dbMedications
 ) {
+  if (!Array.isArray(dbMedications) || dbMedications.length === 0) {
+    logger.warn("⚠️ No medications found in database for matching");
+    return contractMedications;
+  }
+
   return contractMedications.map((contractMed) => {
     // Try to find exact match
     let match = dbMedications.find(
