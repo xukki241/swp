@@ -10,7 +10,7 @@ import logger from "../utils/logger.js";
 export const getAllMedications = async (req, res, next) => {
   try {
     const page = req.query.page ? Number.parseInt(req.query.page) : 1;
-    const limit = req.query.limit ? Number.parseInt(req.query.limit) : 10;
+    const limit = req.query.limit ? Number.parseInt(req.query.limit) : 100;
     const offset = (page - 1) * limit;
 
     const { search, status } = req.query;

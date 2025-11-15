@@ -39,7 +39,7 @@ export default function SupplierEditPage() {
     data: allMedicationsData,
     isLoading: isLoadingMedications,
     error: medicationsError,
-  } = useMedications();
+  } = useMedications({ limit: 1000 });
 
   // Handle both response formats: { data: [...] } or [...]
   const allMedications = Array.isArray(allMedicationsData)

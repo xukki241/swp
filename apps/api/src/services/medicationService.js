@@ -25,7 +25,7 @@ import {
 export const getAllMedications = async ({
   search,
   status,
-  limit = 10,
+  limit = 100,
   offset = 0,
 } = {}) => {
   try {
