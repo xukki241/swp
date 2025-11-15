@@ -72,7 +72,9 @@ nestedReceiptRouter.post(
   authorize("owner"),
   validateParams(purchaseOrderIdParamSchema),
   validateBody(createReceiptRequestSchema),
-  createAuditLog("CREATE", "purchase_receipt"),
+  createAuditLog("CREATE", "purchase_receipt", {
+    excludeFields: ["unitCost", "totalCost", "supplierCost"],
+  }),
   purchaseOrderReceiptController.create
 );
 

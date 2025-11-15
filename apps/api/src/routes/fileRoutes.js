@@ -85,6 +85,7 @@ fileRouter.get("/:id/view", validateParams(idParamSchema), fileController.view);
  * @desc    Delete file
  * @access  Private (Owner only)
  */
+// Note: The controller should store the complete file metadata before deletion in metadata.entityData
 fileRouter.delete(
   "/:id",
   authorize("owner"),
