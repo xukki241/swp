@@ -111,7 +111,6 @@ export default function SupplierCreatePage() {
       });
       const parseResult = await parseContract.mutateAsync(fileId);
 
-
       if (parseResult.success && parseResult.data.medications.length > 0) {
         const newMeds = parseResult.data.medications.map((med) => {
           const matchedMed = allMedications.find(

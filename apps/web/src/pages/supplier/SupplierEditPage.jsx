@@ -224,7 +224,7 @@ export default function SupplierEditPage() {
           });
         } else {
           toast.success("Phân tích hợp đồng thành công!", {
-            description: `✅ Đã khớp ${medsMatched} thuốc! Vui lòng chọn variant cho từng thuốc hoặc tạo variant mới nếu cần.`,
+            description: `Đã khớp ${medsMatched} thuốc! Vui lòng chọn variant cho từng thuốc hoặc tạo variant mới nếu cần.`,
             duration: 6000,
           });
         }

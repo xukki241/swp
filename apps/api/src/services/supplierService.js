@@ -60,6 +60,18 @@ export const supplierService = {
               `Medication #${vIndex + 1}: Supplier SKU is required.`
             );
           }
+          if (variant.purchase_price !== undefined && !variant.purchase_price) {
+            validationErrors.push(
+              `Medication #${vIndex + 1}: Purchase price is required.`
+            );
+          }
+          if (
+            variant.contract_id === undefined ||
+            variant.contract_id === null ||
+            variant.contract_id === ""
+          ) {
+            validationErrors.push(` Contract file is required.`);
+          }
         }
       }
 
