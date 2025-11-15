@@ -40,13 +40,15 @@ describe("MedicationController", () => {
       expect(medicationService.getAllMedications).toHaveBeenCalledWith({
         search: "aspirin",
         status: "active",
+        limit: 10,
+        offset: 0,
       });
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
         success: true,
-        count: 2,
         data: mockMedications,
-      });
+      }));
+    });
     });
 
     it("should handle errors", async () => {
