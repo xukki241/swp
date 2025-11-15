@@ -55,14 +55,18 @@ describe("SupplierService", () => {
           email: "supplier@example.com",
           medicationVariants: [
             {
-              medicationVariantId: 1,
-              supplierSku: "SUP-001",
-              leadTimeDays: 7,
+              medication_variant_id: 1,
+              supplier_sku: "SUP-001",
+              lead_time_days: 7,
+              purchase_price: 50000,
+              contract_id: "contract-123", // Add required contract_id
             },
             {
-              medicationVariantId: 2,
-              supplierSku: "SUP-002",
-              leadTimeDays: 10,
+              medication_variant_id: 2,
+              supplier_sku: "SUP-002",
+              lead_time_days: 10,
+              purchase_price: 75000,
+              contract_id: "contract-123", // Add required contract_id
             },
           ],
         },

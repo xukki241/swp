@@ -38,7 +38,13 @@ export function MedicationRow({
     isLoading: isLoadingVariants,
     error: variantsError,
   } = useMedicationVariants(selectedMedId || undefined);
-  const availableVariants = variantsData || [];
+
+  // Extract array from response - handle both {data: []} and direct array
+  const availableVariants = Array.isArray(variantsData)
+    ? variantsData
+    : Array.isArray(variantsData?.data)
+      ? variantsData.data
+      : [];
 
   // Calculate if variant is from contract (not in available variants)
   const hasVariantFromContract =
