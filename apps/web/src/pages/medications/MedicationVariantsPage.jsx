@@ -502,36 +502,38 @@ export default function MedicationVariantsPage() {
               />
             </div>
 
-            <div className="flex items-center gap-2 pt-6">
-              <Controller
-                name="isActive"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <>
-                    <Checkbox
-                      checked={!!value}
-                      onCheckedChange={(c) => onChange(!!c)}
-                    />
-                    <span className="text-sm">Đang hoạt động</span>
-                  </>
-                )}
-              />
-            </div>
+            <div className="md:col-span-2 grid grid-cols-2 gap-4 pt-4">
+              <div className="flex items-center gap-2">
+                <Controller
+                  name="isActive"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <>
+                      <Checkbox
+                        checked={!!value}
+                        onCheckedChange={(c) => onChange(!!c)}
+                      />
+                      <span className="text-sm">Đang hoạt động</span>
+                    </>
+                  )}
+                />
+              </div>
 
-            <div className="flex items-center gap-2 pt-6">
-              <Controller
-                name="isForSale"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <>
-                    <Checkbox
-                      checked={!!value}
-                      onCheckedChange={(c) => onChange(!!c)}
-                    />
-                    <span className="text-sm">Cho phép bán</span>
-                  </>
-                )}
-              />
+              <div className="flex items-center gap-2">
+                <Controller
+                  name="isForSale"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <>
+                      <Checkbox
+                        checked={!!value}
+                        onCheckedChange={(c) => onChange(!!c)}
+                      />
+                      <span className="text-sm">Cho phép bán</span>
+                    </>
+                  )}
+                />
+              </div>
             </div>
 
             <DialogFooter className="md:col-span-2 flex gap-2 justify-end">
