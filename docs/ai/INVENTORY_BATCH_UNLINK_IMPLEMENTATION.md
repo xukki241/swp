@@ -51,6 +51,7 @@ for (const inv of availableInventory) {
 ```
 
 **Key Points:**
+
 - Checks if `newQuantity <= currentReserved` (all available stock used)
 - Deletes inventory record when condition is met
 - Otherwise, updates quantity normally
@@ -114,6 +115,7 @@ if (newStatus === "completed" && currentOrder.status === "pending") {
 ```
 
 **Key Points:**
+
 - Checks if `newQuantity <= 0` after deduction
 - Deletes inventory record when quantity becomes zero
 - Otherwise, updates both `quantity` and `quantityReserved`
@@ -135,6 +137,7 @@ if (newStatus === "completed" && currentOrder.status === "pending") {
 ## Testing Scenarios
 
 ### Scenario 1: Complete Stock Depletion
+
 ```
 Initial State:
 - Batch A: quantity=10, quantityReserved=0
@@ -148,6 +151,7 @@ Expected Result:
 ```
 
 ### Scenario 2: Partial Stock Depletion
+
 ```
 Initial State:
 - Batch A: quantity=50, quantityReserved=0
@@ -161,6 +165,7 @@ Expected Result:
 ```
 
 ### Scenario 3: Multiple Batches (FEFO)
+
 ```
 Initial State:
 - Batch A: quantity=5, expiry=2025-12-01 (in Bin B01)

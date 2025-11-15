@@ -42,6 +42,7 @@ Complete audit log viewer with features:
 ### 4. Routing Configuration (`apps/web/src/App.jsx`)
 
 Added route for audit log page:
+
 ```jsx
 <Route
   path="/audit-logs"
