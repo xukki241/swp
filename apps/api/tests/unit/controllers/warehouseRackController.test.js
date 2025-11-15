@@ -176,4 +176,229 @@ describe("WarehouseRackController", () => {
       expect(res.status).toHaveBeenCalledWith(404);
     });
   });
+
+  describe("create - batch creation", () => {
+    it("should create multiple racks at once", async () => {
+      req.body = [
+        { zoneId: "zone-1", code: "R001", name: "Rack 1" },
+        { zoneId: "zone-1", code: "R002", name: "Rack 2" },
+        { zoneId: "zone-1", code: "R003", name: "Rack 3" },
+      ];
+      const mockRacks = [
+        { id: 1, zoneId: "zone-1", code: "R001" },
+        { id: 2, zoneId: "zone-1", code: "R002" },
+        { id: 3, zoneId: "zone-1", code: "R003" },
+      ];
+      warehouseRackService.create.mockResolvedValue(mockRacks);
+
+      await warehouseRackController.create(req, res);
+
+      expect(warehouseRackService.create).toHaveBeenCalledWith([
+        {
+          zoneId: "zone-1",
+          code: "R001",
+          name: "Rack 1",
+          description: undefined,
+        },
+        {
+          zoneId: "zone-1",
+          code: "R002",
+          name: "Rack 2",
+          description: undefined,
+        },
+        {
+          zoneId: "zone-1",
+          code: "R003",
+          name: "Rack 3",
+          description: undefined,
+        },
+      ]);
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: "Warehouse racks created successfully",
+        data: mockRacks,
+      });
+    });
+
+    it("should create single rack with description", async () => {
+      req.body = {
+        zoneId: "zone-1",
+        code: "R001",
+        name: "Rack A",
+        description: "Heavy duty rack",
+      };
+      warehouseRackService.create.mockResolvedValue({ id: 1, ...req.body });
+
+      await warehouseRackController.create(req, res);
+
+      expect(warehouseRackService.create).toHaveBeenCalledWith({
+        zoneId: "zone-1",
+        code: "R001",
+        name: "Rack A",
+        description: "Heavy duty rack",
+      });
+      expect(res.status).toHaveBeenCalledWith(201);
+    });
+  });
+
+  describe("createBatch", () => {
+    it("should create racks in batch with auto-generated codes", async () => {
+      req.params = { zoneId: "zone-uuid-1" };
+      req.body = {
+        quantity: 5,
+        code_prefix: "RACK",
+        name_prefix: "Rack",
+      };
+      const mockRacks = Array.from({ length: 5 }, (_, i) => ({
+        id: i + 1,
+        code: `RACK-00${i + 1}`,
+      }));
+      warehouseRackService.create.mockResolvedValue(mockRacks);
+
+      await warehouseRackController.createBatch(req, res);
+
+      expect(warehouseRackService.create).toHaveBeenCalledWith([
+        { zoneId: "zone-uuid-1", code: "RACK-001", name: "Rack 1" },
+        { zoneId: "zone-uuid-1", code: "RACK-002", name: "Rack 2" },
+        { zoneId: "zone-uuid-1", code: "RACK-003", name: "Rack 3" },
+        { zoneId: "zone-uuid-1", code: "RACK-004", name: "Rack 4" },
+        { zoneId: "zone-uuid-1", code: "RACK-005", name: "Rack 5" },
+      ]);
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: "5 warehouse racks created successfully",
+        data: mockRacks,
+      });
+    });
+
+    it("should use default prefixes", async () => {
+      req.params = { zoneId: "zone-uuid-1" };
+      req.body = { quantity: 2 };
+      warehouseRackService.create.mockResolvedValue([{ id: 1 }, { id: 2 }]);
+
+      await warehouseRackController.createBatch(req, res);
+
+      expect(warehouseRackService.create).toHaveBeenCalledWith([
+        { zoneId: "zone-uuid-1", code: "RACK-001", name: "Rack 1" },
+        { zoneId: "zone-uuid-1", code: "RACK-002", name: "Rack 2" },
+      ]);
+    });
+
+    it("should handle custom prefixes", async () => {
+      req.params = { zoneId: "zone-uuid-1" };
+      req.body = {
+        quantity: 3,
+        code_prefix: "R",
+        name_prefix: "Storage Rack",
+      };
+      warehouseRackService.create.mockResolvedValue([
+        { id: 1 },
+        { id: 2 },
+        { id: 3 },
+      ]);
+
+      await warehouseRackController.createBatch(req, res);
+
+      expect(warehouseRackService.create).toHaveBeenCalledWith([
+        { zoneId: "zone-uuid-1", code: "R-001", name: "Storage Rack 1" },
+        { zoneId: "zone-uuid-1", code: "R-002", name: "Storage Rack 2" },
+        { zoneId: "zone-uuid-1", code: "R-003", name: "Storage Rack 3" },
+      ]);
+    });
+
+    it("should handle errors", async () => {
+      req.params = { zoneId: "zone-uuid-1" };
+      req.body = { quantity: 5 };
+      warehouseRackService.create.mockRejectedValue(
+        new Error("Database error")
+      );
+
+      await expect(
+        warehouseRackController.createBatch(req, res)
+      ).rejects.toThrow("Database error");
+    });
+  });
+
+  describe("getAll - with filters", () => {
+    it("should filter by zoneId", async () => {
+      req.query = { zoneId: "zone-uuid-1" };
+      warehouseRackService.getAll.mockResolvedValue([{ id: 1 }, { id: 2 }]);
+
+      await warehouseRackController.getAll(req, res);
+
+      expect(warehouseRackService.getAll).toHaveBeenCalledWith({
+        search: undefined,
+        zoneId: "zone-uuid-1",
+        limit: 100,
+        offset: 0,
+      });
+    });
+
+    it("should apply search filter", async () => {
+      req.query = { search: "heavy" };
+      warehouseRackService.getAll.mockResolvedValue([{ id: 1 }]);
+
+      await warehouseRackController.getAll(req, res);
+
+      expect(warehouseRackService.getAll).toHaveBeenCalledWith({
+        search: "heavy",
+        zoneId: undefined,
+        limit: 100,
+        offset: 0,
+      });
+    });
+
+    it("should use custom limit and offset", async () => {
+      req.query = { limit: "25", offset: "50" };
+      warehouseRackService.getAll.mockResolvedValue([]);
+
+      await warehouseRackController.getAll(req, res);
+
+      expect(warehouseRackService.getAll).toHaveBeenCalledWith({
+        search: undefined,
+        zoneId: undefined,
+        limit: "25",
+        offset: "50",
+      });
+    });
+  });
+
+  describe("update - field handling", () => {
+    it("should update only zoneId", async () => {
+      req.params = { id: "1" };
+      req.body = { zoneId: "new-zone-uuid" };
+      warehouseRackService.update.mockResolvedValue({
+        id: 1,
+        zoneId: "new-zone-uuid",
+      });
+
+      await warehouseRackController.update(req, res);
+
+      expect(warehouseRackService.update).toHaveBeenCalledWith("1", {
+        zoneId: "new-zone-uuid",
+      });
+    });
+
+    it("should update multiple fields", async () => {
+      req.params = { id: "1" };
+      req.body = {
+        zoneId: "new-zone-uuid",
+        code: "R-NEW",
+        name: "Updated Rack",
+        description: "New description",
+      };
+      warehouseRackService.update.mockResolvedValue({ id: 1, ...req.body });
+
+      await warehouseRackController.update(req, res);
+
+      expect(warehouseRackService.update).toHaveBeenCalledWith("1", {
+        zoneId: "new-zone-uuid",
+        code: "R-NEW",
+        name: "Updated Rack",
+        description: "New description",
+      });
+    });
+  });
 });
