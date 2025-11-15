@@ -133,7 +133,7 @@ export default function MedicationViewModal({
           const v = await getMedicationVariants(medication.id);
           setVariants(Array.isArray(v) ? v : v?.data || []);
         }
-      } catch { }
+      } catch {}
     })();
   }, [isModal, open, medication, withVariants]);
 
@@ -373,15 +373,15 @@ export default function MedicationViewModal({
               {inventory.filter(
                 (inv) => String(inv.medicationId) === String(medication.id)
               ).length === 0 && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="text-center text-muted-foreground"
-                    >
-                      No inventory
-                    </TableCell>
-                  </TableRow>
-                )}
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    className="text-center text-muted-foreground"
+                  >
+                    No inventory
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>

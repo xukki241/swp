@@ -15,10 +15,10 @@ Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_fr
 
 ```javascript
 // TRƯỚC ĐÂY (có thể bị rate limit nhanh)
-model: "gemini-2.0-flash-exp"  // Experimental model
+model: "gemini-2.0-flash-exp"; // Experimental model
 
 // SAU KHI SỬA (ổn định hơn)
-model: "gemini-1.5-flash"       // Stable version
+model: "gemini-1.5-flash"; // Stable version
 ```
 
 **Lý do:**
@@ -44,14 +44,17 @@ while (retryCount < maxRetries) {
     if (error.status === 429 && retryCount < maxRetries - 1) {
       // Extract retry delay from error (default 30s)
       const retryDelay = error.errorDetails?.find(
-        (detail) => detail["@type"] === "type.googleapis.com/google.rpc.RetryInfo"
+        (detail) =>
+          detail["@type"] === "type.googleapis.com/google.rpc.RetryInfo"
       )?.retryDelay;
-      const delaySeconds = retryDelay ? parseInt(retryDelay.replace("s", "")) : 30;
-      
+      const delaySeconds = retryDelay
+        ? parseInt(retryDelay.replace("s", ""))
+        : 30;
+
       console.warn(
         `AI API rate limited, retrying in ${delaySeconds} seconds (attempt ${retryCount + 1}/${maxRetries})...`
       );
-      
+
       // Wait before retry
       await new Promise((resolve) => setTimeout(resolve, delaySeconds * 1000));
       retryCount++;
@@ -73,7 +76,7 @@ while (retryCount < maxRetries) {
 ### Free Tier (gemini-1.5-flash)
 
 - **Requests per minute:** 15 requests/min
-- **Requests per day:** 1,500 requests/day  
+- **Requests per day:** 1,500 requests/day
 - **Tokens per minute:** 1 million tokens/min
 
 ### Free Tier (gemini-2.0-flash-exp)
@@ -110,13 +113,15 @@ Nếu dashboard gọi nhiều API AI cùng lúc, thêm delay:
 // Trong Dashboard.jsx hoặc component gọi AI
 const fetchAIData = async () => {
   // Fetch quick insights first
-  const insights = await fetch('/api/ai-analysis/quick-insights?daysBack=90');
-  
+  const insights = await fetch("/api/ai-analysis/quick-insights?daysBack=90");
+
   // Wait 2 seconds before next call
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
   // Fetch purchase recommendations
-  const recommendations = await fetch('/api/ai-analysis/purchase-recommendations?daysBack=90');
+  const recommendations = await fetch(
+    "/api/ai-analysis/purchase-recommendations?daysBack=90"
+  );
 };
 ```
 
@@ -127,8 +132,8 @@ Lưu kết quả AI vào database, chỉ gọi API mới khi cần:
 ```javascript
 // Cache trong 1 giờ
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
-const lastFetch = localStorage.getItem('aiLastFetch');
-const cachedData = localStorage.getItem('aiRecommendations');
+const lastFetch = localStorage.getItem("aiLastFetch");
+const cachedData = localStorage.getItem("aiRecommendations");
 
 if (cachedData && Date.now() - lastFetch < CACHE_DURATION) {
   return JSON.parse(cachedData);
@@ -163,6 +168,7 @@ Nếu vẫn gặp vấn đề, kiểm tra:
 3. Quota còn bao nhiêu (check dashboard)
 
 ---
+
 **Cập nhật:** 2025-11-12 22:10  
 **Model:** gemini-2.0-flash-exp → gemini-1.5-flash  
 **Retry Logic:** ✅ Enabled (max 3 retries)

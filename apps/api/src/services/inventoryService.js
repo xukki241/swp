@@ -561,4 +561,3 @@ export const inventoryService = {
     return deleted.length;
   },
 };
-

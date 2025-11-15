@@ -9,11 +9,11 @@ graph TD
     C --> D[Điều chỉnh số lượng]
     D --> E[Tạo PO & Gửi Email]
     E --> F{Status: PENDING}
-    
+
     F --> G[Supplier nhận email]
     G --> H[Click link xác nhận]
     H --> I{Status: ORDERED}
-    
+
     I --> J[Nhân viên kho nhận hàng]
     J --> K[Tạo Receipt]
     K --> L[Nhập batch info]
@@ -114,12 +114,12 @@ GET /api/purchases/confirm/:purchaseOrderId?token=abc123...
 4. **Chọn Zone để lưu trữ** (Storage Zone)
 5. **Nhập thông tin từng item:**
 
-   | Field | Mô Tả | Bắt Buộc |
-   |-------|-------|----------|
-   | Received Quantity | Số lượng thực tế nhận | ✓ |
-   | Batch Number | Số lô (VD: LOT-2025-001) | ✓ |
-   | Manufacture Date | Ngày sản xuất | ✓ |
-   | Expiry Date | Ngày hết hạn | ✓ |
+   | Field             | Mô Tả                    | Bắt Buộc |
+   | ----------------- | ------------------------ | -------- |
+   | Received Quantity | Số lượng thực tế nhận    | ✓        |
+   | Batch Number      | Số lô (VD: LOT-2025-001) | ✓        |
+   | Manufacture Date  | Ngày sản xuất            | ✓        |
+   | Expiry Date       | Ngày hết hạn             | ✓        |
 
 6. Click **"Find Available Bins"** để tìm ô trống trong zone
 7. **Xem bin được gợi ý** cho từng item
@@ -256,12 +256,12 @@ Zone A (Thuốc thường) - 20 bins
 
 ## 📊 Trạng Thái Purchase Order
 
-| Status | Mô Tả | Ai Thực Hiện | Hành Động Tiếp Theo |
-|--------|-------|--------------|---------------------|
-| `pending` | Đang chờ supplier xác nhận | System (sau khi tạo PO) | Supplier click confirm link |
-| `ordered` | Supplier đã xác nhận | Supplier (click email) | Chuẩn bị hàng và giao |
-| `received` | Đã nhận hàng vào kho | Warehouse Staff (tạo receipt) | Có thể bán hàng |
-| `cancelled` | Đơn hàng bị hủy | Owner | Email thông báo supplier |
+| Status      | Mô Tả                      | Ai Thực Hiện                  | Hành Động Tiếp Theo         |
+| ----------- | -------------------------- | ----------------------------- | --------------------------- |
+| `pending`   | Đang chờ supplier xác nhận | System (sau khi tạo PO)       | Supplier click confirm link |
+| `ordered`   | Supplier đã xác nhận       | Supplier (click email)        | Chuẩn bị hàng và giao       |
+| `received`  | Đã nhận hàng vào kho       | Warehouse Staff (tạo receipt) | Có thể bán hàng             |
+| `cancelled` | Đơn hàng bị hủy            | Owner                         | Email thông báo supplier    |
 
 ---
 

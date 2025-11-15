@@ -1,6 +1,7 @@
 # Scenario: Luồng Nhập Thuốc Đến Bán Thuốc Xong
 
 ## Mục Đích
+
 Tài liệu này mô tả chi tiết các kịch bản (scenarios) cho toàn bộ luồng từ nhập thuốc từ nhà cung cấp đến bán thuốc cho khách hàng, bao gồm quản lý kho, kiểm kê, và bán hàng.
 
 ---
@@ -12,12 +13,14 @@ Tài liệu này mô tả chi tiết các kịch bản (scenarios) cho toàn b�
 **Tiêu đề**: Nhân viên kho tạo đơn nhập hàng mới từ nhà cung cấp
 
 **Precondition**:
+
 - Người dùng đã đăng nhập với vai trò "staff" hoặc "manager"
 - Có quyền quản lý nhập hàng
 - Nhà cung cấp đã tồn tại trong hệ thống
 - Thuốc/variant đã được khai báo
 
 **Steps**:
+
 1. Nhân viên truy cập trang "Nhập Hàng" (Purchase Orders)
 2. Nhấn nút "Tạo Đơn Nhập Mới"
 3. Chọn nhà cung cấp: "Công ty Dược phẩm Tân Dương"
@@ -41,6 +44,7 @@ Tài liệu này mô tả chi tiết các kịch bản (scenarios) cho toàn b�
 8. Nhấn "Lưu Đơn"
 
 **Expected Result**:
+
 - ✅ Đơn nhập hàng được tạo thành công
 - ✅ Hiển thị mã đơn: "PO-2025-00123"
 - ✅ Trạng thái đơn: "pending"
@@ -48,16 +52,17 @@ Tài liệu này mô tả chi tiết các kịch bản (scenarios) cho toàn b�
 - ✅ Chuyển hướng đến chi tiết đơn
 
 **Database Changes**:
+
 ```sql
 -- Tạo đơn nhập hàng
 INSERT INTO purchase_orders (supplier_id, order_date, expected_date, status, total_amount, created_by, created_at)
 VALUES (
-    [supplier_id], 
-    NOW(), 
-    '2025-11-20', 
-    'pending', 
-    9000000, 
-    [user_id], 
+    [supplier_id],
+    NOW(),
+    '2025-11-20',
+    'pending',
+    9000000,
+    [user_id],
     NOW()
 );
 -- Lấy ID đơn vừa tạo
@@ -74,9 +79,9 @@ VALUES (@purchase_order_id, [variant_id_2], 50, 80000, 4000000);
 -- Ghi lại audit log
 INSERT INTO audit_logs (user_id, action, entity, entity_id, changes, created_at)
 VALUES (
-    [user_id], 
-    'CREATE', 
-    'purchase_order', 
+    [user_id],
+    'CREATE',
+    'purchase_order',
     @purchase_order_id,
     JSON_BUILD_OBJECT('status', 'pending', 'total_amount', 9000000),
     NOW()
@@ -84,6 +89,7 @@ VALUES (
 ```
 
 **Postcondition**:
+
 - Đơn nhập hàng có thể được chỉnh sửa hoặc xóa trong trạng thái "pending"
 - Có thể gửi đơn cho nhà cung cấp
 
@@ -94,14 +100,17 @@ VALUES (
 **Tiêu đề**: Hệ thống từ chối khi chọn nhà cung cấp không hợp lệ
 
 **Precondition**:
+
 - Nhân viên đang tạo đơn nhập hàng
 
 **Steps**:
+
 1. Chọn dropdown "Nhà Cung Cấp"
 2. Hệ thống chỉ hiển thị các nhà cung cấp có status = "active"
 3. Cố gắng chọn nhà cung cấp bị vô hiệu hóa
 
 **Expected Result**:
+
 - ❌ Nhà cung cấp không hiển thị trong danh sách
 - ❌ Không thể chọn nhà cung cấp không hoạt động
 
@@ -112,13 +121,16 @@ VALUES (
 **Tiêu đề**: Hệ thống từ chối số lượng không hợp lệ
 
 **Precondition**:
+
 - Nhân viên đang thêm sản phẩm vào đơn
 
 **Steps**:
+
 1. Nhập số lượng: "0" hoặc "-10"
 2. Nhấn "Thêm Sản Phẩm"
 
 **Expected Result**:
+
 - ❌ Hiển thị lỗi: "Số lượng phải lớn hơn 0"
 - ❌ Không thêm được sản phẩm
 
@@ -131,10 +143,12 @@ VALUES (
 **Tiêu đề**: Nhân viên gửi đơn nhập hàng cho nhà cung cấp
 
 **Precondition**:
+
 - Đơn nhập hàng ở trạng thái "pending"
 - Có ít nhất 1 sản phẩm trong đơn
 
 **Steps**:
+
 1. Nhân viên xem chi tiết đơn nhập hàng
 2. Nhấn nút "Gửi Đơn"
 3. Hệ thống hiển thị xác nhận: "Gửi đơn PO-2025-00123 cho nhà cung cấp Công ty Dược phẩm Tân Dương?"
@@ -142,6 +156,7 @@ VALUES (
 5. Hệ thống cập nhật trạng thái thành "ordered"
 
 **Expected Result**:
+
 - ✅ Đơn được gửi thành công
 - ✅ Trạng thái đơn chuyển sang "ordered"
 - ✅ Thông báo: "Đơn hàng đã được gửi"
@@ -149,8 +164,9 @@ VALUES (
 - ✅ Hiển thị thời gian gửi: "13/11/2025 10:30 AM"
 
 **Database Changes**:
+
 ```sql
-UPDATE purchase_orders 
+UPDATE purchase_orders
 SET status = 'ordered', updated_at = NOW()
 WHERE id = [purchase_order_id];
 
@@ -160,6 +176,7 @@ VALUES ([user_id], 'UPDATE', 'purchase_order', [purchase_order_id],
 ```
 
 **Postcondition**:
+
 - Đơn không thể chỉnh sửa nữa (chỉ xem)
 - Có thể hủy đơn (nếu có quyền)
 - Chờ nhà cung cấp gửi hàng
@@ -173,11 +190,13 @@ VALUES ([user_id], 'UPDATE', 'purchase_order', [purchase_order_id],
 **Tiêu đề**: Nhân viên kho nhập hàng khi nhận được từ nhà cung cấp
 
 **Precondition**:
+
 - Đơn nhập hàng ở trạng thái "ordered"
 - Hàng đã được nhân viên kho nhận vật lý
 - Có Phiếu gửi hàng từ nhà cung cấp
 
 **Steps**:
+
 1. Nhân viên kho truy cập trang "Nhập Hàng" (Receiving)
 2. Tìm đơn: "PO-2025-00123"
 3. Nhấn "Tiếp Nhận Hàng"
@@ -200,6 +219,7 @@ VALUES ([user_id], 'UPDATE', 'purchase_order', [purchase_order_id],
 6. Nhấn "Xác Nhận Nhập Hàng"
 
 **Expected Result**:
+
 - ✅ Phiếu tiếp nhận được tạo: "GRN-2025-00456"
 - ✅ Bản ghi trong `purchase_order_receipts` được tạo
 - ✅ Bản ghi trong `purchase_order_receipt_items` được tạo
@@ -208,6 +228,7 @@ VALUES ([user_id], 'UPDATE', 'purchase_order', [purchase_order_id],
 - ✅ Thông báo: "Nhập hàng thành công. Mã GRN: GRN-2025-00456"
 
 **Database Changes**:
+
 ```sql
 -- Tạo bản ghi tiếp nhận
 INSERT INTO purchase_order_receipts (purchase_order_id, received_date, received_by, created_at)
@@ -228,26 +249,26 @@ UPDATE purchase_orders SET status = 'received' WHERE id = [purchase_order_id];
 -- Tạo bản ghi kho cho sản phẩm 1
 INSERT INTO inventory (medication_variant_id, purchase_order_receipt_items_id, bin_id, batch_number, manufacture_date, expiry_date, quantity, quantity_reserved)
 VALUES (
-    [variant_id_1], 
-    [receipt_item_1_id], 
-    [bin_id_1], 
-    'LAB20250915', 
-    '2025-09-15', 
-    '2027-09-14', 
-    100, 
+    [variant_id_1],
+    [receipt_item_1_id],
+    [bin_id_1],
+    'LAB20250915',
+    '2025-09-15',
+    '2027-09-14',
+    100,
     0
 );
 
 -- Tạo bản ghi kho cho sản phẩm 2
 INSERT INTO inventory (medication_variant_id, purchase_order_receipt_items_id, bin_id, batch_number, manufacture_date, expiry_date, quantity, quantity_reserved)
 VALUES (
-    [variant_id_2], 
-    [receipt_item_2_id], 
-    [bin_id_2], 
-    'AMX20250910', 
-    '2025-09-10', 
-    '2026-09-09', 
-    50, 
+    [variant_id_2],
+    [receipt_item_2_id],
+    [bin_id_2],
+    'AMX20250910',
+    '2025-09-10',
+    '2026-09-09',
+    50,
     0
 );
 
@@ -258,6 +279,7 @@ VALUES ([user_id], 'CREATE', 'purchase_order_receipt', @receipt_id,
 ```
 
 **Postcondition**:
+
 - Thuốc có sẵn bán
 - Kho được cập nhật
 - Có thể truy vấn tồn kho
@@ -269,10 +291,12 @@ VALUES ([user_id], 'CREATE', 'purchase_order_receipt', @receipt_id,
 **Tiêu đề**: Số lượng nhận khác với số lượng đặt
 
 **Precondition**:
+
 - Nhân viên kho đang nhập hàng
 - Số lượng thực tế khác với dự kiến
 
 **Steps**:
+
 1. Sản phẩm 1: Dự kiến 100 vỉ, nhưng chỉ nhận 98 vỉ (thiếu 2 vỉ)
 2. Nhập số lượng thực tế: 98
 3. Hệ thống hiển thị cảnh báo: "Thiếu 2 vỉ so với đơn"
@@ -280,6 +304,7 @@ VALUES ([user_id], 'CREATE', 'purchase_order_receipt', @receipt_id,
 5. Nhấn "Tiếp Tục"
 
 **Expected Result**:
+
 - ⚠️ Hệ thống ghi lại chênh lệch: 2 vỉ
 - ⚠️ Hiển thị thông báo cảnh báo
 - ⚠️ Ghi lại lý do trong audit log
@@ -287,6 +312,7 @@ VALUES ([user_id], 'CREATE', 'purchase_order_receipt', @receipt_id,
 - ✅ Số lượng kho: 98 vỉ (không phải 100)
 
 **Discrepancy Handling**:
+
 ```sql
 -- Tạo bản ghi chênh lệch
 INSERT INTO audit_logs (user_id, action, entity, entity_id, changes, created_at)
@@ -301,9 +327,11 @@ VALUES ([user_id], 'DISCREPANCY', 'purchase_order_receipt', @receipt_id,
 **Tiêu đề**: Từ chối hàng bị hỏng hoặc không đạt tiêu chuẩn
 
 **Precondition**:
+
 - Nhân viên kho phát hiện hàng bị hỏng hoặc hết hạn
 
 **Steps**:
+
 1. Nhân viên kho phát hiện sản phẩm: "Lọ thuốc bị nứt, chất lỏng rỉ"
 2. Chọn hành động: "Từ Chối Hàng"
 3. Ghi lý do: "Lọ nứt, chất lỏng rỉ, không thể bán"
@@ -311,6 +339,7 @@ VALUES ([user_id], 'DISCREPANCY', 'purchase_order_receipt', @receipt_id,
 5. Nhấn "Xác Nhận"
 
 **Expected Result**:
+
 - ⚠️ Hàng không được nhập vào kho
 - ⚠️ Tạo bản ghi từ chối
 - ⚠️ Thông báo cho nhà cung cấp
@@ -326,14 +355,17 @@ VALUES ([user_id], 'DISCREPANCY', 'purchase_order_receipt', @receipt_id,
 **Tiêu đề**: Nhân viên xem danh sách thuốc có sẵn trong kho
 
 **Precondition**:
+
 - Người dùng đã đăng nhập
 - Có ít nhất 1 sản phẩm trong kho
 
 **Steps**:
+
 1. Nhân viên truy cập trang "Quản Lý Kho" (Inventory)
 2. Hệ thống hiển thị danh sách tất cả các lô/batch hàng
 
 **Expected Result**:
+
 - ✅ Hiển thị danh sách:
   | Tên Thuốc | Variant | Batch | NSX | HSD | Tồn Kho | Dự Trữ | Khả Dụng |
   |-----------|---------|-------|-----|-----|---------|--------|----------|
@@ -347,8 +379,9 @@ VALUES ([user_id], 'DISCREPANCY', 'purchase_order_receipt', @receipt_id,
   - Theo vị trí (zone, rack, bin)
 
 **Database Query**:
+
 ```sql
-SELECT 
+SELECT
     mv.name as variant_name,
     m.name as medication_name,
     i.batch_number,
@@ -358,7 +391,7 @@ SELECT
     i.quantity_reserved,
     (i.quantity - i.quantity_reserved) as available_quantity,
     CONCAT(z.code, '-', r.code, '-', b.code) as location,
-    CASE 
+    CASE
         WHEN i.expiry_date < NOW() THEN 'expired'
         WHEN i.expiry_date < NOW() + INTERVAL '30 days' THEN 'expiring_soon'
         WHEN (i.quantity - i.quantity_reserved) <= 10 THEN 'low_stock'
@@ -374,6 +407,7 @@ ORDER BY m.name, i.expiry_date;
 ```
 
 **Postcondition**:
+
 - Có thể tìm kiếm thuốc cụ thể
 - Có thể xem chi tiết từng lô hàng
 
@@ -384,10 +418,12 @@ ORDER BY m.name, i.expiry_date;
 **Tiêu đề**: Nhân viên kho kiểm kho định kỳ
 
 **Precondition**:
+
 - Người dùng có vai trò kho hoặc quản lý
 - Có ít nhất 1 sản phẩm trong kho
 
 **Steps**:
+
 1. Nhân viên truy cập trang "Kiểm Kho" (Stock Take)
 2. Chọn ngày kiểm: "13/11/2025"
 3. Bắt đầu kiểm kho:
@@ -401,12 +437,14 @@ ORDER BY m.name, i.expiry_date;
 5. Hoàn thành kiểm kho
 
 **Expected Result**:
+
 - ✅ Tạo bản ghi kiểm kho
 - ✅ Ghi lại chênh lệch nếu có
 - ✅ Hiển thị báo cáo: "Kiểm kho hoàn thành. Chênh lệch: -2 vỉ"
 - ✅ Cập nhật số lượng kho nếu cần
 
 **Postcondition**:
+
 - Kho chính xác và được đối chiếu
 - Có thể tham chiếu cho báo cáo
 
@@ -417,13 +455,16 @@ ORDER BY m.name, i.expiry_date;
 **Tiêu đề**: Hệ thống cảnh báo hàng sắp hết hạn
 
 **Precondition**:
+
 - Có hàng trong kho với ngày hết hạn < 30 ngày
 
 **Steps**:
+
 1. Hệ thống tự động kiểm tra mỗi ngày
 2. Nếu phát hiện hàng sắp hết hạn, hiển thị cảnh báo trên dashboard
 
 **Expected Result**:
+
 - ⚠️ Hiển thị cảnh báo: "3 lô hàng sắp hết hạn trong 30 ngày"
 - ⚠️ Gợi ý: "Ưu tiên bán hoặc trả lại nhà cung cấp"
 - ⚠️ Có danh sách chi tiết:
@@ -439,11 +480,13 @@ ORDER BY m.name, i.expiry_date;
 **Tiêu đề**: Nhân viên bán hàng tạo hóa đơn bán thuốc
 
 **Precondition**:
+
 - Nhân viên đã đăng nhập với vai trò "staff" hoặc "pharmacist"
 - Thuốc có sẵn trong kho
 - Khách hàng xuất hiện để mua thuốc
 
 **Steps**:
+
 1. Nhân viên bán hàng truy cập trang "Bán Hàng" (Point of Sale)
 2. Tạo hóa đơn mới:
    - Nhấn "Hóa Đơn Mới"
@@ -475,6 +518,7 @@ ORDER BY m.name, i.expiry_date;
 10. Hệ thống in hóa đơn
 
 **Expected Result**:
+
 - ✅ Hóa đơn được tạo thành công
 - ✅ Mã hóa đơn: "SO-2025-00789"
 - ✅ Trạng thái: "paid"
@@ -483,6 +527,7 @@ ORDER BY m.name, i.expiry_date;
 - ✅ Kho được cập nhật ngay lập tức
 
 **Database Changes**:
+
 ```sql
 -- Tạo đơn bán hàng
 INSERT INTO sales_orders (customer_id, order_date, total_amount, status, payment_method, salesperson_id, created_at)
@@ -498,11 +543,11 @@ INSERT INTO sales_order_items (sales_order_id, medication_variant_id, quantity, 
 VALUES (@sales_order_id, [variant_id_2], 1, 95000, 95000);
 
 -- Cập nhật kho (trừ quantity_reserved thành quantity)
-UPDATE inventory 
+UPDATE inventory
 SET quantity = quantity - 2, quantity_reserved = quantity_reserved - 2
 WHERE medication_variant_id = [variant_id_1] AND batch_number = 'LAB20250915';
 
-UPDATE inventory 
+UPDATE inventory
 SET quantity = quantity - 1, quantity_reserved = quantity_reserved - 1
 WHERE medication_variant_id = [variant_id_2] AND batch_number = 'AMX20250910';
 
@@ -513,6 +558,7 @@ VALUES ([user_id], 'CREATE', 'sales_order', @sales_order_id,
 ```
 
 **Postcondition**:
+
 - Kho được giảm
 - Hóa đơn được ghi lại cho báo cáo
 - Doanh thu được cập nhật
@@ -524,10 +570,12 @@ VALUES ([user_id], 'CREATE', 'sales_order', @sales_order_id,
 **Tiêu đề**: Bán thuốc yêu cầu đơn (prescription required)
 
 **Precondition**:
+
 - Thuốc yêu cầu đơn (is_prescription_required = true)
 - Khách hàng có đơn thuốc hợp lệ
 
 **Steps**:
+
 1. Nhân viên bán hàng tạo hóa đơn mới
 2. Thêm thuốc yêu cầu đơn: "Amoxicillin 500mg"
 3. Hệ thống hiển thị cảnh báo: "Thuốc này yêu cầu đơn. Vui lòng cung cấp"
@@ -541,11 +589,13 @@ VALUES ([user_id], 'CREATE', 'sales_order', @sales_order_id,
 6. Tiếp tục bán hàng
 
 **Expected Result**:
+
 - ✅ Đơn được lưu trữ
 - ✅ Liên kết đơn với hóa đơn bán
 - ✅ Hóa đơn được tạo thành công
 
 **Database Changes**:
+
 ```sql
 -- Nếu upload file đơn
 INSERT INTO files (filename, file_type, mime_type, file_size, storage_path, uploaded_by, uploaded_at)
@@ -553,13 +603,14 @@ VALUES ('[prescription_image.jpg]', 'prescription', 'image/jpeg', [size], '[path
 SELECT @file_id := LAST_INSERT_ID();
 
 -- Cập nhật hóa đơn bán hàng với prescription_id
-UPDATE sales_orders 
+UPDATE sales_orders
 SET prescription_id = @file_id,
     prescription_note = 'Uống 3 lần/ngày'
 WHERE id = @sales_order_id;
 ```
 
 **Postcondition**:
+
 - Thuốc chỉ có thể bán với đơn hợp lệ
 - Đơn được lưu trữ cho kiểm tra
 
@@ -570,15 +621,18 @@ WHERE id = @sales_order_id;
 **Tiêu đề**: Khi khách muốn mua nhưng kho không đủ
 
 **Precondition**:
+
 - Khách muốn mua 5 vỉ Paracetamol
 - Kho chỉ có 2 vỉ sẵn
 
 **Steps**:
+
 1. Nhân viên nhập số lượng: 5 vỉ
 2. Hệ thống kiểm tra kho
 3. Hiển thị cảnh báo: "Chỉ còn 2 vỉ trong kho"
 
 **Expected Result**:
+
 - ⚠️ Hiển thị lỗi/cảnh báo
 - ⚠️ Cho phép 2 tùy chọn:
   1. Giảm số lượng xuống 2 vỉ
@@ -592,13 +646,16 @@ WHERE id = @sales_order_id;
 **Tiêu đề**: Hệ thống từ chối bán hàng đã hết hạn
 
 **Precondition**:
+
 - Batch hàng có ngày hết hạn < ngày hiện tại
 
 **Steps**:
+
 1. Nhân viên quét barcode hàng đã hết hạn
 2. Hệ thống kiểm tra ngày hết hạn
 
 **Expected Result**:
+
 - ❌ Hiển thị lỗi: "Sản phẩm đã hết hạn. Không thể bán"
 - ❌ Không thêm sản phẩm vào hóa đơn
 - ✅ Gợi ý: "Liên hệ kho để loại bỏ hàng hết hạn"
@@ -610,15 +667,18 @@ WHERE id = @sales_order_id;
 **Tiêu đề**: Bán hàng cho khách hàng không có trong hệ thống
 
 **Precondition**:
+
 - Khách hàng lần đầu mua
 
 **Steps**:
+
 1. Nhân viên chọn "Khách Hàng Mới" hoặc bỏ qua bước chọn khách hàng
 2. Thêm sản phẩm vào hóa đơn
 3. Nhấn "Hoàn Thành"
 4. Hệ thống hiển thị: "Không có thông tin khách hàng. Tạo khách hàng mới?"
 
 **Optional Steps**:
+
 1. Nhấn "Tạo Mới"
 2. Nhập thông tin:
    - Tên: "Trần Văn D"
@@ -628,11 +688,13 @@ WHERE id = @sales_order_id;
 3. Nhấn "Lưu"
 
 **Expected Result**:
+
 - ✅ Khách hàng mới được tạo (nếu chọn)
 - ✅ Hóa đơn được tạo với customer_id = null (nếu không tạo)
 - ✅ Hóa đơn được tạo thành công
 
 **Database Changes** (nếu tạo khách hàng mới):
+
 ```sql
 INSERT INTO customers (name, phone, email, address, created_at)
 VALUES ('Trần Văn D', '0909123456', NULL, NULL, NOW());
@@ -649,10 +711,12 @@ UPDATE sales_orders SET customer_id = @customer_id WHERE id = @sales_order_id;
 **Tiêu đề**: Khách hàng hoàn trả sản phẩm
 
 **Precondition**:
+
 - Hóa đơn đã được tạo trước đó
 - Khách hàng muốn hoàn trả
 
 **Steps**:
+
 1. Nhân viên truy cập hóa đơn cũ: "SO-2025-00789"
 2. Nhấn "Hoàn Trả"
 3. Chọn sản phẩm cần hoàn trả:
@@ -661,12 +725,14 @@ UPDATE sales_orders SET customer_id = @customer_id WHERE id = @sales_order_id;
 5. Nhấn "Xác Nhận"
 
 **Expected Result**:
+
 - ✅ Tạo hóa đơn hoàn trả
 - ✅ Cập nhật số dư hoàn trả
 - ✅ Kho được cập nhật (tăng số lượng)
 - ✅ Hiển thị thông báo hoàn thành
 
 **Database Changes**:
+
 ```sql
 -- Tạo hóa đơn hoàn trả
 INSERT INTO sales_orders (customer_id, order_date, total_amount, status, payment_method, salesperson_id, notes, created_at)
@@ -678,7 +744,7 @@ INSERT INTO sales_order_items (sales_order_id, medication_variant_id, quantity, 
 VALUES (@return_order_id, [variant_id_1], -1, 55000, -55000);
 
 -- Cập nhật kho (tăng số lượng)
-UPDATE inventory 
+UPDATE inventory
 SET quantity = quantity + 1
 WHERE medication_variant_id = [variant_id_1] AND batch_number = 'LAB20250915';
 ```
@@ -692,16 +758,19 @@ WHERE medication_variant_id = [variant_id_1] AND batch_number = 'LAB20250915';
 **Tiêu đề**: Quản lý xem báo cáo bán hàng hàng ngày
 
 **Precondition**:
+
 - Người dùng có vai trò "manager" hoặc "owner"
 - Có ít nhất 1 hóa đơn trong hệ thống
 
 **Steps**:
+
 1. Truy cập trang "Báo Cáo" (Reports)
 2. Chọn "Báo Cáo Bán Hàng Hàng Ngày"
 3. Chọn ngày: "13/11/2025"
 4. Hệ thống hiển thị báo cáo
 
 **Expected Result**:
+
 - ✅ Hiển thị:
   - Tổng doanh thu: 205,000 VNĐ
   - Số hóa đơn: 1
@@ -710,8 +779,9 @@ WHERE medication_variant_id = [variant_id_1] AND batch_number = 'LAB20250915';
   - Chi tiết từng hóa đơn
 
 **Database Query**:
+
 ```sql
-SELECT 
+SELECT
     SO.id,
     SO.order_date,
     C.name as customer_name,
@@ -734,13 +804,16 @@ ORDER BY SO.order_date DESC;
 **Tiêu đề**: Xem báo cáo tồn kho hiện tại
 
 **Precondition**:
+
 - Có ít nhất 1 sản phẩm trong kho
 
 **Steps**:
+
 1. Chọn "Báo Cáo Tồn Kho"
 2. Chọn ngày: "13/11/2025"
 
 **Expected Result**:
+
 - ✅ Hiển thị:
   - Tổng giá trị kho: 9,450,000 VNĐ
   - Số loại sản phẩm: 2
@@ -887,6 +960,7 @@ ORDER BY SO.order_date DESC;
 ## 9. API Endpoints - Luồng Nhập Bán
 
 ### Purchase Order Management
+
 - `GET /api/purchase-orders` - Danh sách đơn nhập
 - `POST /api/purchase-orders` - Tạo đơn nhập
 - `GET /api/purchase-orders/:id` - Chi tiết đơn nhập
@@ -895,22 +969,26 @@ ORDER BY SO.order_date DESC;
 - `POST /api/purchase-orders/:id/send` - Gửi đơn
 
 ### Receiving
+
 - `GET /api/purchase-order-receipts` - Danh sách phiếu tiếp nhận
 - `POST /api/purchase-order-receipts` - Tạo phiếu tiếp nhận
 - `GET /api/purchase-order-receipts/:id` - Chi tiết phiếu tiếp nhận
 
 ### Inventory
+
 - `GET /api/inventory` - Danh sách tồn kho
 - `GET /api/inventory/:id` - Chi tiết tồn kho
 - `POST /api/inventory/stock-take` - Kiểm kho
 
 ### Sales
+
 - `GET /api/sales-orders` - Danh sách hóa đơn bán
 - `POST /api/sales-orders` - Tạo hóa đơn bán
 - `GET /api/sales-orders/:id` - Chi tiết hóa đơn bán
 - `POST /api/sales-orders/:id/return` - Hoàn trả
 
 ### Reports
+
 - `GET /api/reports/daily-sales` - Báo cáo bán hàng hàng ngày
 - `GET /api/reports/inventory` - Báo cáo tồn kho
 - `GET /api/reports/sales-summary` - Tổng hợp doanh thu
@@ -920,28 +998,31 @@ ORDER BY SO.order_date DESC;
 ## 10. Validation Rules
 
 ### Purchase Order
-| Field | Validation | Error Message |
-|-------|-----------|---------------|
-| supplier_id | Bắt buộc, phải tồn tại | "Nhà cung cấp không hợp lệ" |
-| expected_date | Bắt buộc, >= hôm nay | "Ngày nhận phải >= ngày hiện tại" |
-| items | Ít nhất 1 sản phẩm | "Phải có ít nhất 1 sản phẩm" |
-| quantity | > 0 | "Số lượng phải > 0" |
-| unit_price | > 0 | "Đơn giá phải > 0" |
+
+| Field         | Validation             | Error Message                     |
+| ------------- | ---------------------- | --------------------------------- |
+| supplier_id   | Bắt buộc, phải tồn tại | "Nhà cung cấp không hợp lệ"       |
+| expected_date | Bắt buộc, >= hôm nay   | "Ngày nhận phải >= ngày hiện tại" |
+| items         | Ít nhất 1 sản phẩm     | "Phải có ít nhất 1 sản phẩm"      |
+| quantity      | > 0                    | "Số lượng phải > 0"               |
+| unit_price    | > 0                    | "Đơn giá phải > 0"                |
 
 ### Sales Order
-| Field | Validation | Error Message |
-|-------|-----------|---------------|
-| items | Ít nhất 1 sản phẩm | "Phải có ít nhất 1 sản phẩm" |
-| quantity | > 0 và <= tồn kho | "Số lượng không hợp lệ" |
-| payment_method | Bắt buộc | "Chọn phương thức thanh toán" |
-| prescription | Bắt buộc nếu thuốc cần đơn | "Vui lòng cung cấp đơn" |
-| expiry_date | Không hết hạn | "Sản phẩm đã hết hạn" |
+
+| Field          | Validation                 | Error Message                 |
+| -------------- | -------------------------- | ----------------------------- |
+| items          | Ít nhất 1 sản phẩm         | "Phải có ít nhất 1 sản phẩm"  |
+| quantity       | > 0 và <= tồn kho          | "Số lượng không hợp lệ"       |
+| payment_method | Bắt buộc                   | "Chọn phương thức thanh toán" |
+| prescription   | Bắt buộc nếu thuốc cần đơn | "Vui lòng cung cấp đơn"       |
+| expiry_date    | Không hết hạn              | "Sản phẩm đã hết hạn"         |
 
 ---
 
 ## 11. Testing Checklist
 
 ### Purchase Order
+
 - [ ] Tạo đơn nhập hàng thành công
 - [ ] Gửi đơn cho nhà cung cấp
 - [ ] Cập nhật đơn trong trạng thái pending
@@ -949,6 +1030,7 @@ ORDER BY SO.order_date DESC;
 - [ ] Email được gửi cho nhà cung cấp
 
 ### Receiving
+
 - [ ] Nhập hàng thành công
 - [ ] Ghi lại batch, NSX, HSD
 - [ ] Phát hiện chênh lệch số lượng
@@ -956,6 +1038,7 @@ ORDER BY SO.order_date DESC;
 - [ ] Cập nhật kho chính xác
 
 ### Inventory
+
 - [ ] Xem tồn kho
 - [ ] Kiểm kho định kỳ
 - [ ] Cảnh báo hàng sắp hết hạn
@@ -963,6 +1046,7 @@ ORDER BY SO.order_date DESC;
 - [ ] Tính toán giá trị kho chính xác
 
 ### Sales
+
 - [ ] Bán hàng thành công
 - [ ] Từ chối bán hàng hết hạn
 - [ ] Từ chối bán quá số lượng kho
@@ -970,8 +1054,8 @@ ORDER BY SO.order_date DESC;
 - [ ] Hoàn trả sản phẩm
 
 ### Reports
+
 - [ ] Báo cáo bán hàng hàng ngày
 - [ ] Báo cáo tồn kho
 - [ ] Tính toán doanh thu chính xác
 - [ ] Lọc theo ngày tháng
-
