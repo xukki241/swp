@@ -43,7 +43,6 @@ export default function StockOverviewPage() {
     // Preload images for visible medications
     inventory.forEach(async (item) => {
       const imageId = item.medicationVariant?.medication?.imageId;
-      console.log(imageCache[imageId]);
       if (imageId && !imageCache[imageId]) {
         await fetchMedicationImage(imageId);
       }
@@ -177,9 +176,7 @@ export default function StockOverviewPage() {
                               {item.medicationVariant.name}
                             </h3>
                             <p className="text-sm text-muted-foreground mt-1">
-                              Tồn kho:{" "}
-                              {medication?.quantity -
-                                medication?.quantityReserved}
+                              Tồn kho: {item?.quantity - item?.quantityReserved}
                             </p>
                             <p className="text-sm text-muted-foreground mt-1">
                               Giá:{" "}
