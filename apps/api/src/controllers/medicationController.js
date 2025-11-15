@@ -4,21 +4,33 @@ import * as medicationService from "../services/medicationService.js";
 import logger from "../utils/logger.js";
 
 /**
- * Get all medications
+ * Get all medications with pagination
  * @route GET /api/medications
  */
 export const getAllMedications = async (req, res, next) => {
   try {
+    const page = req.query.page ? Number.parseInt(req.query.page) : 1;
+    const limit = req.query.limit ? Number.parseInt(req.query.limit) : 10;
+    const offset = (page - 1) * limit;
+
     const { search, status } = req.query;
-    const medications = await medicationService.getAllMedications({
+    const result = await medicationService.getAllMedications({
       search,
       status,
+      limit,
+      offset,
     });
 
     res.status(200).json({
       success: true,
-      count: medications.length,
-      data: medications,
+      data: result.data,
+      pagination: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+        hasMore: offset + result.data.length < result.total,
+      },
     });
   } catch (error) {
     logger.error("Error in getAllMedications controller:", error);
