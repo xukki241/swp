@@ -491,8 +491,14 @@ export default function MedicationVariantsPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Hệ số quy đổi</label>
-              <Input value="1" disabled className="bg-muted" />
+              <label className="text-sm font-medium">Hệ số quy đổi *</label>
+              <Controller
+                name="unitFactor"
+                control={control}
+                render={({ field }) => (
+                  <Input {...field} placeholder="VD: 1, 10, 100" type="number" step="0.01" min="0.01" />
+                )}
+              />
             </div>
 
             <div className="space-y-2">
