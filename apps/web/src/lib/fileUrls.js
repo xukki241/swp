@@ -4,7 +4,9 @@ import instance from "./axios";
 const API_BASE_URL = instance.defaults.baseURL || "/api";
 
 export function getMedicationImageUrl(id, imageId) {
-  if (!imageId) return "/images/no-image.png";
+  if (!imageId) {
+    return "/images/no-image.png";
+  }
   // Nếu API_BASE_URL đã có http/https thì dùng trực tiếp, không thì dùng relative path
   return API_BASE_URL.startsWith("http")
     ? `${API_BASE_URL}/files/${imageId}/view`
