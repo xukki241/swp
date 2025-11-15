@@ -65,6 +65,7 @@ registrationRouter.post(
  * @desc    Delete registration request (owner only)
  * @access  Private (Owner)
  */
+// Note: The controller should store the complete registration request data before deletion in metadata.entityData
 registrationRouter.delete(
   "/:id",
   authenticate,

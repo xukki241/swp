@@ -133,7 +133,7 @@ export default function MedicationViewModal({
           const v = await getMedicationVariants(medication.id);
           setVariants(Array.isArray(v) ? v : v?.data || []);
         }
-      } catch {}
+      } catch { }
     })();
   }, [isModal, open, medication, withVariants]);
 
@@ -197,7 +197,6 @@ export default function MedicationViewModal({
                     <TableCell>{v.sku}</TableCell>
                     <TableCell>{v.name}</TableCell>
                     <TableCell>{v.unit}</TableCell>
-                    <TableCell>{v.unitFactor}</TableCell>
                     <TableCell>{v.barcode || "-"}</TableCell>
                     <TableCell>{v.sellPrice}</TableCell>
                     <TableCell>{v.isActive ? "Hoạt động" : "Ngừng"}</TableCell>

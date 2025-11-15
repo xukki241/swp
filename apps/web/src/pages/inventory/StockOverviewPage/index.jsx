@@ -37,6 +37,7 @@ export default function StockOverviewPage() {
   });
 
   useEffect(() => {
+    // Inventory API already filters out items with quantity = 0
     setMedications(inventory);
   }, [inventory]);
 
@@ -70,22 +71,22 @@ export default function StockOverviewPage() {
         const matchesPrice =
           (!searchPayload.priceMin ||
             item.medicationVariant.sellPrice >=
-              Number(searchPayload.priceMin)) &&
+            Number(searchPayload.priceMin)) &&
           (!searchPayload.priceMax ||
             item.medicationVariant.sellPrice <= Number(searchPayload.priceMax));
 
         const matchesManufactureDate =
           (!searchPayload.manufactureDateMin ||
             new Date(item.manufactureDate) >=
-              new Date(searchPayload.manufactureDateMin)) &&
+            new Date(searchPayload.manufactureDateMin)) &&
           (!searchPayload.manufactureDateMax ||
             new Date(item.manufactureDate) <=
-              new Date(searchPayload.manufactureDateMax));
+            new Date(searchPayload.manufactureDateMax));
 
         const matchesExpiryDate =
           (!searchPayload.expiryDateMin ||
             new Date(item.expiryDate) >=
-              new Date(searchPayload.expiryDateMin)) &&
+            new Date(searchPayload.expiryDateMin)) &&
           (!searchPayload.expiryDateMax ||
             new Date(item.expiryDate) <= new Date(searchPayload.expiryDateMax));
 
@@ -163,7 +164,9 @@ export default function StockOverviewPage() {
                               {medication.medicationVariant.name}
                             </h3>
                             <p className="text-sm text-muted-foreground mt-1">
-                              Tồn kho: {medication.quantity}
+                              Tồn kho:{" "}
+                              {medication?.quantity -
+                                medication?.quantityReserved}
                             </p>
                             <p className="text-sm text-muted-foreground mt-1">
                               Giá:{" "}

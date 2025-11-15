@@ -5,6 +5,9 @@ import { inventory } from "../db/schema/inventory.js";
 import { medicationVariants } from "../db/schema/medicationVariants.js";
 import { salesOrderItems } from "../db/schema/salesOrderItems.js";
 import { salesOrders } from "../db/schema/salesOrders.js";
+import logger from "../utils/logger.js";
+
+import { inventoryService } from "./inventoryService.js";
 
 export const salesOrderService = {
   /**
@@ -87,7 +90,8 @@ export const salesOrderService = {
           );
         }
 
-        // Reserve inventory using FEFO
+        // Reserve inventory using FEFO - Reduce quantity directly
+        // Since unitFactor was removed, we reduce quantity directly by the sold amount
         let remainingQuantity = quantity;
         for (const inv of availableInventory) {
           if (remainingQuantity <= 0) {
@@ -95,16 +99,28 @@ export const salesOrderService = {
           }
 
           const availableInBatch = Number(inv.quantityAvailable);
-          const toReserve = Math.min(remainingQuantity, availableInBatch);
+          const toSell = Math.min(remainingQuantity, availableInBatch);
 
-          await tx
-            .update(inventory)
-            .set({
-              quantityReserved: sql`${inventory.quantityReserved} + ${toReserve}`,
-            })
-            .where(eq(inventory.id, inv.id));
+          // Calculate the new quantity after reduction
+          const currentQuantity = Number(inv.quantity);
+          const currentReserved = Number(inv.quantityReserved);
+          const newQuantity = currentQuantity - toSell;
 
-          remainingQuantity -= toReserve;
+          // If quantity becomes equal to quantityReserved (all available stock used),
+          // delete the inventory record (unlink batch from bin)
+          if (newQuantity <= currentReserved) {
+            await tx.delete(inventory).where(eq(inventory.id, inv.id));
+          } else {
+            // Otherwise, reduce quantity normally
+            await tx
+              .update(inventory)
+              .set({
+                quantity: sql`${inventory.quantity} - ${toSell}`,
+              })
+              .where(eq(inventory.id, inv.id));
+          }
+
+          remainingQuantity -= toSell;
         }
 
         // Calculate item total
@@ -146,6 +162,23 @@ export const salesOrderService = {
           }))
         )
         .returning();
+
+      // Clean up empty inventory entries (where quantity = 0)
+      // This is done in transaction to ensure data consistency
+      const variantsInOrder = new Set(
+        itemsToCreate.map((item) => item.medicationVariantId)
+      );
+      for (const variantId of variantsInOrder) {
+        const deletedCount = await inventoryService.deleteEmptyInventoryTx(
+          variantId,
+          tx
+        );
+        if (deletedCount > 0) {
+          logger.info(
+            `Deleted ${deletedCount} empty inventory entries for variant ${variantId}`
+          );
+        }
+      }
 
       // Query the order again with relations to get customer and salesperson info
       const orderWithRelations = await tx.query.salesOrders.findFirst({
@@ -335,13 +368,23 @@ export const salesOrderService = {
               const reserved = Number(inv.quantityReserved);
               const toDeduct = Math.min(remainingQuantity, reserved);
 
-              await tx
-                .update(inventory)
-                .set({
-                  quantity: sql`${inventory.quantity} - ${toDeduct}`,
-                  quantityReserved: sql`${inventory.quantityReserved} - ${toDeduct}`,
-                })
-                .where(eq(inventory.id, inv.id));
+              // Calculate the new quantity after deduction
+              const currentQuantity = Number(inv.quantity);
+              const newQuantity = currentQuantity - toDeduct;
+
+              // If quantity becomes 0, delete the inventory record (unlink batch from bin)
+              if (newQuantity <= 0) {
+                await tx.delete(inventory).where(eq(inventory.id, inv.id));
+              } else {
+                // Otherwise, update the quantities
+                await tx
+                  .update(inventory)
+                  .set({
+                    quantity: sql`${inventory.quantity} - ${toDeduct}`,
+                    quantityReserved: sql`${inventory.quantityReserved} - ${toDeduct}`,
+                  })
+                  .where(eq(inventory.id, inv.id));
+              }
 
               remainingQuantity -= toDeduct;
             }

@@ -415,3 +415,89 @@ export const getMedicationSales = async (medicationId) => {
     );
   }
 };
+
+/**
+ * Get all medications with variants and available inventory
+ * Only returns medications that have at least one variant with available stock
+ * @param {Object} options - Query options
+ * @param {string} options.search - Search term for name, brand or variant name
+ * @param {boolean} options.inStockOnly - Filter to only show in-stock items (default: true)
+ * @returns {Promise<Array>} List of medications with variants and inventory info
+ */
+export const getMedicationsWithInventory = async ({
+  search,
+  inStockOnly = true,
+} = {}) => {
+  try {
+    // Get all medications with variants using query API
+    const allMeds = await db.query.medications.findMany({
+      with: {
+        variants: {
+          with: {
+            inventory: true,
+          },
+        },
+      },
+    });
+
+    // Filter medications
+    let filtered = allMeds;
+
+    // Filter by search term
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter((med) => {
+        const medsMatch =
+          med.name.toLowerCase().includes(searchLower) ||
+          med.brand?.toLowerCase().includes(searchLower);
+        const variantMatch = med.variants.some((v) =>
+          v.name.toLowerCase().includes(searchLower)
+        );
+        return medsMatch || variantMatch;
+      });
+    }
+
+    // Filter by in-stock status if requested
+    if (inStockOnly) {
+      filtered = filtered.filter((med) => {
+        // Check if any variant has available inventory
+        return med.variants.some((variant) => {
+          const totalQty = variant.inventory.reduce(
+            (sum, inv) => sum + (inv.quantity - inv.quantityReserved),
+            0
+          );
+          return totalQty > 0;
+        });
+      });
+    }
+
+    // Add inventory summary to each variant
+    const result = filtered.map((med) => ({
+      ...med,
+      variants: med.variants.map((variant) => {
+        const totalQty = variant.inventory.reduce(
+          (sum, inv) => sum + inv.quantity,
+          0
+        );
+        const availableQty = variant.inventory.reduce(
+          (sum, inv) => sum + (inv.quantity - inv.quantityReserved),
+          0
+        );
+        return {
+          ...variant,
+          totalQuantity: totalQty,
+          availableQuantity: availableQty,
+          // Remove detailed inventory array from response to reduce payload
+          // inventory: undefined,
+        };
+      }),
+    }));
+
+    return result;
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch medications with inventory: ${error.message}`
+    );
+  }
+};
+

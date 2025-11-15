@@ -60,6 +60,7 @@ warehouseRacksRouter.patch(
 );
 
 // DELETE /api/warehouse/racks/:id
+// Note: The controller should store the complete warehouse rack data before deletion in metadata.entityData
 warehouseRacksRouter.delete(
   "/racks/:id",
   authorize("owner"),

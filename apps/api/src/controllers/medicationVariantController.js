@@ -144,9 +144,6 @@ export const createMedicationVariant = async (req, res, next) => {
         sku: variantInput.sku,
         name: variantInput.name,
         unit: variantInput.unit,
-        unitFactor: variantInput.unitFactor
-          ? String(variantInput.unitFactor)
-          : "1.0",
         barcode: variantInput.barcode || null,
         sellPrice: String(variantInput.sellPrice),
         isActive:
@@ -182,7 +179,6 @@ export const updateMedicationVariant = async (req, res, _next) => {
       sku,
       name,
       unit,
-      unitFactor,
       barcode,
       sellPrice,
       isActive,
@@ -223,9 +219,6 @@ export const updateMedicationVariant = async (req, res, _next) => {
     }
     if (unit !== undefined) {
       variantData.unit = unit;
-    }
-    if (unitFactor !== undefined) {
-      variantData.unitFactor = unitFactor;
     }
     if (barcode !== undefined) {
       variantData.barcode = barcode;

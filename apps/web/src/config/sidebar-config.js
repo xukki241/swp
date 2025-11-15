@@ -1,6 +1,7 @@
 import {
   Calendar,
   ClipboardList,
+  FileText,
   LayoutDashboard,
   Package,
   Pill,
@@ -86,5 +87,11 @@ export const sidebarConfig = [
       { label: "Danh sách", path: "/users/list" },
       { label: "Đăng ký chờ duyệt", path: "/users/registrations" },
     ],
+  },
+  {
+    title: "Nhật ký kiểm toán",
+    icon: FileText,
+    path: "/audit-logs",
+    roles: ["owner"],
   },
 ];
