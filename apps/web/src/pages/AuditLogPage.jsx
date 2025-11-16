@@ -185,7 +185,7 @@ export default function AuditLogPage() {
   };
 
   return (
-    <AppLayout title="Nhật ký kiểm toán">
+    <AppLayout title="Nhật ký hệ thống">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -194,7 +194,7 @@ export default function AuditLogPage() {
               <FileText className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Nhật ký kiểm toán</h1>
+              <h1 className="text-2xl font-bold">Nhật ký hệ thống</h1>
               <p className="text-sm text-muted-foreground">
                 Theo dõi và quản lý lịch sử hoạt động của hệ thống
               </p>
@@ -418,7 +418,7 @@ export default function AuditLogPage() {
       <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Chi tiết nhật ký kiểm toán</DialogTitle>
+            <DialogTitle>Chi tiết Nhật ký hệ thống</DialogTitle>
             <DialogDescription>
               Thông tin chi tiết về hoạt động được ghi lại
             </DialogDescription>

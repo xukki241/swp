@@ -65,7 +65,7 @@ async function seed() {
       .values([
         {
           name: "Dr. Sarah Chen",
-          email: "tranhuypro30305@gmail.com",
+          email: "pharmaflow09+owner@gmail.com",
           phone: "0901234567",
           address: "123 Medical Plaza, District 1, Ho Chi Minh City",
           status: "active",
@@ -112,7 +112,7 @@ async function seed() {
       {
         userId: owner.id,
         provider: "local",
-        identifier: "tranhuypro30305@gmail.com",
+        identifier: "pharmaflow09+owner@gmail.com",
         secret: "$2a$12$K5knK5KpQNbsKKgIsUcopOKmKpvGqscZh.nku3I5SZO5HMLOei2qu",
       },
       {
@@ -2345,7 +2345,7 @@ async function seed() {
     - Tệp tin: 3
     
     📋 KIỂM TOÁN & BÁO CÁO:
-    - Nhật ký kiểm toán: 5
+    - Nhật ký hệ thống: 5
     - Báo cáo: 4
     
     ⏰ QUẢN LÝ CA:
