@@ -6,8 +6,7 @@ import logger from "../utils/logger.js";
 
 export const fileController = {
   /**
-   /**
-oad a file
+   * Upload a file
    * POST /api/files
    */
   upload: asyncHandler(async (req, res) => {
@@ -35,7 +34,7 @@ oad a file
       fileType: fileExtension || "unknown",
       mimeType: file.mimetype,
       fileSize: file.size,
-      blob: file.buffer, // Store file buffer as blob
+      blob: file.buffer,
       uploadedBy: userId,
     };
 

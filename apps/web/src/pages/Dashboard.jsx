@@ -255,7 +255,7 @@ export default function DashboardPage() {
       icon: Users,
       color: "bg-yellow-100",
       iconColor: "text-yellow-600",
-      path: "/users",
+      path: "/users/list",
     },
     {
       title: "Thuốc",
@@ -271,7 +271,7 @@ export default function DashboardPage() {
       icon: Import,
       color: "bg-red-100",
       iconColor: "text-red-600",
-      path: "/purchases",
+      path: "/procurement/purchase-orders",
     },
     {
       title: "Kho hàng",
