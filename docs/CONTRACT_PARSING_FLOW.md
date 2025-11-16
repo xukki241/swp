@@ -1,6 +1,7 @@
 # Contract Parsing Flow Documentation
 
 ## 📋 Tổng quan
+
 Tài liệu này mô tả chi tiết luồng xử lý file hợp đồng (Contract File) trong hệ thống PharmaFlow, từ khi user upload file ở Frontend cho đến khi nhận được dữ liệu đã parse.
 
 ---
@@ -18,6 +19,7 @@ User Upload PDF/DOC → Frontend → Upload API → Parse API → AI/Regex Parse
 ### File: `apps/web/src/pages/supplier/SupplierCreatePage.jsx`
 
 ### 1.1. User click "Upload Contract"
+
 ```jsx
 <Button onClick={() => fileInputRef.current?.click()}>
   <Upload className="w-4 h-4 mr-2" />
@@ -26,6 +28,7 @@ User Upload PDF/DOC → Frontend → Upload API → Parse API → AI/Regex Parse
 ```
 
 ### 1.2. User chọn file (PDF/DOC/DOCX)
+
 ```jsx
 <input
   ref={fileInputRef}
@@ -37,6 +40,7 @@ User Upload PDF/DOC → Frontend → Upload API → Parse API → AI/Regex Parse
 ```
 
 ### 1.3. Frontend validate file
+
 ```javascript
 const handleContractUpload = async (e) => {
   const file = e.target.files?.[0];
@@ -68,6 +72,7 @@ const handleContractUpload = async (e) => {
 ## ☁️ BƯỚC 2: Upload File lên Server
 
 ### 2.1. Frontend gọi hook `useUploadFile`
+
 ```javascript
 const uploadResult = await uploadFile.mutateAsync(file);
 const fileId = uploadResult.data.id;
@@ -75,7 +80,9 @@ const filename = uploadResult.data.filename;
 ```
 
 ### 2.2. Hook gọi service
+
 **File:** `apps/web/src/hooks/useFiles.js`
+
 ```javascript
 export const useUploadFile = () => {
   return useMutation({
@@ -85,7 +92,9 @@ export const useUploadFile = () => {
 ```
 
 ### 2.3. Service upload file
+
 **File:** `apps/web/src/services/fileService.js`
+
 ```javascript
 export const uploadFile = async (file) => {
   const formData = new FormData();
@@ -100,7 +109,9 @@ export const uploadFile = async (file) => {
 ```
 
 ### 2.4. Backend xử lý upload
+
 **File:** `apps/api/src/controllers/fileController.js`
+
 ```javascript
 export const uploadFile = async (req, res) => {
   const file = req.file; // Multer middleware
@@ -121,6 +132,7 @@ export const uploadFile = async (req, res) => {
 ```
 
 **Kết quả:**
+
 - File được lưu vào database table `files`
 - Trả về `fileId` cho frontend
 - Frontend lưu: `setContractFile({ id: fileId, filename })`
@@ -130,6 +142,7 @@ export const uploadFile = async (req, res) => {
 ## 🔍 BƯỚC 3: Parse Contract File
 
 ### 3.1. Frontend gọi parse API
+
 ```javascript
 toast.success("Contract uploaded!", {
   description: "Parsing contract...",
@@ -139,7 +152,9 @@ const parseResult = await parseContract.mutateAsync(fileId);
 ```
 
 ### 3.2. Hook gọi service
+
 **File:** `apps/web/src/hooks/useContracts.js`
+
 ```javascript
 export const useParseContract = () => {
   return useMutation({
@@ -149,6 +164,7 @@ export const useParseContract = () => {
 ```
 
 **File:** `apps/web/src/services/contractService.js`
+
 ```javascript
 export const parseContract = async (fileId) => {
   const response = await instance.post("/contracts/parse", { fileId });
@@ -157,6 +173,7 @@ export const parseContract = async (fileId) => {
 ```
 
 ### 3.3. Backend nhận request parse
+
 **Route:** `POST /api/contracts/parse`
 
 **File:** `apps/api/src/controllers/contractController.js`
@@ -205,6 +222,7 @@ export const parseContract = async (req, res, next) => {
 ### File: `apps/api/src/services/contractParserService.js`
 
 ### 4.1. Main parse function
+
 ```javascript
 export async function parseContractFile(fileBuffer, mimeType) {
   let text = "";
@@ -251,6 +269,7 @@ export async function parseContractFile(fileBuffer, mimeType) {
 ```
 
 ### 4.2. Extract text từ PDF
+
 ```javascript
 async function extractTextFromPDF(dataBuffer) {
   const loadingTask = pdfjsLib.getDocument({
@@ -272,6 +291,7 @@ async function extractTextFromPDF(dataBuffer) {
 ```
 
 ### 4.3. AI Parsing với Gemini
+
 ```javascript
 async function extractContractDataWithAI(pdfText) {
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
@@ -319,6 +339,7 @@ Trả về JSON với format:
 ```
 
 ### 4.4. Regex Parsing (Fallback)
+
 ```javascript
 function parseMedicationVariants(text) {
   const variants = [];
@@ -347,6 +368,7 @@ function parseMedicationVariants(text) {
 ```
 
 **Ví dụ parse:**
+
 ```
 Input text: 
 "1 Paracetamol Paracetamol 500mg Viên nén VP - PAR500 5 40.000₫"
@@ -366,6 +388,7 @@ Output:
 ## 🔗 BƯỚC 5: Match với Database
 
 ### 5.1. Match Medications
+
 **File:** `apps/api/src/services/contractParserService.js`
 
 ```javascript
@@ -396,6 +419,7 @@ export function matchMedicationsWithDatabase(contractMedications, dbMedications)
 ```
 
 ### 5.2. Match Variants
+
 **File:** `apps/api/src/controllers/contractController.js`
 
 ```javascript
@@ -489,6 +513,7 @@ const medicationsWithVariants = matchedMedications.map((med) => {
 ## 📥 BƯỚC 6: Frontend nhận kết quả
 
 ### 6.1. Parse thành công
+
 ```javascript
 const parseResult = await parseContract.mutateAsync(fileId);
 
@@ -530,6 +555,7 @@ if (parseResult.success && parseResult.data.medications.length > 0) {
 ```
 
 ### 6.2. Hiển thị medications trong UI
+
 **Component:** `MedicationRow`
 
 ```jsx
@@ -546,6 +572,7 @@ if (parseResult.success && parseResult.data.medications.length > 0) {
 ```
 
 **Dữ liệu trong MedicationRow:**
+
 - `medicationId`: Pre-selected medication
 - `medicationVariantId`: Pre-selected variant
 - `supplierSku`: Pre-filled SKU
@@ -661,6 +688,7 @@ User thấy form với medications đã được auto-fill:
 ## ⚠️ Error Handling
 
 ### AI Parsing Failed
+
 ```javascript
 try {
   aiParsedData = await extractContractDataWithAI(text);
@@ -671,6 +699,7 @@ try {
 ```
 
 ### Medication Not Found in DB
+
 ```javascript
 const medsWithoutId = newMeds.filter((m) => !m.medicationId);
 
@@ -682,6 +711,7 @@ if (medsWithoutId.length > 0) {
 ```
 
 ### Variant Not Matched
+
 ```javascript
 if (!matchedVariant) {
   logger.warn(`⚠️ No variant match found for: ${med.variantName}`);
@@ -710,6 +740,7 @@ DATABASE_URL=postgresql://...
 ## 📝 Testing
 
 ### Test AI Parsing
+
 ```javascript
 // Upload file và check logs
 const parseResult = await parseContract.mutateAsync(fileId);
@@ -721,6 +752,7 @@ const parseResult = await parseContract.mutateAsync(fileId);
 ```
 
 ### Test Regex Fallback
+
 ```javascript
 // Nếu AI fail, check regex logs:
 // ⚠️ AI parsing failed, fallback to regex
