@@ -127,7 +127,7 @@ export default function SupplierCreatePage() {
           return {
             medicationId: matchedMed?.id || "",
             medicationName: med.medicationName,
-            medicationVariantId: med.medicationVariantId || "", // ✅ Use matched variant from backend
+            medicationVariantId: med.medicationVariantId || "", 
             variantName: med.variantName,
             supplierSku: med.supplierSku,
             leadTimeDays: med.leadTimeDays?.toString() || "",
