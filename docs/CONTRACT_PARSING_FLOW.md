@@ -44,27 +44,27 @@ User Upload PDF/DOC → Frontend → Upload API → Parse API → AI/Regex Parse
 ```javascript
 const handleContractUpload = async (e) => {
   const file = e.target.files?.[0];
-  
+
   // ✅ Check file type
   const allowedTypes = [
     "application/pdf",
-    "application/msword", 
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   ];
-  
+
   if (!allowedTypes.includes(file.type)) {
     toast.error("Invalid file type");
     return;
   }
-  
+
   // ✅ Check file size (max 10MB)
   if (file.size > 10 * 1024 * 1024) {
     toast.error("File too large");
     return;
   }
-  
+
   // → Tiếp tục upload...
-}
+};
 ```
 
 ---
@@ -99,11 +99,11 @@ export const useUploadFile = () => {
 export const uploadFile = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
-  
+
   const response = await instance.post("/files/upload", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
-  
+
   return response.data;
 };
 ```
@@ -115,7 +115,7 @@ export const uploadFile = async (file) => {
 ```javascript
 export const uploadFile = async (req, res) => {
   const file = req.file; // Multer middleware
-  
+
   // Lưu file vào database với blob
   const result = await fileService.create({
     filename: file.originalname,
@@ -123,10 +123,10 @@ export const uploadFile = async (req, res) => {
     size: file.size,
     blob: file.buffer, // Binary data
   });
-  
-  res.json({ 
-    success: true, 
-    data: { id: result.id, filename: result.filename } 
+
+  res.json({
+    success: true,
+    data: { id: result.id, filename: result.filename },
   });
 };
 ```
@@ -181,27 +181,27 @@ export const parseContract = async (fileId) => {
 ```javascript
 export const parseContract = async (req, res, next) => {
   const { fileId } = req.body;
-  
+
   // ✅ Step 1: Lấy file từ database
   const file = await fileService.getFileWithBlob(fileId);
-  
+
   // ✅ Step 2: Parse file với AI/Regex
   const parsedData = await parseContractFile(file.blob, file.mimeType);
-  
+
   // ✅ Step 3: Match medications với database
   const allMedications = await getAllMedications();
   const matchedMedications = matchMedicationsWithDatabase(
     parsedData.data.medications,
     allMedications
   );
-  
+
   // ✅ Step 4: Match variants với database
   const allVariants = await getAllMedicationVariants({ limit: 10000 });
   const medicationsWithVariants = matchVariantsForMedications(
     matchedMedications,
     allVariants
   );
-  
+
   // ✅ Step 5: Trả về kết quả
   res.json({
     success: true,
@@ -227,11 +227,11 @@ export const parseContract = async (req, res, next) => {
 export async function parseContractFile(fileBuffer, mimeType) {
   let text = "";
   let aiParsedData = null;
-  
+
   // ✅ Step 1: Extract text từ file
   if (mimeType === "application/pdf") {
     text = await extractTextFromPDF(fileBuffer);
-    
+
     // Try AI parsing first
     try {
       aiParsedData = await extractContractDataWithAI(text);
@@ -241,21 +241,21 @@ export async function parseContractFile(fileBuffer, mimeType) {
   } else {
     text = await extractTextFromDOC(fileBuffer);
   }
-  
+
   // ✅ Step 2: Nếu AI thành công, dùng AI data
   if (aiParsedData) {
     return {
       success: true,
       parsedBy: "ai",
-      data: aiParsedData
+      data: aiParsedData,
     };
   }
-  
+
   // ✅ Step 3: Fallback to regex parsing
   const supplierInfo = parseSupplierInfo(text);
   const medicationVariants = parseMedicationVariants(text);
   const contractDetails = parseContractDetails(text);
-  
+
   return {
     success: true,
     parsedBy: "regex",
@@ -275,30 +275,30 @@ async function extractTextFromPDF(dataBuffer) {
   const loadingTask = pdfjsLib.getDocument({
     data: new Uint8Array(dataBuffer),
   });
-  
+
   const pdf = await loadingTask.promise;
   let fullText = "";
-  
+
   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
     const page = await pdf.getPage(pageNum);
     const textContent = await page.getTextContent();
-    const pageText = textContent.items.map(item => item.str).join(" ");
+    const pageText = textContent.items.map((item) => item.str).join(" ");
     fullText += pageText + "\n";
   }
-  
+
   return fullText.trim();
 }
 ```
 
 ### 4.3. AI Parsing với Gemini
 
-```javascript
+````javascript
 async function extractContractDataWithAI(pdfText) {
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
-  const model = genAI.getGenerativeModel({ 
-    model: "gemini-2.5-flash" 
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
   });
-  
+
   const prompt = `
 Bạn là chuyên gia phân tích hợp đồng dược phẩm. Trích xuất thông tin từ hợp đồng:
 
@@ -328,30 +328,32 @@ Trả về JSON với format:
   ]
 }
 `;
-  
+
   const result = await model.generateContent(prompt);
-  const jsonText = result.response.text().trim()
+  const jsonText = result.response
+    .text()
+    .trim()
     .replace(/```json\n?/g, "")
     .replace(/```\n?/g, "");
-  
+
   return JSON.parse(jsonText);
 }
-```
+````
 
 ### 4.4. Regex Parsing (Fallback)
 
 ```javascript
 function parseMedicationVariants(text) {
   const variants = [];
-  
+
   // Pattern: STT + Name + Variant + SKU + LeadTime + Price
-  const pattern = 
+  const pattern =
     /(\d+)\s+([\wÀ-ỹ]+)\s+([\wÀ-ỹ\s()]+?mg[^V]*?)\s+(VP\s*-?\s*[\w\d]+)\s+(\d+)\s+([\d.,\s]+₫)/gi;
-  
+
   let match;
   while ((match = pattern.exec(text)) !== null) {
     const [, stt, medName, variant, sku, leadTime, price] = match;
-    
+
     variants.push({
       medicationName: medName.trim(),
       variantName: variant.trim(),
@@ -362,7 +364,7 @@ function parseMedicationVariants(text) {
       ),
     });
   }
-  
+
   return variants;
 }
 ```
@@ -370,7 +372,7 @@ function parseMedicationVariants(text) {
 **Ví dụ parse:**
 
 ```
-Input text: 
+Input text:
 "1 Paracetamol Paracetamol 500mg Viên nén VP - PAR500 5 40.000₫"
 
 Output:
@@ -392,27 +394,33 @@ Output:
 **File:** `apps/api/src/services/contractParserService.js`
 
 ```javascript
-export function matchMedicationsWithDatabase(contractMedications, dbMedications) {
+export function matchMedicationsWithDatabase(
+  contractMedications,
+  dbMedications
+) {
   return contractMedications.map((contractMed) => {
     // Try exact match
     let matched = dbMedications.find(
-      (dbMed) => dbMed.name.toLowerCase() === contractMed.medicationName.toLowerCase()
+      (dbMed) =>
+        dbMed.name.toLowerCase() === contractMed.medicationName.toLowerCase()
     );
-    
+
     // Try fuzzy match
     if (!matched) {
       matched = dbMedications.find((dbMed) =>
-        dbMed.name.toLowerCase().includes(contractMed.medicationName.toLowerCase())
+        dbMed.name
+          .toLowerCase()
+          .includes(contractMed.medicationName.toLowerCase())
       );
     }
-    
+
     if (matched) {
       return {
         ...contractMed,
         medicationId: matched.id, // ✅ Gán ID từ database
       };
     }
-    
+
     return contractMed; // ⚠️ Không tìm thấy
   });
 }
@@ -425,54 +433,58 @@ export function matchMedicationsWithDatabase(contractMedications, dbMedications)
 ```javascript
 const medicationsWithVariants = matchedMedications.map((med) => {
   if (!med.medicationId) return med;
-  
+
   // Lấy tất cả variants của medication này
   const medVariants = allVariants.filter(
     (v) => v.medicationId === med.medicationId
   );
-  
+
   // ✅ Match by SKU (ưu tiên cao nhất)
   let matchedVariant = medVariants.find(
     (v) => v.sku && v.sku.toLowerCase() === med.supplierSku.toLowerCase()
   );
-  
+
   // ✅ Match by variant name (fuzzy matching)
   if (!matchedVariant) {
-    const normalizeText = (text) => 
+    const normalizeText = (text) =>
       text.toLowerCase().replace(/[()]/g, "").replace(/\s+/g, " ").trim();
-    
+
     const contractVariantNorm = normalizeText(med.variantName);
-    
+
     matchedVariant = medVariants.find((v) => {
       const dbVariantNorm = normalizeText(v.name);
-      
+
       // Extract dosage (e.g., "500mg")
-      const contractDosage = med.variantName.match(/(\d+(?:\.\d+)?)\s*mg/i)?.[1];
+      const contractDosage =
+        med.variantName.match(/(\d+(?:\.\d+)?)\s*mg/i)?.[1];
       const dbDosage = v.name.match(/(\d+(?:\.\d+)?)\s*mg/i)?.[1];
-      
+
       // Dosage MUST match exactly
       if (contractDosage && dbDosage && contractDosage !== dbDosage) {
         return false;
       }
-      
+
       // Calculate match ratio (60% threshold)
       const contractParts = contractVariantNorm.split(" ");
       const dbParts = dbVariantNorm.split(" ");
-      const matchingParts = contractParts.filter(p => dbParts.includes(p)).length;
-      const matchRatio = matchingParts / Math.max(contractParts.length, dbParts.length);
-      
+      const matchingParts = contractParts.filter((p) =>
+        dbParts.includes(p)
+      ).length;
+      const matchRatio =
+        matchingParts / Math.max(contractParts.length, dbParts.length);
+
       return matchRatio >= 0.6;
     });
   }
-  
+
   if (matchedVariant) {
     return {
       ...med,
       medicationVariantId: matchedVariant.id, // ✅ Gán variant ID
-      variantName: matchedVariant.name,       // ✅ Dùng tên từ DB
+      variantName: matchedVariant.name, // ✅ Dùng tên từ DB
     };
   }
-  
+
   return med; // ⚠️ Không tìm thấy variant
 });
 ```
@@ -520,9 +532,10 @@ const parseResult = await parseContract.mutateAsync(fileId);
 if (parseResult.success && parseResult.data.medications.length > 0) {
   const newMeds = parseResult.data.medications.map((med) => {
     const matchedMed = allMedications.find(
-      (m) => m.name.toLowerCase().trim() === med.medicationName.toLowerCase().trim()
+      (m) =>
+        m.name.toLowerCase().trim() === med.medicationName.toLowerCase().trim()
     );
-    
+
     return {
       medicationId: matchedMed?.id || "",
       medicationName: med.medicationName,
@@ -535,13 +548,13 @@ if (parseResult.success && parseResult.data.medications.length > 0) {
       contractFilename: filename,
     };
   });
-  
+
   // ✅ Set medications vào form
   setMeds(newMeds);
-  
+
   // ✅ Show toast notification
   const medsWithoutId = newMeds.filter((m) => !m.medicationId);
-  
+
   if (medsWithoutId.length > 0) {
     toast.warning("Contract parsed with warnings", {
       description: `${medsWithoutId.length} medication(s) not found in database`,
@@ -559,16 +572,18 @@ if (parseResult.success && parseResult.data.medications.length > 0) {
 **Component:** `MedicationRow`
 
 ```jsx
-{meds.map((m, i) => (
-  <MedicationRow
-    key={i}
-    index={i}
-    rowData={m} // ← Dữ liệu từ contract
-    allMedications={allMedications}
-    onChange={handleMedRowChange}
-    onRemove={handleRemoveMed}
-  />
-))}
+{
+  meds.map((m, i) => (
+    <MedicationRow
+      key={i}
+      index={i}
+      rowData={m} // ← Dữ liệu từ contract
+      allMedications={allMedications}
+      onChange={handleMedRowChange}
+      onRemove={handleRemoveMed}
+    />
+  ));
+}
 ```
 
 **Dữ liệu trong MedicationRow:**
@@ -674,12 +689,9 @@ User thấy form với medications đã được auto-fill:
 
 ```jsx
 <MedicationRow>
-  Medication: [Paracetamol] ← Pre-selected
-  Variant: [Paracetamol 500mg Tablet] ← Pre-selected
-  SKU: VP-PAR500 ← Pre-filled
-  Lead Time: 5 ← Pre-filled
-  Price: 40000 ← Pre-filled
-  Contract: [contract.pdf] ← Attached
+  Medication: [Paracetamol] ← Pre-selected Variant: [Paracetamol 500mg Tablet] ←
+  Pre-selected SKU: VP-PAR500 ← Pre-filled Lead Time: 5 ← Pre-filled Price:
+  40000 ← Pre-filled Contract: [contract.pdf] ← Attached
 </MedicationRow>
 ```
 
