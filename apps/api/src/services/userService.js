@@ -9,11 +9,14 @@ import { users } from "../db/schema/index.js";
  * @param {string} options.search - Search term for name, email, or phone
  * @param {string} options.role - Filter by role
  * @param {string} options.status - Filter by status
- * @returns {Promise<Array>} List of users
+ * @param {number} options.limit - Results per page (default: 10)
+ * @param {number} options.offset - Pagination offset (default: 0)
+ * @returns {Promise<Object>} Object with data array and total count
  */
-export const getAllUsers = async ({ search, role, status } = {}) => {
+export const getAllUsers = async ({ search, role, status, limit = 10, offset = 0 } = {}) => {
   try {
     let query = db.select().from(users);
+    let countQuery = db.select().from(users);
 
     const conditions = [];
 
@@ -36,13 +39,16 @@ export const getAllUsers = async ({ search, role, status } = {}) => {
     }
 
     if (conditions.length > 0) {
-      query = query.where(
-        conditions.length === 1 ? conditions[0] : and(...conditions)
-      );
+      const condition = conditions.length === 1 ? conditions[0] : and(...conditions);
+      query = query.where(condition);
+      countQuery = countQuery.where(condition);
     }
 
-    const result = await query;
-    return result;
+    const data = await query.limit(limit).offset(offset);
+    const countResult = await countQuery;
+    const total = countResult.length;
+
+    return { data, total };
   } catch (error) {
     throw new Error(`Failed to fetch users: ${error.message}`);
   }
@@ -174,11 +180,14 @@ export const getUserByPhone = async (phone) => {
  * @param {string} options.search - Search term for name, email, or phone
  * @param {string} options.role - Filter by role
  * @param {string} options.status - Filter by status
- * @returns {Promise<Array>} List of staff users
+ * @param {number} options.limit - Results per page (default: 10)
+ * @param {number} options.offset - Pagination offset (default: 0)
+ * @returns {Promise<Object>} Object with data array and total count
  */
-export const getAllStaff = async ({ search, role, status } = {}) => {
+export const getAllStaff = async ({ search, role, status, limit = 10, offset = 0 } = {}) => {
   try {
     let query = db.select().from(users);
+    let countQuery = db.select().from(users);
 
     const conditions = [];
 
@@ -201,13 +210,16 @@ export const getAllStaff = async ({ search, role, status } = {}) => {
     }
 
     if (conditions.length > 0) {
-      query = query.where(
-        conditions.length === 1 ? conditions[0] : and(...conditions)
-      );
+      const condition = conditions.length === 1 ? conditions[0] : and(...conditions);
+      query = query.where(condition);
+      countQuery = countQuery.where(condition);
     }
 
-    const result = await query;
-    return result;
+    const data = await query.limit(limit).offset(offset);
+    const countResult = await countQuery;
+    const total = countResult.length;
+
+    return { data, total };
   } catch (error) {
     throw new Error(`Failed to fetch staff: ${error.message}`);
   }

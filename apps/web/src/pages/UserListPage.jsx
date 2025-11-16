@@ -13,6 +13,7 @@ import {
 } from "@/components/user-management/LoadingAndErrorStates";
 import { UserFilters } from "@/components/user-management/UserFilters";
 import { UserTable } from "@/components/user-management/UserTable";
+import { UserPagination } from "@/components/user-management/UserPagination";
 import {
   useActivateUser,
   useDeactivateUser,
@@ -32,18 +33,22 @@ export default function UserListPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [roleFilter, setRoleFilter] = useState("all");
 
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
   // Dialog state
   const [selectedUser, setSelectedUser] = useState(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
 
   // Build API filters - memoized to prevent unnecessary re-renders
   const apiFilters = useMemo(() => {
-    const filters = {};
+    const filters = { page, limit };
     if (appliedSearch) filters.search = appliedSearch;
     if (statusFilter !== "all") filters.status = statusFilter;
     if (roleFilter !== "all") filters.role = roleFilter;
     return filters;
-  }, [appliedSearch, statusFilter, roleFilter]);
+  }, [appliedSearch, statusFilter, roleFilter, page, limit]);
 
   // Fetch users with filters
   const { data: apiResponse, isLoading, error } = useUsers(apiFilters);
@@ -52,12 +57,16 @@ export default function UserListPage() {
   const deactivateMutation = useDeactivateUser();
   const suspendMutation = useSuspendUser();
 
-  // Extract users array from API response
+  // Extract users array and pagination info from API response
   const users = Array.isArray(apiResponse)
     ? apiResponse
     : Array.isArray(apiResponse?.data)
       ? apiResponse.data
       : [];
+
+  const total = apiResponse?.total || 0;
+  const totalPages = apiResponse?.totalPages || 0;
+  const currentPage = apiResponse?.page || 1;
 
   // Handler functions - memoized to prevent unnecessary re-renders
   const handleSearchSubmit = useCallback(
@@ -73,6 +82,16 @@ export default function UserListPage() {
     setAppliedSearch("");
     setStatusFilter("all");
     setRoleFilter("all");
+    setPage(1);
+  }, []);
+
+  const handlePageChange = useCallback((newPage) => {
+    setPage(newPage);
+  }, []);
+
+  const handleLimitChange = useCallback((newLimit) => {
+    setLimit(newLimit);
+    setPage(1); // Reset to first page when limit changes
   }, []);
 
   const handleEditClick = useCallback((user) => {
@@ -210,6 +229,15 @@ export default function UserListPage() {
               users={users}
               onEdit={handleEditClick}
               onStatusChange={handleStatusChange}
+            />
+
+            <UserPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              total={total}
+              limit={limit}
+              onPageChange={handlePageChange}
+              onLimitChange={handleLimitChange}
             />
           </CardContent>
         </Card>

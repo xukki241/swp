@@ -7,13 +7,25 @@ import logger from "../utils/logger.js";
  */
 export const getAllUsers = async (req, res, next) => {
   try {
-    const { search, role, status } = req.query;
-    const users = await userService.getAllUsers({ search, role, status });
+    const { search, role, status, page = 1, limit = 10 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const { data, total } = await userService.getAllUsers({
+      search,
+      role,
+      status,
+      limit: parseInt(limit),
+      offset
+    });
 
     res.status(200).json({
       success: true,
-      count: users.length,
-      data: users,
+      count: data.length,
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages: Math.ceil(total / parseInt(limit)),
+      data,
     });
   } catch (error) {
     logger.error("Error in getAllUsers controller:", error);
@@ -245,13 +257,25 @@ export const deleteUser = async (req, res, next) => {
  */
 export const getAllStaff = async (req, res, next) => {
   try {
-    const { search, role, status } = req.query;
-    const staff = await userService.getAllStaff({ search, role, status });
+    const { search, role, status, page = 1, limit = 10 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const { data, total } = await userService.getAllStaff({
+      search,
+      role,
+      status,
+      limit: parseInt(limit),
+      offset
+    });
 
     res.status(200).json({
       success: true,
-      count: staff.length,
-      data: staff,
+      count: data.length,
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages: Math.ceil(total / parseInt(limit)),
+      data,
     });
   } catch (error) {
     logger.error("Error in getAllStaff controller:", error);
