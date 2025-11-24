@@ -334,7 +334,7 @@ export function MedicationRow({
             <Input
               placeholder="e.g., 50,000"
               type="number"
-              step="1000"
+              step="any"
               min="0"
               value={rowData.purchasePrice || ""}
               onChange={(e) =>

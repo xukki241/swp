@@ -65,13 +65,6 @@ export const supplierService = {
               `Medication #${vIndex + 1}: Purchase price is required.`
             );
           }
-          if (
-            variant.contract_id === undefined ||
-            variant.contract_id === null ||
-            variant.contract_id === ""
-          ) {
-            validationErrors.push(` Contract file is required.`);
-          }
         }
       }
 

@@ -1,6 +1,5 @@
 import AIAnalyticsDialog from "@/components/AIAnalyticsDialog";
 import {
-  ActivityItem,
   QuickActionCard,
   StatCard,
   WelcomeBanner,
@@ -26,8 +25,8 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-  Clock,
   DollarSign,
+  Import,
   Package,
   ShoppingCart,
   TrendingUp,
@@ -45,9 +44,12 @@ export default function DashboardPage() {
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
 
   // Get current month report with month/year selector
-  // Default to October 2025 (month with seeded data)
-  const [selectedYear, setSelectedYear] = useState(2025);
-  const [selectedMonth, setSelectedMonth] = useState(10); // October has data
+  // Default to current month/year
+  const currentDate = new Date();
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(
+    currentDate.getMonth() + 1
+  );
 
   const {
     data: monthlyReport,
@@ -80,9 +82,34 @@ export default function DashboardPage() {
     { value: 12, label: "Tháng 12" },
   ];
 
-  const years = [2023, 2024, 2025, 2026];
+  // Generate years from 3 years ago to current year
+  const years = Array.from(
+    { length: 4 },
+    (_, i) => currentDate.getFullYear() - 3 + i
+  );
+
+  // Calculate min/max date limits (3 years ago from current month to now)
+  const minDate = new Date(
+    currentDate.getFullYear() - 3,
+    currentDate.getMonth(),
+    1
+  );
+  const maxDate = currentDate;
+
+  // Check if we can navigate
+  const canGoPrevious = () => {
+    const current = new Date(selectedYear, selectedMonth - 1, 1);
+    return current > minDate;
+  };
+
+  const canGoNext = () => {
+    const current = new Date(selectedYear, selectedMonth - 1, 1);
+    const max = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+    return current < max;
+  };
 
   const goToPreviousMonth = () => {
+    if (!canGoPrevious()) return;
     if (selectedMonth === 1) {
       setSelectedMonth(12);
       setSelectedYear(selectedYear - 1);
@@ -92,6 +119,7 @@ export default function DashboardPage() {
   };
 
   const goToNextMonth = () => {
+    if (!canGoNext()) return;
     if (selectedMonth === 12) {
       setSelectedMonth(1);
       setSelectedYear(selectedYear + 1);
@@ -222,20 +250,12 @@ export default function DashboardPage() {
   // Quick action items with navigation
   const quickActions = [
     {
-      title: "Bán hàng",
-      description: "Tạo đơn hàng mới",
-      icon: ShoppingCart,
-      color: "bg-blue-100",
-      iconColor: "text-blue-600",
-      path: "/sales",
-    },
-    {
-      title: "Kho hàng",
-      description: "Kiểm tra tồn kho",
-      icon: Package,
-      color: "bg-green-100",
-      iconColor: "text-green-600",
-      path: "/inventory/stock",
+      title: "Người dùng",
+      description: "Quản lý khách hàng",
+      icon: Users,
+      color: "bg-yellow-100",
+      iconColor: "text-yellow-600",
+      path: "/users/list",
     },
     {
       title: "Thuốc",
@@ -246,48 +266,36 @@ export default function DashboardPage() {
       path: "/medications",
     },
     {
+      title: "Nhập hàng",
+      description: "Tạo phiếu nhập mới",
+      icon: Import,
+      color: "bg-red-100",
+      iconColor: "text-red-600",
+      path: "/procurement/purchase-orders",
+    },
+    {
+      title: "Kho hàng",
+      description: "Kiểm tra tồn kho",
+      icon: Package,
+      color: "bg-green-100",
+      iconColor: "text-green-600",
+      path: "/inventory/stock",
+    },
+    {
+      title: "Bán hàng",
+      description: "Tạo đơn hàng mới",
+      icon: ShoppingCart,
+      color: "bg-blue-100",
+      iconColor: "text-blue-600",
+      path: "/sales",
+    },
+    {
       title: "Báo cáo",
       description: "Xem báo cáo & phân tích",
       icon: BarChart3,
       color: "bg-gradient-to-br from-orange-100 to-pink-100",
       iconColor: "text-orange-600",
       onClick: () => setIsAIDialogOpen(true), // Open AI dialog instead of navigation
-    },
-  ];
-
-  // Mock recent activities - Replace with actual API data
-  const recentActivities = [
-    {
-      id: 1,
-      type: "sale",
-      description: "Đơn bán hàng mới hoàn thành",
-      time: "5 phút trước",
-      icon: ShoppingCart,
-      color: "text-green-600",
-    },
-    {
-      id: 2,
-      type: "inventory",
-      description: "Cập nhật tồn kho Paracetamol",
-      time: "15 phút trước",
-      icon: Package,
-      color: "text-blue-600",
-    },
-    {
-      id: 3,
-      type: "alert",
-      description: "Cảnh báo tồn kho thấp: Amoxicillin",
-      time: "1 giờ trước",
-      icon: AlertTriangle,
-      color: "text-orange-600",
-    },
-    {
-      id: 4,
-      type: "user",
-      description: "Đăng ký người dùng mới đang chờ",
-      time: "2 giờ trước",
-      icon: Users,
-      color: "text-purple-600",
     },
   ];
 
@@ -301,13 +309,38 @@ export default function DashboardPage() {
 
   return (
     <AppLayout title="Tổng quan">
-      <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="space-y-4 animate-in fade-in duration-500">
         {/* Welcome Section */}
         <WelcomeBanner userName={userName} greeting={getGreeting()} />
 
+        {/* Quick Actions - 2 columns */}
+        <Card className="lg:col-span-3 rounded-xl border-0 shadow-md">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <Activity className="h-4 w-4 text-primary" />
+              Thao tác nhanh
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid gap-3 md:grid-cols-3">
+              {quickActions.map((action, index) => (
+                <QuickActionCard
+                  key={action.path || index}
+                  action={action}
+                  onClick={
+                    action.onClick
+                      ? action.onClick
+                      : () => navigate(action.path)
+                  }
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Month/Year Selector */}
         <Card className="border-0 shadow-md">
-          <CardContent className="p-4">
+          <CardContent className="py-0">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-primary" />
@@ -320,6 +353,7 @@ export default function DashboardPage() {
                   variant="outline"
                   size="icon"
                   onClick={goToPreviousMonth}
+                  disabled={!canGoPrevious()}
                   className="h-8 w-8"
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -332,19 +366,36 @@ export default function DashboardPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {months.map((month) => (
-                      <SelectItem
-                        key={month.value}
-                        value={month.value.toString()}
-                      >
-                        {month.label}
-                      </SelectItem>
-                    ))}
+                    {months.map((month) => {
+                      // Disable future months
+                      const isDisabled =
+                        selectedYear === currentDate.getFullYear() &&
+                        month.value > currentDate.getMonth() + 1;
+                      return (
+                        <SelectItem
+                          key={month.value}
+                          value={month.value.toString()}
+                          disabled={isDisabled}
+                        >
+                          {month.label}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
                 <Select
                   value={selectedYear.toString()}
-                  onValueChange={(value) => setSelectedYear(parseInt(value))}
+                  onValueChange={(value) => {
+                    const newYear = parseInt(value);
+                    setSelectedYear(newYear);
+                    // If selecting current year and selected month is in the future, reset to current month
+                    if (
+                      newYear === currentDate.getFullYear() &&
+                      selectedMonth > currentDate.getMonth() + 1
+                    ) {
+                      setSelectedMonth(currentDate.getMonth() + 1);
+                    }
+                  }}
                 >
                   <SelectTrigger className="w-[100px]">
                     <SelectValue />
@@ -361,6 +412,7 @@ export default function DashboardPage() {
                   variant="outline"
                   size="icon"
                   onClick={goToNextMonth}
+                  disabled={!canGoNext()}
                   className="h-8 w-8"
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -381,12 +433,14 @@ export default function DashboardPage() {
         {/* Error Display */}
         {reportError && (
           <Card className="border-red-200 bg-red-50">
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-center gap-2 text-red-700">
-                <AlertTriangle className="h-5 w-5" />
+                <AlertTriangle className="h-4 w-4" />
                 <div>
-                  <p className="font-semibold">Lỗi tải dữ liệu Dashboard</p>
-                  <p className="text-sm">
+                  <p className="font-semibold text-sm">
+                    Lỗi tải dữ liệu Dashboard
+                  </p>
+                  <p className="text-xs">
                     {reportError.message || "Không thể tải báo cáo tháng"}
                   </p>
                 </div>
@@ -396,31 +450,31 @@ export default function DashboardPage() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <StatCard key={stat.title} stat={stat} />
           ))}
         </div>
 
         {/* Main Content Grid - 7:3 Layout */}
-        <div className="grid gap-6 lg:grid-cols-10">
+        <div className="grid gap-4 lg:grid-cols-10">
           {/* Top Selling Medications - 7 columns */}
-          <Card className="lg:col-span-7 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader>
+          <Card className="lg:col-span-7 rounded-xl border-0 shadow-md">
+            <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
-                  <Package className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <Package className="h-4 w-4 text-primary" />
                   Thuốc bán chạy nhất
                 </CardTitle>
                 <Badge
                   variant="secondary"
-                  className="bg-primary/10 text-primary"
+                  className="bg-primary/10 text-primary text-xs"
                 >
                   Tháng {selectedMonth}/{selectedYear}
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               {isLoadingReport ? (
                 <div className="space-y-4">
                   {[1, 2, 3, 4, 5].map((i) => (
@@ -431,37 +485,37 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : topMedications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <Package className="h-12 w-12 text-muted-foreground/50" />
-                  <p className="mt-4 text-muted-foreground">
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Package className="h-10 w-10 text-muted-foreground/50" />
+                  <p className="mt-3 text-sm text-muted-foreground">
                     Chưa có dữ liệu bán hàng
                   </p>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {topMedications.map((med, index) => (
                     <div
                       key={med.medicationId}
-                      className="group flex items-center justify-between rounded-xl border border-border p-4 transition-all hover:border-primary/50 hover:bg-primary/5 hover:scale-[1.02]"
+                      className="group flex items-center justify-between rounded-lg border border-border p-3 transition-all hover:border-primary/50 hover:bg-primary/5 hover:scale-[1.01]"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 font-bold text-white shadow-md">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 font-bold text-white text-sm shadow-md">
                           #{index + 1}
                         </div>
                         <div>
-                          <p className="font-semibold text-foreground">
+                          <p className="font-semibold text-sm text-foreground">
                             {med.medicationName}
                           </p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-xs text-muted-foreground">
                             {med.variantName}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-primary">
+                        <p className="font-bold text-sm text-primary">
                           {formatCurrency(med.totalRevenue)}
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-xs text-muted-foreground">
                           {Number(med.totalQuantity).toLocaleString()} đơn vị
                         </p>
                       </div>
@@ -473,61 +527,61 @@ export default function DashboardPage() {
           </Card>
 
           {/* Purchase Order Receipts - 3 columns */}
-          <Card className="lg:col-span-3 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader>
+          <Card className="lg:col-span-3 rounded-xl border-0 shadow-md">
+            <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
-                  <Package className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <Package className="h-4 w-4 text-primary" />
                   Phiếu nhập gần đây
                 </CardTitle>
                 <Badge
                   variant="secondary"
-                  className="bg-primary/10 text-primary"
+                  className="bg-primary/10 text-primary text-xs"
                 >
                   5 mới nhất
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               {isLoadingReceipts ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <div
                       key={i}
-                      className="h-16 animate-pulse rounded-xl bg-gray-200"
+                      className="h-14 animate-pulse rounded-lg bg-gray-200"
                     />
                   ))}
                 </div>
               ) : purchaseOrderReceipts.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <Package className="h-12 w-12 text-muted-foreground/50" />
-                  <p className="mt-4 text-muted-foreground">
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Package className="h-10 w-10 text-muted-foreground/50" />
+                  <p className="mt-3 text-sm text-muted-foreground">
                     Chưa có phiếu nhập
                   </p>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {purchaseOrderReceipts.map((receipt) => (
                     <div
                       key={receipt.id}
-                      className="group flex flex-col gap-2 rounded-xl border border-border p-3 transition-all hover:border-primary/50 hover:bg-primary/5"
+                      className="group flex flex-col gap-1.5 rounded-lg border border-border p-2.5 transition-all hover:border-primary/50 hover:bg-primary/5"
                     >
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-md">
-                          <Package className="h-4 w-4" />
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-md">
+                          <Package className="h-3.5 w-3.5" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm text-foreground truncate">
+                          <p className="font-semibold text-xs text-foreground truncate">
                             #{receipt.id.slice(0, 8)}
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-[10px] text-muted-foreground">
                             {new Date(
                               receipt.receivedDate
                             ).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
-                      <div className="text-xs">
+                      <div className="text-[10px] pl-9">
                         <p className="font-medium text-primary truncate">
                           {receipt.supplierName || "Unknown"}
                         </p>
@@ -539,51 +593,6 @@ export default function DashboardPage() {
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Actions & Recent Activities Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Quick Actions - 2 columns */}
-          <Card className="lg:col-span-2 rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
-                <Activity className="h-5 w-5 text-primary" />
-                Thao tác nhanh
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2">
-                {quickActions.map((action, index) => (
-                  <QuickActionCard
-                    key={action.path || index}
-                    action={action}
-                    onClick={
-                      action.onClick
-                        ? action.onClick
-                        : () => navigate(action.path)
-                    }
-                  />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Activities - 1 column */}
-          <Card className="rounded-2xl border-0 shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
-                <Clock className="h-5 w-5 text-primary" />
-                Hoạt động gần đây
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentActivities.map((activity) => (
-                  <ActivityItem key={activity.id} activity={activity} />
-                ))}
-              </div>
             </CardContent>
           </Card>
         </div>

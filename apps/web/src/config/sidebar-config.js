@@ -89,7 +89,7 @@ export const sidebarConfig = [
     ],
   },
   {
-    title: "Nhật ký kiểm toán",
+    title: "Nhật ký hệ thống",
     icon: FileText,
     path: "/audit-logs",
     roles: ["owner"],

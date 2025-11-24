@@ -274,7 +274,7 @@ function parseMedicationVariants(text) {
 
   if (medicationRows.length > 0) {
     logger.info(
-      `✅ Found ${medicationRows.length} medications via direct pattern match`
+      ` Found ${medicationRows.length} medications via direct pattern match`
     );
     return medicationRows.map((row) => ({
       medicationName: row.medicationName,
