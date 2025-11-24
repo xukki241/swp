@@ -259,7 +259,7 @@ export const inventoryService = {
     const countResult = await db
       .select({
         count: sql`COUNT(DISTINCT ${inventory.medicationVariantId})`.as(
-          "count"
+          "count",
         ),
       })
       .from(inventory);
@@ -280,7 +280,7 @@ export const inventoryService = {
    */
   async getExpiring(filters = {}) {
     const {
-      daysUntilExpiry = 30,
+      daysUntilExpiry = 90,
       sortBy = "expiryDate",
       sortOrder = "asc",
       limit = 100,

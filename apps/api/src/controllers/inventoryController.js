@@ -7,34 +7,12 @@ export const inventoryController = {
    * GET /api/inventory - List all inventory items with pagination
    */
   getAll: asyncHandler(async (req, res) => {
-    const page = req.query.page ? Number.parseInt(req.query.page) : 1;
-    const limit = req.query.limit ? Number.parseInt(req.query.limit) : 100;
-    const offset = (page - 1) * limit;
 
-    const filters = {
-      medicationVariantId: req.query.medication_variant_id,
-      binId: req.query.bin_id,
-      batchNumber: req.query.batchNumber,
-      expiryDateFrom: req.query.expiryDateFrom,
-      expiryDateTo: req.query.expiryDateTo,
-      sortBy: req.query.sortBy,
-      sortOrder: req.query.sortOrder,
-      limit,
-      offset,
-    };
-
-    const result = await inventoryService.getAll(filters);
+    const result = await inventoryService.getAll();
 
     res.json({
       success: true,
       data: result.data || [],
-      pagination: {
-        page,
-        limit,
-        total: result.total,
-        totalPages: Math.ceil(result.total / limit),
-        hasMore: offset + (result.data ? result.data.length : 0) < result.total,
-      },
     });
   }),
 
@@ -96,7 +74,7 @@ export const inventoryController = {
     const offset = (page - 1) * limit;
     const daysUntilExpiry = req.query.daysUntilExpiry
       ? Number.parseInt(req.query.daysUntilExpiry)
-      : 30;
+      : 90;
 
     const filters = {
       daysUntilExpiry,
@@ -123,7 +101,7 @@ export const inventoryController = {
 
   /**
    * GET /api/inventory/low-stock - Get low stock items
-   * Default threshold: 250 units
+   * Default threshold: 50 units
    */
   getLowStock: asyncHandler(async (req, res) => {
     const page = req.query.page ? Number.parseInt(req.query.page) : 1;
@@ -133,7 +111,7 @@ export const inventoryController = {
       : (page - 1) * limit;
     const threshold = req.query.threshold
       ? Number.parseFloat(req.query.threshold)
-      : 250;
+      : 50;
 
     const filters = {
       threshold,
